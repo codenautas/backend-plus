@@ -1,0 +1,8 @@
+server:
+  port: 8884
+db:
+  host: localhost
+  database: tutifruti_db
+  port: 5435
+  user: tuti_node
+  password: ponerlo_en_el_config_local
