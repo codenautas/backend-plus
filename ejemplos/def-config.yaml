@@ -1,0 +1,8 @@
+server:
+  port: 3030
+db:
+  motor: postgresql
+  host: localhost
+  database: beplus_example_db
+  user: beplus_example_user
+  password: beplus_example_3948812bdz

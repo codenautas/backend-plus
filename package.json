@@ -1,11 +1,14 @@
 {
   "name": "backend-plus",
   "description": "Backend for tedede",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
   "main": "lib/backend-plus.js",
+  "files": [
+    "lib"
+  ],
   "contributors": [
     { "name": "Estefanía Capece", "email": "eycapece@gmail.com" },
     { "name": "Emilio Platzer", "email": "emilioplatzer@gmail.com" }
@@ -28,8 +31,9 @@
     "extension-serve-static": "0.1.6",
     "js-to-html": "0.7.0",
     "login-plus": "0.1.0",
-    "mini-tools": "0.1.4",
-    "pg-promise-strict": "0.2.3"
+    "mini-tools": "0.2.0",
+    "pg-promise-strict": "0.2.3",
+    "promsie-plus": ""
   },
   "devDependencies": {
   },
@@ -37,7 +41,7 @@
     "node": ">= 4.2.0"
   },
   "scripts": {
-    "start": "node examples/server.js"
+    "start": "node ejemplos/encuesta-trac.js"
   },
   "jshintConfig": {
     "asi": false,
