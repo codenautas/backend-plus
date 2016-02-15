@@ -1,13 +1,20 @@
 "use strict";
 
+const util = require('util');
+
 var backendPlus = require("..");
-var backend = new backendPlus.AppBackend();
 
-backend.init([
-    'ejemplos/def-config.yaml',
-    'ejemplos/local-config.yaml'
-]);
+function AppTrac(){
+    AppTrac.super_.call(this);
+}
 
-backend.app.get('/index', function(req,res){
-    res.end('here we are');
-});
+util.inherits(AppTrac, backendPlus.AppBackend);
+
+AppTrac.prototype.configList=function configList(){
+    return AppTrac.super_.prototype.configList.call(this).concat([
+        'ejemplos/def-config.yaml',
+        'ejemplos/local-config.yaml'
+    ]);
+};
+
+new AppTrac().start();
