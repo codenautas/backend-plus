@@ -17,4 +17,6 @@ AppTrac.prototype.configList=function configList(){
     ]);
 };
 
+AppTrac.prototype.rootPath = __dirname +'/';
+
 new AppTrac().start();
