@@ -4,5 +4,11 @@ db:
   motor: postgresql
   host: localhost
   database: beplus_example_db
+  schema: bep
   user: beplus_example_user
   password: beplus_example_3948812bdz
+login:
+  table: users
+  userFieldName: username
+  passFieldName: md5pass
+  infoFieldList: [username, rol]
