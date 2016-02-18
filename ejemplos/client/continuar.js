@@ -9,21 +9,25 @@ window.addEventListener("load",function(){
         data:{}
     }).then(function(result){
         var test=JSON.parse(result);
-        var titulo;
+        var titulo=[];
         var preguntasYrespuestas;
         var cuestionario=[];
         var preguntas=[];
         test=test.estructura.forEach(function(fila){
             if(fila.tipo=='TITULO'){
-                titulo=html.h1(JSON.stringify(fila.texto));
+                titulo.push(html.div({"class":"titulo"},JSON.stringify(fila.texto)))
+//                titulo=html.h1({id:"titulo"},JSON.stringify(fila.texto));
             }
             if(fila.tipo=='PREGUNTA'){
                 preguntas.push(html.tr({id:fila.id},JSON.stringify(fila.texto)));
-                preguntas.push(html.ol({class:"respuestas"}));
                 var opciones=fila.opciones;
                 var respuestas=[];
                 opciones.forEach(function(opcion){
-                    preguntas.push(html.li({class:"opciones"},JSON.stringify(opcion.texto)));  
+                    preguntas.push(html.td([         
+                        html.label({"for":"opciones"},JSON.stringify(opcion.texto)),
+                        html.input({"class":"opc-resp",type:"checkbox"})
+                    ]));
+                    preguntas.push(html.br());
                 });
                 preguntas.push(html.br());
             }
@@ -31,10 +35,10 @@ window.addEventListener("load",function(){
         });
 
         pantalla.appendChild(html.div([
-            html.pre(result),
+            html.tr(titulo),
+            html.div({"class":"bloque"},preguntas),
             html.hr(),
-            html.tr([titulo]),
-            html.div(preguntas),
+            html.pre(JSON.stringify(result)),
             html.pre(JSON.stringify(JSON.parse(result),null,'  ')),
         ]).create());
         
