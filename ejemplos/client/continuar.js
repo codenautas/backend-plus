@@ -15,11 +15,11 @@ window.addEventListener("load",function(){
         var preguntas=[];
         test=test.estructura.forEach(function(fila){
             if(fila.tipo=='TITULO'){
-                titulo.push(html.div({"class":"titulo"},JSON.stringify(fila.texto)))
+                titulo.push(html.div({id:"titulo"},JSON.stringify(fila.texto)))
 //                titulo=html.h1({id:"titulo"},JSON.stringify(fila.texto));
             }
             if(fila.tipo=='PREGUNTA'){
-                preguntas.push(html.tr({id:fila.id},JSON.stringify(fila.texto)));
+                preguntas.push(html.tr({"class":"preguntas",id:fila.id},JSON.stringify(fila.texto)));
                 var opciones=fila.opciones;
                 var respuestas=[];
                 opciones.forEach(function(opcion){
