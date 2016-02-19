@@ -22,7 +22,7 @@
     "fs-extra": "~0.26.5", 
     "fs-promise": "~0.4.1", 
     "jade": "~1.11.0",
-    "lodash": "~4.3.0",
+    "lodash": "~4.5.0",
     "numeral": "~1.5.3",
     "read-yaml-promise": "~1.0.2",
     "stylus": "~0.53.0",
@@ -35,7 +35,8 @@
     "login-plus": "0.3.0",
     "mini-tools": "0.2.3",
     "pg-promise-strict": "0.2.3",
-    "promise-plus": ""
+    "promise-plus": "0.0.6",
+    "tedede": "0.0.3"
   },
   "devDependencies": {
   },
