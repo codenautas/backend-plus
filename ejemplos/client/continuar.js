@@ -20,9 +20,9 @@ window.addEventListener("load",function(){
             }
             if(fila.tipo=='PREGUNTA'){
                 preguntas.push(html.tr({"class":"preguntas",id:fila.id},JSON.stringify(fila.texto)));
-                var opciones=fila.opciones;
                 var respuestas=[];
-                opciones.forEach(function(opcion){
+                preguntas.push(html.br());
+                fila.opciones.forEach(function(opcion){
                     preguntas.push(html.td([         
                         html.label({"for":"opciones"},JSON.stringify(opcion.texto)),
                         html.input({"class":"opc-resp",type:"checkbox"})
