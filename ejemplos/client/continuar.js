@@ -12,6 +12,7 @@ function presentarFormulario(estructura){
         if(fila.tipo=='PREGUNTA'){
             preguntas.push(html.tr({"class":"preguntas",id:fila.id},fila.texto));
             var respuestas=[];
+            /*
             preguntas.push(html.br());
             fila.opciones.forEach(function(opcion){
                 preguntas.push(html.td([         
@@ -21,6 +22,12 @@ function presentarFormulario(estructura){
                 preguntas.push(html.br());
             });
             preguntas.push(html.br());
+            */
+            var opciones={};
+            fila.opciones.forEach(function(opcion){
+                opciones[opcion.opcion]={label:opcion.texto};
+            }));
+            preguntas.push(Tedede.optionsCtrl(null,opciones));
         }
         console.log(preguntas);
     });
