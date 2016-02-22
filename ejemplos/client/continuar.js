@@ -26,7 +26,8 @@ function presentarFormulario(estructura){
             var opciones={};
             fila.opciones.forEach(function(opcion){
                 opciones[opcion.opcion]={label:opcion.texto};
-            }));
+            });
+            console.log("Tedede = ",Tedede);
             preguntas.push(Tedede.optionsCtrl(null,opciones));
         }
         console.log(preguntas);
