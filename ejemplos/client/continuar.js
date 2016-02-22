@@ -27,15 +27,30 @@ function presentarFormulario(estructura){
             fila.opciones.forEach(function(opcion){
                 opciones[opcion.opcion]={label:opcion.texto};
             });
-            console.log("Tedede = ",Tedede);
-            preguntas.push(Tedede.optionsCtrl(null,opciones));
+            preguntas.push(Tedede.optionsCtrl(fila.variable,opciones));
         }
-        console.log(preguntas);
     });
     pantalla.appendChild(html.div([
         html.tr(titulo),
         html.div({"class":"bloque"},preguntas),
     ]).create());
+    estructura.forEach(function(fila){
+        var variable=document.getElementById(fila.variable);
+        var typeInfo={};
+        typeInfo.typeName="enum";
+        typeInfo.options={};
+        if(fila.tipo=='PREGUNTA'){
+            fila.opciones.forEach(function(opcion){
+                typeInfo.options[opcion.opcion]={label:opcion.texto};
+            });
+        }
+       // console.log("typeinfo",variable); 
+        Tedede.adaptElement(variable,typeInfo)
+        
+        
+    })
+    
+    
 }
 
 function ponerDatos(datos){
