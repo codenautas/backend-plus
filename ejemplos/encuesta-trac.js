@@ -54,6 +54,12 @@ class AppTrac extends backendPlus.AppBackend{
             };
             res.end(JSON.stringify(provisorio));
         });
+        this.app.post('/guardar', function(req, res){
+            // console.log("req", req.body);
+            // res.end("OK");
+            var info=JSON.parse(req.body.info);
+            res.end("recibi: "+JSON.stringify(info));
+        });
     }
     get rootPath(){ return __dirname +'/'; }
 }
