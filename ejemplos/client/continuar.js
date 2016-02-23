@@ -35,17 +35,22 @@ function presentarFormulario(estructura){
         html.div({"class":"bloque"},preguntas),
     ]).create());
     estructura.forEach(function(fila){
-        var variable=document.getElementById(fila.variable);
+        var domElement;
         var typeInfo={};
         typeInfo.typeName="enum";
         typeInfo.options={};
         if(fila.tipo=='PREGUNTA'){
+            
+            domElement=document.getElementById(fila.id);
+            
             fila.opciones.forEach(function(opcion){
                 typeInfo.options[opcion.opcion]={label:opcion.texto};
+                
             });
+            Tedede.adaptElement(domElement,typeInfo);
+//            domElement.getTypedValue();
+            
         }
-       // console.log("typeinfo",variable); 
-        Tedede.adaptElement(variable,typeInfo)
         
         
     })
