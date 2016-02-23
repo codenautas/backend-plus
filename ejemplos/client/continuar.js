@@ -40,16 +40,12 @@ function presentarFormulario(estructura){
         typeInfo.typeName="enum";
         typeInfo.options={};
         if(fila.tipo=='PREGUNTA'){
-            
             domElement=document.getElementById(fila.id);
-            
             fila.opciones.forEach(function(opcion){
                 typeInfo.options[opcion.opcion]={label:opcion.texto};
-                
             });
             Tedede.adaptElement(domElement,typeInfo);
 //            domElement.getTypedValue();
-            
         }
         
         
