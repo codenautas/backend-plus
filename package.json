@@ -31,12 +31,12 @@
     "best-globals": "0.2.1",
     "best-promise": "0.2.4",
     "extension-serve-static": "0.1.6",
-    "js-to-html": "0.8.0",
+    "js-to-html": "0.8.1",
     "login-plus": "0.3.0",
     "mini-tools": "0.2.3",
     "pg-promise-strict": "0.2.3",
     "promise-plus": "0.0.6",
-    "tedede": "0.0.3"
+    "tedede": "0.0.5"
   },
   "devDependencies": {
   },
