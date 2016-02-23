@@ -2,61 +2,56 @@
 
 var html=jsToHtml.html;
 
-function presentarFormulario(result){
-    var estructura = result.estructura;
-    var titulo=[];
-    var preguntas=[];
+function presentarFormulario(estructura){
+    var celdas=[];
+    var divFormulario=html.div({"tedede-formulario":"trac"}).create();
+    var luego = Promise.resolve();
     estructura.forEach(function(fila){
         if(fila.tipo=='TITULO'){
-            titulo.push(html.div({id:"titulo"},JSON.stringify(fila.texto)))
+            celdas.push(html.div({id:"titulo"},JSON.stringify(fila.texto)))
         }
         if(fila.tipo=='PREGUNTA'){
-            preguntas.push(html.tr({"class":"preguntas",id:fila.id},fila.texto));
+            celdas.push(html.div({"class":"preguntas",id:fila.id},fila.texto));
             var opciones={};
+            var typeInfo={};
+            typeInfo.typeName="enum";
+            typeInfo.options={};
             fila.opciones.forEach(function(opcion){
                 opciones[opcion.opcion]={label:opcion.texto};
-            });
-            preguntas.push(Tedede.optionsCtrl(fila.variable,opciones));
-        }
-    });
-    pantalla.appendChild(html.div([
-        html.tr(titulo),
-        html.div({"class":"bloque"},preguntas),
-    ]).create());
-    estructura.forEach(function(fila){
-        var domElement;
-        var typeInfo={};
-        typeInfo.typeName="enum";
-        typeInfo.options={};
-        if(fila.tipo=='PREGUNTA'){
-            domElement=document.getElementById(fila.variable);
-            fila.opciones.forEach(function(opcion){
                 typeInfo.options[opcion.opcion]={label:opcion.texto};
             });
-            Tedede.adaptElement(domElement,typeInfo);
-            domElement.addEventListener('update',function(){
-                var value = this.getTypedValue();
-                AjaxBestPromise.post({
-                    url:'/guardar',
-                    data:{ info:JSON.stringify({
-                        id: result.id.enc,
-                        variable: fila.variable,
-                        valor:value 
-                    })}
-                }).then(function(resultJson){
-                    var result=resultJson;
-                    document.getElementById('status').innerHTML = result;
-                }).catch(function(err) {
-                    document.getElementById('status').innerHTML = "Error: " + err;
+            var controlOpciones = Tedede.optionsCtrl(fila.variable,opciones).create();
+            celdas.push(controlOpciones);
+            luego = luego.then(function(){
+                Tedede.adaptElement(controlOpciones,typeInfo);
+                controlOpciones.addEventListener('update',function(){
+                    var value = this.getTypedValue();
+                    AjaxBestPromise.post({
+                        url:'/guardar',
+                        data:{ info:JSON.stringify({
+                            id: divFormulario.idRegistro,
+                            variable: fila.variable,
+                            valor:value 
+                        })}
+                    }).then(function(resultJson){
+                        var result=resultJson;
+                        document.getElementById('status').textContent = result;
+                    }).catch(function(err) {
+                        document.getElementById('status').textContent = "Error: " + err;
+                    });
+                    // alert('el value '+value+' para la variable '+fila.variable);
                 });
-                // alert('el value '+value+' para la variable '+fila.variable);
             });
         }
-    })
+    });
+    divFormulario.appendChild(html.div({"class":"bloque"},celdas).create());
+    pantalla.appendChild(divFormulario);
+    return luego.then(function(){
+        return divFormulario;
+    });
 }
 
-function ponerDatos(datos){
-    
+function ponerDatos(estructura, datos){
 }
 
 window.addEventListener("load",function(){
@@ -67,7 +62,9 @@ window.addEventListener("load",function(){
         data:{}
     }).then(function(resultJson){
         var result=JSON.parse(resultJson);
-        presentarFormulario(result);
-        ponerDatos(result.datos);
+        presentarFormulario(result.estructura).then(function(divFormulario){
+            divFormulario.idRegistro = result.id;
+            ponerDatos(result.datos);
+        });
     });
 });
