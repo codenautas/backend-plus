@@ -11,18 +11,6 @@ function presentarFormulario(estructura){
         }
         if(fila.tipo=='PREGUNTA'){
             preguntas.push(html.tr({"class":"preguntas",id:fila.id},fila.texto));
-            var respuestas=[];
-            /*
-            preguntas.push(html.br());
-            fila.opciones.forEach(function(opcion){
-                preguntas.push(html.td([         
-                    html.label({"for":"opciones"},opcion.texto),
-                    html.input({"class":"opc-resp",type:"checkbox"})
-                ]));
-                preguntas.push(html.br());
-            });
-            preguntas.push(html.br());
-            */
             var opciones={};
             fila.opciones.forEach(function(opcion){
                 opciones[opcion.opcion]={label:opcion.texto};
@@ -40,18 +28,17 @@ function presentarFormulario(estructura){
         typeInfo.typeName="enum";
         typeInfo.options={};
         if(fila.tipo=='PREGUNTA'){
-            domElement=document.getElementById(fila.id);
+            domElement=document.getElementById(fila.variable);
             fila.opciones.forEach(function(opcion){
                 typeInfo.options[opcion.opcion]={label:opcion.texto};
             });
             Tedede.adaptElement(domElement,typeInfo);
-//            domElement.getTypedValue();
+            domElement.addEventListener('update',function(){
+                var value = this.getTypedValue();
+                alert('el value '+value+' para la variable '+fila.variable);
+            });
         }
-        
-        
     })
-    
-    
 }
 
 function ponerDatos(datos){

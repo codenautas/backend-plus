@@ -49,7 +49,8 @@ class AppTrac extends backendPlus.AppBackend{
                         {opcion:"e",  texto:"No aplica"}
                     ]}
                 ],
-                datos:{v1: "1", v2: null, v3: null, v4: null, v5: null}
+                datos:{v1: "a", v2: "b", v3: null, v4: null, v5: null},
+                estado:'con-datos',
             };
             res.end(JSON.stringify(provisorio));
         });
