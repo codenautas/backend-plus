@@ -49,7 +49,6 @@ provisorio.estructura.forEach(function(celda){
     }
 });
 
-
 class AppTrac extends backendPlus.AppBackend{
     configList(){
         return super.configList().concat([
@@ -109,12 +108,15 @@ class AppTrac extends backendPlus.AppBackend{
             yo.updateDatabase(req, parametros,
                               "UPDATE bep.datos SET contenido = $2, estado='ingresado' WHERE id = $1 RETURNING contenido",
                               [parametros.id, parametros.datos]);
-            res.end("OK");
+            res.end("Encuesta finalizada");
         });
         this.app.post('/blanquear', function(req, res){
             var parametros=JSON.parse(req.body.info);
             console.log('entra a /blanquear',parametros);
-            res.end("OK");
+            yo.updateDatabase(req, parametros,
+                              "UPDATE bep.datos SET contenido = $2, estado='ingresado' WHERE id = $1 RETURNING contenido",
+                              [parametros.id, registroVacio]);
+            res.end("Encuesta blanqueada");
         });
         this.app.get('/enc-status', function(req, res){
             var client;
@@ -130,7 +132,6 @@ class AppTrac extends backendPlus.AppBackend{
             }).catch(function(err) {
                 console.log("error: "+err);
             }).then(function(){
-                
                 client.done();
             }).catch(function(err) {
                 console.log("error al cerrar: "+err);
