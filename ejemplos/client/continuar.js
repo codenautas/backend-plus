@@ -2,23 +2,6 @@
 
 var html=jsToHtml.html;
 
-function status(msg) {
-    document.getElementById('status').textContent = msg;    
-}
-
-function postAction(url, data) {
-    return AjaxBestPromise.post({
-        url:url,
-        data:{ info:JSON.stringify(data)}
-    }).then(function(resultJson){
-        var result=resultJson;
-        status(result);
-        return result;
-    }).catch(function(err) {
-        status("Error: " + err);
-    });
-}
-
 function presentarFormulario(estructura){
     var celdas=[];
     var controles=[];

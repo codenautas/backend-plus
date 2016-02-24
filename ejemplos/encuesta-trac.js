@@ -43,6 +43,7 @@ var provisorio = {
 };
 
 var registroVacio={};
+
 provisorio.estructura.forEach(function(celda){
     if(celda.tipo=='PREGUNTA'){
         registroVacio[celda.variable]=null;
@@ -114,11 +115,19 @@ class AppTrac extends backendPlus.AppBackend{
             var parametros=JSON.parse(req.body.info);
             console.log('entra a /blanquear',parametros);
             yo.updateDatabase(req, parametros,
-                              "UPDATE bep.datos SET contenido = $2, estado='ingresado' WHERE id = $1 RETURNING contenido",
+                              "UPDATE bep.datos SET contenido = $2, estado='vacio' WHERE id = $1 RETURNING contenido",
                               [parametros.id, registroVacio]);
             res.end("Encuesta blanqueada");
         });
-        this.app.get('/enc-status', function(req, res){
+        this.app.post('/set-status', function(req, res){
+            var parametros=JSON.parse(req.body.info);
+            console.log('entra a /set-status',parametros);
+            yo.updateDatabase(req, parametros,
+                              "UPDATE bep.datos SET estado=$2 WHERE id = $1 RETURNING contenido",
+                              [parametros.id, parametros.estado]);
+            res.end("status = "+parametros.estado);
+        });
+        this.app.post('/enc-status', function(req, res){
             var client;
             var estado;
             return yo.getDbClient().then(function(cli) {
