@@ -4,9 +4,12 @@ const util = require('util');
 
 var Promises = require('best-promise');
 
+// var idEncuesta = Math.random();
+var idEncuesta = 1001;
+
 var backendPlus = require("..");
 var provisorio = {
-    id:{enc: Math.random(), "for": "TRAC"},
+    id:{enc: idEncuesta, "for": "TRAC"},
     estructura:[
         { tipo:'TITULO', texto:"EVALUACION DE SOPORTE INFORMATICO"},
         { tipo:'PREGUNTA', id: "1", variable: "v1", texto: "Tiempo transcurrido entre el pedido y la asistencia", opciones:[
@@ -89,10 +92,10 @@ class AppTrac extends backendPlus.AppBackend{
     }
     addLoggedServices(){
         super.addLoggedServices();
+        var yo = this;
         this.app.get('/info-enc-act', function(req, res){
             res.end(JSON.stringify(provisorio));
         });
-        var yo = this;
         this.app.post('/guardar', function(req, res){
             var parametros=JSON.parse(req.body.info);
             yo.updateDatabase(req, parametros,
@@ -100,13 +103,33 @@ class AppTrac extends backendPlus.AppBackend{
                               [parametros.id, {[parametros.variable]: parametros.valor}]);
             res.end("recibi: "+JSON.stringify(parametros));
         });
-      this.app.post('/finalizar', function(req, res){
+        this.app.post('/finalizar', function(req, res){
             var parametros=JSON.parse(req.body.info);
             console.log('entra a /finalizar',parametros);
             yo.updateDatabase(req, parametros,
                               "UPDATE bep.datos SET contenido = $2, estado='ingresado' WHERE id = $1 RETURNING contenido",
                               [parametros.id, parametros.datos]);
             res.end("OK");
+        });
+        this.app.get('/enc-status', function(req, res){
+            var client;
+            var estado;
+            return yo.getDbClient().then(function(cli) {
+                client=cli;
+                return client.query("SELECT estado FROM bep.datos WHERE id = $1",[provisorio.id]).fetchOneRowIfExists();
+            }).then(function(data) {
+                console.log("data",data);
+                estado = data.row.estado;
+            console.log("estado", estado);
+                res.end(JSON.stringify(estado));
+            }).catch(function(err) {
+                console.log("error: "+err);
+            }).then(function(){
+                
+                client.done();
+            }).catch(function(err) {
+                console.log("error al cerrar: "+err);
+            });
         });
     }
     get rootPath(){ return __dirname +'/'; }

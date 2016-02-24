@@ -74,6 +74,9 @@ function presentarFormulario(estructura){
     });
 }
 
+function ponerDatos(datos) {
+    
+}
 
 window.addEventListener("load",function(){
     document.getElementById('status').innerHTML = "Listo.";
