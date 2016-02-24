@@ -2,6 +2,23 @@
 
 var html=jsToHtml.html;
 
+function status(msg) {
+    document.getElementById('status').textContent = msg;    
+}
+
+function postAction(url, data) {
+    return AjaxBestPromise.post({
+        url:url,
+        data:{ info:JSON.stringify(data)}
+    }).then(function(resultJson){
+        var result=resultJson;
+        status(result);
+        return result;
+    }).catch(function(err) {
+        status("Error: " + err);
+    });
+}
+
 function presentarFormulario(estructura){
     var celdas=[];
     var controles=[];
@@ -27,48 +44,35 @@ function presentarFormulario(estructura){
                 Tedede.adaptElement(controlOpciones,typeInfo);
                 controlOpciones.addEventListener('update',function(){
                     var value = this.getTypedValue();
-                    AjaxBestPromise.post({
-                        url:'/guardar',
-                        data:{ info:JSON.stringify({
-                            id: divFormulario.idRegistro,
-                            variable: fila.variable,
-                            valor:value 
-                        })}
-                    }).then(function(resultJson){
-                        var result=resultJson;
-                        document.getElementById('status').textContent = result;
-                    }).catch(function(err) {
-                        document.getElementById('status').textContent = "Error: " + err;
-                    });
-                    // alert('el value '+value+' para la variable '+fila.variable);
+                    return postAction('/guardar',
+                                      {id: divFormulario.idRegistro,
+                                       variable: fila.variable,
+                                       valor:value});
                 });
                 controles.push(controlOpciones);
             });
         }
     });
-    var botonFin=html.input({type:"button",id:"botonFin", value:"Finalizar"}).create();
     divFormulario.appendChild(html.div({"class":"bloque"},celdas).create());
     pantalla.appendChild(divFormulario);
-    pantalla.appendChild(botonFin);
+    pantalla.appendChild(html.input({type:"button",id:"bFinalizar", value:"Finalizar"}).create());
+    pantalla.appendChild(html.span(' ').create());
+    pantalla.appendChild(html.input({type:"button",id:"bBlanquear", value:"Blanquear"}).create());
     return luego.then(function(){
-        var bFin = document.getElementById('botonFin');
+        var bFin = document.getElementById('bFinalizar');
         bFin.addEventListener('click', function() {
-            //console.log("celdas", celdas);
-            var data = {};
-            data.id = divFormulario.idRegistro;
-            data.datos={};
+            var data = {
+                id: divFormulario.idRegistro,
+                datos: {}
+            };
             controles.forEach(function(control){
                 data.datos[control.id] = control.getTypedValue();
             });
-            AjaxBestPromise.post({
-                url:'/finalizar',
-                data:{ info:JSON.stringify(data)}
-            }).then(function(resultJson){
-                var result=resultJson;
-                document.getElementById('status').textContent = result;
-            }).catch(function(err) {
-                document.getElementById('status').textContent = "Error: " + err;
-            });
+            return postAction('/finalizar', data);
+        });
+        var bBlan = document.getElementById('bBlanquear');
+        bBlan.addEventListener('click', function() {
+            return postAction('/blanquear', {id: divFormulario.idRegistro});
         });
         return divFormulario;
     });

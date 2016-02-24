@@ -111,6 +111,11 @@ class AppTrac extends backendPlus.AppBackend{
                               [parametros.id, parametros.datos]);
             res.end("OK");
         });
+        this.app.post('/blanquear', function(req, res){
+            var parametros=JSON.parse(req.body.info);
+            console.log('entra a /blanquear',parametros);
+            res.end("OK");
+        });
         this.app.get('/enc-status', function(req, res){
             var client;
             var estado;
