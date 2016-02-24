@@ -54,91 +54,58 @@ class AppTrac extends backendPlus.AppBackend{
             'ejemplos/local-config.yaml'
         ]);
     }
+    
+    updateDatabase(req, parametros, updateSql, updateParameters) {
+        console.log('updateDatabase', parametros, updateSql, updateParameters);
+        var client;
+        return this.getDbClient().then(function(cli) {
+            client=cli;
+            return client.query("BEGIN TRANSACTION").execute();
+        }).then(function() {
+            return client.query("LOCK TABLE bep.datos").execute();
+        }).then(function() {            
+            return client.query("SELECT id, contenido, estado FROM bep.datos WHERE id = $1",[parametros.id]).fetchOneRowIfExists();
+        }).then(function(data) {
+            if(data.rowCount == 0) {
+                console.log('tengo que hacer el insert', parametros)
+                var sql = "INSERT INTO bep.datos (id, contenido) SELECT $1, $2 WHERE NOT EXISTS (SELECT 1 FROM bep.datos WHERE id=$3)";
+                return client.query(sql,[parametros.id, registroVacio, parametros.id]).execute();
+            }
+        }).then(function() {
+            console.log('termine el insert', parametros)
+            return client.query(updateSql, updateParameters).execute();
+        }).then(function(datos) {
+            return client.query("COMMIT").execute().then(function(){ return datos; });
+        }).then(function(datos) {
+            console.log("data", datos);
+        }).catch(function(err) {
+            console.log("error: "+err);
+        }).then(function(){
+            client.done();
+            return parametros;
+        }).catch(function(err) {
+            console.log("error al cerrar: "+err);
+        });
+    }
     addLoggedServices(){
         super.addLoggedServices();
         this.app.get('/info-enc-act', function(req, res){
             res.end(JSON.stringify(provisorio));
         });
-        var be = this;
+        var yo = this;
         this.app.post('/guardar', function(req, res){
             var parametros=JSON.parse(req.body.info);
-            console.log('entra a /guardar',parametros)
-            var client;
-            return be.getDbClient().then(function(cli) {
-                client=cli;
-                return client.query("BEGIN TRANSACTION").execute();
-            }).then(function() {
-                return client.query("LOCK TABLE bep.datos").execute();
-            }).then(function() {            
-                return client.query("SELECT id, contenido, estado FROM bep.datos WHERE id = $1",[parametros.id]).fetchOneRowIfExists();
-            })/*.then(function(data) {
-                console.log('veo filas',data.rowCount,parametros)
-                return Promises.sleep(1000).then(function(){
-                    console.log('terminé de esperar',parametros)
-                    return data;
-                });
-            })*/.then(function(data) {
-                if(data.rowCount == 0) {
-                    console.log('tengo que hacer el insert', parametros)
-                    var sql = "INSERT INTO bep.datos (id, contenido) SELECT $1, $2 WHERE NOT EXISTS (SELECT 1 FROM bep.datos WHERE id=$3)";
-                    return client.query(sql,[parametros.id, registroVacio, parametros.id]).execute();
-                }
-            }).then(function() {
-                console.log('termine el insert', parametros)
-                var sql = "UPDATE bep.datos SET contenido = contenido || $2, estado='pendiente' WHERE id = $1 RETURNING contenido";
-                // var nuevoValorCampo
-                return client.query(sql,[parametros.id, {[parametros.variable]: parametros.valor}]).execute();
-            }).then(function(datos) {
-                return client.query("COMMIT").execute().then(function(){ return datos; });
-            }).then(function(datos) {
-                console.log("data", datos);
-                res.end("recibi: "+JSON.stringify(datos.rows));
-            }).catch(function(err) {
-                console.log("error: "+err);
-                res.end("error: "+err);
-            }).then(function(){
-                client.done();
-            }).catch(function(err) {
-                console.log("error al cerrar: "+err);
-            });
+            yo.updateDatabase(req, parametros,
+                              "UPDATE bep.datos SET contenido = contenido || $2, estado='pendiente' WHERE id = $1 RETURNING contenido",
+                              [parametros.id, {[parametros.variable]: parametros.valor}]);
+            res.end("recibi: "+JSON.stringify(parametros));
         });
       this.app.post('/finalizar', function(req, res){
             var parametros=JSON.parse(req.body.info);
-            console.log('entra a /finalizar',parametros)
-            /*
-            var client;
-            return be.getDbClient().then(function(cli) {
-                client=cli;
-                return client.query("BEGIN TRANSACTION").execute();
-            }).then(function() {
-                return client.query("LOCK TABLE bep.datos").execute();
-            }).then(function() {            
-                return client.query("SELECT id, contenido, estado FROM bep.datos WHERE id = $1",[parametros.id]).fetchOneRowIfExists();
-            }).then(function(data) {
-                if(data.rowCount == 0) {
-                    console.log('tengo que hacer el insert', parametros)
-                    var sql = "INSERT INTO bep.datos (id, contenido) SELECT $1, $2 WHERE NOT EXISTS (SELECT 1 FROM bep.datos WHERE id=$3)";
-                    return client.query(sql,[parametros.id, registroVacio, parametros.id]).execute();
-                }
-            }).then(function() {
-                console.log('termine el insert', parametros)
-                var sql = "UPDATE bep.datos SET contenido = contenido || $2, estado='pendiente' WHERE id = $1 RETURNING contenido";
-                // var nuevoValorCampo
-                return client.query(sql,[parametros.id, {[parametros.variable]: parametros.valor}]).execute();
-            }).then(function(datos) {
-                return client.query("COMMIT").execute().then(function(){ return datos; });
-            }).then(function(datos) {
-                console.log("data", datos);
-                res.end("recibi: "+JSON.stringify(datos.rows));
-            }).catch(function(err) {
-                console.log("error: "+err);
-                res.end("error: "+err);
-            }).then(function(){
-                client.done();
-            }).catch(function(err) {
-                console.log("error al cerrar: "+err);
-            });
-            */
+            console.log('entra a /finalizar',parametros);
+            yo.updateDatabase(req, parametros,
+                              "UPDATE bep.datos SET contenido = $2, estado='ingresado' WHERE id = $1 RETURNING contenido",
+                              [parametros.id, parametros.datos]);
             res.end("OK");
         });
     }

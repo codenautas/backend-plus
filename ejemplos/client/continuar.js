@@ -2,10 +2,6 @@
 
 var html=jsToHtml.html;
 
-
-function ponerDatos(estructura, datos){
-}
-
 function presentarFormulario(estructura){
     var celdas=[];
     var controles=[];
@@ -57,7 +53,7 @@ function presentarFormulario(estructura){
     return luego.then(function(){
         var bFin = document.getElementById('botonFin');
         bFin.addEventListener('click', function() {
-            console.log("celdas", celdas);
+            //console.log("celdas", celdas);
             var data = {};
             data.id = divFormulario.idRegistro;
             data.datos={};
