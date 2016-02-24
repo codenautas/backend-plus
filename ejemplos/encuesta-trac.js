@@ -68,18 +68,19 @@ class AppTrac extends backendPlus.AppBackend{
                 client=cli;
                 return client.query("BEGIN TRANSACTION").execute();
             }).then(function() {
-                return client.query("SELECT id, contenido, estado FROM bep.datos WHERE id = $1 FOR UPDATE",[parametros.id]).fetchOneRowIfExists();
-            }).then(function(data) {
+                return client.query("LOCK TABLE bep.datos").execute();
+            }).then(function() {            
+                return client.query("SELECT id, contenido, estado FROM bep.datos WHERE id = $1",[parametros.id]).fetchOneRowIfExists();
+            })/*.then(function(data) {
                 console.log('veo filas',data.rowCount,parametros)
                 return Promises.sleep(1000).then(function(){
                     console.log('terminé de esperar',parametros)
                     return data;
                 });
-            }).then(function(data) {
-                var sql = '';
+            })*/.then(function(data) {
                 if(data.rowCount == 0) {
                     console.log('tengo que hacer el insert', parametros)
-                    sql = "INSERT INTO bep.datos (id, contenido) SELECT $1, $2 FROM bep.datos WHERE NOT EXISTS (SELECT 1 FROM bep.datos WHERE id=$3)";
+                    var sql = "INSERT INTO bep.datos (id, contenido) SELECT $1, $2 WHERE NOT EXISTS (SELECT 1 FROM bep.datos WHERE id=$3)";
                     return client.query(sql,[parametros.id, registroVacio, parametros.id]).execute();
                 }
             }).then(function() {
