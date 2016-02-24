@@ -2,8 +2,13 @@
 
 var html=jsToHtml.html;
 
+
+function ponerDatos(estructura, datos){
+}
+
 function presentarFormulario(estructura){
     var celdas=[];
+    var controles=[];
     var divFormulario=html.div({"tedede-formulario":"trac"}).create();
     var luego = Promise.resolve();
     estructura.forEach(function(fila){
@@ -41,18 +46,38 @@ function presentarFormulario(estructura){
                     });
                     // alert('el value '+value+' para la variable '+fila.variable);
                 });
+                controles.push(controlOpciones);
             });
         }
     });
+    var botonFin=html.input({type:"button",id:"botonFin", value:"Finalizar"}).create();
     divFormulario.appendChild(html.div({"class":"bloque"},celdas).create());
     pantalla.appendChild(divFormulario);
+    pantalla.appendChild(botonFin);
     return luego.then(function(){
+        var bFin = document.getElementById('botonFin');
+        bFin.addEventListener('click', function() {
+            console.log("celdas", celdas);
+            var data = {};
+            data.id = divFormulario.idRegistro;
+            data.datos={};
+            controles.forEach(function(control){
+                data.datos[control.id] = control.getTypedValue();
+            });
+            AjaxBestPromise.post({
+                url:'/finalizar',
+                data:{ info:JSON.stringify(data)}
+            }).then(function(resultJson){
+                var result=resultJson;
+                document.getElementById('status').textContent = result;
+            }).catch(function(err) {
+                document.getElementById('status').textContent = "Error: " + err;
+            });
+        });
         return divFormulario;
     });
 }
 
-function ponerDatos(estructura, datos){
-}
 
 window.addEventListener("load",function(){
     document.getElementById('status').innerHTML = "Listo.";
