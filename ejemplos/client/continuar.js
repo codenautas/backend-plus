@@ -39,11 +39,11 @@ function presentarFormulario(estructura){
     });
     divFormulario.appendChild(html.div({"class":"bloque"},celdas).create());
     pantalla.appendChild(divFormulario);
-    pantalla.appendChild(html.input({type:"button",id:"bFinalizar", value:"Finalizar"}).create());
+    pantalla.appendChild(html.input({type:"button",id:"botonFin", value:"Finalizar"}).create());
     pantalla.appendChild(html.span(' ').create());
     pantalla.appendChild(html.input({type:"button",id:"bBlanquear", value:"Blanquear"}).create());
     return luego.then(function(){
-        var bFin = document.getElementById('bFinalizar');
+        var bFin = document.getElementById('botonFin');
         bFin.addEventListener('click', function() {
             var data = {
                 id: divFormulario.idRegistro,
