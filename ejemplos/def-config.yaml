@@ -12,3 +12,6 @@ login:
   userFieldName: username
   passFieldName: md5pass
   infoFieldList: [username, rol]
+  plus:
+    unloggedPath: ejemplos/unlogged
+    loginPagePath: ejemplos/unlogged/login
