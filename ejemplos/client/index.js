@@ -21,10 +21,10 @@ function presentarPlaca(estado) {
         placa.push(html.p('Ud. ya ha completado una encuesta, desea comenzar una nueva?'));
         placa.push(encNueva);
         break;
-    // case 'vacio':
-        // placa.push(html.p('Ud. ya ha completado una encuesta, desea comenzar una nueva?'));
-        // placa.push(encNueva);
-        // break;
+    case 'vacio':
+        placa.push(html.p('Ud. está por empezar la encuesta'));
+        placa.push(encNueva);
+        break;
     default:
         throw new Error('Estado inexistente: '+estado);
     }
@@ -45,6 +45,6 @@ function presentarPlaca(estado) {
 window.addEventListener("load",function(){
     postAction('/enc-status', {id:idEncuesta}).then(function(resultJson){
         var estado=JSON.parse(resultJson);
-        presentarPlaca(estado);
+        presentarPlaca(estado.estado);
     });
 });

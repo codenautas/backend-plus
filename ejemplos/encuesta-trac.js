@@ -92,13 +92,13 @@ class AppTrac extends backendPlus.AppBackend{
     }
     addLoggedServices(){
         super.addLoggedServices();
-        var yo = this;
+        var be = this;
         this.app.get('/info-enc-act', function(req, res){
             res.end(JSON.stringify(provisorio));
         });
         this.app.post('/guardar', function(req, res){
             var parametros=JSON.parse(req.body.info);
-            yo.updateDatabase(req, parametros,
+            be.updateDatabase(req, parametros,
                               "UPDATE bep.datos SET contenido = contenido || $2, estado='pendiente' WHERE id = $1 RETURNING contenido",
                               [parametros.id, {[parametros.variable]: parametros.valor}]);
             res.end("recibi: "+JSON.stringify(parametros));
@@ -106,7 +106,7 @@ class AppTrac extends backendPlus.AppBackend{
         this.app.post('/finalizar', function(req, res){
             var parametros=JSON.parse(req.body.info);
             console.log('entra a /finalizar',parametros);
-            yo.updateDatabase(req, parametros,
+            be.updateDatabase(req, parametros,
                               "UPDATE bep.datos SET contenido = $2, estado='ingresado' WHERE id = $1 RETURNING contenido",
                               [parametros.id, parametros.datos]);
             res.end("Encuesta finalizada");
@@ -114,30 +114,20 @@ class AppTrac extends backendPlus.AppBackend{
         this.app.post('/blanquear', function(req, res){
             var parametros=JSON.parse(req.body.info);
             console.log('entra a /blanquear',parametros);
-            yo.updateDatabase(req, parametros,
+            be.updateDatabase(req, parametros,
                               "UPDATE bep.datos SET contenido = $2, estado='vacio' WHERE id = $1 RETURNING contenido",
                               [parametros.id, registroVacio]);
             res.end("Encuesta blanqueada");
         });
-        this.app.post('/set-status', function(req, res){
-            var parametros=JSON.parse(req.body.info);
-            console.log('entra a /set-status',parametros);
-            yo.updateDatabase(req, parametros,
-                              "UPDATE bep.datos SET estado=$2 WHERE id = $1 RETURNING contenido",
-                              [parametros.id, parametros.estado]);
-            res.end("status = "+parametros.estado);
-        });
         this.app.post('/enc-status', function(req, res){
             var client;
             var estado;
-            return yo.getDbClient().then(function(cli) {
+            return be.getDbClient().then(function(cli) {
                 client=cli;
                 return client.query("SELECT estado FROM bep.datos WHERE id = $1",[provisorio.id]).fetchOneRowIfExists();
             }).then(function(data) {
                 console.log("data",data);
-                estado = data.row.estado;
-            console.log("estado", estado);
-                res.end(JSON.stringify(estado));
+                res.end(JSON.stringify(data.rowCount==0?{estado:'vacio'}:data.row));
             }).catch(function(err) {
                 console.log("error: "+err);
             }).then(function(){

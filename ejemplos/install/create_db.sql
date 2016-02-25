@@ -17,8 +17,8 @@ alter table bep."users" owner to beplus_example_user;
 
 insert into bep.users values ('tester', md5('1234tester'), 'test');
 
-DROP TYPE IF EXISTS bep.estados;
 CREATE TYPE bep.estados as enum ('vacio','pendiente','ingresado');
+ALTER type bep.estados OWNER TO beplus_example_user;
 
 CREATE TABLE bep.datos(
   id jsonb primary key,
@@ -31,7 +31,6 @@ ALTER TABLE bep.datos
   OWNER TO beplus_example_user;
 
   
-insert into bep.users values ('tester', md5('1234tester'), 'test');
 insert into bep.users values ('test1',md5('1test1'),'test','{"enc":1,"for":"TRAC"}');
 insert into bep.users values ('test2',md5('1test2'),'test','{"enc":2,"for":"TRAC"}');
 insert into bep.users values ('test3',md5('1test3'),'test','{"enc":3,"for":"TRAC"}');
