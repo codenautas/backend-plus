@@ -15,4 +15,7 @@ window.addEventListener('load',function(){
             elem.disabled=false;
         }
     });
+    if(params['a']==1){
+        loginForm.submit();
+    }
 });
