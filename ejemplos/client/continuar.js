@@ -27,10 +27,11 @@ function presentarFormulario(estructura){
                 Tedede.adaptElement(controlOpciones,typeInfo);
                 controlOpciones.addEventListener('update',function(){
                     var value = this.getTypedValue();
-                    return postAction('/guardar',
-                                      {id: divFormulario.idRegistro,
-                                       variable: fila.variable,
-                                       valor:value});
+                    return postAction('/guardar',{
+                        id: divFormulario.idRegistro,
+                        variable: fila.variable,
+                        valor:value
+                    });
                 });
                 controles.push(controlOpciones);
             });
