@@ -51,11 +51,11 @@ function presentarFormulario(estructura){
             controles.forEach(function(control){
                 data.datos[control.id] = control.getTypedValue();
             });
-            return postAction('/finalizar', data);
+            postAction('/finalizar', data);
         });
         var bBlan = document.getElementById('bBlanquear');
         bBlan.addEventListener('click', function() {
-            return postAction('/blanquear', {id: divFormulario.idRegistro});
+            postAction('/blanquear', {id: divFormulario.idRegistro});
         });
         return divFormulario;
     });
