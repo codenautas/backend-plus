@@ -43,7 +43,7 @@ function presentarPlaca(estado) {
 }
 
 window.addEventListener("load",function(){
-    postAction('/enc-status', {id:idEncuesta}).then(function(resultJson){
+    postAction('/info-enc-act', {id:idEncuesta}).then(function(resultJson){
         var estado=JSON.parse(resultJson);
         presentarPlaca(estado.estado);
     });

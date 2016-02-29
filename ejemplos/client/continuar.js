@@ -7,7 +7,7 @@ function presentarFormulario(estructura){
     var controles=[];
     var divFormulario=html.div({"tedede-formulario":"trac"}).create();
     var luego = Promise.resolve();
-    estructura.forEach(function(fila){
+    estructura.celdas.forEach(function(fila){
         if(fila.tipo=='TITULO'){
             celdas.push(html.div({id:"titulo"},JSON.stringify(fila.texto)))
         }
@@ -68,12 +68,12 @@ function ponerDatos(datos) {
 window.addEventListener("load",function(){
     document.getElementById('status').innerHTML = "Listo.";
    // console.log("HOLA MUNDO");
-    AjaxBestPromise.get({
+    AjaxBestPromise.post({
         url:'/info-enc-act',
-        data:{}
+        data:{info:"{}"}
     }).then(function(resultJson){
         var result=JSON.parse(resultJson);
-        presentarFormulario(result.estructura).then(function(divFormulario){
+        presentarFormulario(result.estructura.formularios[result.id["for"]]).then(function(divFormulario){
             divFormulario.idRegistro = result.id;
             ponerDatos(result.datos);
         });
