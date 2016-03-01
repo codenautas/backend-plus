@@ -40,7 +40,6 @@ function presentarFormulario(estructura){
     divFormulario.appendChild(html.div({"class":"bloque"},celdas).create());
     pantalla.appendChild(divFormulario);
     pantalla.appendChild(html.input({type:"button",id:"botonFin", value:"Finalizar"}).create());
-    pantalla.appendChild(html.input({type:"button",id:"bBlanquear", value:"Blanquear"}).create());
     return luego.then(function(){
         var bFin = document.getElementById('botonFin');
         bFin.addEventListener('click', function() {
@@ -51,11 +50,9 @@ function presentarFormulario(estructura){
             controles.forEach(function(control){
                 data.datos[control.id] = control.getTypedValue();
             });
-            postAction('/finalizar', data);
-        });
-        var bBlan = document.getElementById('bBlanquear');
-        bBlan.addEventListener('click', function() {
-            postAction('/blanquear', {id: divFormulario.idRegistro});
+            postAction('/finalizar', data).then(function(){
+                window.location = '/fin-ingreso';
+            });
         });
         return divFormulario;
     });
