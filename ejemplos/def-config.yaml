@@ -16,4 +16,4 @@ login:
     unloggedPath: ejemplos/unlogged
     loginPagePath: ejemplos/unlogged/login
 estructura:
-  origen: ejemplos/estructura-trac.yaml
+  origen: ejemplos/estructura-ejemplo.yaml

@@ -11,7 +11,9 @@ var idEncuesta = 1001;
 
 var backendPlus = require("..");
 
-class AppTrac extends backendPlus.AppBackend{
+var backendEncuesta={};
+
+class AppEncuesta extends backendPlus.AppBackend{
     configList(){
         return super.configList().concat([
             'ejemplos/def-config.yaml',
@@ -23,9 +25,8 @@ class AppTrac extends backendPlus.AppBackend{
         return readYaml(be.config.estructura.origen).then(function(estructura){
             be.estructura = estructura;
             // var test=be.estructura['main-form']
-            // console.log("be.estructura",test.TRAC);
             be.registroVacio = {};
-            be.estructura.formularios.TRAC.celdas.forEach(function(celda){
+            be.estructura.formularios[be.estructura["main-form"]].celdas.forEach(function(celda){
                 if(celda.tipo=='PREGUNTA'){
                     be.registroVacio[celda.variable]=null;
                 }
@@ -122,4 +123,6 @@ class AppTrac extends backendPlus.AppBackend{
     get rootPath(){ return __dirname +'/'; }
 }
 
-new AppTrac().start();
+backendEncuesta.AppEncuesta = AppEncuesta;
+
+module.exports=backendEncuesta;
