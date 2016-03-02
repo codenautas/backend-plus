@@ -2,26 +2,34 @@ main-form: EJEMPLO
 formularios: 
   EJEMPLO: 
     celdas:
-    - { titulo: "EVALUACION DE SOPORTE INFORMATICO" }
-    - {tipo: 'PREGUNTA', id: "1", variable: "v1", texto: "Tiempo transcurrido entre el pedido y la asistencia", opciones:[
-          {opcion: "a", texto: "24hs"},
-          {opcion: "b", texto: "48hs"},
-          {opcion: "c", texto: "72hs"},
-          {opcion: "d", texto: "Más de 72 hs"}
-      ]}
-    - { tipo: 'PREGUNTA', id: "2", variable: "v2", texto: "Tiempo que llevo la asistencia", opciones:[
+    - titulo: Encuesta de ejemplo
+    - pregunta: P1, 
+      texto: ¿cuál es su tipo de ejemplo preferido?
+      aclaracion: no considerar este ejemplo
+      opciones:
+      - opcion: a 
+        texto: uno sencillo
+      - opcion: b 
+        texto: uno completo
+      - opcion: c 
+        texto: uno didáctico
+        salta: P3
+      - opcion: d 
+        texto: otro tipo 
+        especifique: true
+    - { pregunta: "2", variable: "v2", texto: "Tiempo que llevo la asistencia", opciones:[
           {opcion: "a", texto: "24hs"},
           {opcion: "b", texto: "48hs"},
           {opcion: "c", texto: "72hs"},
           {opcion: "d", texto: "Más de 72hs"}
       ]}
-    - {tipo: 'PREGUNTA', id: "3", variable: "v3",texto: "Cumplimiento con la asistencia",opciones:[
+    - {pregunta: "3", variable: "v3",texto: "Cumplimiento con la asistencia",opciones:[
           {opcion: "a", texto: "Total"},
           {opcion: "b", texto: "Parcial"},
           {opcion: "c", texto: "No cumplió (aclarar en observaciones)"},
           {opcion: "d", texto: "No aplica"}
       ]}
-    - {tipo: "PREGUNTA", id: "4", variable: "v4",texto: "Calidad de la asistencia",opciones:[
+    - {pregunta: "4", variable: "v4",texto: "Calidad de la asistencia",opciones:[
           {opcion: "a",  texto: "Muy buena"},
           {opcion: "b",  texto: "Buena"},
           {opcion: "c",  texto: "Regular (aclarar en observaciones)"},

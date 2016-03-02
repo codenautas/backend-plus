@@ -1,5 +1,6 @@
 "use strict";
 
+const _ = require('lodash');
 const util = require('util');
 var readYaml = require('read-yaml-promise');
 var MiniTools = require('mini-tools');
@@ -14,6 +15,24 @@ var backendPlus = require("..");
 var backendEncuesta={};
 
 class AppEncuesta extends backendPlus.AppBackend{
+    constructor(){
+        super();
+        this.tiposCeldas={
+            titulo:{
+                completar(){
+                    
+                }
+            },
+            pregunta:{
+                completar(celda, be, idFormulario){
+                    be.registroVacio[celda.variable]=null;
+                    if(!celda.variable){
+                        celda.variable = celda.pregunta.toLowerCase();
+                    }
+                }
+            }
+        }
+    }
     configList(){
         return super.configList().concat([
             'ejemplos/def-config.yaml',
@@ -26,11 +45,22 @@ class AppEncuesta extends backendPlus.AppBackend{
             be.estructura = estructura;
             // var test=be.estructura['main-form']
             be.registroVacio = {};
-            be.estructura.formularios[be.estructura["main-form"]].celdas.forEach(function(celda){
-                if(celda.tipo=='PREGUNTA'){
-                    be.registroVacio[celda.variable]=null;
-                }
+            _.forEach(be.estructura.formularios, function(formulario, idFormulario){
+                _.forEach(formulario.celdas, function(celda, indexCelda){
+                    if(!celda.tipo){
+                        for(var tipoCelda in be.tiposCeldas){
+                            if(tipoCelda in celda){
+                                celda.tipo = tipoCelda;
+                            }
+                        }
+                    }
+                    var defTipoCelda = be.tiposCeldas[celda.tipo];
+                    defTipoCelda.completar(celda, be, idFormulario);
+                });
             });
+            console.log('***************************')
+            console.dir(be.estructura);
+            console.dir(be.estructura.formularios[be.estructura["main-form"]].celdas, {depth:8});
         });
     }
     updateDatabase(req, parametros, updateSql, updateParameters) {

@@ -8,11 +8,14 @@ function presentarFormulario(estructura){
     var divFormulario=html.div({"tedede-formulario":"trac"}).create();
     var luego = Promise.resolve();
     estructura.celdas.forEach(function(fila){
-        if(fila.tipo=='TITULO'){
-            celdas.push(html.div({id:"titulo"},JSON.stringify(fila.texto)))
+        if(fila.tipo=='titulo'){
+            celdas.push(html.div({id:"titulo"},fila.titulo))
         }
-        if(fila.tipo=='PREGUNTA'){
-            celdas.push(html.div({"class":"preguntas",id:fila.id},fila.texto));
+        if(fila.tipo=='pregunta'){
+            celdas.push(html.div({"class":"preguntas",id:fila.pregunta},fila.texto));
+            if(fila.aclaracion){
+                celdas.push(html.div({"class":"aclaracion"},fila.aclaracion));
+            }
             var opciones={};
             var typeInfo={};
             typeInfo.typeName="enum";
