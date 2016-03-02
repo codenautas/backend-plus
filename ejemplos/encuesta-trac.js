@@ -34,7 +34,7 @@ class AppTrac extends backendPlus.AppBackend{
     }
     updateDatabase(req, parametros, updateSql, updateParameters) {
         var be=this;
-        console.log('updateDatabase', parametros, updateSql, updateParameters);
+        //console.log('updateDatabase', parametros, updateSql, updateParameters);
         var client;
         return this.getDbClient().then(function(cli) {
             client=cli;
@@ -45,17 +45,17 @@ class AppTrac extends backendPlus.AppBackend{
             return client.query("SELECT id, contenido, estado FROM bep.datos WHERE id = $1",[parametros.id]).fetchOneRowIfExists();
         }).then(function(data) {
             if(data.rowCount == 0) {
-                console.log('tengo que hacer el insert', parametros)
+                //console.log('tengo que hacer el insert', parametros)
                 var sql = "INSERT INTO bep.datos (id, contenido) SELECT $1, $2 WHERE NOT EXISTS (SELECT 1 FROM bep.datos WHERE id=$3)";
                 return client.query(sql,[parametros.id, be.registroVacio, parametros.id]).execute();
             }
         }).then(function() {
-            console.log('termine el insert', parametros)
+            //console.log('termine el insert', parametros)
             return client.query(updateSql, updateParameters).execute();
         }).then(function(datos) {
             return client.query("COMMIT").execute().then(function(){ return datos; });
         }).then(function(datos) {
-            console.log("data", datos);
+            //console.log("data", datos);
         }).catch(function(err) {
             console.log("error: "+err);
         }).then(function(){
@@ -104,7 +104,7 @@ class AppTrac extends backendPlus.AppBackend{
         });
         this.app.post('/finalizar', function(req, res){
             var parametros=be.obtenerParametros(req);
-            console.log('entra a /finalizar',parametros);
+            //console.log('entra a /finalizar',parametros);
             be.updateDatabase(req, parametros,
                               "UPDATE bep.datos SET contenido = $2, estado='ingresado' WHERE id = $1 RETURNING contenido",
                               [parametros.id, parametros.datos]);
@@ -112,7 +112,7 @@ class AppTrac extends backendPlus.AppBackend{
         });
         this.app.post('/blanquear', function(req, res){
             var parametros=be.obtenerParametros(req);
-            console.log('entra a /blanquear',parametros);
+            //console.log('entra a /blanquear',parametros);
             be.updateDatabase(req, parametros,
                               "UPDATE bep.datos SET contenido = $2, estado='vacio' WHERE id = $1 RETURNING contenido",
                               [parametros.id, be.registroVacio]);
