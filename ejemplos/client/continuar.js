@@ -16,18 +16,10 @@ function presentarFormulario(estructura){
             if(fila.aclaracion){
                 celdas.push(html.div({"class":"aclaracion"},fila.aclaracion));
             }
-            var opciones={};
-            var typeInfo={};
-            typeInfo.typeName="enum";
-            typeInfo.options={};
-            fila.opciones.forEach(function(opcion){
-                opciones[opcion.opcion]={label:opcion.texto};
-                typeInfo.options[opcion.opcion]={label:opcion.texto};
-            });
-            var controlOpciones = Tedede.optionsCtrl(opciones).create();
+            var controlOpciones = Tedede.bestCtrl(fila.typeInfo).create();
             celdas.push(controlOpciones);
             luego = luego.then(function(){
-                Tedede.adaptElement(controlOpciones,typeInfo);
+                Tedede.adaptElement(controlOpciones,fila.typeInfo);
                 controlOpciones.addEventListener('update',function(){
                     var value = this.getTypedValue();
                     postAction('/guardar',{

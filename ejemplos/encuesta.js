@@ -14,6 +14,8 @@ var backendPlus = require("..");
 
 var backendEncuesta={};
 
+require('best-globals').setGlobals(global);
+
 class AppEncuesta extends backendPlus.AppBackend{
     constructor(){
         super();
@@ -29,6 +31,20 @@ class AppEncuesta extends backendPlus.AppBackend{
                     if(!celda.variable){
                         celda.variable = celda.pregunta.toLowerCase();
                     }
+                    if(!celda.typeInfo){
+                        celda.typeInfo={}
+                        if(celda.opciones){
+                            celda.typeInfo.typeName="enum";
+                            celda.typeInfo.options=celda.opciones;
+                        }else{
+                            celda.typeInfo.typeName=celda["tipo-dato"];
+                        }
+                        (celda.typeInfo.options||[]).forEach(function(opcion){
+                            opcion.option = coalesce(opcion.option,opcion.opcion,coalesce.throwError);
+                            opcion.label  = coalesce(opcion.label ,opcion.texto ,coalesce.throwError);
+                        });
+                    }
+
                 }
             }
         }
@@ -58,9 +74,11 @@ class AppEncuesta extends backendPlus.AppBackend{
                     defTipoCelda.completar(celda, be, idFormulario);
                 });
             });
+            /*
             console.log('***************************')
             console.dir(be.estructura);
             console.dir(be.estructura.formularios[be.estructura["main-form"]].celdas, {depth:8});
+            */
         });
     }
     updateDatabase(req, parametros, updateSql, updateParameters) {

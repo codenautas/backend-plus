@@ -28,7 +28,7 @@
     "stylus": "~0.53.0",
 
     "ajax-best-promise": "0.0.7",
-    "best-globals": "0.2.1",
+    "best-globals": "0.2.3",
     "best-promise": "0.2.4",
     "extension-serve-static": "0.1.6",
     "js-to-html": "0.8.1",
