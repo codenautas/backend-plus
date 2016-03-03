@@ -7,35 +7,39 @@ formularios:
       texto: ¿cuál es su tipo de ejemplo preferido?
       aclaracion: no considerar este ejemplo
       opciones:
-      - opcion: a 
+      - opcion: 1
         texto: uno sencillo
-      - opcion: b 
+      - opcion: 2
         texto: uno completo
-      - opcion: c 
+      - opcion: 3
         texto: uno didáctico
         salta: P3
-      - opcion: d 
+      - opcion: 4
         texto: otro tipo 
         especifique: true
-    - { pregunta: "2", variable: "v2", texto: "Tiempo que llevo la asistencia", opciones:[
-          {opcion: "a", texto: "24hs"},
-          {opcion: "b", texto: "48hs"},
-          {opcion: "c", texto: "72hs"},
-          {opcion: "d", texto: "Más de 72hs"}
-      ]}
-    - {pregunta: "3", variable: "v3",texto: "Cumplimiento con la asistencia",opciones:[
-          {opcion: "a", texto: "Total"},
-          {opcion: "b", texto: "Parcial"},
-          {opcion: "c", texto: "No cumplió (aclarar en observaciones)"},
-          {opcion: "d", texto: "No aplica"}
-      ]}
-    - {pregunta: "4", variable: "v4",texto: "Calidad de la asistencia",opciones:[
-          {opcion: "a",  texto: "Muy buena"},
-          {opcion: "b",  texto: "Buena"},
-          {opcion: "c",  texto: "Regular (aclarar en observaciones)"},
-          {opcion: "d",  texto: "Mala (aclarar en observaciones)"},
-          {opcion: "e",  texto: "No aplica"}
-      ]}
+    - pregunta: P2
+      texto: ¿cuánto tiempo le llevó decidirse a contestar la respuesta anterior? 
+      alcaración: exprese el tiempo en minutos
+      typeInfo: 
+        typeName: number
+        minValue: 0
+    - pregunta: P3
+      texto: Por favor describa el proceso que usó para tomar la decisión
+      typeInfo: text
+    - pregunta: P4
+      texto: ¿Qué características son decisorias para evaluar un ejemplo?
+      typeInfo: multiple
+      opciones:
+      - opcion: a
+        texto: que se entienda
+      - opcion: b
+        texto: que sea bonito
+      - opcion: c
+        texto: que sea rápido para usar
+      - opcion: d
+        texto: que minimice posibles errores
+      - opcion: e
+        texto: otras características
 textos:
   botones:
     fin: Finalizar

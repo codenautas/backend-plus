@@ -24,7 +24,7 @@ function presentarFormulario(estructura){
                 opciones[opcion.opcion]={label:opcion.texto};
                 typeInfo.options[opcion.opcion]={label:opcion.texto};
             });
-            var controlOpciones = Tedede.optionsCtrl(fila.variable,opciones).create();
+            var controlOpciones = Tedede.optionsCtrl(opciones).create();
             celdas.push(controlOpciones);
             luego = luego.then(function(){
                 Tedede.adaptElement(controlOpciones,typeInfo);
