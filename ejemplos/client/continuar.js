@@ -20,6 +20,7 @@ function presentarFormulario(estructura){
             celdas.push(controlOpciones);
             luego = luego.then(function(){
                 Tedede.adaptElement(controlOpciones,fila.typeInfo);
+                controlOpciones.setAttribute("tedede-var", fila.variable);
                 controlOpciones.addEventListener('update',function(){
                     var value = this.getTypedValue();
                     postAction('/guardar',{
@@ -43,7 +44,7 @@ function presentarFormulario(estructura){
                 datos: {}
             };
             controles.forEach(function(control){
-                data.datos[control.id] = control.getTypedValue();
+                data.datos[control.getAttribute("tedede-var")] = control.getTypedValue();
             });
             postAction('/finalizar', data).then(function(){
                 window.location = '/fin-ingreso';
@@ -58,7 +59,7 @@ function ponerDatos(datos) {
 }
 
 window.addEventListener("load",function(){
-    document.getElementById('status').innerHTML = "Listo.";
+    document.getElementById('status').textContent = "Listo.";
    // console.log("HOLA MUNDO");
     AjaxBestPromise.post({
         url:'/info-enc-act',

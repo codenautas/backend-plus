@@ -1,6 +1,6 @@
 function status(msg) {
     var s = document.getElementById('status');
-    if(s) { s.textContent = msg; }    
+    if(s) { s.textContent += '\n'+msg; }    
 }
 
 function postAction(url, data) {
