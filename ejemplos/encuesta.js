@@ -126,6 +126,9 @@ class AppEncuesta extends backendPlus.AppBackend{
     addLoggedServices(){
         super.addLoggedServices();
         var be = this;
+        this.app.post('/info', function(req, res){
+            res.end('ok!');
+        });
         this.app.post('/info-enc-act', function(req, res){
             var rta={};
             var parametros=be.obtenerParametros(req);

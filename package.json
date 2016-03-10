@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for tedede",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -32,7 +32,7 @@
     "best-promise": "0.2.4",
     "extension-serve-static": "0.1.6",
     "js-to-html": "0.8.3",
-    "login-plus": "0.3.0",
+    "login-plus": "0.3.1",
     "mini-tools": "0.2.3",
     "pg-promise-strict": "0.2.3",
     "promise-plus": "0.0.6",
