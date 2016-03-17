@@ -29,21 +29,21 @@ function presentarPlaca(estado) {
         throw new Error('Estado inexistente: '+estado);
     }
     encContinuar.addEventListener('click', function() {
-       postAction('/set-status', {id:idEncuesta,estado:'pendiente'}).then(function(res) {
-           window.location = '/continuar';
+       postAction('set-status', {id:idEncuesta,estado:'pendiente'}).then(function(res) {
+           window.location = 'continuar';
        });
     });
     encNueva.addEventListener('click', function() {
-       postAction('/set-status', {id:idEncuesta,estado:'vacio'}).then(function(res) {
+       postAction('set-status', {id:idEncuesta,estado:'vacio'}).then(function(res) {
            console.log("res", res);
-           window.location = '/continuar';
+           window.location = 'continuar';
        });
     });
     pantalla.appendChild(html.div(placa).create());
 }
 
 window.addEventListener("load",function(){
-    postAction('/info-enc-act', {id:idEncuesta}).then(function(resultJson){
+    postAction('info-enc-act', {id:idEncuesta}).then(function(resultJson){
         var estado=JSON.parse(resultJson);
         presentarPlaca(estado.estado);
     });

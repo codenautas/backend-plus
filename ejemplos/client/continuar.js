@@ -23,7 +23,7 @@ function presentarFormulario(estructura){
                 controlOpciones.setAttribute("tedede-var", fila.variable);
                 controlOpciones.addEventListener('update',function(){
                     var value = this.getTypedValue();
-                    postAction('/guardar',{
+                    postAction('guardar',{
                         id: divFormulario.idRegistro,
                         variable: fila.variable,
                         valor:value
@@ -46,8 +46,8 @@ function presentarFormulario(estructura){
             controles.forEach(function(control){
                 data.datos[control.getAttribute("tedede-var")] = control.getTypedValue();
             });
-            postAction('/finalizar', data).then(function(){
-                window.location = '/fin-ingreso';
+            postAction('finalizar', data).then(function(){
+                window.location = 'fin-ingreso';
             });
         });
         return divFormulario;
