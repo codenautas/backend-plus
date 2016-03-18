@@ -2,15 +2,13 @@
 
 var html=jsToHtml.html;
 
-var idEncuesta={enc: 1001, "for": "TRAC"};
-
 function presentarPlaca(estado) {
     //console.log("estado", estado);
     var mensaje;
     var placa = [];
     var encContinuar = html.input({type:'button', id:'continuar', value:'Continuar'}).create();
     var encNueva = html.input({type:'button', id:'nueva', value:'nueva'}).create();
-    switch(estado) {
+    switch(estado.estado) {
     case 'pendiente':
         placa.push(html.p('Desea continuar con la encuesta que tiene pendiente o comenzar una nueva?'));
         placa.push(encContinuar);
@@ -26,15 +24,15 @@ function presentarPlaca(estado) {
         placa.push(encNueva);
         break;
     default:
-        throw new Error('Estado inexistente: '+estado);
+        throw new Error('Estado inexistente: '+estado.estado);
     }
     encContinuar.addEventListener('click', function() {
-       postAction('set-status', {id:idEncuesta,estado:'pendiente'}).then(function(res) {
+       postAction('set-status', {id:estado.id,estado:'pendiente'}).then(function(res) {
            window.location = 'continuar';
        });
     });
     encNueva.addEventListener('click', function() {
-       postAction('set-status', {id:idEncuesta,estado:'vacio'}).then(function(res) {
+       postAction('set-status', {id:estado.id,estado:'vacio'}).then(function(res) {
            console.log("res", res);
            window.location = 'continuar';
        });
@@ -43,8 +41,8 @@ function presentarPlaca(estado) {
 }
 
 window.addEventListener("load",function(){
-    postAction('info-enc-act', {id:idEncuesta}).then(function(resultJson){
+    postAction('info-enc-act', {}).then(function(resultJson){
         var estado=JSON.parse(resultJson);
-        presentarPlaca(estado.estado);
+        presentarPlaca(estado);
     });
 });

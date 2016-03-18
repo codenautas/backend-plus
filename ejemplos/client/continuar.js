@@ -59,10 +59,10 @@ function ponerDatos(datos) {
 }
 
 window.addEventListener("load",function(){
-    document.getElementById('status').textContent = "Listo.";
+    document.getElementById('status').textContent = "Cargando...";
    // console.log("HOLA MUNDO");
     AjaxBestPromise.post({
-        url:'/info-enc-act',
+        url:'info-enc-act',
         data:{info:"{}"}
     }).then(function(resultJson){
         var result=JSON.parse(resultJson);
@@ -70,5 +70,7 @@ window.addEventListener("load",function(){
             divFormulario.idRegistro = result.id;
             ponerDatos(result.datos);
         });
+    }).catch(function(err){
+        document.getElementById('status').textContent = "Error "+err.message;
     });
 });

@@ -134,17 +134,20 @@ class AppEncuesta extends backendPlus.AppBackend{
             var parametros=be.obtenerParametros(req);
             rta.id = req.user.iddato || parametros.id;
             rta.estructura = be.estructura;
+            console.log('por get client');
             be.getDbClient().then(function(client){
-                return client.query("SELECT contenido, estado FROM bep.datos WHERE id = $1", [rta.id]).fetchOneRowIfExists().then(function(result){
-                    if(result.rowCount>0){
-                        rta.datos=result.row.contenido;
-                        rta.estado=result.row.estado;
-                    }else{
-                        rta.datos=be.registroVacio;
-                        rta.estado='vacio';
-                    }
-                    res.end(JSON.stringify(rta));
-                });
+                console.log('por select');
+                return client.query("SELECT contenido, estado FROM bep.datos WHERE id = $1", [rta.id]).fetchOneRowIfExists();
+            }).then(function(result){
+                console.log('obtuve',result);
+                if(result.rowCount>0){
+                    rta.datos=result.row.contenido;
+                    rta.estado=result.row.estado;
+                }else{
+                    rta.datos=be.registroVacio;
+                    rta.estado='vacio';
+                }
+                res.end(JSON.stringify(rta));
             }).catch(MiniTools.serveErr(req,res));
         });
         this.app.post('/guardar', function(req, res){
