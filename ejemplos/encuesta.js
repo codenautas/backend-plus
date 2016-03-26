@@ -19,35 +19,6 @@ require('best-globals').setGlobals(global);
 class AppEncuesta extends backendPlus.AppBackend{
     constructor(){
         super();
-        this.tiposCeldas={
-            titulo:{
-                completar(){
-                    
-                }
-            },
-            pregunta:{
-                completar(celda, be, idFormulario){
-                    be.registroVacio[celda.variable]=null;
-                    if(!celda.variable){
-                        celda.variable = celda.pregunta.toLowerCase();
-                    }
-                    if(!celda.typeInfo){
-                        celda.typeInfo={}
-                        if(celda.opciones){
-                            celda.typeInfo.typeName="enum";
-                            celda.typeInfo.options=celda.opciones;
-                        }else{
-                            celda.typeInfo.typeName=celda["tipo-dato"];
-                        }
-                        (celda.typeInfo.options||[]).forEach(function(opcion){
-                            opcion.option = coalesce(opcion.option,opcion.opcion,coalesce.throwError);
-                            opcion.label  = coalesce(opcion.label ,opcion.texto ,coalesce.throwError);
-                        });
-                    }
-
-                }
-            }
-        }
     }
     configList(){
         return super.configList().concat([
@@ -57,28 +28,9 @@ class AppEncuesta extends backendPlus.AppBackend{
     }
     postConfig(){
         var be=this;
-        return readYaml(be.config.estructura.origen).then(function(estructura){
+        be.registroVacio = {};
+        be.readStructure(be.config.estructura.origen).then(function(estructura){
             be.estructura = estructura;
-            // var test=be.estructura['main-form']
-            be.registroVacio = {};
-            _.forEach(be.estructura.formularios, function(formulario, idFormulario){
-                _.forEach(formulario.celdas, function(celda, indexCelda){
-                    if(!celda.tipo){
-                        for(var tipoCelda in be.tiposCeldas){
-                            if(tipoCelda in celda){
-                                celda.tipo = tipoCelda;
-                            }
-                        }
-                    }
-                    var defTipoCelda = be.tiposCeldas[celda.tipo];
-                    defTipoCelda.completar(celda, be, idFormulario);
-                });
-            });
-            /*
-            console.log('***************************')
-            console.dir(be.estructura);
-            console.dir(be.estructura.formularios[be.estructura["main-form"]].celdas, {depth:8});
-            */
         });
     }
     updateDatabase(req, parametros, updateSql, updateParameters) {
