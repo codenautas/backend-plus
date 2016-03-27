@@ -15,5 +15,6 @@ login:
   plus:
     unloggedPath: ejemplos/unlogged
     loginPagePath: ejemplos/unlogged/login
+    fileStore: true
 estructura:
   origen: ejemplos/estructura-ejemplo.yaml
