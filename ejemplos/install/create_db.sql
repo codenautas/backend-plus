@@ -35,3 +35,12 @@ insert into bep.users
 insert into bep.users 
   select 'trac'||n, md5(n||'trac'||n), 'test', ('{"enc":'||n||',"for":"TRAC"}')::jsonb
     from generate_series(1,200) n;
+
+create table bep.parametros(
+  unico_registro boolean not null primary key,
+  full_log boolean not null default true,
+  constraint unico_registro check (unico_registro is true)
+);
+alter table bep.parametros owner to beplus_example_user;
+
+insert into bep.parametros(unico_registro) values (true);

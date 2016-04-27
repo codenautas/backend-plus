@@ -35,7 +35,6 @@ class AppEncuesta extends backendPlus.AppBackend{
     }
     updateDatabase(req, parametros, updateSql, updateParameters) {
         var be=this;
-        //console.log('updateDatabase', parametros, updateSql, updateParameters);
         var client;
         return this.getDbClient().then(function(cli) {
             client=cli;
@@ -46,17 +45,14 @@ class AppEncuesta extends backendPlus.AppBackend{
             return client.query("SELECT id, contenido, estado FROM bep.datos WHERE id = $1",[parametros.id]).fetchOneRowIfExists();
         }).then(function(data) {
             if(data.rowCount == 0) {
-                //console.log('tengo que hacer el insert', parametros)
                 var sql = "INSERT INTO bep.datos (id, contenido) SELECT $1, $2 WHERE NOT EXISTS (SELECT 1 FROM bep.datos WHERE id=$3)";
                 return client.query(sql,[parametros.id, be.registroVacio, parametros.id]).execute();
             }
         }).then(function() {
-            //console.log('termine el insert', parametros)
             return client.query(updateSql, updateParameters).execute();
         }).then(function(datos) {
             return client.query("COMMIT").execute().then(function(){ return datos; });
         }).then(function(datos) {
-            //console.log("data", datos);
         }).catch(function(err) {
             console.log("error: "+err);
         }).then(function(){
@@ -67,7 +63,6 @@ class AppEncuesta extends backendPlus.AppBackend{
         });
     }
     obtenerParametros(req){
-       // console.log("########################",req.body);
         var parametros=JSON.parse(req.body.info);
         if(req.user.iddato && req.query.id && req.user.iddato != req.query.id){
             throw new Error("No coinciden los ID");
@@ -86,12 +81,9 @@ class AppEncuesta extends backendPlus.AppBackend{
             var parametros=be.obtenerParametros(req);
             rta.id = req.user.iddato || parametros.id;
             rta.estructura = be.estructura;
-            console.log('por get client');
             be.getDbClient().then(function(client){
-                console.log('por select');
                 return client.query("SELECT contenido, estado FROM bep.datos WHERE id = $1", [rta.id]).fetchOneRowIfExists();
             }).then(function(result){
-                console.log('obtuve',result);
                 if(result.rowCount>0){
                     rta.datos=result.row.contenido;
                     rta.estado=result.row.estado;
@@ -111,7 +103,6 @@ class AppEncuesta extends backendPlus.AppBackend{
         });
         this.app.post('/finalizar', function(req, res){
             var parametros=be.obtenerParametros(req);
-            //console.log('entra a /finalizar',parametros);
             be.updateDatabase(req, parametros,
                               "UPDATE bep.datos SET contenido = $2, estado='ingresado' WHERE id = $1 RETURNING contenido",
                               [parametros.id, parametros.datos]);
@@ -119,11 +110,28 @@ class AppEncuesta extends backendPlus.AppBackend{
         });
         this.app.post('/blanquear', function(req, res){
             var parametros=be.obtenerParametros(req);
-            //console.log('entra a /blanquear',parametros);
             be.updateDatabase(req, parametros,
                               "UPDATE bep.datos SET contenido = $2, estado='vacio' WHERE id = $1 RETURNING contenido",
                               [parametros.id, be.registroVacio]);
             res.end("Encuesta blanqueada");
+        });
+        this.app.get('/about-info', function(req, res){
+            if(req.user.rol=='admin'){
+                be.getDbClient().then(function(client){
+                    return client.query("select * from bep.parametros").fetchUniqueRow();
+                }).then(function(sysParams){
+                    if(sysParams.row.full_log){
+                        res.header('Content-Type','text/plain');
+                        res.end(JSON.stringify(be.config,null,'    ').replace(/\n(.*".*pass.*":\s*").*(",?)\n/g,'\n$1********$2\n'));
+                    }else{
+                        res.status(401);
+                        res.end("Not full log");
+                    }
+                }).catch(MiniTools.serveErr(req,res));
+            }else{
+                res.status(401);
+                res.end("No autorizado");
+            }
         });
     }
     get rootPath(){ return __dirname +'/'; }

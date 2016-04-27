@@ -1,8 +1,8 @@
 server:
-  base-url: /trac
+  base-url: /ejemplo
 db:
   port: 5435
 estructura:
-  origen: ejemplo/estructura-trac.yaml
+  origen: ejemplo/estructura-ejemplo.yaml
 log:
   req: true
