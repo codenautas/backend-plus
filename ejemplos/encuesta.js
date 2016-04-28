@@ -31,6 +31,10 @@ class AppEncuesta extends backendPlus.AppBackend{
         be.registroVacio = {};
         be.readStructure(be.config.estructura.origen).then(function(estructura){
             be.estructura = estructura;
+        }).catch(function(err){
+            console.log('ERROR AL LEER LA ESTRUCTURA');
+            console.log(err);
+            console.log(err.stack);
         });
     }
     updateDatabase(req, parametros, updateSql, updateParameters) {
