@@ -20,3 +20,7 @@ insert into bep.users values ('test17',md5('1test17'),'test','{"enc":17,"for":"T
 insert into bep.users values ('test18',md5('1test18'),'test','{"enc":18,"for":"TRAC"}');
 insert into bep.users values ('test19',md5('1test19'),'test','{"enc":19,"for":"TRAC"}');
 insert into bep.users values ('test20',md5('1test20'),'test','{"enc":20,"for":"TRAC"}');
+
+insert into bep.users values ('tca1',md5('1tca1'),'test','{"enc":1,"for":"TCA2"}');
+insert into bep.users values ('tca3',md5('1tca3'),'test','{"enc":1,"for":"TCA3"}');
+insert into bep.users values ('tca4',md5('1tca4'),'test','{"enc":1,"for":"TCA4"}');
