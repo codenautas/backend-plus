@@ -56,10 +56,11 @@ class AppEncuesta extends backendPlus.AppBackend{
         }).catch(function(err) {
             console.log("error: "+err);
         }).then(function(){
-            client.done();
             return parametros;
         }).catch(function(err) {
             console.log("error al cerrar: "+err);
+        }).then(function(){
+            client.done();
         });
     }
     obtenerParametros(req){
@@ -81,7 +82,9 @@ class AppEncuesta extends backendPlus.AppBackend{
             var parametros=be.obtenerParametros(req);
             rta.id = req.user.iddato || parametros.id;
             rta.estructura = be.estructura;
-            be.getDbClient().then(function(client){
+            var client;
+            be.getDbClient().then(function(cli){
+                client=cli;
                 return client.query("SELECT contenido, estado FROM bep.datos WHERE id = $1", [rta.id]).fetchOneRowIfExists();
             }).then(function(result){
                 if(result.rowCount>0){
@@ -92,7 +95,9 @@ class AppEncuesta extends backendPlus.AppBackend{
                     rta.estado='vacio';
                 }
                 res.end(JSON.stringify(rta));
-            }).catch(MiniTools.serveErr(req,res));
+            }).catch(MiniTools.serveErr(req,res)).then(function(){
+                client.done();
+            });
         });
         this.app.post('/guardar', function(req, res){
             var parametros=be.obtenerParametros(req);
@@ -117,7 +122,9 @@ class AppEncuesta extends backendPlus.AppBackend{
         });
         this.app.get('/about-info', function(req, res){
             if(req.user.rol=='admin'){
-                be.getDbClient().then(function(client){
+                var client;
+                be.getDbClient().then(function(cli){
+                    client=cli;
                     return client.query("select * from bep.parametros").fetchUniqueRow();
                 }).then(function(sysParams){
                     if(sysParams.row.full_log){
@@ -127,7 +134,9 @@ class AppEncuesta extends backendPlus.AppBackend{
                         res.status(401);
                         res.end("Not full log");
                     }
-                }).catch(MiniTools.serveErr(req,res));
+                }).catch(MiniTools.serveErr(req,res)).then(function(){
+                    client.done();
+                });
             }else{
                 res.status(401);
                 res.end("No autorizado");

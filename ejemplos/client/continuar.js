@@ -3,21 +3,25 @@
 var html=jsToHtml.html;
 
 function presentarFormulario(estructura){
-    var celdas=[];
+    var celdasDesplegadas=[];
     var controles=[];
     var divFormulario=html.div({"tedede-formulario":"trac"}).create();
     var luego = Promise.resolve();
     estructura.celdas.forEach(function(fila){
+        var contenidoCelda=[];
         if(fila.tipo=='titulo'){
-            celdas.push(html.div({id:"titulo"},fila.titulo))
+            contenidoCelda.push(html.div({"class":"titulo", id:"titulo"},fila.titulo))
+        }
+        if(fila.tipo=='texto'){
+            contenidoCelda.push(html.div({"class":"texto"},fila.texto))
         }
         if(fila.tipo=='pregunta'){
-            celdas.push(html.div({"class":"preguntas",id:fila.pregunta},fila.texto));
+            contenidoCelda.push(html.div({"class":fila.subtipo||"preguntas",id:fila.pregunta},fila.texto));
             if(fila.aclaracion){
-                celdas.push(html.div({"class":"aclaracion"},fila.aclaracion));
+                contenidoCelda.push(html.div({"class":"aclaracion"},fila.aclaracion));
             }
             var controlOpciones = Tedede.bestCtrl(fila.typeInfo).create();
-            celdas.push(controlOpciones);
+            contenidoCelda.push(html.div({"class":"opciones"}, [controlOpciones]));
             luego = luego.then(function(){
                 Tedede.adaptElement(controlOpciones,fila.typeInfo);
                 controlOpciones.setAttribute("tedede-var", fila.variable);
@@ -32,8 +36,9 @@ function presentarFormulario(estructura){
                 controles.push(controlOpciones);
             });
         }
+        celdasDesplegadas.push(html.div({"class": "celda"}, contenidoCelda));
     });
-    divFormulario.appendChild(html.div({"class":"bloque"},celdas).create());
+    divFormulario.appendChild(html.div({"class":"bloque"},celdasDesplegadas).create());
     pantalla.appendChild(divFormulario);
     pantalla.appendChild(html.input({type:"button",id:"botonFin", value:"Finalizar"}).create());
     return luego.then(function(){
@@ -60,7 +65,6 @@ function ponerDatos(datos) {
 
 window.addEventListener("load",function(){
     document.getElementById('status').textContent = "Cargando...";
-   // console.log("HOLA MUNDO");
     AjaxBestPromise.post({
         url:'info-enc-act',
         data:{info:"{}"}
