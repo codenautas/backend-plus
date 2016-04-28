@@ -4,7 +4,7 @@ formularios:
     celdas:
     - titulo: Encuesta de ejemplo
     - pregunta: P1, 
-      texto: ¿cuál es su tipo de ejemplo preferido?
+      texto: ¿Cuál es su tipo de ejemplo preferido?
       aclaracion: no considerar este ejemplo
       opciones:
       - opcion: 1
@@ -18,15 +18,19 @@ formularios:
         texto: otro tipo 
         especifique: true
     - pregunta: P2
-      texto: ¿cuánto tiempo le llevó decidirse a contestar la respuesta anterior? 
+      texto: ¿Cuánto tiempo le llevó decidirse a contestar la respuesta anterior? 
       alcaración: exprese el tiempo en minutos
       typeInfo: 
         typeName: number
         minValue: 0
     - pregunta: P3
+      texto: ¿Alguna vez había contestado una encuesta autoreferente? 
+      typeInfo: 
+        typeName: boolean
+    - pregunta: P4
       texto: Por favor describa el proceso que usó para tomar la decisión
       typeInfo: text
-    - pregunta: P4
+    - pregunta: P5
       texto: ¿Qué características son decisorias para evaluar un ejemplo?
       typeInfo: multiple
       opciones:

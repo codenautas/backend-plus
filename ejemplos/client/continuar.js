@@ -21,7 +21,7 @@ function presentarFormulario(estructura){
                 contenidoCelda.push(html.div({"class":"aclaracion"},fila.aclaracion));
             }
             var controlOpciones = Tedede.bestCtrl(fila.typeInfo).create();
-            contenidoCelda.push(html.div({"class":"opciones"}, [controlOpciones]));
+            contenidoCelda.push(html.div({"class":["opciones", fila.typeInfo.typeName]}, [controlOpciones]));
             luego = luego.then(function(){
                 Tedede.adaptElement(controlOpciones,fila.typeInfo);
                 controlOpciones.setAttribute("tedede-var", fila.variable);
