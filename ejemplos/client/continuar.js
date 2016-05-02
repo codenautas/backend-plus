@@ -12,7 +12,7 @@ function presentarFormulario(estructura){
         if(fila.tipo=='titulo'){
             contenidoCelda.push(html.div({"class":"titulo", id:"titulo"},fila.titulo))
         }
-        if(fila.tipo=='otro'){
+        if(fila.tipo=='texto'){
             contenidoCelda.push(html.div({"class":"texto"},fila.texto))
         }
         if(fila.tipo=='pregunta'){
