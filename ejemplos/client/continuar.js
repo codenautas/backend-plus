@@ -1,5 +1,13 @@
 "use script";
 
+function classToggle(element,clase, sacoAgrego ){
+    if(sacoAgrego){
+        element.classList.add(clase);
+    }else{
+        element.classList.remove(clase);
+    } 
+}
+
 var html=jsToHtml.html;
 
 function presentarFormulario(estructura){
@@ -16,6 +24,7 @@ function presentarFormulario(estructura){
             contenidoCelda.push(html.div({"class":"texto"},fila.texto))
         }
         if(fila.tipo=='pregunta'){
+            contenidoCelda.push(html.div({"class":"codigo"},fila.pregunta));
             contenidoCelda.push(html.div({"class":fila.subtipo||"preguntas",id:fila.pregunta},fila.texto));
             if(fila.aclaracion){
                 contenidoCelda.push(html.div({"class":"aclaracion"},fila.aclaracion));
@@ -38,6 +47,10 @@ function presentarFormulario(estructura){
         }
         celdasDesplegadas.push(html.div({"class": "celda"}, contenidoCelda));
     });
+    divFormulario.appendChild(html.div({"class":"bloque"},[
+        html.label({"for": "modo-revisar"}, "modo revisar"),
+        html.input({type: "checkbox", "id": "modo-revisar"}),
+    ]).create());
     divFormulario.appendChild(html.div({"class":"bloque"},celdasDesplegadas).create());
     pantalla.appendChild(divFormulario);
     pantalla.appendChild(html.input({type:"button",id:"botonFin", value:"Finalizar"}).create());
@@ -54,6 +67,16 @@ function presentarFormulario(estructura){
             postAction('finalizar', data).then(function(){
                 window.location = 'fin-ingreso';
             });
+        });
+        document.getElementById("modo-revisar").addEventListener('change', function(){
+            var divContenedor=this;
+            while(divContenedor && !divContenedor.getAttribute("tedede-formulario")){
+                divContenedor=divContenedor.parentNode;
+            }
+            if(!divContenedor){
+                throw new Error("No encontre en tedede-formulario");
+            }
+            classToggle(divContenedor, "modo-revisar", this.checked);
         });
         return divFormulario;
     });
