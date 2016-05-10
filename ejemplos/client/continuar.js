@@ -34,6 +34,12 @@ function presentarFormulario(estructura){
                     });
                 });
                 controles.push(controlOpciones);
+            }).then(function(){
+                (fila.typeInfo.options||[]).forEach(function(option){
+                    if(option.salto || true){
+                        controlOpciones.moreOptions[option.option].textContent=option.salto || JSON.stringify(option);
+                    }
+                });
             });
         }
         celdasDesplegadas.push(html.div({"class": "celda"}, contenidoCelda));
