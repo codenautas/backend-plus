@@ -45,8 +45,8 @@ function presentarFormulario(estructura){
                 controles.push(controlOpciones);
             }).then(function(){
                 (fila.typeInfo.options||[]).forEach(function(option){
-                    if(option.salto || true){
-                        controlOpciones.moreOptions[option.option].textContent=option.salto || JSON.stringify(option);
+                    if(option.salto){
+                        controlOpciones.moreInfo[option.option].textContent=' pase a '+option.salto.tipo+' '+option.salto[option.salto.tipo];
                     }
                 });
             });
