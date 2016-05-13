@@ -11,23 +11,26 @@ function classToggle(element,clase, sacoAgrego ){
 var html=jsToHtml.html;
 var coalesce = bestGlobals.coalesce;
 
-function validarRegistro(estructura, registro){
+function validarRegistro(estructuraFormulario, registro, controles){
         // transformar en recorrer el arreglo controles y verificar la existencia de "expresion-habilitar"
     console.log('======= controles');
-    console.log(controles);
-    return ;
-    var variablesAApagar=divFormulario.querySelectorAll("[tedede-var=t10]");
-    Array.prototype.forEach.call(variablesAApagar, function(elemento){
-        elemento.disabled=true;
-    })
+    console.log(estructuraFormulario);
+    estructuraFormulario.celdas.forEach(function(celda){
+        if(celda.tipo==='pregunta' && celda['expresion-habilitar']){
+            var expresionEvaluable = celda['expresion-habilitar'].replace(Regexplicit.variables, function(variableName){
+                return "registro."+variableName;
+            });
+            console.log(celda.variable,celda['expresion-habilitar'],expresionEvaluable,eval(expresionEvaluable));
+        }
+    });
 }
 
-function presentarFormulario(estructura, registro){
+function presentarFormulario(estructuraFormulario, registro){
     var celdasDesplegadas=[];
-    var controles=[];
+    var controles={};
     var divFormulario=html.div({"tedede-formulario":"trac"}).create();
     var luego = Promise.resolve();
-    estructura.celdas.forEach(function(celda){
+    estructuraFormulario.celdas.forEach(function(celda){
         var contenidoCelda=[];
         if(celda.tipo=='titulo'){
             contenidoCelda.push(html.div({"class":"titulo", id:"titulo"},celda.titulo))
@@ -52,14 +55,15 @@ function presentarFormulario(estructura, registro){
                 controlVariable.setAttribute("tedede-var", celda.variable);
                 controlVariable.addEventListener('update',function(){
                     var value = this.getTypedValue();
+                    registro[celda.variable] = value;
                     postAction('guardar',{
                         id: divFormulario.idRegistro,
                         variable: celda.variable,
                         valor:value
                     });
-                    validarRegistro(estructura, controles);
+                    validarRegistro(estructuraFormulario, registro, controles);
                 });
-                controles.push(controlVariable);
+                controles[celda.variable] = controlVariable;
             }).then(function(){
                 (celda.typeInfo.options||[]).forEach(function(option){
                     if(option.salto){
@@ -84,9 +88,6 @@ function presentarFormulario(estructura, registro){
                 id: divFormulario.idRegistro,
                 datos: {}
             };
-            controles.forEach(function(control){
-                data.datos[control.getAttribute("tedede-var")] = control.getTypedValue();
-            });
             postAction('finalizar', data).then(function(){
                 window.location = 'fin-ingreso';
             });

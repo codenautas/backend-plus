@@ -36,6 +36,7 @@
     "mini-tools": "~0.2.8",
     "pg-promise-strict": "~0.2.3",
     "promise-plus": "~0.0.6",
+    "regexplicit": "~0.0.2",
     "tedede": "~0.2.1"
   },
   "devDependencies": {
