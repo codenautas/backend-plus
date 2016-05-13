@@ -9,44 +9,61 @@ function classToggle(element,clase, sacoAgrego ){
 }
 
 var html=jsToHtml.html;
+var coalesce = bestGlobals.coalesce;
 
-function presentarFormulario(estructura){
+function validarRegistro(estructura, registro){
+        // transformar en recorrer el arreglo controles y verificar la existencia de "expresion-habilitar"
+    console.log('======= controles');
+    console.log(controles);
+    return ;
+    var variablesAApagar=divFormulario.querySelectorAll("[tedede-var=t10]");
+    Array.prototype.forEach.call(variablesAApagar, function(elemento){
+        elemento.disabled=true;
+    })
+}
+
+function presentarFormulario(estructura, registro){
     var celdasDesplegadas=[];
     var controles=[];
     var divFormulario=html.div({"tedede-formulario":"trac"}).create();
     var luego = Promise.resolve();
-    estructura.celdas.forEach(function(fila){
+    estructura.celdas.forEach(function(celda){
         var contenidoCelda=[];
-        if(fila.tipo=='titulo'){
-            contenidoCelda.push(html.div({"class":"titulo", id:"titulo"},fila.titulo))
+        if(celda.tipo=='titulo'){
+            contenidoCelda.push(html.div({"class":"titulo", id:"titulo"},celda.titulo))
         }
-        if(fila.tipo=='texto'){
-            contenidoCelda.push(html.div({"class":"texto"},fila.texto))
+        if(celda.tipo=='texto'){
+            contenidoCelda.push(html.div({"class":"texto"},celda.texto))
         }
-        if(fila.tipo=='pregunta'){
-            contenidoCelda.push(html.div({"class":"codigo"},fila.pregunta));
-            contenidoCelda.push(html.div({"class":fila.subtipo||"preguntas",id:fila.pregunta},fila.texto));
-            if(fila.aclaracion){
-                contenidoCelda.push(html.div({"class":"aclaracion"},fila.aclaracion));
+        if(celda.tipo=='pregunta'){
+            contenidoCelda.push(html.div({"class":"codigo"},celda.pregunta));
+            contenidoCelda.push(html.div({"class":celda.subtipo||"preguntas",id:celda.pregunta},celda.texto));
+            if(celda.aclaracion){
+                contenidoCelda.push(html.div({"class":"aclaracion"},celda.aclaracion));
             }
-            var controlOpciones = Tedede.bestCtrl(fila.typeInfo).create();
-            contenidoCelda.push(html.div({"class":["opciones", fila.typeInfo.typeName]}, [controlOpciones]));
+            var controlVariable = Tedede.bestCtrl(celda.typeInfo).create();
+            if(!(celda.variable in registro)){
+                registro[celda.variable] = coalesce(celda.defaultValue, null);
+            }
+            contenidoCelda.push(html.div({"class":["opciones", celda.typeInfo.typeName]}, [controlVariable]));
             luego = luego.then(function(){
-                Tedede.adaptElement(controlOpciones,fila.typeInfo);
-                controlOpciones.setAttribute("tedede-var", fila.variable);
-                controlOpciones.addEventListener('update',function(){
+                Tedede.adaptElement(controlVariable,celda.typeInfo);
+                controlVariable.setTypedValue(registro[celda.variable]);
+                controlVariable.setAttribute("tedede-var", celda.variable);
+                controlVariable.addEventListener('update',function(){
                     var value = this.getTypedValue();
                     postAction('guardar',{
                         id: divFormulario.idRegistro,
-                        variable: fila.variable,
+                        variable: celda.variable,
                         valor:value
                     });
+                    validarRegistro(estructura, controles);
                 });
-                controles.push(controlOpciones);
+                controles.push(controlVariable);
             }).then(function(){
-                (fila.typeInfo.options||[]).forEach(function(option){
+                (celda.typeInfo.options||[]).forEach(function(option){
                     if(option.salto){
-                        controlOpciones.moreInfo[option.option].textContent=' pase a '+option.salto.tipo+' '+option.salto[option.salto.tipo];
+                        controlVariable.moreInfo[option.option].textContent=' pase a '+option.salto.tipo+' '+option.salto[option.salto.tipo];
                     }
                 });
             });
@@ -88,10 +105,6 @@ function presentarFormulario(estructura){
     });
 }
 
-function ponerDatos(datos) {
-    
-}
-
 window.addEventListener("load",function(){
     document.getElementById('status').textContent = "Cargando...";
     AjaxBestPromise.post({
@@ -99,9 +112,8 @@ window.addEventListener("load",function(){
         data:{info:"{}"}
     }).then(function(resultJson){
         var result=JSON.parse(resultJson);
-        presentarFormulario(result.estructura.formularios[result.id["for"]]).then(function(divFormulario){
+        presentarFormulario(result.estructura.formularios[result.id["for"]], result.datos).then(function(divFormulario){
             divFormulario.idRegistro = result.id;
-            ponerDatos(result.datos);
         });
     }).catch(function(err){
         document.getElementById('status').textContent = "Error "+err.message;
