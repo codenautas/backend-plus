@@ -13,14 +13,15 @@ var coalesce = bestGlobals.coalesce;
 
 function validarRegistro(estructuraFormulario, registro, controles){
         // transformar en recorrer el arreglo controles y verificar la existencia de "expresion-habilitar"
-    console.log('======= controles');
-    console.log(estructuraFormulario);
+    //console.log('======= controles');
+    //console.log(estructuraFormulario);
+    //console.log(controles);
     estructuraFormulario.celdas.forEach(function(celda){
         if(celda.tipo==='pregunta' && celda['expresion-habilitar']){
             var expresionEvaluable = celda['expresion-habilitar'].replace(Regexplicit.variables, function(variableName){
                 return "registro."+variableName;
             });
-            console.log(celda.variable,celda['expresion-habilitar'],expresionEvaluable,eval(expresionEvaluable));
+      //      console.log(celda.variable,celda['expresion-habilitar'],expresionEvaluable,eval(expresionEvaluable));
         }
     });
 }
