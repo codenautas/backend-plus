@@ -8,6 +8,7 @@ function presentarPlaca(estado) {
     var placa = [];
     var encContinuar = html.input({type:'button', id:'continuar', value:'Continuar'}).create();
     var encNueva = html.input({type:'button', id:'nueva', value:'nueva'}).create();
+    var metadatos = html.input({type:'button', id:'metadatos', value:'Ir a los metadatos'}).create();
     switch(estado.estado) {
     case 'pendiente':
         placa.push(html.p('Desea continuar con la encuesta que tiene pendiente o comenzar una nueva?'));
@@ -26,6 +27,7 @@ function presentarPlaca(estado) {
     default:
         throw new Error('Estado inexistente: '+estado.estado);
     }
+    placa.push(metadatos);
     encContinuar.addEventListener('click', function() {
        postAction('set-status', {id:estado.id,estado:'pendiente'}).then(function(res) {
            window.location = 'continuar';
@@ -36,6 +38,13 @@ function presentarPlaca(estado) {
            console.log("res", res);
            window.location = 'continuar';
        });
+    });
+    metadatos.addEventListener('click', function() {
+        window.location = 'metadatos';
+       /*postAction('set-status', {id:estado.id,estado:'vacio'}).then(function(res) {
+           console.log("res", res);
+           window.location = 'metadatos';
+       });*/
     });
     pantalla.appendChild(html.div(placa).create());
 }
