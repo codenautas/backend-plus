@@ -4,7 +4,7 @@ const _ = require('lodash');
 const util = require('util');
 var readYaml = require('read-yaml-promise');
 var MiniTools = require('mini-tools');
-
+var fs = require('fs-promise');
 var Promises = require('best-promise');
 
 // var idEncuesta = Math.random();
@@ -123,6 +123,19 @@ class AppEncuesta extends backendPlus.AppBackend{
                               "UPDATE bep.datos SET contenido = $2, estado='vacio' WHERE id = $1 RETURNING contenido",
                               [parametros.id, be.registroVacio]);
             res.end("Encuesta blanqueada");
+        });
+        this.app.get('/metadatos/obtener', function(req, res){
+            /*console.log(req.query);
+            console.log('__dirname',__dirname)
+            console.log('process.cwd()',process.cwd())
+            console.log('config',be.config)*/
+            fs.readFile(be.config.estructura.origen,'utf8').then(function(data){
+                res.end(data);
+                //res.end("estos son\nlos metadatos");
+            }).catch(function(err){
+                console.log(err.message);
+            });
+            
         });
         this.app.get('/about-info', function(req, res){
             if(req.user.rol=='admin'){
