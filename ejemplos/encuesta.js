@@ -125,17 +125,23 @@ class AppEncuesta extends backendPlus.AppBackend{
             res.end("Encuesta blanqueada");
         });
         this.app.get('/metadatos/obtener', function(req, res){
-            /*console.log(req.query);
-            console.log('__dirname',__dirname)
-            console.log('process.cwd()',process.cwd())
-            console.log('config',be.config)*/
             fs.readFile(be.config.estructura.origen,'utf8').then(function(data){
                 res.end(data);
-                //res.end("estos son\nlos metadatos");
             }).catch(function(err){
                 console.log(err.message);
             });
             
+        });
+        this.app.post('/reescribir',function(req,res){
+            //console.log(req.body);
+            var contenido=JSON.stringify(req.body);
+            var file='nuevaEstructura.yaml';
+            fs.writeFile(file,contenido,'utf8').then(function(err){
+                if(err){
+                    console.log(err);
+                }
+            })
+            res.end('hola mundo');
         });
         this.app.get('/about-info', function(req, res){
             if(req.user.rol=='admin'){

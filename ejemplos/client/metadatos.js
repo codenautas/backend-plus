@@ -9,38 +9,39 @@ fs.readFile('continuar.styl','utf8',function(err,data){
 function leer(){
     AjaxBestPromise.get({
             url:'/metadatos/obtener',
-            data:{/*a:'prueba1', b:'prueba2'*/}
+            data:{}
         }).then(function(result){
-        preDiv.textContent=result;
+            preDiv.textContent=result;
     });
+    
+}
+function reescribir(){
+    document.getElementById('reescrbirMetadatos').addEventListener('click',function(){
+        var contenido=document.getElementById('preDiv').firstChild.data;
+
+        AjaxBestPromise.post({
+            url:'/reescribir',
+            data:{contenido}
+        }).then(function(result){
+            console.log('reescribirMetadatos')
+        }).catch(function(err){
+            console.log(err);
+        });
+       
+    })
 }
 
 window.addEventListener("load",function(){
     var divStatus=html.div({id:'status'},'status').create();
     var preTag=[];
-    var variable='variable:'
-    var texto=variable+'  pregunta';
-    preTag.push(html.div({id:'preDiv'},[html.pre(texto)]));
+    preTag.push(html.pre({id:'preDiv'}));
     var bloque=html.div({id:'formulario'},preTag).create();
+    var botonReescribir=html.input({type:'button', id:'reescrbirMetadatos', value:'Ir a la encuesta'}).create();
     pantalla.appendChild(bloque);
+    pantalla.appendChild(botonReescribir);
     pantalla.appendChild(divStatus);
-
     document.getElementById('preDiv').setAttribute('contenteditable',true)
     leer();
+    reescribir();
 });
 
-
-// window.addEventListener("load",function(){
-    // document.getElementById('status').textContent = "Cargando...";
-    // AjaxBestPromise.post({
-        // url:'metadatos',
-        // data:{info:"{}"}
-    // }).then(function(resultJson){
-        // var result=JSON.parse(resultJson);
-        // presentarFormulario(result.estructura.formularios[result.id["for"]], result.datos).then(function(divFormulario){
-            // divFormulario.idRegistro = result.id;
-        // });
-    // }).catch(function(err){
-        // document.getElementById('status').textContent = "Error "+err.message;
-    // });
-// });
