@@ -132,16 +132,23 @@ class AppEncuesta extends backendPlus.AppBackend{
             });
             
         });
-        this.app.post('/reescribir',function(req,res){
-            //console.log(req.body);
-            var contenido=JSON.stringify(req.body);
-            var file='nuevaEstructura.yaml';
-            fs.writeFile(file,contenido,'utf8').then(function(err){
-                if(err){
-                    console.log(err);
-                }
-            })
-            res.end('hola mundo');
+        this.app.post('/metadatos/reescribir',function(req,res){
+            var contenido=req.body.contenido;
+            var file=be.config.estructura.origen;
+            Promise.all([
+                be.config.estructura.origen,
+                be.config.estructura.origen.replace(/^(.*[\/\\])([^\/\\]+).yaml$/,'$1local-copy-$2')+(new Date()).toISOString().replace(/[:.]/g,'-')+'.yaml'
+            ].map(function(fileName){
+                return fs.writeFile(fileName,contenido,'utf8').then(function(){
+                    console.log('grabado ok', fileName);
+                    return 'ok';
+                }, function(err){
+                    console.log('grabado con error',fileName, err);
+                    return 'error al grabar '+fileName+': '+err.message;
+                })
+            })).then(function(resultados){
+                res.end('grabado '+JSON.stringify(resultados));
+            });
         });
         this.app.get('/about-info', function(req, res){
             if(req.user.rol=='admin'){

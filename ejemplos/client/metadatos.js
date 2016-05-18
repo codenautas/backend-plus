@@ -18,14 +18,16 @@ function leer(){
 function reescribir(){
     document.getElementById('reescrbirMetadatos').addEventListener('click',function(){
         var contenido=document.getElementById('preDiv').firstChild.data;
-
         AjaxBestPromise.post({
-            url:'/reescribir',
+            url:'/metadatos/reescribir',
             data:{contenido}
         }).then(function(result){
-            console.log('reescribirMetadatos')
+            document.getElementById('status').textContent=result;
         }).catch(function(err){
-            console.log(err);
+            document.getElementById('status').appendChild(html.div([
+                html.div(err.message),
+                html.pre(err.stack)
+            ]).create());
         });
        
     })
