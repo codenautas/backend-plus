@@ -27,15 +27,7 @@ class AppEncuesta extends backendPlus.AppBackend{
         ]);
     }
     postConfig(){
-        var be=this;
-        be.registroVacio = {};
-        be.readStructure(be.config.estructura.origen).then(function(estructura){
-            be.estructura = estructura;
-        }).catch(function(err){
-            console.log('ERROR AL LEER LA ESTRUCTURA');
-            console.log(err);
-            console.log(err.stack);
-        });
+        this.releerMetadatos();
     }
     updateDatabase(req, parametros, updateSql, updateParameters) {
         var be=this;
@@ -74,6 +66,20 @@ class AppEncuesta extends backendPlus.AppBackend{
         }
         /////////// OJO, FALTA VER SI TIENE PERMISO EN CASO DE QUE NO SEA UNA ORGANIZACIÓN SIMPLE
         return parametros;
+    }
+    releerMetadatos(){
+        var be=this;
+        be.registroVacio = {};
+        return Promises.start(function(){
+            return be.readStructure(be.config.estructura.origen);
+        }).then(function(estructura){
+            be.estructura = estructura;
+            return "metadatos ok";
+        }).catch(function(err){
+            console.log('ERROR AL LEER LA ESTRUCTURA');
+            console.log(err);
+            console.log(err.stack);
+        });
     }
     addLoggedServices(){
         super.addLoggedServices();
@@ -137,7 +143,9 @@ class AppEncuesta extends backendPlus.AppBackend{
             var file=be.config.estructura.origen;
             Promise.all([
                 be.config.estructura.origen,
-                be.config.estructura.origen.replace(/^(.*[\/\\])([^\/\\]+).yaml$/,'$1local-copy-$2')+(new Date()).toISOString().replace(/[:.]/g,'-')+'.yaml'
+                be.config.estructura.origen.replace(/^(.*[\/\\])([^\/\\]+).yaml$/,function(matchCompleto,path,fileName){
+                    return path+'local-copy-'+fileName;
+                })+(new Date()).toISOString().replace(/[:.]/g,'-')+'.yaml'
             ].map(function(fileName){
                 return fs.writeFile(fileName,contenido,'utf8').then(function(){
                     console.log('grabado ok', fileName);
@@ -147,8 +155,17 @@ class AppEncuesta extends backendPlus.AppBackend{
                     return 'error al grabar '+fileName+': '+err.message;
                 })
             })).then(function(resultados){
+                return Promises.start(function(){
+                    return be.releerMetadatos();
+                }).then(function(result){
+                    resultados.push(result);
+                    console.log("resultados",resultados)
+                    return resultados;
+                });
+            }).then(function(resultados){
+                console.log("resultados",resultados)
                 res.end('grabado '+JSON.stringify(resultados));
-            });
+            })
         });
         this.app.get('/about-info', function(req, res){
             if(req.user.rol=='admin'){

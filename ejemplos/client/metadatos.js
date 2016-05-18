@@ -6,23 +6,29 @@ fs.readFile('continuar.styl','utf8',function(err,data){
     console.log(data);
 })*/
 
+var contenidoOriginal;
+
 function leer(){
     AjaxBestPromise.get({
-            url:'/metadatos/obtener',
-            data:{}
-        }).then(function(result){
-            preDiv.textContent=result;
+        url:'/metadatos/obtener',
+        data:{}
+    }).then(function(result){
+        preDiv.textContent=result;
+        contenidoOriginal=result;
     });
     
 }
 function reescribir(){
     document.getElementById('reescrbirMetadatos').addEventListener('click',function(){
-        var contenido=document.getElementById('preDiv').firstChild.data;
+        document.getElementById('status').textContent='grabando...';
+        // var contenido=document.getElementById('preDiv').firstChild.data;
+        var contenido=document.getElementById('preDiv').textContent;
         AjaxBestPromise.post({
             url:'/metadatos/reescribir',
             data:{contenido}
         }).then(function(result){
             document.getElementById('status').textContent=result;
+            contenidoOriginal=result;
         }).catch(function(err){
             document.getElementById('status').appendChild(html.div([
                 html.div(err.message),
@@ -34,8 +40,8 @@ function reescribir(){
 }
 function alFormulario(){
     document.getElementById('irAlFormulario').addEventListener('click', function() {
-           window.location = 'continuar';
-       });
+        window.location = 'continuar';
+    });
 }
 
 window.addEventListener("load",function(){
@@ -53,5 +59,15 @@ window.addEventListener("load",function(){
     leer();
     reescribir();
     alFormulario();
+    setInterval(function(){
+        if(document.getElementById('preDiv')===document.activeElement){
+            var contenidoActual=document.getElementById('preDiv').textContent;
+            if(contenidoOriginal!==undefined && contenidoOriginal!==contenidoActual){
+                document.getElementById('status').textContent='hay cambios sin guardar';
+            }else{
+                document.getElementById('status').textContent='';
+            }
+        }
+    },2000);
 });
 
