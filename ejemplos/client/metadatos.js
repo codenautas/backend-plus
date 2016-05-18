@@ -28,7 +28,7 @@ function reescribir(){
             data:{contenido}
         }).then(function(result){
             document.getElementById('status').textContent=result;
-            contenidoOriginal=result;
+            contenidoOriginal=contenido;
         }).catch(function(err){
             document.getElementById('status').appendChild(html.div([
                 html.div(err.message),
