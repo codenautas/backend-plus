@@ -32,18 +32,26 @@ function reescribir(){
        
     })
 }
+function alFormulario(){
+    document.getElementById('irAlFormulario').addEventListener('click', function() {
+           window.location = 'continuar';
+       });
+}
 
 window.addEventListener("load",function(){
-    var divStatus=html.div({id:'status'},'status').create();
+    var divStatus=html.div({id:'status'},'Estado').create();
     var preTag=[];
     preTag.push(html.pre({id:'preDiv'}));
     var bloque=html.div({id:'formulario'},preTag).create();
-    var botonReescribir=html.input({type:'button', id:'reescrbirMetadatos', value:'Ir a la encuesta'}).create();
+    var botonReescribir=html.input({type:'button', id:'reescrbirMetadatos', value:'Guardar Metadatos'}).create();
+    var botonIrAlFormulario=html.input({type:'button', id:'irAlFormulario', value:'Ir al formulario'}).create();
     pantalla.appendChild(bloque);
     pantalla.appendChild(botonReescribir);
     pantalla.appendChild(divStatus);
+    pantalla.appendChild(botonIrAlFormulario);
     document.getElementById('preDiv').setAttribute('contenteditable',true)
     leer();
     reescribir();
+    alFormulario();
 });
 
