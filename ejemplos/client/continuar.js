@@ -20,8 +20,11 @@ function validarRegistro(estructuraFormulario, registro, controles){
         if(celda.tipo==='pregunta' && celda['expresion-habilitar']){
             var expresionEvaluable = celda['expresion-habilitar'].replace(Regexplicit.variables, function(variableName){
                 return "registro."+variableName;
+            }).replace(Regexplicit.operatorEqual, function(match,left,equal,right){
+                return left+'=='+right;
             });
-      //      console.log(celda.variable,celda['expresion-habilitar'],expresionEvaluable,eval(expresionEvaluable));
+            // console.log(celda.variable,celda['expresion-habilitar'],expresionEvaluable,eval(expresionEvaluable));
+            controles[celda.variable].disabled = !eval(expresionEvaluable);
         }
     });
 }

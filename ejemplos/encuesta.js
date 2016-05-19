@@ -144,7 +144,7 @@ class AppEncuesta extends backendPlus.AppBackend{
             Promise.all([
                 be.config.estructura.origen,
                 be.config.estructura.origen.replace(/^(.*[\/\\])([^\/\\]+).yaml$/,function(matchCompleto,path,fileName){
-                    return path+'local-copy-'+fileName;
+                    return path+'copias/'+fileName;
                 })+(new Date()).toISOString().replace(/[:.]/g,'-')+'.yaml'
             ].map(function(fileName){
                 return fs.writeFile(fileName,contenido,'utf8').then(function(){

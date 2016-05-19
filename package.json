@@ -14,30 +14,30 @@
     { "name": "Emilio Platzer", "email": "emilioplatzer@gmail.com" }
   ],
   "dependencies": {
-    "body-parser": "~1.15.0",
+    "body-parser": "~1.15.1",
     "cookie-parser": "~1.4.1",
-    "es6-promise": "~3.1.2",
+    "es6-promise": "~3.2.1",
     "express": "~4.13.4",
     "express-session": "~1.13.0",
-    "fs-extra": "~0.28.0", 
+    "fs-extra": "~0.30.0", 
     "fs-promise": "~0.5.0", 
-    "jade": "~1.11.0",
-    "lodash": "~4.11.1",
+    "pug": "~2.0.0-alpha7",
+    "lodash": "~4.12.0",
     "numeral": "~1.5.3",
     "read-yaml-promise": "~1.0.2",
-    "stylus": "~0.54.3",
+    "stylus": "~0.54.5",
 
     "ajax-best-promise": "~0.0.7",
-    "best-globals": "~0.2.4",
+    "best-globals": "~0.3.0",
     "best-promise": "~0.2.4",
     "extension-serve-static": "~0.1.6",
     "js-to-html": "~0.9.0",
-    "login-plus": "~0.4.1",
-    "mini-tools": "~0.2.8",
+    "login-plus": "~0.4.2",
+    "mini-tools": "~0.2.9",
     "pg-promise-strict": "~0.2.3",
     "promise-plus": "~0.0.6",
-    "regexplicit": "~0.0.2",
-    "tedede": "~0.2.1"
+    "regexplicit": "~0.0.4",
+    "tedede": "~0.2.2"
   },
   "devDependencies": {
     "kill-9": "~0.4.1"
