@@ -114,18 +114,24 @@ function presentarFormulario(estructuraFormulario, registro){
 function presentarAlmacen(result, formAMostrar){
     menu_bar.innerHTML='';
     var botonera=[];
+    var principal='';
     _.forEach(result.almacen.formularios, function(formulario, idFormulario){
         var defFor = result.estructura.formularios[idFormulario];
-        if(!defFor.multiple){
-            var boton = html.button({class:'boton-abrir-formulario'}, idFormulario).create();
-            boton.addEventListener('click', function(){
-                presentarAlmacen(result, idFormulario)
-            });
-            botonera.push(boton);
+        if((defFor.grupo||{"tipo-abonado":null})["tipo-abonado"]===result.id["tipo-abonado"]){
+            if(defFor.principal && !principal){
+                principal = idFormulario;
+            }
+            if(!defFor.multiple){
+                var boton = html.button({class:'boton-abrir-formulario'}, idFormulario).create();
+                boton.addEventListener('click', function(){
+                    presentarAlmacen(result, idFormulario)
+                });
+                botonera.push(boton);
+            }
         }
     });
     menu_bar.appendChild(html.div(botonera).create());
-    formAMostrar = formAMostrar || result.id["for"];
+    formAMostrar = formAMostrar || principal;
     presentarFormulario(result.estructura.formularios[formAMostrar], result.almacen.formularios[formAMostrar].registro).then(function(divFormulario){
         divFormulario.idRegistro = result.id;
     });
