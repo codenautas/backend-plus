@@ -42,7 +42,7 @@ class AppEncuesta extends backendPlus.AppBackend{
         }).then(function(data) {
             if(data.rowCount == 0) {
                 var sql = "INSERT INTO bep.datos (id, contenido) SELECT $1, $2 WHERE NOT EXISTS (SELECT 1 FROM bep.datos WHERE id=$3)";
-                return client.query(sql,[parametros.id, be.registroVacio, parametros.id]).execute();
+                return client.query(sql,[parametros.id, be.almacenVacio, parametros.id]).execute();
             }
         }).then(function() {
             return client.query(updateSql, updateParameters).execute();
@@ -69,7 +69,6 @@ class AppEncuesta extends backendPlus.AppBackend{
     }
     releerMetadatos(){
         var be=this;
-        be.registroVacio = {};
         return Promises.start(function(){
             return be.readStructure(be.config.estructura.origen);
         }).then(function(estructura){
@@ -98,10 +97,10 @@ class AppEncuesta extends backendPlus.AppBackend{
                 return client.query("SELECT contenido, estado FROM bep.datos WHERE id = $1", [rta.id]).fetchOneRowIfExists();
             }).then(function(result){
                 if(result.rowCount>0){
-                    rta.datos=result.row.contenido;
+                    rta.almacen=result.row.contenido;
                     rta.estado=result.row.estado;
                 }else{
-                    rta.datos=be.registroVacio;
+                    rta.almacen=be.almacenVacio;
                     rta.estado='vacio';
                 }
                 res.end(JSON.stringify(rta));
@@ -127,7 +126,7 @@ class AppEncuesta extends backendPlus.AppBackend{
             var parametros=be.obtenerParametros(req);
             be.updateDatabase(req, parametros,
                               "UPDATE bep.datos SET contenido = $2, estado='vacio' WHERE id = $1 RETURNING contenido",
-                              [parametros.id, be.registroVacio]);
+                              [parametros.id, be.almacenVacio]);
             res.end("Encuesta blanqueada");
         });
         this.app.get('/metadatos/obtener', function(req, res){

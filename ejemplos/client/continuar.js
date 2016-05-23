@@ -12,7 +12,7 @@ var html=jsToHtml.html;
 var coalesce = bestGlobals.coalesce;
 
 function validarRegistro(estructuraFormulario, registro, controles){
-        // transformar en recorrer el arreglo controles y verificar la existencia de "expresion-habilitar"
+    // transformar en recorrer el arreglo controles y verificar la existencia de "expresion-habilitar"
     //console.log('======= controles');
     //console.log(estructuraFormulario);
     //console.log(controles);
@@ -83,8 +83,9 @@ function presentarFormulario(estructuraFormulario, registro){
         html.input({type: "checkbox", "id": "modo-revisar"}),
     ]).create());
     divFormulario.appendChild(html.div({"class":"bloque"},celdasDesplegadas).create());
+    pantalla.innerHTML='';
     pantalla.appendChild(divFormulario);
-    pantalla.appendChild(html.input({type:"button",id:"botonFin", value:"Finalizar"}).create());
+    pantalla.appendChild(html.input({type:"button",id:"botonFin", value:"Continuar"}).create());
     return luego.then(function(){
         var bFin = document.getElementById('botonFin');
         bFin.addEventListener('click', function() {
@@ -110,6 +111,26 @@ function presentarFormulario(estructuraFormulario, registro){
     });
 }
 
+function presentarAlmacen(result, formAMostrar){
+    menu_bar.innerHTML='';
+    var botonera=[];
+    _.forEach(result.almacen.formularios, function(formulario, idFormulario){
+        var defFor = result.estructura.formularios[idFormulario];
+        if(!defFor.multiple){
+            var boton = html.button({class:'boton-abrir-formulario'}, idFormulario).create();
+            boton.addEventListener('click', function(){
+                presentarAlmacen(result, idFormulario)
+            });
+            botonera.push(boton);
+        }
+    });
+    menu_bar.appendChild(html.div(botonera).create());
+    formAMostrar = formAMostrar || result.id["for"];
+    presentarFormulario(result.estructura.formularios[formAMostrar], result.almacen.formularios[formAMostrar].registro).then(function(divFormulario){
+        divFormulario.idRegistro = result.id;
+    });
+};
+
 window.addEventListener("load",function(){
     document.getElementById('status').textContent = "Cargando...";
     AjaxBestPromise.post({
@@ -117,10 +138,9 @@ window.addEventListener("load",function(){
         data:{info:"{}"}
     }).then(function(resultJson){
         var result=JSON.parse(resultJson);
-        presentarFormulario(result.estructura.formularios[result.id["for"]], result.datos).then(function(divFormulario){
-            divFormulario.idRegistro = result.id;
-        });
+        presentarAlmacen(result);
     }).catch(function(err){
         document.getElementById('status').textContent = "Error "+err.message;
+        document.getElementById('status').textContent += "\n"+err.stack;
     });
 });
