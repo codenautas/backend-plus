@@ -111,7 +111,7 @@ function presentarFormulario(estructuraFormulario, registro){
     });
 }
 
-function presentarAlmacen(result, formAMostrar){
+function presentarAlmacen(result, formAMostrar, orden){
     menu_bar.innerHTML='';
     var botonera=[];
     var principal='';
@@ -121,18 +121,46 @@ function presentarAlmacen(result, formAMostrar){
             if(defFor.principal && !principal){
                 principal = idFormulario;
             }
+            var listaFormularios;
+            var sumarAlOrden;
             if(!defFor.multiple){
-                var boton = html.button({class:'boton-abrir-formulario'}, idFormulario).create();
+                sumarAlOrden=0;
+                listaFormularios=[formulario];
+            }else{
+                sumarAlOrden=1;
+                listaFormularios=formulario;
+            }
+            _.forEach(listaFormularios, function(formulario, orden){
+                var boton = html.button({class:'boton-abrir-formulario'}, idFormulario+" "+(orden+sumarAlOrden||'')).create();
                 boton.addEventListener('click', function(){
-                    presentarAlmacen(result, idFormulario)
+                    presentarAlmacen(result, idFormulario,orden)
                 });
                 botonera.push(boton);
+            });
+            if(defFor.multiple){
+                if("con boton agregar formulario"){ // OJO: OCULTAR AL USUARIO FINAL
+                    var boton = html.button({class:'boton-abrir-formulario'}, idFormulario+" nuevo").create();
+                    boton.addEventListener('click', function(){
+                        var length = result.almacen.formularios[idFormulario].push({
+                            registro:bestGlobals.changing(result.estructura.registrosVacios[idFormulario],{})
+                        });
+                        presentarAlmacen(result, idFormulario, length-1)
+                    });
+                    botonera.push(boton);
+                }
             }
         }
     });
     menu_bar.appendChild(html.div(botonera).create());
     formAMostrar = formAMostrar || principal;
-    presentarFormulario(result.estructura.formularios[formAMostrar], result.almacen.formularios[formAMostrar].registro).then(function(divFormulario){
+    var defFor = result.estructura.formularios[formAMostrar];
+    var registro;
+    if(defFor.multiple){
+        registro=result.almacen.formularios[formAMostrar][orden].registro;
+    }else{
+        registro=result.almacen.formularios[formAMostrar].registro;
+    }
+    presentarFormulario(result.estructura.formularios[formAMostrar], registro).then(function(divFormulario){
         divFormulario.idRegistro = result.id;
     });
 };
