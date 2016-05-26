@@ -34,6 +34,8 @@ function presentarFormulario(estructuraFormulario, registro){
     var controles={};
     var divFormulario=html.div({"tedede-formulario":"trac"}).create();
     var luego = Promise.resolve();
+    var contador=0;
+    var divsOpcionesMultiples=[];
     estructuraFormulario.celdas.forEach(function(celda){
         var contenidoCelda=[];
         if(celda.tipo=='titulo'){
@@ -43,41 +45,69 @@ function presentarFormulario(estructuraFormulario, registro){
             contenidoCelda.push(html.div({"class":"texto"},celda.texto))
         }
         if(celda.tipo=='pregunta'){
-            contenidoCelda.push(html.div({"class":"codigo"},celda.pregunta));
-            contenidoCelda.push(html.div({"class":celda.subtipo||"preguntas",id:celda.pregunta},celda.texto));
-            if(celda.aclaracion){
-                contenidoCelda.push(html.div({"class":"aclaracion"},celda.aclaracion));
-            }
-            var controlVariable = Tedede.bestCtrl(celda.typeInfo).create();
-            if(!(celda.variable in registro)){
-                registro[celda.variable] = coalesce(celda.defaultValue, null);
-            }
-            contenidoCelda.push(html.div({"class":["opciones", celda.typeInfo.typeName]}, [controlVariable]));
-            luego = luego.then(function(){
-                Tedede.adaptElement(controlVariable,celda.typeInfo);
-                controlVariable.setTypedValue(registro[celda.variable]);
-                controlVariable.setAttribute("tedede-var", celda.variable);
-                controlVariable.addEventListener('update',function(){
-                    var value = this.getTypedValue();
-                    registro[celda.variable] = value;
-                    postAction('guardar',{
-                        id: divFormulario.idRegistro,
-                        variable: celda.variable,
-                        valor:value
+            if(celda.subtipo && celda.subtipo=='multiple' && !"por si tenemos que usar una tabla real"){
+                if(!document.getElementById("multiple"+celda.pregunta)){
+                    divsOpcionesMultiples.push(html.div({"class":"divsMultiples",id:"multiple"+celda.pregunta}));
+                }
+                divsOpcionesMultiples.push(html.div({"class":celda.subtipo,id:celda.pregunta},celda.texto));
+                if(celda.aclaracion){
+                    divsOpcionesMultiples.push(html.div({"class":"aclaracion"},celda.aclaracion));
+                }
+                var controlVariableMultiple = Tedede.bestCtrl(celda.typeInfo).create();
+                if(!(celda.variable in registro)){
+                    registro[celda.variable] = coalesce(celda.defaultValue, null);
+                }
+                divsOpcionesMultiples.push(html.div({"class":["opciones", celda.typeInfo.typeName]}, [controlVariableMultiple]));
+            }else{
+                contenidoCelda.push(html.div({"class":"codigo"},celda.pregunta));
+                contenidoCelda.push(html.div({"class":celda.subtipo||"preguntas",id:celda.pregunta},celda.texto));
+                if(celda.aclaracion){
+                    contenidoCelda.push(html.div({"class":"aclaracion"},celda.aclaracion));
+                }
+                var controlVariable = Tedede.bestCtrl(celda.typeInfo).create();
+                if(!(celda.variable in registro)){
+                    registro[celda.variable] = coalesce(celda.defaultValue, null);
+                }
+                contenidoCelda.push(html.div({"class":["opciones", celda.typeInfo.typeName]}, [controlVariable]));
+                luego = luego.then(function(){
+                    Tedede.adaptElement(controlVariable,celda.typeInfo);
+                    controlVariable.setTypedValue(registro[celda.variable]);
+                    controlVariable.setAttribute("tedede-var", celda.variable);
+                    controlVariable.addEventListener('update',function(){
+                        var value = this.getTypedValue();
+                        registro[celda.variable] = value;
+                        postAction('guardar',{
+                            id: divFormulario.idRegistro,
+                            variable: celda.variable,
+                            valor:value
+                        });
+                        validarRegistro(estructuraFormulario, registro, controles);
                     });
-                    validarRegistro(estructuraFormulario, registro, controles);
+                    controles[celda.variable] = controlVariable;
+                }).then(function(){
+                    (celda.typeInfo.options||[]).forEach(function(option){
+                        if(option.salto){
+                            controlVariable.moreInfo[option.option].textContent=' pase a '+option.salto.tipo+' '+option.salto[option.salto.tipo];
+                        }
+                    });
                 });
-                controles[celda.variable] = controlVariable;
-            }).then(function(){
-                (celda.typeInfo.options||[]).forEach(function(option){
-                    if(option.salto){
-                        controlVariable.moreInfo[option.option].textContent=' pase a '+option.salto.tipo+' '+option.salto[option.salto.tipo];
-                    }
-                });
-            });
+            }
         }
-        celdasDesplegadas.push(html.div({"class": "celda"}, contenidoCelda));
+        var divCelda=html.div({"class":"celda"}, contenidoCelda);
+        if(celda.tipo=='pregunta' && celda.subtipo=='multiple'){
+            divsOpcionesMultiples.push(divCelda);
+        }else{
+            if(divsOpcionesMultiples.length){
+                celdasDesplegadas.push(html.div({"class":"conjunto-preguntas-multiples"}, divsOpcionesMultiples));
+                divsOpcionesMultiples=[];
+            }
+            celdasDesplegadas.push(divCelda);
+        }
     });
+    if(divsOpcionesMultiples.length){
+        celdasDesplegadas.push(html.div({"class":"conjunto-preguntas-multiples"}, divsOpcionesMultiples));
+        divsOpcionesMultiples=[];
+    }
     divFormulario.appendChild(html.div({"class":"bloque"},[
         html.label({"for": "modo-revisar"}, "modo revisar"),
         html.input({type: "checkbox", "id": "modo-revisar"}),
