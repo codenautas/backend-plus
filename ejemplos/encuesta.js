@@ -41,8 +41,8 @@ class AppEncuesta extends backendPlus.AppBackend{
             return client.query("SELECT id, contenido, estado FROM bep.datos WHERE id = $1",[parametros.id]).fetchOneRowIfExists();
         }).then(function(data) {
             if(data.rowCount == 0) {
-                var sql = "INSERT INTO bep.datos (id, contenido) SELECT $1, $2 WHERE NOT EXISTS (SELECT 1 FROM bep.datos WHERE id=$3)";
-                return client.query(sql,[parametros.id, be.almacenVacio, parametros.id]).execute();
+                var sql = "INSERT INTO bep.datos (id, contenido, cambios) SELECT $1, $2, $3 WHERE NOT EXISTS (SELECT 1 FROM bep.datos WHERE id=$4)";
+                return client.query(sql,[parametros.id, be.almacenVacio, be.almacenVacio, parametros.id]).execute();
             }
         }).then(function() {
             return client.query(updateSql, updateParameters).execute();
@@ -51,6 +51,7 @@ class AppEncuesta extends backendPlus.AppBackend{
         }).then(function(datos) {
         }).catch(function(err) {
             console.log("error: "+err);
+            console.log(err.stack);
         }).then(function(){
             return parametros;
         }).catch(function(err) {
@@ -112,21 +113,39 @@ class AppEncuesta extends backendPlus.AppBackend{
             var parametros=be.obtenerParametros(req);
             be.updateDatabase(req, parametros,
                               "UPDATE bep.datos SET contenido = contenido || $2, estado='pendiente' WHERE id = $1 RETURNING contenido",
-                              [parametros.id, {[parametros.variable]: parametros.valor}]);
+                              [parametros.id, parametros.almacen]).then(function(result){
+                res.end("recibi: "+JSON.stringify(parametros));
+            },function(err){
+                res.end("error: "+err.message);
+            });
+        });
+        this.app.post('/guardar-cambios', function(req, res){
+            var parametros=be.obtenerParametros(req);
+            // basado en:
+            // select jsonb_set('{"formularios": {"TCNAI" : {"variables": {}}, "TCNAA" : [{"variables": {"v1":"a"}}, {"variables": {"v2":"b"}} ] }}', '{formularios,TCNAA,1,variables,t3}', '3')
+            var ruta=['formularios', parametros.ruta.formulario];
+            if(parametros.ruta.orden!=null){
+                ruta.push(parametros.ruta.orden);
+            }
+            ruta.push('variables');
+            ruta.push(parametros.ruta.variable);
+            be.updateDatabase(req, parametros,
+                              "UPDATE bep.datos SET cambios = jsonb_set(cambios, $2, $3), estado='pendiente' WHERE id = $1 RETURNING contenido",
+                              [parametros.id, '{'+ruta.join(',')+'}', parametros.valor]);
             res.end("recibi: "+JSON.stringify(parametros));
         });
         this.app.post('/finalizar', function(req, res){
             var parametros=be.obtenerParametros(req);
             be.updateDatabase(req, parametros,
                               "UPDATE bep.datos SET contenido = $2, estado='ingresado' WHERE id = $1 RETURNING contenido",
-                              [parametros.id, parametros.datos]);
+                              [parametros.id, parametros.almacen]);
             res.end("Encuesta finalizada");
         });
         this.app.post('/blanquear', function(req, res){
             var parametros=be.obtenerParametros(req);
             be.updateDatabase(req, parametros,
-                              "UPDATE bep.datos SET contenido = $2, estado='vacio' WHERE id = $1 RETURNING contenido",
-                              [parametros.id, be.almacenVacio]);
+                              "UPDATE bep.datos SET contenido = $2, cambios = $3, estado='vacio' WHERE id = $1 RETURNING contenido",
+                              [parametros.id, be.almacenVacio, be.almacenVacio]);
             res.end("Encuesta blanqueada");
         });
         this.app.get('/metadatos/obtener', function(req, res){

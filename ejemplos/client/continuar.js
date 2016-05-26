@@ -29,13 +29,22 @@ function validarRegistro(estructuraFormulario, registro, controles){
     });
 }
 
-function presentarFormulario(estructuraFormulario, registro){
+function presentarFormulario(estructuraFormulario, registro, almacen, idFormulario, orden){
     var celdasDesplegadas=[];
     var controles={};
     var divFormulario=html.div({"tedede-formulario":"trac"}).create();
     var luego = Promise.resolve();
     var contador=0;
     var divsOpcionesMultiples=[];
+    var tieneCambios=false;
+    var grabarAlmacen=function(){
+        if(tieneCambios){
+            sennialCambios.style.backgroundColor='lightblue';
+        
+            tieneCambios=false;
+            sennialCambios.style.backgroundColor='lightgreen';
+        }
+    }
     estructuraFormulario.celdas.forEach(function(celda){
         var contenidoCelda=[];
         if(celda.tipo=='titulo'){
@@ -74,11 +83,17 @@ function presentarFormulario(estructuraFormulario, registro){
                     controlVariable.setTypedValue(registro[celda.variable]);
                     controlVariable.setAttribute("tedede-var", celda.variable);
                     controlVariable.addEventListener('update',function(){
+                        tieneCambios=true;
+                        sennialCambios.style.backgroundColor='orange';
+                        if(timerCambios){
+                            clearTimeout(timerCambios);
+                        }
+                        var timerCambios=setTimeout(grabarAlmacen,5000);
                         var value = this.getTypedValue();
                         registro[celda.variable] = value;
-                        postAction('guardar',{
+                        postAction('guardar-cambios',{
                             id: divFormulario.idRegistro,
-                            variable: celda.variable,
+                            ruta: {formulario: idFormulario, orden: orden, variable:celda.variable},
                             valor:value
                         });
                         validarRegistro(estructuraFormulario, registro, controles);
@@ -109,7 +124,7 @@ function presentarFormulario(estructuraFormulario, registro){
         divsOpcionesMultiples=[];
     }
     divFormulario.appendChild(html.div({"class":"bloque"},[
-        html.label({"for": "modo-revisar"}, "modo revisar"),
+        html.label({"for": "modo-revisar", id:"sennialCambios"}, "modo revisar"),
         html.input({type: "checkbox", "id": "modo-revisar"}),
     ]).create());
     divFormulario.appendChild(html.div({"class":"bloque"},celdasDesplegadas).create());
@@ -121,9 +136,10 @@ function presentarFormulario(estructuraFormulario, registro){
         bFin.addEventListener('click', function() {
             var data = {
                 id: divFormulario.idRegistro,
-                datos: {}
+                almacen: almacen
             };
             postAction('finalizar', data).then(function(){
+                tieneCambios=false;
                 window.location = 'fin-ingreso';
             });
         });
@@ -145,8 +161,48 @@ function presentarAlmacen(result, formAMostrar, orden){
     menu_bar.innerHTML='';
     var botonera=[];
     var principal='';
-    _.forEach(result.almacen.formularios, function(formulario, idFormulario){
+    // cambiar ese forEach por un forEach que devuelva primero el idFormulario (en el primer parámetro de function
+    // var formulario = result.almacen.formularios[idFormulario]
+      
+    _.forEach(result.estructura['con-for'][result.id["tipo-abonado"]].formularios,function(idFormulario){
         var defFor = result.estructura.formularios[idFormulario];
+        if((defFor.grupo||{"tipo-abonado":null})["tipo-abonado"]===result.id["tipo-abonado"]){
+            if(defFor.principal && !principal){
+                principal = idFormulario;
+            }
+            var listaFormularios;
+            var sumarAlOrden;
+            if(!defFor.multiple){
+                sumarAlOrden=0;
+                listaFormularios=[result.almacen.formularios[idFormulario]];
+            }else{
+                sumarAlOrden=1;
+                listaFormularios=result.almacen.formularios[idFormulario];
+            }
+            _.forEach(listaFormularios, function(formulario, orden){
+                var boton = html.button({class:'boton-abrir-formulario'}, idFormulario+" "+(orden+sumarAlOrden||'')).create();
+                boton.addEventListener('click', function(){
+                    presentarAlmacen(result, idFormulario,orden)
+                });
+                botonera.push(boton);
+            });
+            if(defFor.multiple){
+                if("con boton agregar formulario"){ // OJO: OCULTAR AL USUARIO FINAL
+                    var boton = html.button({class:'boton-abrir-formulario'}, idFormulario+" nuevo").create();
+                    boton.addEventListener('click', function(){
+                        var length = result.almacen.formularios[idFormulario].push({
+                            registro:bestGlobals.changing(result.estructura.registrosVacios[idFormulario],{})
+                        });
+                        presentarAlmacen(result, idFormulario, length-1)
+                    });
+                    botonera.push(boton);
+                }
+            }
+        }
+    });
+    /*_.forEach(result.almacen.formularios, function(formulario, idFormulario){
+        var defFor = result.estructura.formularios[idFormulario];
+        console.log(formulario)
         if((defFor.grupo||{"tipo-abonado":null})["tipo-abonado"]===result.id["tipo-abonado"]){
             if(defFor.principal && !principal){
                 principal = idFormulario;
@@ -180,7 +236,7 @@ function presentarAlmacen(result, formAMostrar, orden){
                 }
             }
         }
-    });
+    });*/
     menu_bar.appendChild(html.div(botonera).create());
     formAMostrar = formAMostrar || principal;
     var defFor = result.estructura.formularios[formAMostrar];
@@ -190,7 +246,7 @@ function presentarAlmacen(result, formAMostrar, orden){
     }else{
         registro=result.almacen.formularios[formAMostrar].registro;
     }
-    presentarFormulario(result.estructura.formularios[formAMostrar], registro).then(function(divFormulario){
+    presentarFormulario(result.estructura.formularios[formAMostrar], registro, result.almacen, formAMostrar, orden).then(function(divFormulario){
         divFormulario.idRegistro = result.id;
     });
 };

@@ -44,3 +44,5 @@ create table bep.parametros(
 alter table bep.parametros owner to beplus_example_user;
 
 insert into bep.parametros(unico_registro) values (true);
+
+ALTER TABLE bep.datos ADD COLUMN cambios jsonb;
