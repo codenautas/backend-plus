@@ -29,7 +29,7 @@ class AppEncuesta extends backendPlus.AppBackend{
     postConfig(){
         this.releerMetadatos();
     }
-    updateDatabase(req, parametros, updateSql, updateParameters) {
+    updateDatabase(parametros, updateSql, updateParameters) {
         var be=this;
         var client;
         return this.getDbClient().then(function(cli) {
@@ -88,7 +88,7 @@ class AppEncuesta extends backendPlus.AppBackend{
             res.end('ok!');
         });
         this.app.post('/info-enc-act', function(req, res){
-            var rta={};
+            var rta={"modo-devel": new Date(be.config["modo-devel"].hasta)>new Date()  };
             var parametros=be.obtenerParametros(req);
             rta.id = req.user.iddato || parametros.id;
             rta.estructura = be.estructura;
@@ -109,11 +109,25 @@ class AppEncuesta extends backendPlus.AppBackend{
                 client.done();
             });
         });
+        this.app.post('/set-status', function(req, res){
+            var parametros=be.obtenerParametros(req);
+            be.updateDatabase(
+                parametros,
+                "UPDATE bep.datos SET estado=$2 WHERE id = $1 RETURNING contenido",
+                [parametros.id, parametros.estado]
+            ).then(function(result){
+                res.end("recibi: "+JSON.stringify(parametros));
+            },function(err){
+                res.end("error: "+err.message);
+            });
+        });
         this.app.post('/guardar', function(req, res){
             var parametros=be.obtenerParametros(req);
-            be.updateDatabase(req, parametros,
-                              "UPDATE bep.datos SET contenido = contenido || $2, estado='pendiente' WHERE id = $1 RETURNING contenido",
-                              [parametros.id, parametros.almacen]).then(function(result){
+            be.updateDatabase(
+                parametros,
+                "UPDATE bep.datos SET contenido = $2, estado='pendiente' WHERE id = $1 RETURNING contenido",
+                [parametros.id, parametros.almacen]
+            ).then(function(result){
                 res.end("recibi: "+JSON.stringify(parametros));
             },function(err){
                 res.end("error: "+err.message);
@@ -125,27 +139,33 @@ class AppEncuesta extends backendPlus.AppBackend{
             // select jsonb_set('{"formularios": {"TCNAI" : {"variables": {}}, "TCNAA" : [{"variables": {"v1":"a"}}, {"variables": {"v2":"b"}} ] }}', '{formularios,TCNAA,1,variables,t3}', '3')
             var ruta=['formularios', parametros.ruta.formulario];
             if(parametros.ruta.orden!=null){
-                ruta.push(parametros.ruta.orden);
+                ruta.push(parametros.ruta.orden.toString());
             }
-            ruta.push('variables');
+            ruta.push('registro');
             ruta.push(parametros.ruta.variable);
-            be.updateDatabase(req, parametros,
-                              "UPDATE bep.datos SET cambios = jsonb_set(cambios, $2, $3), estado='pendiente' WHERE id = $1 RETURNING contenido",
-                              [parametros.id, '{'+ruta.join(',')+'}', parametros.valor]);
+            be.updateDatabase(
+                parametros,
+                "UPDATE bep.datos SET cambios = jsonb_set(cambios, $2, $3), estado='pendiente' WHERE id = $1 RETURNING contenido",
+                [parametros.id, ruta, parametros.valor]
+            );
             res.end("recibi: "+JSON.stringify(parametros));
         });
         this.app.post('/finalizar', function(req, res){
             var parametros=be.obtenerParametros(req);
-            be.updateDatabase(req, parametros,
-                              "UPDATE bep.datos SET contenido = $2, estado='ingresado' WHERE id = $1 RETURNING contenido",
-                              [parametros.id, parametros.almacen]);
+            be.updateDatabase(
+                parametros,
+                "UPDATE bep.datos SET contenido = $2, estado='ingresado' WHERE id = $1 RETURNING contenido",
+                [parametros.id, parametros.almacen]
+            );
             res.end("Encuesta finalizada");
         });
         this.app.post('/blanquear', function(req, res){
             var parametros=be.obtenerParametros(req);
-            be.updateDatabase(req, parametros,
-                              "UPDATE bep.datos SET contenido = $2, cambios = $3, estado='vacio' WHERE id = $1 RETURNING contenido",
-                              [parametros.id, be.almacenVacio, be.almacenVacio]);
+            be.updateDatabase(
+                parametros,
+                "UPDATE bep.datos SET contenido = $2, cambios = $3, estado='vacio' WHERE id = $1 RETURNING contenido",
+                [parametros.id, be.almacenVacio, be.almacenVacio]
+            );
             res.end("Encuesta blanqueada");
         });
         this.app.get('/metadatos/obtener', function(req, res){

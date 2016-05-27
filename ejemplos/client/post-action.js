@@ -13,5 +13,6 @@ function postAction(url, data) {
         return result;
     }).catch(function(err) {
         status("Error: " + err);
+        throw err;
     });
 }

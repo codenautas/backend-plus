@@ -29,6 +29,18 @@ function validarRegistro(estructuraFormulario, registro, controles){
     });
 }
 
+function grabarYLuego(result){
+    sennialCambios.style.backgroundColor='lightblue';
+    placa_grabando.style.visibility='visible';
+    return postAction('guardar',{
+        id: result.id,
+        almacen: result.almacen
+    }).then(function(){
+        tieneCambios=false;
+        sennialCambios.style.backgroundColor='lightgreen';
+    });
+}
+
 function presentarFormulario(result, idFormulario, orden){
     var estructuraFormulario=result.estructura.formularios[idFormulario];
     var registro;
@@ -134,7 +146,7 @@ function presentarFormulario(result, idFormulario, orden){
         celdasDesplegadas.push(html.div({"class":"conjunto-preguntas-multiples"}, divsOpcionesMultiples));
         divsOpcionesMultiples=[];
     }
-    divFormulario.appendChild(html.div({"class":"bloque", id:"div-modo-revisar"},[
+    divFormulario.appendChild(html.div({"class":["bloque","provisorio"], id:"div-modo-revisar"},[
         html.label({"for": "modo-revisar", id:"sennialCambios"}, "modo revisar"),
         html.input({type: "checkbox", "id": "modo-revisar"}),
     ]).create());
@@ -156,7 +168,7 @@ function presentarFormulario(result, idFormulario, orden){
             };
             postAction('finalizar', data).then(function(){
                 tieneCambios=false;
-                window.location = 'fin-ingreso';
+                window.location = 'continuar';
             });
         });
         document.getElementById("modo-revisar").addEventListener('change', function(){
@@ -197,13 +209,16 @@ function presentarAlmacen(result, formAMostrar, orden){
             _.forEach(listaFormularios, function(formulario, orden){
                 var boton = html.button({class:'boton-abrir-formulario'}, idFormulario+" "+(orden+sumarAlOrden||'')).create();
                 boton.addEventListener('click', function(){
-                    presentarAlmacen(result, idFormulario,orden)
+                    grabarYLuego(result).then(function(){
+                        window.location='continuar#'+idFormulario+(sumarAlOrden?','+(orden+sumarAlOrden):'');
+                        window.location.reload();
+                    });
                 });
                 botonera.push(boton);
             });
             if(defFor.multiple){
-                if("con boton agregar formulario"){ // OJO: OCULTAR AL USUARIO FINAL
-                    var boton = html.button({class:'boton-abrir-formulario'}, idFormulario+" nuevo").create();
+                if(result["modo-devel"]){ // OJO: OCULTAR AL USUARIO FINAL
+                    var boton = html.button({class:['boton-abrir-formulario','provisorio']}, idFormulario+" nuevo").create();
                     boton.addEventListener('click', function(){
                         var length = result.almacen.formularios[idFormulario].push({
                             registro:bestGlobals.changing(result.estructura.registrosVacios[idFormulario],{})
@@ -215,43 +230,6 @@ function presentarAlmacen(result, formAMostrar, orden){
             }
         }
     });
-    /*_.forEach(result.almacen.formularios, function(formulario, idFormulario){
-        var defFor = result.estructura.formularios[idFormulario];
-        console.log(formulario)
-        if((defFor.grupo||{"tipo-abonado":null})["tipo-abonado"]===result.id["tipo-abonado"]){
-            if(defFor.principal && !principal){
-                principal = idFormulario;
-            }
-            var listaFormularios;
-            var sumarAlOrden;
-            if(!defFor.multiple){
-                sumarAlOrden=0;
-                listaFormularios=[formulario];
-            }else{
-                sumarAlOrden=1;
-                listaFormularios=formulario;
-            }
-            _.forEach(listaFormularios, function(formulario, orden){
-                var boton = html.button({class:'boton-abrir-formulario'}, idFormulario+" "+(orden+sumarAlOrden||'')).create();
-                boton.addEventListener('click', function(){
-                    presentarAlmacen(result, idFormulario,orden)
-                });
-                botonera.push(boton);
-            });
-            if(defFor.multiple){
-                if("con boton agregar formulario"){ // OJO: OCULTAR AL USUARIO FINAL
-                    var boton = html.button({class:'boton-abrir-formulario'}, idFormulario+" nuevo").create();
-                    boton.addEventListener('click', function(){
-                        var length = result.almacen.formularios[idFormulario].push({
-                            registro:bestGlobals.changing(result.estructura.registrosVacios[idFormulario],{})
-                        });
-                        presentarAlmacen(result, idFormulario, length-1)
-                    });
-                    botonera.push(boton);
-                }
-            }
-        }
-    });*/
     menu_bar.appendChild(html.div(botonera).create());
     formAMostrar = formAMostrar || principal;
     var defFor = result.estructura.formularios[formAMostrar];
@@ -260,16 +238,31 @@ function presentarAlmacen(result, formAMostrar, orden){
     });
 };
 
-window.addEventListener("load",function(){
+function alCargarOCambiarHash(){
     document.getElementById('status').textContent = "Cargando...";
     AjaxBestPromise.post({
         url:'info-enc-act',
         data:{info:"{}"}
     }).then(function(resultJson){
         var result=JSON.parse(resultJson);
-        presentarAlmacen(result);
+        var idFormulario;
+        var orden;
+        if(window.location.hash){
+            var partes=window.location.hash.substr(1).split(',');
+            idFormulario=partes[0];
+            if(partes[1]-0){
+                orden=partes[1]-1||0;
+            }
+            if(orden<0){ orden=0; }
+        }
+        presentarAlmacen(result,idFormulario,orden);
     }).catch(function(err){
         document.getElementById('status').textContent = "Error "+err.message;
         document.getElementById('status').textContent += "\n"+err.stack;
     });
-});
+};
+
+window.addEventListener("load",alCargarOCambiarHash);
+window.addEventListener("haschange",alCargarOCambiarHash);
+window.addEventListener("popstate",alCargarOCambiarHash);
+

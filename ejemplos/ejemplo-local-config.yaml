@@ -6,3 +6,5 @@ estructura:
   origen: ejemplo/estructura-ejemplo.yaml
 log:
   req: true
+modo-devel:
+  hasta: 2016-01-01
