@@ -29,7 +29,15 @@ function validarRegistro(estructuraFormulario, registro, controles){
     });
 }
 
-function presentarFormulario(estructuraFormulario, registro, almacen, idFormulario, orden){
+function presentarFormulario(result, idFormulario, orden){
+    var estructuraFormulario=result.estructura.formularios[idFormulario];
+    var registro;
+    var almacen=result.almacen;
+    if(estructuraFormulario.multiple){
+        registro=almacen.formularios[idFormulario][orden].registro;
+    }else{
+        registro=almacen.formularios[idFormulario].registro;
+    }
     var celdasDesplegadas=[];
     var controles={};
     var divFormulario=html.div({"tedede-formulario":"trac"}).create();
@@ -40,7 +48,10 @@ function presentarFormulario(estructuraFormulario, registro, almacen, idFormular
     var grabarAlmacen=function(){
         if(tieneCambios){
             sennialCambios.style.backgroundColor='lightblue';
-        
+            postAction('guardar',{
+                id: result.id,
+                almacen: almacen
+            });
             tieneCambios=false;
             sennialCambios.style.backgroundColor='lightgreen';
         }
@@ -123,7 +134,7 @@ function presentarFormulario(estructuraFormulario, registro, almacen, idFormular
         celdasDesplegadas.push(html.div({"class":"conjunto-preguntas-multiples"}, divsOpcionesMultiples));
         divsOpcionesMultiples=[];
     }
-    divFormulario.appendChild(html.div({"class":"bloque"},[
+    divFormulario.appendChild(html.div({"class":"bloque", id:"div-modo-revisar"},[
         html.label({"for": "modo-revisar", id:"sennialCambios"}, "modo revisar"),
         html.input({type: "checkbox", "id": "modo-revisar"}),
     ]).create());
@@ -132,6 +143,11 @@ function presentarFormulario(estructuraFormulario, registro, almacen, idFormular
     pantalla.appendChild(divFormulario);
     pantalla.appendChild(html.input({type:"button",id:"botonFin", value:"Continuar"}).create());
     return luego.then(function(){
+        if(result["modo-devel"]){
+            var divModoRevisar = document.getElementById('div-modo-revisar');
+            divModoRevisar.style.display='inherit';
+            console.log(divModoRevisar)
+        }
         var bFin = document.getElementById('botonFin');
         bFin.addEventListener('click', function() {
             var data = {
@@ -163,7 +179,6 @@ function presentarAlmacen(result, formAMostrar, orden){
     var principal='';
     // cambiar ese forEach por un forEach que devuelva primero el idFormulario (en el primer parámetro de function
     // var formulario = result.almacen.formularios[idFormulario]
-      
     _.forEach(result.estructura['con-for'][result.id["tipo-abonado"]].formularios,function(idFormulario){
         var defFor = result.estructura.formularios[idFormulario];
         if((defFor.grupo||{"tipo-abonado":null})["tipo-abonado"]===result.id["tipo-abonado"]){
@@ -240,13 +255,7 @@ function presentarAlmacen(result, formAMostrar, orden){
     menu_bar.appendChild(html.div(botonera).create());
     formAMostrar = formAMostrar || principal;
     var defFor = result.estructura.formularios[formAMostrar];
-    var registro;
-    if(defFor.multiple){
-        registro=result.almacen.formularios[formAMostrar][orden].registro;
-    }else{
-        registro=result.almacen.formularios[formAMostrar].registro;
-    }
-    presentarFormulario(result.estructura.formularios[formAMostrar], registro, result.almacen, formAMostrar, orden).then(function(divFormulario){
+    presentarFormulario(result, formAMostrar, orden).then(function(divFormulario){
         divFormulario.idRegistro = result.id;
     });
 };
