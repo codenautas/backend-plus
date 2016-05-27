@@ -41,12 +41,18 @@ function grabarYLuego(result){
     });
 }
 
+function grabarEIr(result, pagina, idFormulario, orden){
+    grabarYLuego(result).then(function(){
+        window.location=pagina+'#'+idFormulario+(orden?','+orden:'');
+    });
+}
+
 function presentarFormulario(result, idFormulario, orden){
     var estructuraFormulario=result.estructura.formularios[idFormulario];
     var registro;
     var almacen=result.almacen;
     if(estructuraFormulario.multiple){
-        registro=almacen.formularios[idFormulario][orden].registro;
+        registro=almacen.formularios[idFormulario][orden-1].registro;
     }else{
         registro=almacen.formularios[idFormulario].registro;
     }
@@ -166,10 +172,14 @@ function presentarFormulario(result, idFormulario, orden){
                 id: divFormulario.idRegistro,
                 almacen: almacen
             };
-            postAction('finalizar', data).then(function(){
-                tieneCambios=false;
-                window.location = 'continuar';
-            });
+            if("no estoy en el ultimo"){
+                grabarEIr(result,'continuar', result.status.siguiente.formulario, result.status.siguiente.orden)
+            }else{
+                postAction('finalizar', data).then(function(){
+                    tieneCambios=false;
+                    window.location = 'continuar';
+                });
+            }
         });
         document.getElementById("modo-revisar").addEventListener('change', function(){
             var divContenedor=this;
@@ -185,10 +195,11 @@ function presentarFormulario(result, idFormulario, orden){
     });
 }
 
-function presentarAlmacen(result, formAMostrar, orden){
+function presentarAlmacen(result, formAMostrar, ordenAMostrar){
     menu_bar.innerHTML='';
     var botonera=[];
     var principal='';
+    result.status.siguiente={formulario:null, orden:null};
     // cambiar ese forEach por un forEach que devuelva primero el idFormulario (en el primer parámetro de function
     // var formulario = result.almacen.formularios[idFormulario]
     _.forEach(result.estructura['con-for'][result.id["tipo-abonado"]].formularios,function(idFormulario){
@@ -206,14 +217,21 @@ function presentarAlmacen(result, formAMostrar, orden){
                 sumarAlOrden=1;
                 listaFormularios=result.almacen.formularios[idFormulario];
             }
-            _.forEach(listaFormularios, function(formulario, orden){
-                var boton = html.button({class:'boton-abrir-formulario'}, idFormulario+" "+(orden+sumarAlOrden||'')).create();
+            _.forEach(listaFormularios, function(formulario, index){
+                var orden=index+sumarAlOrden;
+                var boton = html.button({class:'boton-abrir-formulario'}, idFormulario+" "+(orden||'')).create();
                 boton.addEventListener('click', function(){
-                    grabarYLuego(result).then(function(){
-                        window.location='continuar#'+idFormulario+(sumarAlOrden?','+(orden+sumarAlOrden):'');
-                        window.location.reload();
-                    });
+                    grabarEIr(result, 'continuar', idFormulario, orden);
                 });
+                if(formAMostrar===idFormulario && orden == ordenAMostrar){
+                    boton.style.fontWeight='bold';
+                    result.status.siguiente={formulario:null, orden:null};
+                }else{
+                    if(!result.status.siguiente.formulario){
+                        result.status.siguiente.formulario=idFormulario;
+                        result.status.siguiente.orden=orden;
+                    }
+                }
                 botonera.push(boton);
             });
             if(defFor.multiple){
@@ -223,7 +241,7 @@ function presentarAlmacen(result, formAMostrar, orden){
                         var length = result.almacen.formularios[idFormulario].push({
                             registro:bestGlobals.changing(result.estructura.registrosVacios[idFormulario],{})
                         });
-                        presentarAlmacen(result, idFormulario, length-1)
+                        grabarEIr(result, 'continuar', idFormulario, length);
                     });
                     botonera.push(boton);
                 }
@@ -233,27 +251,26 @@ function presentarAlmacen(result, formAMostrar, orden){
     menu_bar.appendChild(html.div(botonera).create());
     formAMostrar = formAMostrar || principal;
     var defFor = result.estructura.formularios[formAMostrar];
-    presentarFormulario(result, formAMostrar, orden).then(function(divFormulario){
+    presentarFormulario(result, formAMostrar, ordenAMostrar).then(function(divFormulario){
         divFormulario.idRegistro = result.id;
     });
 };
 
 function alCargarOCambiarHash(){
     document.getElementById('status').textContent = "Cargando...";
+    placa_grabando.style.visibility='hidden';
     AjaxBestPromise.post({
         url:'info-enc-act',
         data:{info:"{}"}
     }).then(function(resultJson){
         var result=JSON.parse(resultJson);
+        result.status={};
         var idFormulario;
         var orden;
         if(window.location.hash){
             var partes=window.location.hash.substr(1).split(',');
             idFormulario=partes[0];
-            if(partes[1]-0){
-                orden=partes[1]-1||0;
-            }
-            if(orden<0){ orden=0; }
+            orden=partes[1]-0||0;
         }
         presentarAlmacen(result,idFormulario,orden);
     }).catch(function(err){

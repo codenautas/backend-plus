@@ -34,7 +34,7 @@ function presentarPlaca(estado) {
        });
     });
     encNueva.addEventListener('click', function() {
-       postAction('set-status', {id:estado.id,estado:'vacio'}).then(function(res) {
+       postAction('blanquear', {id:estado.id,estado:'vacio'}).then(function(res) {
            window.location = 'continuar';
        });
     });
