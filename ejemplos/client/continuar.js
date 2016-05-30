@@ -198,16 +198,12 @@ function presentarFormulario(result, idFormulario, orden){
 function presentarAlmacen(result, formAMostrar, ordenAMostrar){
     menu_bar.innerHTML='';
     var botonera=[];
-    var principal='';
     result.status.siguiente={formulario:null, orden:null};
     // cambiar ese forEach por un forEach que devuelva primero el idFormulario (en el primer parámetro de function
     // var formulario = result.almacen.formularios[idFormulario]
     _.forEach(result.estructura['con-for'][result.id["tipo-abonado"]].formularios,function(idFormulario){
         var defFor = result.estructura.formularios[idFormulario];
         if((defFor.grupo||{"tipo-abonado":null})["tipo-abonado"]===result.id["tipo-abonado"]){
-            if(defFor.principal && !principal){
-                principal = idFormulario;
-            }
             var listaFormularios;
             var sumarAlOrden;
             if(!defFor.multiple){
@@ -249,7 +245,7 @@ function presentarAlmacen(result, formAMostrar, ordenAMostrar){
         }
     });
     menu_bar.appendChild(html.div(botonera).create());
-    formAMostrar = formAMostrar || principal;
+    formAMostrar = formAMostrar || result.estructura['con-for'][result.id["tipo-abonado"]]["formulario-principal"];
     var defFor = result.estructura.formularios[formAMostrar];
     presentarFormulario(result, formAMostrar, ordenAMostrar).then(function(divFormulario){
         divFormulario.idRegistro = result.id;
