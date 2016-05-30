@@ -91,7 +91,8 @@ class AppEncuesta extends backendPlus.AppBackend{
         var cantidadFormulariosAbono = contenido.formularios[formularioPrincipal].registro.t13; // OJO GENERALIZAR
         var formularioMultiple = be.estructura["con-for"][id["tipo-abonado"]].formularios[1]; // OJO GENERALIZAR
         while(contenido.formularios[formularioMultiple].length<cantidadFormulariosAbono){
-            contenido.formularios[formularioMultiple].push(be.registrosVacios[formularioMultiple]);
+            actualizarCambiosTambien=true;
+            contenido.formularios[formularioMultiple].push({registro: be.registrosVacios[formularioMultiple]});
         }
         var sqlUpdate="UPDATE bep.datos SET contenido = $2, estado = $3 /*, cambios = #4*/ WHERE id = $1 RETURNING contenido";
         if(actualizarCambiosTambien){

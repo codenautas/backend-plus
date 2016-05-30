@@ -196,6 +196,8 @@ function presentarFormulario(result, idFormulario, orden){
 }
 
 function presentarAlmacen(result, formAMostrar, ordenAMostrar){
+    formAMostrar = formAMostrar || result.estructura['con-for'][result.id["tipo-abonado"]]["formulario-principal"];
+    ordenAMostrar = ordenAMostrar || 0;
     menu_bar.innerHTML='';
     var botonera=[];
     result.status.siguiente={formulario:null, orden:null};
@@ -245,7 +247,6 @@ function presentarAlmacen(result, formAMostrar, ordenAMostrar){
         }
     });
     menu_bar.appendChild(html.div(botonera).create());
-    formAMostrar = formAMostrar || result.estructura['con-for'][result.id["tipo-abonado"]]["formulario-principal"];
     var defFor = result.estructura.formularios[formAMostrar];
     presentarFormulario(result, formAMostrar, ordenAMostrar).then(function(divFormulario){
         divFormulario.idRegistro = result.id;
