@@ -161,9 +161,7 @@ class AppEncuesta extends backendPlus.AppBackend{
             ruta.push(parametros.ruta.variable);
             console.log('por hacer un /guardar-cambios');
             console.log(parametros,ruta);
-            console.log("UPDATE bep.datos SET cambios = jsonb_set(cambios, $2, $3), estado='pendiente' WHERE id = $1 RETURNING contenido");
             be.updateDatabase(
-                parametros,
                 "UPDATE bep.datos SET cambios = jsonb_set(cambios, $2, $3::jsonb), estado='pendiente' WHERE id = $1 RETURNING contenido",
                 [parametros.id, ruta, JSON.stringify(parametros.valor)]
             );
