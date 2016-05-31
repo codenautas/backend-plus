@@ -17,14 +17,20 @@ function validarRegistro(estructuraFormulario, registro, controles){
     //console.log(estructuraFormulario);
     //console.log(controles);
     estructuraFormulario.celdas.forEach(function(celda){
-        if(celda.tipo==='pregunta' && celda['expresion-habilitar']){
+        if(celda.tipo==='pregunta' && celda['expresion-habilitar'] ){
             var expresionEvaluable = celda['expresion-habilitar'].replace(Regexplicit.variables, function(variableName){
                 return "registro."+variableName;
             }).replace(Regexplicit.operatorEqual, function(match,left,equal,right){
                 return left+'=='+right;
             });
             // console.log(celda.variable,celda['expresion-habilitar'],expresionEvaluable,eval(expresionEvaluable));
-            controles[celda.variable].disabled = !eval(expresionEvaluable);
+            var disabled = !eval(expresionEvaluable);
+            controles[celda.variable].disabled = disabled;
+            if(disabled){
+                controles[celda.variable].celda.setAttribute('tedede-disabled','disabled');
+            }else{
+                controles[celda.variable].celda.removeAttribute('tedede-disabled');
+            }
         }
     });
 }
@@ -79,10 +85,17 @@ function presentarFormulario(result, idFormulario, orden){
         var contenidoCelda=[];
         if(celda.tipo=='titulo'){
             contenidoCelda.push(html.div({"class":"titulo", id:"titulo"},celda.titulo))
+            if(celda.aclaracion){
+                contenidoCelda.push(html.div({"class":"aclaracion"},celda.aclaracion));
+            }
         }
         if(celda.tipo=='texto'){
             contenidoCelda.push(html.div({"class":"texto"},celda.texto))
+            if(celda.aclaracion){
+                contenidoCelda.push(html.div({"class":"aclaracion"},celda.aclaracion));
+            }
         }
+        var divCelda;
         if(celda.tipo=='pregunta'){
             if(celda.subtipo && celda.subtipo=='multiple' && !"por si tenemos que usar una tabla real"){
                 if(!document.getElementById("multiple"+celda.pregunta)){
@@ -128,6 +141,7 @@ function presentarFormulario(result, idFormulario, orden){
                         });
                         validarRegistro(estructuraFormulario, registro, controles);
                     });
+                    controlVariable.celda = divCelda;
                     controles[celda.variable] = controlVariable;
                 }).then(function(){
                     (celda.typeInfo.options||[]).forEach(function(option){
@@ -138,7 +152,10 @@ function presentarFormulario(result, idFormulario, orden){
                 });
             }
         }
-        var divCelda=html.div({"class":"celda"}, contenidoCelda);
+        divCelda=html.div({"class":"celda"}, contenidoCelda).create();
+        if(celda.deshabilitado){
+            divCelda.setAttribute('deshabilitado',celda.deshabilitado);
+        }
         if(celda.tipo=='pregunta' && celda.subtipo=='multiple'){
             divsOpcionesMultiples.push(divCelda);
         }else{
@@ -169,7 +186,7 @@ function presentarFormulario(result, idFormulario, orden){
         if(result["modo-devel"]){
             var divModoRevisar = document.getElementById('div-modo-revisar');
             divModoRevisar.style.display='inherit';
-            console.log(divModoRevisar)
+            //console.log(divModoRevisar)
         }
         var bFin = document.getElementById('botonFin');
         bFin.addEventListener('click', function() {
@@ -260,7 +277,7 @@ function presentarAlmacen(result, formAMostrar, ordenAMostrar){
 };
 
 function alCargarOCambiarHash(){
-    document.getElementById('status').textContent = "Cargando...";
+   // document.getElementById('status').textContent = "Cargando...";
     placa_grabando.style.visibility='hidden';
     AjaxBestPromise.post({
         url:'info-enc-act',
