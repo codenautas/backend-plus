@@ -170,7 +170,8 @@ class AppEncuesta extends backendPlus.AppBackend{
         });
         this.app.post('/finalizar', function(req, res){
             var parametros=be.obtenerParametros(req);
-            be.guardarContenido(res, parametros.id, parametros.almacen, 'ingresando').then(function(){
+            be.guardarContenido(res, parametros.id, parametros.almacen, 'ingresado').then(function(){
+            // be.guardarContenido(res, parametros.id, parametros.almacen, 'pendiente').then(function(){
                 res.end("Encuesta finalizada");
             });
         });

@@ -8,20 +8,26 @@ function presentarPlaca(estado) {
     var placa = [];
     var encContinuar = html.input({type:'button', id:'continuar', value:'Continuar'}).create();
     var encNueva = html.input({type:'button', id:'nueva', value:'nueva'}).create();
-    var metadatos = html.input({type:'button', id:'metadatos', value:'Ir a los metadatos'}).create();
+    var encFinalizar=html.input({type:'button',id:'ingresado-fin',value:'finalizar'}).create();
+    var metadatos = html.input({type:'button', style:"color:magenta", id:'metadatos', value:'Ir a los metadatos'}).create();
     switch(estado.estado) {
     case 'pendiente':
-        placa.push(html.p('Desea continuar con la encuesta que tiene pendiente o comenzar una nueva?'));
+        placa.push(html.h3('¡BIENVENIDO NUEVAMENTE!'));
+        placa.push(html.p('En nuestros registros usted ya completo un formulario y se encuentra registrado. ¿Qué desea hacer?'));
         placa.push(encContinuar);
         placa.push(html.span(' ').create());
         placa.push(encNueva);
         break;
     case 'ingresado':
-        placa.push(html.p('Ud. ya ha completado una encuesta, desea comenzar una nueva?'));
+        placa.push(html.h3('¡BIENVENIDO NUEVAMENTE!'));
+        placa.push(html.p('En nuestros registros usted ya ha iniciado  un formulario. ¿Qué desea hacer?'));
         placa.push(encNueva);
+        placa.push(encFinalizar);
         break;
     case 'vacio':
-        placa.push(html.p('Ud. está por empezar la encuesta'));
+        placa.push(html.h3('¡BIENVENIDO!'));
+        placa.push(html.p('Lo invitamos a completar algunos datos para el Registro de Abonados al Teatro Colón. La información que solicitamos es sobre sus abonos y su asistencia al Teatro Colón. Serán solo unos minutos y nos ayudará a conocer mejor a nuestros abonados y sus preferencias. La encuesta es personal. La información solicitada será utilizada con fines estadísticos y para aplicar acciones para mejorar la oferta del teatro.'));
+        placa.push(html.p('Los datos que brinde son confidenciales, de acuerdo con la Ley de Protección de los Datos Personales (PONER NUMERO).'));
         placa.push(encNueva);
         break;
     default:
@@ -45,6 +51,9 @@ function presentarPlaca(estado) {
            window.location = 'metadatos';
        });*/
     });
+    encFinalizar.addEventListener('click',function(){
+        window.location='fin-ingreso'
+    })
     pantalla.appendChild(html.div(placa).create());
 }
 

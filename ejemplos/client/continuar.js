@@ -43,6 +43,7 @@ function grabarYLuego(result){
 
 function grabarEIr(result, pagina, idFormulario, orden){
     grabarYLuego(result).then(function(){
+        window.scrollTo(0,0);
         window.location=pagina+'#'+idFormulario+(orden?','+orden:'');
     });
 }
@@ -159,7 +160,11 @@ function presentarFormulario(result, idFormulario, orden){
     divFormulario.appendChild(html.div({"class":"bloque"},celdasDesplegadas).create());
     pantalla.innerHTML='';
     pantalla.appendChild(divFormulario);
-    pantalla.appendChild(html.input({type:"button",id:"botonFin", value:"Continuar"}).create());
+    pantalla.appendChild(html.input({
+        type:"button",
+        id:"botonFin", 
+        value:result.status.siguiente.formulario?"Continuar":"Finalizar"
+    }).create());
     return luego.then(function(){
         if(result["modo-devel"]){
             var divModoRevisar = document.getElementById('div-modo-revisar');
@@ -172,12 +177,13 @@ function presentarFormulario(result, idFormulario, orden){
                 id: divFormulario.idRegistro,
                 almacen: almacen
             };
-            if("no estoy en el ultimo"){
+            if(result.status.siguiente.formulario){
                 grabarEIr(result,'continuar', result.status.siguiente.formulario, result.status.siguiente.orden)
             }else{
                 postAction('finalizar', data).then(function(){
                     tieneCambios=false;
-                    window.location = 'continuar';
+//                    window.location = 'continuar';
+                    window.location = 'fin-ingreso';
                 });
             }
         });
