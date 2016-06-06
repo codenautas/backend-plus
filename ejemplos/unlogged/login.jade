@@ -1,0 +1,20 @@
+h2 login
+form(id="loginForm", action="./login", method="post")
+  table
+    tr
+      td
+        label Usuario:
+      td
+        input(id="username", type="text", name="username", autofocus=true, disabled=true)
+      td(rowspan=4)
+        img(src="./unlogged/Oxygen480-actions-key-enter.svg.png", style="height:128px")
+    tr
+      td
+        label Clave:
+      td
+        input(id="password", type="password", name="password", disabled=true)
+    tr
+      td
+      td
+        input(type="submit", value="Log In")
+script(src="unlogged/login.js")
