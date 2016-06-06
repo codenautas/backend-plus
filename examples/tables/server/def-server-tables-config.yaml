@@ -1,0 +1,18 @@
+server:
+  port: 3033
+db:
+  motor: postgresql
+  host: localhost
+  database: beplus_example_db
+  schema: ext
+  user: beplus_example_user
+  password: beplus_example_3948812bdz
+login:
+  table: users
+  userFieldName: username
+  passFieldName: md5pass
+  infoFieldList: [username, rol]
+  plus:
+    unloggedPath: examples/tables/unlogged
+    loginPagePath: examples/tables/unlogged/login
+    fileStore: true

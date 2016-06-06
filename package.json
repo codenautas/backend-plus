@@ -15,20 +15,21 @@
   ],
   "dependencies": {
     "body-parser": "~1.15.1",
-    "cookie-parser": "~1.4.1",
+    "cookie-parser": "~1.4.3",
     "es6-promise": "~3.2.1",
     "express": "~4.13.4",
     "express-session": "~1.13.0",
     "fs-extra": "~0.30.0", 
     "fs-promise": "~0.5.0", 
-    "pug": "~2.0.0-alpha7",
-    "lodash": "~4.12.0",
+    "lodash": "~4.13.1",
     "numeral": "~1.5.3",
+    "pug": "~2.0.0-beta2",
     "read-yaml-promise": "~1.0.2",
     "stylus": "~0.54.5",
 
     "ajax-best-promise": "~0.0.7",
-    "best-globals": "~0.3.0",
+    "basic-interfaces": "git://github.com/codenautas/basic-interfaces.git#pr_discr1",
+    "best-globals": "~0.4.1",
     "best-promise": "~0.2.4",
     "extension-serve-static": "~0.1.6",
     "js-to-html": "~0.9.0",
@@ -37,6 +38,7 @@
     "pg-promise-strict": "~0.2.3",
     "promise-plus": "~0.0.6",
     "regexplicit": "~0.0.4",
+    "require-bro": "~0.1.0",
     "tedede": "~0.2.2"
   },
   "devDependencies": {
@@ -46,7 +48,8 @@
     "node": ">= 0.12"
   },
   "scripts": {
-    "start": "node ejemplos/encuesta-trac.js"
+    "start": "node ejemplos/encuesta-trac.js",
+    "example-tables": "node examples/tables/server/server-tables.js"
   },
   "jshintConfig": {
     "asi": false,
