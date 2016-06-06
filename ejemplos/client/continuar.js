@@ -143,13 +143,13 @@ function presentarFormulario(result, idFormulario, orden){
                     });
                     controlVariable.celda = divCelda;
                     controles[celda.variable] = controlVariable;
-                }).then(function(){
+                })/*.then(function(){
                     (celda.typeInfo.options||[]).forEach(function(option){
                         if(option.salto){
                             controlVariable.moreInfo[option.option].textContent=' pase a '+option.salto.tipo+' '+option.salto[option.salto.tipo];
                         }
                     });
-                });
+                })*/;
             }
         }
         divCelda=html.div({"class":"celda"}, contenidoCelda).create();

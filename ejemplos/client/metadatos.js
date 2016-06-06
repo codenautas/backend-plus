@@ -54,10 +54,10 @@ window.addEventListener("load",function(){
     pantalla.appendChild(botonReescribir);
     pantalla.appendChild(divStatus);
     pantalla.appendChild(botonIrAlFormulario);
-    document.getElementById('preDiv');
     leer();
     reescribir();
     alFormulario();
+    darMedidas();
     setInterval(function(){
         if(document.getElementById('preDiv')===document.activeElement){
             var contenidoActual=document.getElementById('preDiv').value;
@@ -70,3 +70,10 @@ window.addEventListener("load",function(){
     },2000);
 });
 
+window.addEventListener("resize", darMedidas);
+function darMedidas(){
+    var altura=window.innerHeight-200;
+    var ancho = window.innerWidth-200;
+    document.getElementById("preDiv").style.width = ancho+'px'
+    document.getElementById("preDiv").style.height = altura+'px'
+}
