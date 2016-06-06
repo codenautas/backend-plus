@@ -214,6 +214,11 @@ function presentarFormulario(result, idFormulario, orden){
             }
             classToggle(divContenedor, "modo-revisar", this.checked);
         });
+    }).then(function(){
+        validarRegistro(estructuraFormulario, registro, controles);
+        window.addEventListener("beforeunload", function (event) {
+            grabarAlmacen();
+        });
         return divFormulario;
     });
 }

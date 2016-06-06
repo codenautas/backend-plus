@@ -9,7 +9,8 @@ function presentarPlaca(estado) {
     var encContinuar = html.input({type:'button', id:'continuar', value:'Continuar'}).create();
     var encNueva = html.input({type:'button', id:'nueva', value:'nueva'}).create();
     var encFinalizar=html.input({type:'button',id:'ingresado-fin',value:'finalizar'}).create();
-    var metadatos = html.input({type:'button', style:"color:magenta", id:'metadatos', value:'Ir a los metadatos'}).create();
+    var metadatos = html.input({type:'button', id:'metadatos', value:'Ir a los metadatos'}).create();
+    //var metadatos = html.input({type:'button', style:"color:magenta", id:'metadatos', value:'Ir a los metadatos'}).create();
     switch(estado.estado) {
     case 'pendiente':
         placa.push(html.h3('¡BIENVENIDO NUEVAMENTE!'));
