@@ -13,7 +13,7 @@ function leer(){
         url:'/metadatos/obtener',
         data:{}
     }).then(function(result){
-        preDiv.textContent=result;
+        preDiv.value=result;
         contenidoOriginal=result;
     });
     
@@ -21,8 +21,7 @@ function leer(){
 function reescribir(){
     document.getElementById('reescrbirMetadatos').addEventListener('click',function(){
         document.getElementById('status').textContent='grabando...';
-        // var contenido=document.getElementById('preDiv').firstChild.data;
-        var contenido=document.getElementById('preDiv').textContent;
+        var contenido=document.getElementById('preDiv').value;
         AjaxBestPromise.post({
             url:'/metadatos/reescribir',
             data:{contenido}
@@ -47,7 +46,7 @@ function alFormulario(){
 window.addEventListener("load",function(){
     var divStatus=html.div({id:'status'},'Estado').create();
     var preTag=[];
-    preTag.push(html.pre({id:'preDiv'}));
+    preTag.push(html.textarea({id:'preDiv'}));
     var bloque=html.div({id:'formulario'},preTag).create();
     var botonReescribir=html.input({type:'button', id:'reescrbirMetadatos', value:'Guardar Metadatos'}).create();
     var botonIrAlFormulario=html.input({type:'button', id:'irAlFormulario', value:'Ir al formulario'}).create();
@@ -55,13 +54,13 @@ window.addEventListener("load",function(){
     pantalla.appendChild(botonReescribir);
     pantalla.appendChild(divStatus);
     pantalla.appendChild(botonIrAlFormulario);
-    document.getElementById('preDiv').setAttribute('contenteditable',true)
+    document.getElementById('preDiv');
     leer();
     reescribir();
     alFormulario();
     setInterval(function(){
         if(document.getElementById('preDiv')===document.activeElement){
-            var contenidoActual=document.getElementById('preDiv').textContent;
+            var contenidoActual=document.getElementById('preDiv').value;
             if(contenidoOriginal!==undefined && contenidoOriginal!==contenidoActual){
                 document.getElementById('status').textContent='hay cambios sin guardar';
             }else{
