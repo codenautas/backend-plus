@@ -27,8 +27,9 @@ function presentarPlaca(estado) {
         break;
     case 'vacio':
         placa.push(html.h3('¡BIENVENIDO!'));
-        placa.push(html.p('Lo invitamos a completar algunos datos para el Registro de Abonados al Teatro Colón. La información que solicitamos es sobre sus abonos y su asistencia al Teatro Colón. Serán solo unos minutos y nos ayudará a conocer mejor a nuestros abonados y sus preferencias. La encuesta es personal. La información solicitada será utilizada con fines estadísticos y para aplicar acciones para mejorar la oferta del teatro.'));
-        placa.push(html.p('Los datos que brinde son confidenciales, de acuerdo con la Ley de Protección de los Datos Personales (PONER NUMERO).'));
+        placa.push(html.p('Lo invitamos a completar algunos datos para el Registro de Abonados al Teatro Colón. La información que solicitamos es sobre sus abonos y su asistencia al Teatro Colón. Serán solo unos minutos y nos ayudará a conocer mejor a nuestros abonados y sus preferencias.'));
+        placa.push(html.p('La encuesta es personal. La información solicitada será utilizada con fines estadísticos y para aplicar acciones para mejorar la oferta del teatro.'));
+        placa.push(html.p('Los datos que brinde son confidenciales, de acuerdo con la Ley de Protección de los Datos Personales(Nº25.326).'))
         placa.push(encNueva);
         break;
     default:
