@@ -2,9 +2,12 @@ var html=jsToHtml.html;
 
 function presentarPlacaFin(textoFinIngreso){
     var placa=[];
-    var mensaje=textoFinIngreso
-    placa.push(html.h3('¡MUCHAS GRACIAS!'));
-    placa.push(('Usted ha completado satisfactoriamente el formulario y se encuentra registrado en la base de datos de ABONADOS al TEATRO COLON 2016.'));
+    var encabezado=textoFinIngreso.encabezado;
+    var parrafos=textoFinIngreso.parrafos;
+    placa.push(html.h3(encabezado));
+    parrafos.forEach(function(parrafo){
+        placa.push((parrafo));
+    });
     //    placa.push(html.div({id:"fin-ingreso"},mensaje));
     pantallaIngreso.appendChild(html.div(placa).create());
 }

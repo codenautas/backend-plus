@@ -70,6 +70,7 @@ function presentarFormulario(result, idFormulario, orden){
     var contador=0;
     var divsOpcionesMultiples=[];
     var tieneCambios=false;
+    var celdasEspecificarParaVariablesMultiples={};
     var grabarAlmacen=function(){
         if(tieneCambios){
             sennialCambios.style.backgroundColor='lightblue';
@@ -97,66 +98,58 @@ function presentarFormulario(result, idFormulario, orden){
         }
         var divCelda;
         if(celda.tipo=='pregunta'){
-            if(celda.subtipo && celda.subtipo=='multiple' && !"por si tenemos que usar una tabla real"){
-                if(!document.getElementById("multiple"+celda.pregunta)){
-                    divsOpcionesMultiples.push(html.div({"class":"divsMultiples",id:"multiple"+celda.pregunta}));
-                }
-                divsOpcionesMultiples.push(html.div({"class":celda.subtipo,id:celda.pregunta},celda.texto));
-                if(celda.aclaracion){
-                    divsOpcionesMultiples.push(html.div({"class":"aclaracion"},celda.aclaracion));
-                }
-                var controlVariableMultiple = Tedede.bestCtrl(celda.typeInfo).create();
-                if(!(celda.variable in registro)){
-                    registro[celda.variable] = coalesce(celda.defaultValue, null);
-                }
-                divsOpcionesMultiples.push(html.div({"class":["opciones", celda.typeInfo.typeName]}, [controlVariableMultiple]));
-            }else{
-                contenidoCelda.push(html.div({"class":"codigo"},celda.pregunta));
-                contenidoCelda.push(html.div({"class":celda.subtipo||"preguntas",id:celda.pregunta},celda.texto));
-                if(celda.aclaracion){
-                    contenidoCelda.push(html.div({"class":"aclaracion"},celda.aclaracion));
-                }
-                var controlVariable = Tedede.bestCtrl(celda.typeInfo).create();
-                if(!(celda.variable in registro)){
-                    registro[celda.variable] = coalesce(celda.defaultValue, null);
-                }
-                contenidoCelda.push(html.div({"class":["opciones", celda.typeInfo.typeName]}, [controlVariable]));
-                luego = luego.then(function(){
-                    Tedede.adaptElement(controlVariable,celda.typeInfo);
-                    controlVariable.setTypedValue(registro[celda.variable]);
-                    controlVariable.setAttribute("tedede-var", celda.variable);
-                    controlVariable.addEventListener('update',function(){
-                        tieneCambios=true;
-                        sennialCambios.style.backgroundColor='orange';
-                        if(timerCambios){
-                            clearTimeout(timerCambios);
-                        }
-                        var timerCambios=setTimeout(grabarAlmacen,5000);
-                        var value = this.getTypedValue();
-                        registro[celda.variable] = value;
-                        postAction('guardar-cambios',{
-                            id: divFormulario.idRegistro,
-                            ruta: {formulario: idFormulario, orden: orden, variable:celda.variable},
-                            valor:value
-                        });
-                        validarRegistro(estructuraFormulario, registro, controles);
-                    });
-                    controlVariable.celda = divCelda;
-                    controles[celda.variable] = controlVariable;
-                })/*.then(function(){
-                    (celda.typeInfo.options||[]).forEach(function(option){
-                        if(option.salto){
-                            controlVariable.moreInfo[option.option].textContent=' pase a '+option.salto.tipo+' '+option.salto[option.salto.tipo];
-                        }
-                    });
-                })*/;
+            contenidoCelda.push(html.div({"class":"codigo"},celda.pregunta));
+            contenidoCelda.push(html.div({"class":celda.subtipo||"preguntas",id:celda.pregunta},celda.texto));
+            if(celda.aclaracion){
+                contenidoCelda.push(html.div({"class":"aclaracion"},celda.aclaracion));
             }
+            var controlVariable = Tedede.bestCtrl(celda.typeInfo).create();
+            if(!(celda.variable in registro)){
+                registro[celda.variable] = coalesce(celda.defaultValue, null);
+            }
+            contenidoCelda.push(html.div({"class":["opciones", celda.typeInfo.typeName]}, [controlVariable]));
+            if(celda.subtipo=='multiple'){
+                var masInfoMultiple=html.div({"class":["mas-info-multiple"]}).create();
+                contenidoCelda.push(masInfoMultiple);
+                celdasEspecificarParaVariablesMultiples[celda.variable]=masInfoMultiple;
+            }
+            luego = luego.then(function(){
+                Tedede.adaptElement(controlVariable,celda.typeInfo);
+                controlVariable.setTypedValue(registro[celda.variable]);
+                controlVariable.setAttribute("tedede-var", celda.variable);
+                controlVariable.addEventListener('update',function(){
+                    tieneCambios=true;
+                    sennialCambios.style.backgroundColor='orange';
+                    if(timerCambios){
+                        clearTimeout(timerCambios);
+                    }
+                    var timerCambios=setTimeout(grabarAlmacen,5000);
+                    var value = this.getTypedValue();
+                    registro[celda.variable] = value;
+                    postAction('guardar-cambios',{
+                        id: divFormulario.idRegistro,
+                        ruta: {formulario: idFormulario, orden: orden, variable:celda.variable},
+                        valor:value
+                    });
+                    validarRegistro(estructuraFormulario, registro, controles);
+                });
+                controlVariable.celda = divCelda;
+                controles[celda.variable] = controlVariable;
+            })/*.then(function(){
+                (celda.typeInfo.options||[]).forEach(function(option){
+                    if(option.salto){
+                        controlVariable.moreInfo[option.option].textContent=' pase a '+option.salto.tipo+' '+option.salto[option.salto.tipo];
+                    }
+                });
+            })*/;
         }
         divCelda=html.div({"class":"celda"}, contenidoCelda).create();
         if(celda.deshabilitado){
             divCelda.setAttribute('deshabilitado',celda.deshabilitado);
         }
-        if(celda.tipo=='pregunta' && celda.subtipo=='multiple'){
+        if(celdasEspecificarParaVariablesMultiples[celda["subordinado-a"]||celda["expresion-habilitar"]]){
+            celdasEspecificarParaVariablesMultiples[celda["subordinado-a"]||celda["expresion-habilitar"]].appendChild(divCelda)
+        }else if(celda.tipo=='pregunta' && celda.subtipo=='multiple'){
             divsOpcionesMultiples.push(divCelda);
         }else{
             if(divsOpcionesMultiples.length){

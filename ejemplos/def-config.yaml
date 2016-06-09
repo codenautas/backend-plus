@@ -1,5 +1,5 @@
 server:
-  port: 3030
+  port: 3032
 db:
   motor: postgresql
   host: localhost
