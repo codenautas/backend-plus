@@ -1,5 +1,8 @@
 "use string";
 
+// var html=require('js-to-html').html;
+var html=jsToHtml.html;
+
 function prepareTableButtons(){
     var buttons = document.querySelectorAll("button#tables");
     Array.prototype.forEach.call(buttons, function(button){
@@ -12,8 +15,15 @@ function prepareTableButtons(){
                 data:{
                     table:tableName
                 }
-            }).then(function(result){
-                layout.textContent = 'strcture '+result+' ----\n ';
+            }).then(JSON.parse).then(function(tableDef){
+                console.log(tableDef);
+                var table = html.table([html.thead([html.tr(
+                    tableDef.fields.map(function(fieldDef){
+                        return html.th(fieldDef.title);
+                    })
+                )])]).create();
+                layout.innerHTML='';
+                layout.appendChild(table);
             });
             AjaxBestPromise.post({
                 url:'table/data',
@@ -22,7 +32,7 @@ function prepareTableButtons(){
                 }
             }).then(function(result){
                 structureRequest.then(function(){
-                    layout.textContent += 'data '+result+' ----\n ';
+                    layout.appendChild(html.pre('data '+result+' ----\n ').create());
                 });
             });
         });

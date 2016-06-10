@@ -1,6 +1,8 @@
 "use strict";
 
-module.exports = {
+var tableDefCompleter = require('./table-def-completer.js');
+
+module.exports = tableDefCompleter({
     name:'ptable',
     title:'periodic table',
     fields:[
@@ -17,4 +19,4 @@ module.exports = {
     constraints:[
         {constraintType:'unique', fields:['symbol']}
     ]
-};
+});
