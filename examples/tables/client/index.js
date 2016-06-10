@@ -44,6 +44,27 @@ function prepareTableButtons(){
                             var td = html.td([row[fieldDef.name]]).create();
                             Tedede.adaptElement(td, fieldDef);
                             td.contentEditable=true;
+                            td.addEventListener('update',function(){
+                                var value = this.getTypedValue();
+                                this.setAttribute('io-status', 'pending');
+                                AjaxBestPromise.post({
+                                    url:'table/save-record',
+                                    data:{
+                                        table:tableName,
+                                        primaryKeyValues:JSON.stringify([row.atomic_number]),
+                                        field:fieldDef.name,
+                                        value:value
+                                    }
+                                }).then(function(){
+                                    td.setAttribute('io-status', 'temporal-ok');
+                                    setTimeout(function(){
+                                        td.setAttribute('io-status', 'ok');
+                                    },3000);
+                                }).catch(function(err){
+                                    td.setAttribute('io-status', 'error');
+                                    td.title=err.message;
+                                });
+                            });
                             tr.appendChild(td);
                         });
                     });
