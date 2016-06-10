@@ -17,7 +17,7 @@ function prepareTableButtons(){
                 }
             }).then(JSON.parse).then(function(tableDef){
                 console.log(tableDef);
-                var tableElement = html.table([
+                var tableElement = html.table({"class":"tedede-grid"},[
                     html.caption(tableDef.title),
                     html.thead([html.tr(
                         tableDef.fields.map(function(fieldDef){
@@ -36,16 +36,22 @@ function prepareTableButtons(){
                     table:tableName
                 }
             }).then(JSON.parse).then(function(rows){
-                structureRequest.then(function(table){
+                return structureRequest.then(function(table){
                     var tbody = table.element.tBodies[0];
                     rows.forEach(function(row){
                         var tr = tbody.insertRow(-1);
                         table.def.fields.forEach(function(fieldDef){
-                            tr.appendChild(html.td([row[fieldDef.name]]).create());
+                            var td = html.td([row[fieldDef.name]]).create();
+                            Tedede.adaptElement(td, fieldDef);
+                            td.contentEditable=true;
+                            tr.appendChild(td);
                         });
                     });
                 });
-            });
+            }).catch(function(err){
+                console.log(err);
+                status.textContent=err.message;
+            })
         });
     });
 }

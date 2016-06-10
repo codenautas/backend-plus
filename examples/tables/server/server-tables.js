@@ -31,7 +31,9 @@ class AppExample extends backendPlus.AppBackend{
         this.app.post('/table/data', function(req, res){
             var defTable=tableStructures[req.body.table];
             if(defTable){
-                be.getDbClient().then(function(client){
+                var client;
+                be.getDbClient().then(function(client_){
+                    client=client_;
                     return client.query(
                         "SELECT "+defTable.fields.map(function(fieldDef){ return be.db.quoteObject(fieldDef.name); }).join(', ')+
                         " FROM "+be.db.quoteObject(defTable.name)+
@@ -39,7 +41,9 @@ class AppExample extends backendPlus.AppBackend{
                     ).execute();
                 }).then(function(result){
                     res.end(JSON.stringify(result.rows));
-                }).catch(MiniTools.serveErr(req,res));
+                }).catch(MiniTools.serveErr(req,res)).then(function(){
+                    client.done();
+                });
             }
         });
     }
