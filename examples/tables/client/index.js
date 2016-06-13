@@ -15,6 +15,9 @@ function prepareTableButtons(){
                 data:{
                     table:tableName
                 }
+            }).then(function(result){
+                console.log(result);
+                return result;
             }).then(JSON.parse).then(function(tableDef){
                 console.log(tableDef);
                 var tableElement = html.table({"class":"tedede-grid"},[
@@ -37,12 +40,14 @@ function prepareTableButtons(){
                 }
             }).then(JSON.parse).then(function(rows){
                 return structureRequest.then(function(table){
+                    my.adaptData(table.def,rows);
                     var tbody = table.element.tBodies[0];
                     rows.forEach(function(row){
                         var tr = tbody.insertRow(-1);
                         table.def.fields.forEach(function(fieldDef){
-                            var td = html.td([row[fieldDef.name]]).create();
+                            var td = html.td().create();
                             Tedede.adaptElement(td, fieldDef);
+                            td.setTypedValue(row[fieldDef.name]);
                             td.contentEditable=true;
                             td.addEventListener('update',function(){
                                 var value = this.getTypedValue();
@@ -70,8 +75,7 @@ function prepareTableButtons(){
                     });
                 });
             }).catch(function(err){
-                console.log(err);
-                status.textContent=err.message;
+                my.log(err);
             })
         });
     });

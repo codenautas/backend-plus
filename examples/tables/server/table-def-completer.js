@@ -7,6 +7,17 @@ function tableDefCompleter(tableDef){
         fieldDef.title = fieldDef.title || fieldDef.name.replace(/_/g, ' ');
         if(fieldDef.typeName==='integer'){
             fieldDef.typeName='number';
+            fieldDef.exact=true;
+            fieldDef.decimals=0;
+        }
+        if(fieldDef.typeName==='enum'){
+            fieldDef.options = fieldDef.options.map(function(option){
+                if(typeof option !== 'object'){
+                    return {option:option, label:option};
+                }else{
+                    return option;
+                }
+            });
         }
     });
     return tableDef;

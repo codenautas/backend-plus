@@ -7,7 +7,7 @@
   "repository": "codenautas/backend-plus",
   "main": "lib/backend-plus.js",
   "files": [
-    "lib"
+    "lib", "for-client"
   ],
   "contributors": [
     { "name": "Estefanía Capece", "email": "eycapece@gmail.com" },
@@ -23,22 +23,22 @@
     "fs-promise": "~0.5.0", 
     "lodash": "~4.13.1",
     "numeral": "~1.5.3",
-    "pug": "~2.0.0-beta2",
+    "pug": "~2.0.0-beta3",
     "read-yaml-promise": "~1.0.2",
     "stylus": "~0.54.5",
 
     "ajax-best-promise": "~0.0.7",
     "basic-interfaces": "~0.0.2",
-    "best-globals": "~0.4.4",
+    "best-globals": "~0.4.6",
     "best-promise": "~0.2.4",
     "extension-serve-static": "~0.1.6",
-    "js-to-html": "~0.9.0",
+    "js-to-html": "~0.9.2",
     "login-plus": "~0.4.2",
-    "mini-tools": "~0.2.10",
+    "mini-tools": "~0.2.11",
     "pg-promise-strict": "~0.2.3",
     "promise-plus": "~0.0.6",
     "regexplicit": "~0.0.4",
-    "require-bro": "~0.1.0",
+    "require-bro": "~0.1.1",
     "tedede": "~0.2.2"
   },
   "devDependencies": {

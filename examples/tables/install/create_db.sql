@@ -39,7 +39,7 @@ create table ext.ptable(
   weight               numeric,
   "group"              text,
   discovered_date      date,
-  discobered_precision text,
+  discovered_precision text,
   bigbang              boolean
 );
 alter table ext.ptable owner to beplus_example_user;
@@ -51,7 +51,7 @@ insert into ext.ptable(
   ,weight       
   ,"group"
   ,discovered_date
-  ,discobered_precision
+  ,discovered_precision
   ,bigbang
 ) values 
 ( 1, 'H' , 'Hydrogen' , 1.008      , 'Other nonmetals'      , '1766-01-01', 'year'   , true ),

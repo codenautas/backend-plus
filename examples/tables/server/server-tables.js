@@ -2,18 +2,20 @@
 
 var Path = require('path');
 var backendPlus = require("../../..");
-var tableStructures = {};
-
 var MiniTools = require('mini-tools');
 
-tableStructures.ptable = require('./table-ptable.js');
-tableStructures.groups = require('./table-groups.js');
+var Promises = require('best-promise');
 
 class AppExample extends backendPlus.AppBackend{
     constructor(){
         super();
         this.rootPath=Path.resolve(__dirname,'..');
         console.log('rootPath',this.rootPath);
+        this.tableStructures = {};
+        this.tableStructures.ptable = require('./table-ptable.js');
+        this.tableStructures.groups = require('./table-groups.js');
+        this.procedures = {};
+        this.procedures.table = require('./procedures-table.js');
     }
     configList(){
         return super.configList().concat([
@@ -24,12 +26,37 @@ class AppExample extends backendPlus.AppBackend{
     addLoggedServices(){
         var be = this;
         super.addLoggedServices();
-        this.app.post('/table/structure', function(req, res){
-            console.log('params',req.body);
-            res.end(JSON.stringify(tableStructures[req.body.table]));
-        });
+        for(var groupName in this.procedures){
+            for(var procedureName in this.procedures[groupName]){
+                var procedureDef = this.procedures[groupName][procedureName];
+                this.app.post('/'+groupName+'/'+procedureName, function(req, res){
+                    console.log('////entering',procedureDef);
+                    var params={};
+                    var source=procedureDef.method=='post'?'body':'query';
+                    procedureDef.params.forEach(function(fieldDef){
+                        var value = req[source][fieldDef.name];
+                        if(fieldDef.encoding=='JSON'){
+                            value = JSON.parse(value);
+                        }
+                        params[fieldDef.name] = value;
+                    });
+                    return Promises.start(function(){
+                        return procedureDef.coreFunction.call(be,params);
+                    }).then(function(result){
+                        if(procedureDef.encoding=='JSON'){
+                            result = JSON.stringify(result);
+                        };
+                        res.end(result);
+                    }).catch(MiniTools.serveErr(req,res));
+                });
+            }
+        }
+        //this.app.post('/table/structure', function(req, res){
+        //    console.log('params',req.body);
+        //    res.end(JSON.stringify(tableStructures[req.body.table]));
+        //});
         this.app.post('/table/data', function(req, res){
-            var defTable=tableStructures[req.body.table];
+            var defTable=be.tableStructures[req.body.table];
             if(defTable){
                 var client;
                 be.getDbClient().then(function(client_){
@@ -47,7 +74,7 @@ class AppExample extends backendPlus.AppBackend{
             }
         });
         this.app.post('/table/save-record', function(req, res){
-            var defTable=tableStructures[req.body.table];
+            var defTable=be.tableStructures[req.body.table];
             var primaryKeyValues=JSON.parse(req.body.primaryKeyValues);
             if(defTable && defTable.field[req.body.field] && primaryKeyValues.length==defTable.primaryKey.length){
                 var client;
