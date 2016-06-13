@@ -1,5 +1,6 @@
 server:
-  port: 3032
+  port: 3030
+  release: 20160613b
 db:
   motor: postgresql
   host: localhost
