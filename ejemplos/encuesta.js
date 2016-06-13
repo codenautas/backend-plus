@@ -114,7 +114,8 @@ class AppEncuesta extends backendPlus.AppBackend{
             res.end('ok!');
         });
         this.app.post('/info-enc-act', function(req, res){
-            var rta={"modo-devel": new Date(be.config["modo-devel"].hasta)>new Date()  };
+            var rta=be.config["modo-devel"]?{"modo-devel": new Date(be.config["modo-devel"].hasta)>new Date()}:{};
+        //    var rta={"modo-devel": new Date(be.config["modo-devel"].hasta)>new Date()  };
             var parametros=be.obtenerParametros(req);
             rta.id = req.user.iddato || parametros.id;
             rta.estructura = be.estructura;

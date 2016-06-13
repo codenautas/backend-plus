@@ -24,3 +24,5 @@ insert into bep.users values ('test20',md5('1test20'),'test','{"enc":20,"for":"T
 insert into bep.users values ('tca1',md5('1tca1'),'test','{"enc":1,"for":"TCA2"}');
 insert into bep.users values ('tca3',md5('1tca3'),'test','{"enc":1,"for":"TCA3"}');
 insert into bep.users values ('tca4',md5('1tca4'),'test','{"enc":1,"for":"TCA4"}');
+
+insert into bep.users values ('admin',md5('superclave.99xadmin'),'admin','{"enc": 1000, "tipo-abonado": "nuevo"}')
