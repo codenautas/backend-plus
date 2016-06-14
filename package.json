@@ -39,7 +39,7 @@
     "promise-plus": "~0.0.6",
     "regexplicit": "~0.0.4",
     "require-bro": "~0.1.1",
-    "tedede": "~0.2.2"
+    "tedede": "~0.2.3"
   },
   "devDependencies": {
     "kill-9": "~0.4.1"

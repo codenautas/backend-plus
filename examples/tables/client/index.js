@@ -16,7 +16,6 @@ function prepareTableButtons(){
                     table:tableName
                 }
             }).then(function(result){
-                console.log(result);
                 return result;
             }).then(JSON.parse).then(function(tableDef){
                 console.log(tableDef);

@@ -55,24 +55,24 @@ class AppExample extends backendPlus.AppBackend{
         //    console.log('params',req.body);
         //    res.end(JSON.stringify(tableStructures[req.body.table]));
         //});
-        this.app.post('/table/data', function(req, res){
-            var defTable=be.tableStructures[req.body.table];
-            if(defTable){
-                var client;
-                be.getDbClient().then(function(client_){
-                    client=client_;
-                    return client.query(
-                        "SELECT "+defTable.fields.map(function(fieldDef){ return be.db.quoteObject(fieldDef.name); }).join(', ')+
-                        " FROM "+be.db.quoteObject(defTable.name)+
-                        " ORDER BY "+defTable.primaryKey.join(',')
-                    ).execute();
-                }).then(function(result){
-                    res.end(JSON.stringify(result.rows));
-                }).catch(MiniTools.serveErr(req,res)).then(function(){
-                    client.done();
-                });
-            }
-        });
+        // this.app.post('/table/data', function(req, res){
+        //     var defTable=be.tableStructures[req.body.table];
+        //     if(defTable){
+        //         var client;
+        //         be.getDbClient().then(function(client_){
+        //             client=client_;
+        //             return client.query(
+        //                 "SELECT "+defTable.fields.map(function(fieldDef){ return be.db.quoteObject(fieldDef.name); }).join(', ')+
+        //                 " FROM "+be.db.quoteObject(defTable.name)+
+        //                 " ORDER BY "+defTable.primaryKey.join(',')
+        //             ).execute();
+        //         }).then(function(result){
+        //             res.end(JSON.stringify(result.rows));
+        //         }).catch(MiniTools.serveErr(req,res)).then(function(){
+        //             client.done();
+        //         });
+        //     }
+        // });
         this.app.post('/table/save-record', function(req, res){
             var defTable=be.tableStructures[req.body.table];
             var primaryKeyValues=JSON.parse(req.body.primaryKeyValues);
