@@ -143,7 +143,9 @@ function presentarFormulario(result, idFormulario, orden){
                 });
             })*/;
         }
-        divCelda=html.div({"class":"celda"}, contenidoCelda).create();
+       // console.log("celda.subtipo",celda.subtipo)
+        divCelda=html.div({"class":"celda", "tedede-tipo":celda.tipo, "tedede-subtipo":celda.subtipo}, contenidoCelda).create();
+        // divCelda=html.div({"class":"celda"}, contenidoCelda).create();
         if(celda.deshabilitado){
             divCelda.setAttribute('deshabilitado',celda.deshabilitado);
         }

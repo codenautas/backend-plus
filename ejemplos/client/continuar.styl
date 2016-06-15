@@ -12,16 +12,27 @@ body
   font-size 200%
   
 .preguntas
-  border-top 1px solid gray
   font-size 110%
   
 .multiple
   font-size 110%
   
 .texto
-  border-top 1px solid gray
   font-size 110%
-    
+
+.celda[tedede-tipo=texto]
+  border-top 1px solid gray
+
+.celda[tedede-tipo=pregunta]
+  border-top 1px solid gray
+      
+.celda[tedede-tipo=texto]
+  border 1px solid gray
+
+.celda[tedede-tipo=texto][tedede-subtipo=multiple]
+  border 0px solid red
+  border-top 1px solid gray
+
 .opciones
   margin-top 12px
   font-size 110%
