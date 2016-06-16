@@ -25,11 +25,15 @@ function validarRegistro(estructuraFormulario, registro, controles){
             });
             // console.log(celda.variable,celda['expresion-habilitar'],expresionEvaluable,eval(expresionEvaluable));
             var disabled = !eval(expresionEvaluable);
+            //console.log(celda.variable,disabled)
             controles[celda.variable].disabled = disabled;
             if(disabled){
                 controles[celda.variable].celda.setAttribute('tedede-disabled','disabled');
+                controles[celda.variable].disable(true);
+                //controles[celda.variable].setTypedValue(null)
             }else{
                 controles[celda.variable].celda.removeAttribute('tedede-disabled');
+                controles[celda.variable].disable(false);
             }
         }
     });
