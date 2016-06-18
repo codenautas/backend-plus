@@ -13,9 +13,10 @@ class AppExample extends backendPlus.AppBackend{
         console.log('rootPath',this.rootPath);
         this.tableStructures = {};
         this.tableStructures.ptable = require('./table-ptable.js');
-        this.tableStructures.groups = require('./table-groups.js');
-        this.procedures = {};
-        this.procedures.table = require('./procedures-table.js');
+        this.tableStructures.pgroups = require('./table-groups.js');
+        this.procedures = [];
+        this.procedures = this.procedures.concat(require('./procedures-table.js'));
+        console.log('////requireds procedures',this.procedures);
     }
     configList(){
         return super.configList().concat([
@@ -26,31 +27,33 @@ class AppExample extends backendPlus.AppBackend{
     addLoggedServices(){
         var be = this;
         super.addLoggedServices();
-        for(var groupName in this.procedures){
-            for(var procedureName in this.procedures[groupName]){
-                var procedureDef = this.procedures[groupName][procedureName];
-                this.app.post('/'+groupName+'/'+procedureName, function(req, res){
-                    console.log('////entering',procedureDef);
-                    var params={};
-                    var source=procedureDef.method=='post'?'body':'query';
-                    procedureDef.params.forEach(function(fieldDef){
-                        var value = req[source][fieldDef.name];
-                        if(fieldDef.encoding=='JSON'){
-                            value = JSON.parse(value);
-                        }
-                        params[fieldDef.name] = value;
-                    });
-                    return Promises.start(function(){
-                        return procedureDef.coreFunction.call(be,params);
-                    }).then(function(result){
-                        if(procedureDef.encoding=='JSON'){
-                            result = JSON.stringify(result);
-                        };
-                        res.end(result);
-                    }).catch(MiniTools.serveErr(req,res));
+        console.log('////conecting procedures',this.procedures);
+        this.procedures.forEach(function(procedureDef){
+            console.log('////conecting',procedureDef);
+            be.app[procedureDef.method](procedureDef.action, function(req, res){
+                console.log('////entering',procedureDef);
+                var params={};
+                var source=procedureDef.method=='post'?'body':'query';
+                procedureDef.params.forEach(function(fieldDef){
+                    var value = req[source][fieldDef.name];
+                    if(fieldDef.encoding=='JSON'){
+                        value = JSON.parse(value);
+                    }
+                    params[fieldDef.name] = value;
                 });
-            }
-        }
+                return Promises.start(function(){
+                    return procedureDef.coreFunction.call(be,params);
+                }).then(function(result){
+                    if(procedureDef.encoding=='JSON'){
+                        result = JSON.stringify(result);
+                    };
+                    res.end(result);
+                }).catch(MiniTools.serveErr(req,res));
+            });
+        });
+        this.app.get('/echo', function(req,res){
+            res.end('echo');
+        });
         //this.app.post('/table/structure', function(req, res){
         //    console.log('params',req.body);
         //    res.end(JSON.stringify(tableStructures[req.body.table]));

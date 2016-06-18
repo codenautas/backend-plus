@@ -1,9 +1,10 @@
 "use strict";
 
-var proceduresDefCompleter = require('./procedures-def-completer.js');
+var procedures = require('./procedures.js');
 
-module.exports = proceduresDefCompleter('table',{
-    structure:{
+module.exports = [
+    {
+        action:'/table/structure',
         params:[
             {name: 'table'}
         ],
@@ -13,7 +14,8 @@ module.exports = proceduresDefCompleter('table',{
             return this.tableStructures[params.table];
         }
     },
-    data:{
+    {
+        action:'/table/data',
         params:[
             {name: 'table'}
         ],
@@ -30,7 +32,8 @@ module.exports = proceduresDefCompleter('table',{
                 return client.query(
                     "SELECT "+defTable.fields.map(function(fieldDef){ return be.db.quoteObject(fieldDef.name); }).join(', ')+
                     " FROM "+be.db.quoteObject(defTable.name)+
-                    " ORDER BY "+defTable.primaryKey.join(',')
+                    // " ORDER BY "+defTable.primaryKey.map(be.db.quoteObject.bind(be.db)).join(',')
+                    " ORDER BY "+defTable.primaryKey.map(function(fieldName){ return be.db.quoteObject(fieldName); }).join(',')
                 ).execute();
             }).then(function(result){
          
@@ -38,4 +41,4 @@ module.exports = proceduresDefCompleter('table',{
             });
         }
     }
-});
+].map(procedures.defCompleter);
