@@ -14,8 +14,6 @@ class AppExample extends backendPlus.AppBackend{
         this.tableStructures = {};
         this.tableStructures.ptable = require('./table-ptable.js');
         this.tableStructures.pgroups = require('./table-groups.js');
-        this.procedures = [];
-        this.procedures = this.procedures.concat(require('./procedures-table.js'));
         console.log('////requireds procedures',this.procedures);
     }
     configList(){
@@ -27,30 +25,6 @@ class AppExample extends backendPlus.AppBackend{
     addLoggedServices(){
         var be = this;
         super.addLoggedServices();
-        console.log('////conecting procedures',this.procedures);
-        this.procedures.forEach(function(procedureDef){
-            console.log('////conecting',procedureDef);
-            be.app[procedureDef.method](procedureDef.action, function(req, res){
-                console.log('////entering',procedureDef);
-                var params={};
-                var source=procedureDef.method=='post'?'body':'query';
-                procedureDef.params.forEach(function(fieldDef){
-                    var value = req[source][fieldDef.name];
-                    if(fieldDef.encoding=='JSON'){
-                        value = JSON.parse(value);
-                    }
-                    params[fieldDef.name] = value;
-                });
-                return Promises.start(function(){
-                    return procedureDef.coreFunction.call(be,params);
-                }).then(function(result){
-                    if(procedureDef.encoding=='JSON'){
-                        result = JSON.stringify(result);
-                    };
-                    res.end(result);
-                }).catch(MiniTools.serveErr(req,res));
-            });
-        });
         this.app.get('/echo', function(req,res){
             res.end('echo');
         });

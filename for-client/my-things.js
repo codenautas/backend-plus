@@ -2,13 +2,44 @@
 
 var coalesce=bestGlobals.coalesce;
 
-var my = {
+function id(x){return x;}
+
+var myOwn = {
+    autoSetup(){
+        var my = this;
+        return this.ajaxPromise({
+            action:'def-procedures',
+            method:'get',
+            parameters:[],
+            encoding:'JSON'
+        }).then(function(defSource){
+            my.proceduresDef=eval(defSource);
+            my.proceduresDef.forEach(function(procedureDef){
+                var target;
+                var lastName = null;
+                var partsNames=procedureDef.action.split('/').filter(id).forEach(function(name){
+                    if(lastName){
+                        if(!target[lastName]){
+                            target[lastName]={"dont-use":lastName};
+                        }else if(target[lastName]["dont-use"]!==lastName){
+                            throw new Error("Bad nesting of procedures");
+                        }
+                        target=target[lastName];
+                    }else{
+                        target=my.ajax;
+                    }
+                    lastName=name;
+                });
+                target[lastName]=my.ajaxPromise.bind(my,procedureDef);
+            });
+        });
+    },
     "log-severities":{
         error:{permanent:true },
         log  :{permanent:false},
     },
     log:function(severity, message){
-        var self=this;
+        var my=this;
         var consoleMessage;
         var clientMessage;
         if(!message){
@@ -31,7 +62,7 @@ var my = {
         status.appendChild(divMessage);
         if(!this["log-severities"][severity].permanent){
             setTimeout(function(){
-                self.fade(divMessage);
+                my.fade(divMessage);
             },3000);
         }
     },
@@ -54,8 +85,15 @@ var my = {
             });
         });
     },
-    ajax:function(procedureDef,data){
-        var self = this;
+    get ajax(){
+        if(!this.proceduresDef){
+            throw new Error("before use myOwn.ajax, myOwn.autoSetup() must be called");
+        }else{
+            return this.ajaxPromise;
+        }
+    },
+    ajaxPromise:function(procedureDef,data){
+        var my = this;
         return Promise.resolve().then(function(){
             var params={};
             procedureDef.parameters.forEach(function(paramDef){
@@ -73,12 +111,13 @@ var my = {
                     body.innerHTML=result;
                     throw new Error('NOT LOGGED');
                 }
-                if(proceureDef.encoding=='JSON'){
+                if(procedureDef.encoding=='JSON'){
                     return JSON.parse(result);
                 }
                 return result;
             }).catch(function(err){
-                self.log(err);
+                my.log(err);
+                throw err;
             });
         });
     },
