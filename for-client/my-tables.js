@@ -36,7 +36,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                     td.addEventListener('update',function(){
                         var value = this.getTypedValue();
                         this.setAttribute('io-status', 'pending');
-                        my.table['save-record']({
+                        my.ajax.table['save-record']({
                             table:tableName,
                             primaryKeyValues:[row.atomic_number],
                             field:fieldDef.name,

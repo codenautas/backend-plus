@@ -11,7 +11,6 @@ var myOwn = {
             action:'def-procedures',
             method:'get',
             parameters:[],
-            encoding:'JSON'
         }).then(function(defSource){
             my.proceduresDef=eval(defSource);
             my.proceduresDef.forEach(function(procedureDef){
@@ -98,7 +97,11 @@ var myOwn = {
             var params={};
             procedureDef.parameters.forEach(function(paramDef){
                 var value=coalesce(data[paramDef.name],paramDef.def,coalesce.throwErrorIfUndefined("lack of parameter "+paramDef.name));
-                if(paramDef.enconding=='JSON'){
+                if(paramDef.encoding=='plain'){
+                    if(typeof value === "object"){
+                        throw new Error("Invalid plain type "+(value==null?value:typeof value)+" detected");
+                    }
+                }else{
                     value=JSON.stringify(value);
                 }
                 params[paramDef.name]=value;
@@ -108,13 +111,14 @@ var myOwn = {
                 data:params
             }).then(function(result){
                 if(result && result[0]=="<" && result.match(/login/m)){
-                    body.innerHTML=result;
+                    location='login';
                     throw new Error('NOT LOGGED');
                 }
-                if(procedureDef.encoding=='JSON'){
+                if(procedureDef.encoding=='plain'){
+                    return result;
+                }else{
                     return JSON.parse(result);
                 }
-                return result;
             }).catch(function(err){
                 my.log(err);
                 throw err;
