@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for tedede",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -39,7 +39,7 @@
     "promise-plus": "~0.0.6",
     "regexplicit": "~0.0.4",
     "require-bro": "~0.1.1",
-    "tedede": "~0.2.3"
+    "tedede": "~0.2.4"
   },
   "devDependencies": {
     "kill-9": "~0.4.1"
