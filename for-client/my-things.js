@@ -91,6 +91,20 @@ var myOwn = {
             return this.ajaxPromise;
         }
     },
+    reconnect() { return document.getElementById('reconection_div'); },
+    reconnectCreate() {
+        var reconnectDiv = this.reconnect();
+        if(! reconnectDiv.childNodes.length) {
+            reconnectDiv.appendChild(html.span("Disconnected!").create());
+            reconnectDiv.appendChild(html.a({href:'login'}, "reconnect").create());
+        }
+    },
+    reconnectRemove() {
+        var reconnectDiv = this.reconnect();
+        if(reconnectDiv.childNodes.length) {
+            while(reconnectDiv.firstChild) { reconnectDiv.removeChild(reconnectDiv.firstChild); }
+        }
+    },
     ajaxPromise:function(procedureDef,data){
         var my = this;
         return Promise.resolve().then(function(){
@@ -111,9 +125,11 @@ var myOwn = {
                 data:params
             }).then(function(result){
                 if(result && result[0]=="<" && result.match(/login/m)){
-                    location='login';
-                    throw new Error('NOT LOGGED');
+                    return my.reconnectCreate();
+                    // location='login';
+                    // throw new Error('NOT LOGGED');
                 }
+                my.reconnectRemove();
                 if(procedureDef.encoding=='plain'){
                     return result;
                 }else{
