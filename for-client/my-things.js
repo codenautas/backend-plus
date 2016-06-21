@@ -93,11 +93,13 @@ var myOwn = {
     },
     reconnect() { return document.getElementById('reconection_div'); },
     reconnectCreate() {
+        document.body.scrollTop = document.documentElement.scrollTop = 0; // cross browser scrolling to top
         var reconnectDiv = this.reconnect();
         if(! reconnectDiv.childNodes.length) {
             reconnectDiv.appendChild(html.span("Disconnected!").create());
             reconnectDiv.appendChild(html.a({href:'login'}, "reconnect").create());
         }
+        
     },
     reconnectRemove() {
         var reconnectDiv = this.reconnect();
