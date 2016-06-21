@@ -67,7 +67,7 @@
     }
   },    
   "qa-control": {
-    "package-version": "0.1.4",
+    "package-version": "0.2.0",
     "run-in": "server",
     "type": "lib",
     "stage": "designing",
