@@ -13,6 +13,7 @@ login:
   passFieldName: md5pass
   infoFieldList: [username, rol]
   plus:
-    unloggedPath: examples/tables/unlogged
-    loginPagePath: examples/tables/unlogged/login
     fileStore: true
+    loginForm:
+      formTitle: example tables
+      formImg: unlogged/tables-lock.png
