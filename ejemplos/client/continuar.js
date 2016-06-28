@@ -242,7 +242,8 @@ function presentarAlmacen(result, formAMostrar, ordenAMostrar){
             }
             _.forEach(listaFormularios, function(formulario, index){
                 var orden=index+sumarAlOrden;
-                var boton = html.button({class:'boton-abrir-formulario'}, idFormulario+" "+(orden||'')).create();
+                var boton = html.button({class:'boton-abrir-formulario'}, defFor.abreviatura+" "+(orden||'')).create();
+//                var boton = html.button({class:'boton-abrir-formulario'}, idFormulario+" "+(orden||'')).create();
                 boton.addEventListener('click', function(){
                     grabarEIr(result, 'continuar', idFormulario, orden);
                 });
