@@ -29,6 +29,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             my.adaptData(table.def,rows);
             var tbody = table.element.tBodies[0];
             rows.forEach(function(row){
+                var primaryKeyValues = table.def.primaryKey.map(function(fieldName){ return row[fieldName]; });
                 var tr = tbody.insertRow(-1);
                 var buttonDelete=html.button({class:'table-button'}, [html.img({src:'img/delete.png'})]).create();
                 tr.appendChild(html.th([
@@ -45,7 +46,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                         this.setAttribute('io-status', 'pending');
                         my.ajax.table['save-record']({
                             table:tableName,
-                            primaryKeyValues:[row.atomic_number],
+                            primaryKeyValues:primaryKeyValues,
                             field:fieldDef.name,
                             value:value
                         }).then(function(){
@@ -61,9 +62,9 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                     tr.appendChild(td);
                 });
                 buttonDelete.addEventListener('click', function(){
-                    my.showQuestion('Delete "'+row.atomic_number+'" ?').then(function(result){
+                    my.showQuestion('Delete '+JSON.stringify(primaryKeyValues)+' ?').then(function(result){
                         if(result){
-                            my.ajax.table['delete-record']({table:tableName, primaryKeyValues:[row.atomic_number]}).then(function(){
+                            my.ajax.table['delete-record']({table:tableName, primaryKeyValues:primaryKeyValues}).then(function(){
                                 my.fade(tr);
                             });
                         }
