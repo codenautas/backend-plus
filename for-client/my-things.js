@@ -5,33 +5,40 @@ var coalesce=bestGlobals.coalesce;
 function id(x){return x;}
 
 var myOwn = {
+    debugging:false,
     autoSetup(){
         var my = this;
-        return this.ajaxPromise({
-            action:'def-procedures',
-            method:'get',
-            parameters:[],
-        }).then(function(defSource){
-            my.proceduresDef=eval(defSource);
-            my.proceduresDef.forEach(function(procedureDef){
-                var target;
-                var lastName = null;
-                var partsNames=procedureDef.action.split('/').filter(id).forEach(function(name){
-                    if(lastName){
-                        if(!target[lastName]){
-                            target[lastName]={"dont-use":lastName};
-                        }else if(target[lastName]["dont-use"]!==lastName){
-                            throw new Error("Bad nesting of procedures");
+        var readProcedureDefinitions = function readProcedureDefinitions(){
+            return my.ajaxPromise({
+                action:'def-procedures',
+                method:'get',
+                parameters:[],
+            }).then(function(defSource){
+                my.proceduresDef=eval(defSource);
+                my.proceduresDef.forEach(function(procedureDef){
+                    var target;
+                    var lastName = null;
+                    var partsNames=procedureDef.action.split('/').filter(id).forEach(function(name){
+                        if(lastName){
+                            if(!target[lastName]){
+                                target[lastName]={"dont-use":lastName};
+                            }else if(target[lastName]["dont-use"]!==lastName){
+                                throw new Error("Bad nesting of procedures");
+                            }
+                            target=target[lastName];
+                        }else{
+                            target=my.ajax;
                         }
-                        target=target[lastName];
-                    }else{
-                        target=my.ajax;
-                    }
-                    lastName=name;
+                        lastName=name;
+                    });
+                    target[lastName]=my.ajaxPromise.bind(my,procedureDef);
                 });
-                target[lastName]=my.ajaxPromise.bind(my,procedureDef);
             });
-        });
+        };
+        setInterval(function(){
+            my.testKeepAlive();
+        },my.debugging?6*1000:60*1000);
+        return readProcedureDefinitions();
     },
     "log-severities":{
         error:{permanent:true },
@@ -127,9 +134,8 @@ var myOwn = {
                 data:params
             }).then(function(result){
                 if(result && result[0]=="<" && result.match(/login/m)){
-                    return my.reconnectCreate();
-                    // location='login';
-                    // throw new Error('NOT LOGGED');
+                    my.reconnectCreate();
+                    throw new Error('NOT LOGGED');
                 }
                 my.reconnectRemove();
                 if(procedureDef.encoding=='plain'){
@@ -143,5 +149,34 @@ var myOwn = {
             });
         });
     },
+    testKeepAlive(){
+        var my = this;
+        var element = document.getElementById('keep-alive-signal') || my.debugging && document.body.appendChild(html.div({id:'keep-alive-signal'}).create());
+        if(element){
+            element.textContent='t';
+            element.style.backgroundColor='#4DD';
+            element.style.display='';
+        }
+        return my.ajaxPromise({
+            parameters:[],
+            method:'post',
+            action:'keep-alive',
+            encoding:'plain'
+        }).then(function(){
+            if(element){
+                element.textContent='ok';
+                element.style.backgroundColor='lightgreen';
+            }
+        },function(){
+            if(element){
+                element.textContent='E!';
+                element.style.backgroundColor='#F88';
+            }
+        }).then(function(){
+            setTimeout(function(){
+                element.style.display='none';
+            }, 2000);
+        })
+    }
 };
 
