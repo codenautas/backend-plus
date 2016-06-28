@@ -98,22 +98,6 @@ var myOwn = {
             return this.ajaxPromise;
         }
     },
-    reconnect() { return document.getElementById('reconection_div'); },
-    reconnectCreate() {
-        document.body.scrollTop = document.documentElement.scrollTop = 0; // cross browser scrolling to top
-        var reconnectDiv = this.reconnect();
-        if(! reconnectDiv.childNodes.length) {
-            reconnectDiv.appendChild(html.span("Disconnected!").create());
-            reconnectDiv.appendChild(html.a({href:'login'}, "reconnect").create());
-        }
-        
-    },
-    reconnectRemove() {
-        var reconnectDiv = this.reconnect();
-        if(reconnectDiv.childNodes.length) {
-            while(reconnectDiv.firstChild) { reconnectDiv.removeChild(reconnectDiv.firstChild); }
-        }
-    },
     ajaxPromise:function(procedureDef,data){
         var my = this;
         return Promise.resolve().then(function(){
@@ -134,10 +118,10 @@ var myOwn = {
                 data:params
             }).then(function(result){
                 if(result && result[0]=="<" && result.match(/login/m)){
-                    my.reconnectCreate();
+                    my.createReconnectionDiv();
                     throw new Error('NOT LOGGED');
                 }
-                my.reconnectRemove();
+                my.removeReconnectionDiv();
                 if(procedureDef.encoding=='plain'){
                     return result;
                 }else{
@@ -180,6 +164,23 @@ var myOwn = {
     },
     showQuestion(message){
         return Promise.resolve(confirm(message));
+    },
+    reconnectionDivName:function() { return 'reconnection_div'; },
+    createReconnectionDiv() {
+        document.body.scrollTop = document.documentElement.scrollTop = 0; // cross browser scrolling to top
+        var recDiv = document.getElementById(this.reconnectionDivName());
+        if(! recDiv) {
+            recDiv = html.div({id:this.reconnectionDivName()}).create();
+            recDiv.appendChild(html.span("Disconnected!").create());
+            recDiv.appendChild(html.a({href:'login'}, "reconnect").create());
+            var body = document.body;
+            body.insertBefore(recDiv, body.firstChild);
+        }
+        return recDiv;
+    },
+    removeReconnectionDiv() {
+        var recDiv = document.getElementById(this.reconnectionDivName());
+        if(recDiv) { document.body.removeChild(recDiv); }
     }
 };
 
