@@ -9,11 +9,13 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         console.log(tableDef);
         var tableElement = html.table({"class":"tedede-grid"},[
             html.caption(tableDef.title),
-            html.thead([html.tr(
-                tableDef.fields.map(function(fieldDef){
-                    return html.th(fieldDef.title);
-                })
-            )]),
+            html.thead([
+                html.tr([html.th([html.img({src:'img/insert.png', class:'table-button'})])].concat(
+                    tableDef.fields.map(function(fieldDef){
+                        return html.th(fieldDef.title);
+                    })
+                ))
+            ]),
             html.tbody()
         ]).create();
         layout.innerHTML='';
@@ -28,6 +30,11 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             var tbody = table.element.tBodies[0];
             rows.forEach(function(row){
                 var tr = tbody.insertRow(-1);
+                var buttonDelete=html.button({class:'table-button'}, [html.img({src:'img/delete.png'})]).create();
+                tr.appendChild(html.th([
+                    html.button({class:'table-button'}, [html.img({src:'img/insert.png'})]),
+                    buttonDelete
+                ]).create())
                 table.def.fields.forEach(function(fieldDef){
                     var td = html.td().create();
                     Tedede.adaptElement(td, fieldDef);
@@ -53,6 +60,15 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                     });
                     tr.appendChild(td);
                 });
+                buttonDelete.addEventListener('click', function(){
+                    my.showQuestion('Delete "'+row.atomic_number+'" ?').then(function(result){
+                        if(result){
+                            my.ajax.table['delete-record']({table:tableName, primaryKeyValues:[row.atomic_number]}).then(function(){
+                                my.fade(tr);
+                            });
+                        }
+                    });
+                })
             });
         });
     }).catch(function(err){

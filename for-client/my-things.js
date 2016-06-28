@@ -177,6 +177,9 @@ var myOwn = {
                 element.style.display='none';
             }, 2000);
         })
+    },
+    showQuestion(message){
+        return Promise.resolve(confirm(message));
     }
 };
 
