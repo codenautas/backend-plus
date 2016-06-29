@@ -15,10 +15,11 @@ login:
   infoFieldList: [username, rol, iddato]
   plus:
     fileStore: true
-    formLogin:
+    loginForm:
       usernameLabel: abonado
       passwordLabel: clave
       formTitle: registro
       buttonLabel: entrar
+      autoLogin: true
 estructura:
   origen: ejemplos/estructura-ejemplo.yaml
