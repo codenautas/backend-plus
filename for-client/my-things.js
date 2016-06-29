@@ -172,10 +172,11 @@ var myOwn = {
         if(! recDiv) {
             recDiv = html.div({id:this.reconnectionDivName()}).create();
             recDiv.appendChild(html.span("Disconnected!").create());
-            recDiv.appendChild(html.a({href:'login'}, "reconnect").create());
+            recDiv.appendChild(html.a({id:'reconnect', href:'login'}, "RECONNECT").create());
             var body = document.body;
             body.insertBefore(recDiv, body.firstChild);
         }
+        document.getElementById('reconnect').classList.add('reconnect');
         return recDiv;
     },
     removeReconnectionDiv() {

@@ -18,10 +18,30 @@
   color #BBB
   padding 2px
 
-//#reconnection_div
-//  border-bottom 1px solid red
-//  color #800
+@keyframes pulse {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.2;
+  }
+  40% {
+    opacity: 0.4;
+  }
+  60% {
+    opacity: 0.6;
+  }
+  80% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+  }
+}
 
+.reconnect
+    animation-name pulse
+    animation-duration 1s
 
 #keep-alive-signal
   position fixed
