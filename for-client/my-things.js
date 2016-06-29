@@ -169,14 +169,17 @@ var myOwn = {
     createReconnectionDiv() {
         document.body.scrollTop = document.documentElement.scrollTop = 0; // cross browser scrolling to top
         var recDiv = document.getElementById(this.reconnectionDivName());
+        var recName = 'reconnect';
         if(! recDiv) {
             recDiv = html.div({id:this.reconnectionDivName()}).create();
-            recDiv.appendChild(html.span("Disconnected!").create());
-            recDiv.appendChild(html.a({id:'reconnect', href:'login'}, "RECONNECT").create());
+            recDiv.appendChild(html.span("Disconnected! ").create());
+            recDiv.appendChild(html.a({id:recName, href:'login'}, "RECONNECT").create());
             var body = document.body;
             body.insertBefore(recDiv, body.firstChild);
         }
-        document.getElementById('reconnect').classList.add('reconnect');
+        var recLink = document.getElementById(recName);
+        recLink.classList.remove(recName);
+        recLink.classList.add(recName);
         return recDiv;
     },
     removeReconnectionDiv() {
