@@ -2,16 +2,27 @@
 
 myOwn.tableGrid = function tableGrid(layout, tableName){
     var my = this;
+    var modes = {
+        saveByField: true
+    };
     layout.textContent = 'loading...';
     var structureRequest = my.ajax.table.structure({
         table:tableName
     }).then(function(tableDef){
         console.log(tableDef);
+        var getSaveModeImgSrc=function(){ return modes.saveByField?'img/tables-update-by-field.png':'img/tables-update-by-row.png';};
+        var buttonSaveModeImg=html.img({src:getSaveModeImgSrc()}).create();
+        var buttonSaveMode=html.button({class:'table-button'}, [buttonSaveModeImg]).create();
+        buttonSaveMode.addEventListener('click',function(){
+            modes.saveByField = !modes.saveByField;
+            buttonSaveModeImg.src=getSaveModeImgSrc();
+        });
         var tableElement = html.table({"class":"tedede-grid"},[
             html.caption(tableDef.title),
             html.thead([
                 html.tr([
-                    html.button({class:'table-button'}, [html.img({src:'img/insert.png'})])
+                    html.button({class:'table-button'}, [html.img({src:'img/insert.png'})]),
+                    buttonSaveMode
                 ].concat(
                     tableDef.fields.map(function(fieldDef){
                         return html.th(fieldDef.title);
@@ -32,6 +43,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             var tbody = table.element.tBodies[0];
             rows.forEach(function(row){
                 var rowControls = {};
+                var rowPendingForUpdate = {};
                 var primaryKeyValues;
                 var createRowElements = function createRowElements(){
                     var tr = tbody.insertRow(-1);
@@ -48,24 +60,29 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                         td.addEventListener('update',function(){
                             var value = this.getTypedValue();
                             if(value!==row[fieldDef.name]){
-                                this.setAttribute('io-status', 'pending');
-                                my.ajax.table['save-record']({
-                                    table:tableName,
-                                    primaryKeyValues:primaryKeyValues,
-                                    field:fieldDef.name,
-                                    value:value
-                                }).then(function(updatedRow){
-                                    my.adaptData(table.def,[updatedRow]);
-                                    row = updatedRow;
-                                    updateRowData();
-                                    td.setAttribute('io-status', 'temporal-ok');
-                                    setTimeout(function(){
-                                        td.setAttribute('io-status', 'ok');
-                                    },3000);
-                                }).catch(function(err){
-                                    td.setAttribute('io-status', 'error');
-                                    td.title=err.message;
-                                });
+                                if(!modes.saveByField){
+                                    this.setAttribute('io-status', 'pending');
+                                    rowPendingForUpdate[fieldDef.name] = value;
+                                }else{
+                                    this.setAttribute('io-status', 'updating');
+                                    my.ajax.table['save-record']({
+                                        table:tableName,
+                                        primaryKeyValues:primaryKeyValues,
+                                        field:fieldDef.name,
+                                        value:value
+                                    }).then(function(updatedRow){
+                                        my.adaptData(table.def,[updatedRow]);
+                                        row = updatedRow;
+                                        updateRowData();
+                                        td.setAttribute('io-status', 'temporal-ok');
+                                        setTimeout(function(){
+                                            td.setAttribute('io-status', 'ok');
+                                        },3000);
+                                    }).catch(function(err){
+                                        td.setAttribute('io-status', 'error');
+                                        td.title=err.message;
+                                    });
+                                }
                             }
                         });
                         tr.appendChild(td);
@@ -79,6 +96,14 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                             }
                         });
                     })
+                    tr.addEventListener('focusout', function(event){
+                        if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
+                            for(name in rowPendingForUpdate){
+                                var td=rowControls[name];
+                                td.setAttribute('io-status', 'temporal-ok');
+                            }
+                        }
+                    });
                 }
                 var updateRowData = function updateRowData(){
                     primaryKeyValues = table.def.primaryKey.map(function(fieldName){ return row[fieldName]; });
