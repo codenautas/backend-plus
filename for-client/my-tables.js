@@ -47,24 +47,26 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                         td.contentEditable=true;
                         td.addEventListener('update',function(){
                             var value = this.getTypedValue();
-                            this.setAttribute('io-status', 'pending');
-                            my.ajax.table['save-record']({
-                                table:tableName,
-                                primaryKeyValues:primaryKeyValues,
-                                field:fieldDef.name,
-                                value:value
-                            }).then(function(updatedRow){
-                                my.adaptData(table.def,[updatedRow]);
-                                row = updatedRow;
-                                updateRowData();
-                                td.setAttribute('io-status', 'temporal-ok');
-                                setTimeout(function(){
-                                    td.setAttribute('io-status', 'ok');
-                                },3000);
-                            }).catch(function(err){
-                                td.setAttribute('io-status', 'error');
-                                td.title=err.message;
-                            });
+                            if(value!==row[fieldDef.name]){
+                                this.setAttribute('io-status', 'pending');
+                                my.ajax.table['save-record']({
+                                    table:tableName,
+                                    primaryKeyValues:primaryKeyValues,
+                                    field:fieldDef.name,
+                                    value:value
+                                }).then(function(updatedRow){
+                                    my.adaptData(table.def,[updatedRow]);
+                                    row = updatedRow;
+                                    updateRowData();
+                                    td.setAttribute('io-status', 'temporal-ok');
+                                    setTimeout(function(){
+                                        td.setAttribute('io-status', 'ok');
+                                    },3000);
+                                }).catch(function(err){
+                                    td.setAttribute('io-status', 'error');
+                                    td.title=err.message;
+                                });
+                            }
                         });
                         tr.appendChild(td);
                     });
