@@ -66,6 +66,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                         my.adaptData(table.def,[updatedRow]);
                         row = updatedRow;
                         updateRowData();
+                        rowPendingForUpdate = {};
                         changeIoStatus('temporal-ok');
                         setTimeout(function(){
                             changeIoStatus('ok');
@@ -89,35 +90,10 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                         td.addEventListener('update',function(){
                             var value = this.getTypedValue();
                             if(value!==row[fieldDef.name]){
-                                if(!modes.saveByField){
-                                    this.setAttribute('io-status', 'pending');
-                                    rowPendingForUpdate[fieldDef.name] = value;
-                                }else{
-<<<<<<< HEAD
-                                    var newRow={};
-                                    newRow[fieldDef.name]=value;
-                                    saveRow(newRow);
-=======
-                                    this.setAttribute('io-status', 'updating');
-                                    var newRow={};
-                                    newRow[fieldDef.name]=value;
-                                    my.ajax.table['save-record']({
-                                        table:tableName,
-                                        primaryKeyValues:primaryKeyValues,
-                                        newRow:newRow
-                                    }).then(function(updatedRow){
-                                        my.adaptData(table.def,[updatedRow]);
-                                        row = updatedRow;
-                                        updateRowData();
-                                        td.setAttribute('io-status', 'temporal-ok');
-                                        setTimeout(function(){
-                                            td.setAttribute('io-status', 'ok');
-                                        },3000);
-                                    }).catch(function(err){
-                                        td.setAttribute('io-status', 'error');
-                                        td.title=err.message;
-                                    });
->>>>>>> 6d2d89392839d5a6cdf258fe6a89b2c627c18fc1
+                                this.setAttribute('io-status', 'pending');
+                                rowPendingForUpdate[fieldDef.name] = value;
+                                if(modes.saveByField){
+                                    saveRow(rowPendingForUpdate);
                                 }
                             }
                         });
@@ -134,10 +110,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                     })
                     tr.addEventListener('focusout', function(event){
                         if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
-                            for(name in rowPendingForUpdate){
-                                var td=rowControls[name];
-                                td.setAttribute('io-status', 'temporal-ok');
-                            }
+                            saveRow(rowPendingForUpdate);
                         }
                     });
                 }
