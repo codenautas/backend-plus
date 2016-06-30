@@ -51,6 +51,29 @@ create table ext.ptable(
 );
 alter table ext.ptable owner to beplus_example_user;
 
+create function ext.ptable_state_camel_trg() returns trigger
+  language plpgsql
+as
+$BODY$
+declare
+  v_camel_text text;
+begin
+  v_camel_text = upper(substr(new."state at STP", 1, 1)) || lower(substr(new."state at STP", 2));
+  if v_camel_text is distinct from new."state at STP" then
+    new."state at STP" = v_camel_text;
+  end if;
+  return new;
+end;
+$BODY$;
+alter function ext.ptable_state_camel_trg() owner to beplus_example_user;
+
+CREATE TRIGGER ptable_state_camel_trg
+  BEFORE UPDATE OR INSERT
+  ON ext.ptable
+  FOR EACH ROW
+  EXECUTE PROCEDURE ext.ptable_state_camel_trg();
+
+
 insert into ext.ptable (atomic_number, name, symbol, "column", period, block, "state at STP", ocurrence, description) values
 ('1', 'Hydrogen', 'H', '1', '1', 's', 'Gas', 'Primordial', 'Diatomic nonmetal'),
 ('2', 'Helium', 'He', '18', '1', 's', 'Gas', 'Primordial', 'Noble gas'),
@@ -200,7 +223,7 @@ create table ext.isotopes(
   primary key (atomic_number, mass_number),
   unique (atomic_number, "order")
 );
-alter table ext.ptable owner to beplus_example_user;
+alter table ext.isotopes owner to beplus_example_user;
 
 insert into ext.isotopes(atomic_number, "order", mass_number) values
 (2  ,1,4 ),
