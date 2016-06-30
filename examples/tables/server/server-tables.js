@@ -14,6 +14,7 @@ class AppExample extends backendPlus.AppBackend{
         this.tableStructures = {};
         this.tableStructures.ptable = require('./table-ptable.js');
         this.tableStructures.pgroups = require('./table-groups.js');
+        this.tableStructures.isotopes = require('./table-isotopes.js');
     }
     configList(){
         return super.configList().concat([

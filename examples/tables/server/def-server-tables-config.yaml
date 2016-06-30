@@ -1,5 +1,8 @@
 server:
   port: 3033
+  kill-9:
+    pid: 1234
+    master-pass: 3920192
 db:
   motor: postgresql
   host: localhost

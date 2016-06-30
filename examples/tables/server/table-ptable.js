@@ -14,6 +14,12 @@ module.exports = tableDefCompleter({
         {name:'discovered_date'     , typeName:'date'                                    },
         {name:'discovered_precision', typeName:'text'   , options:['year','day'],        },
         {name:'bigbang'             , typeName:'boolean'                                 },
+        {name:'column'              , typeName:'integer'                                 },
+        {name:'period'              , typeName:'integer'                                 },
+        {name:'block'               , typeName:'text'                                    },
+        {name:'state at STP'        , typeName:'text'                                    },
+        {name:'ocurrence'           , typeName:'text'                                    },
+        {name:'description'         , typeName:'text'                                    },
     ],
     primaryKey:['atomic_number'],
     constraints:[
