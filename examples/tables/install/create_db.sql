@@ -225,6 +225,8 @@ create table ext.isotopes(
 );
 alter table ext.isotopes owner to beplus_example_user;
 
+alter table ext.isotopes add constraint "atomic_number must be < mass_number" check (atomic_number < mass_number or atomic_number=1 and atomic_number <= mass_number);
+
 insert into ext.isotopes(atomic_number, "order", mass_number) values
 (2  ,1,4 ),
 (2  ,2,3 ),
