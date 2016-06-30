@@ -10,7 +10,9 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         var tableElement = html.table({"class":"tedede-grid"},[
             html.caption(tableDef.title),
             html.thead([
-                html.tr([html.th([html.img({src:'img/insert.png', class:'table-button'})])].concat(
+                html.tr([
+                    html.button({class:'table-button'}, [html.img({src:'img/insert.png'})])
+                ].concat(
                     tableDef.fields.map(function(fieldDef){
                         return html.th(fieldDef.title);
                     })

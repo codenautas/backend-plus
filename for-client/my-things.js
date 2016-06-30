@@ -63,7 +63,7 @@ var myOwn = {
         consoleMessage = consoleMessage || clientMessage;
         var status = document.getElementById('status');
         console.log(severity, consoleMessage);
-        status = status||body;
+        status = status||document.body;
         var divMessage = html.div({"class": ["status-"+severity]}, clientMessage).create();
         status.appendChild(divMessage);
         if(!this["log-severities"][severity].permanent){
