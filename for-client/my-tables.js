@@ -65,11 +65,12 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                                     rowPendingForUpdate[fieldDef.name] = value;
                                 }else{
                                     this.setAttribute('io-status', 'updating');
+                                    var newRow={};
+                                    newRow[fieldDef.name]=value;
                                     my.ajax.table['save-record']({
                                         table:tableName,
                                         primaryKeyValues:primaryKeyValues,
-                                        field:fieldDef.name,
-                                        value:value
+                                        newRow:newRow
                                     }).then(function(updatedRow){
                                         my.adaptData(table.def,[updatedRow]);
                                         row = updatedRow;
