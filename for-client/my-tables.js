@@ -45,6 +45,35 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 var rowControls = {};
                 var rowPendingForUpdate = {};
                 var primaryKeyValues;
+                var saveRow = function(newRow){
+                    var changeIoStatus = function changeIoStatus(newStatus, title){
+                        fieldNames.forEach(function(name){ 
+                            var td=rowControls[name];
+                            td.setAttribute('io-status', newStatus); 
+                            if(title){
+                                td.title=err.message;
+                            }
+
+                        });
+                    }
+                    var fieldNames=Object.keys(newRow);
+                    changeIoStatus('updating');
+                    my.ajax.table['save-record']({
+                        table:tableName,
+                        primaryKeyValues:primaryKeyValues,
+                        newRow:newRow
+                    }).then(function(updatedRow){
+                        my.adaptData(table.def,[updatedRow]);
+                        row = updatedRow;
+                        updateRowData();
+                        changeIoStatus('temporal-ok');
+                        setTimeout(function(){
+                            changeIoStatus('ok');
+                        },3000);
+                    }).catch(function(err){
+                        changeIoStatus('error',err.message);
+                    });
+                }
                 var createRowElements = function createRowElements(){
                     var tr = tbody.insertRow(-1);
                     var buttonDelete=html.button({class:'table-button'}, [html.img({src:'img/delete.png'})]).create();
@@ -64,6 +93,11 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                                     this.setAttribute('io-status', 'pending');
                                     rowPendingForUpdate[fieldDef.name] = value;
                                 }else{
+<<<<<<< HEAD
+                                    var newRow={};
+                                    newRow[fieldDef.name]=value;
+                                    saveRow(newRow);
+=======
                                     this.setAttribute('io-status', 'updating');
                                     var newRow={};
                                     newRow[fieldDef.name]=value;
@@ -83,6 +117,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                                         td.setAttribute('io-status', 'error');
                                         td.title=err.message;
                                     });
+>>>>>>> 6d2d89392839d5a6cdf258fe6a89b2c627c18fc1
                                 }
                             }
                         });
