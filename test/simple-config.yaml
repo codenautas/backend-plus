@@ -1,0 +1,22 @@
+server:
+  port: 37033
+  kill-9:
+    pid: 1234
+    master-pass: 3920192
+db:
+  motor: postgresql
+  host: localhost
+  database: test_db
+  schema: testbe
+  user: test_user
+  password: test_pass
+login:
+  table: users
+  userFieldName: username
+  passFieldName: md5pass
+  infoFieldList: [username, rol]
+  plus:
+    fileStore: true
+    loginForm:
+      formTitle: example tables
+      formImg: unlogged/tables-lock.png
