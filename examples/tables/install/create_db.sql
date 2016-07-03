@@ -10,12 +10,20 @@ grant all on schema ext to beplus_example_user;
 create table ext.users(
   username text primary key,
   md5pass text,
+  active_until date not null,
+  locked_since date,
   rol text
 );
 alter table ext."users" owner to beplus_example_user;
 
-insert into ext."users" (username, md5pass, rol)
-  values ('bob', md5('bobpass'||'bob'), 'boss');
+insert into ext."users" (username, md5pass, rol, active_until)
+  values ('bob', md5('bobpass'||'bob'), 'boss', '2099-12-31');
+
+insert into ext."users" (username, md5pass, rol, active_until)
+  values ('died', md5('diedpass'||'died'), 'boss', '1999-12-31');
+
+insert into ext."users" (username, md5pass, rol, active_until,locked_since)
+  values ('locked', md5('lockedpass'||'locked'), 'boss', '2999-12-31','2016-07-02');
 
 create table ext.pgroups(
   "group" text primary key,
