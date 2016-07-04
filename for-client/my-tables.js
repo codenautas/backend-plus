@@ -51,7 +51,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                             var td=rowControls[name];
                             td.setAttribute('io-status', newStatus); 
                             if(title){
-                                td.title=err.message;
+                                //td.title=err.message;
                             }
 
                         });

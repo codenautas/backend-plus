@@ -168,20 +168,35 @@ var myOwn = {
         return Promise.resolve(confirm(message));
     },
     reconnectionDivName:function() { return 'reconnection_div'; },
-    scrollToTop:function (element, to, duration) {
-        if (duration <= 0) return;
-        var difference = to - element.scrollTop;
-        var perTick = difference / duration * 10;
-
-        setTimeout(function() {
-            element.scrollTop = element.scrollTop + perTick;
-            if(element.scrollTop == to) return;
-            scrollTo(element, to, duration - 10);
-        }, 10);
+    easeInOut: function(currentTime, start, change, duration) {
+        currentTime /= duration / 2;
+        if (currentTime < 1) {
+            return change / 2 * currentTime * currentTime + start;
+        }
+        currentTime -= 1;
+        return -change / 2 * (currentTime * (currentTime - 2) - 1) + start;
+    },
+    scrollToTop: function(element, to, duration) {
+        var start = element.scrollTop,
+            change = to - start,
+            increment = 20;
+        var me = this;
+        var animateScroll = function(elapsedTime) {        
+            elapsedTime += increment;
+            var position = me.easeInOut(elapsedTime, start, change, duration);                        
+            element.scrollTop = position; 
+            if (elapsedTime < duration) {
+                setTimeout(function() {
+                    animateScroll(elapsedTime);
+                }, increment);
+            } else {
+                element.scrollTop = document.documentElement.scrollTop = 0; // cross browser scrolling to top
+            }
+        };
+        animateScroll(0);
     },
     createReconnectionDiv() {
-        //document.body.scrollTop = document.documentElement.scrollTop = 0; // cross browser scrolling to top
-        this.scrollToTop(document.body, 0, 1000);
+        this.scrollToTop(document.body, 0, 500);
         var recDiv = document.getElementById(this.reconnectionDivName());
         var recName = 'reconnect';
         if(! recDiv) {
