@@ -199,7 +199,9 @@ var myOwn = {
         this.scrollToTop(document.body, 0, 500);
         var recDiv = document.getElementById(this.reconnectionDivName());
         var recName = 'reconnect';
+        var classToSet = 'blink';
         if(! recDiv) {
+            classToSet = recName;
             recDiv = html.div({id:this.reconnectionDivName()}).create();
             recDiv.appendChild(html.span("Disconnected! ").create());
             recDiv.appendChild(html.a({id:recName, href:'login'}, "RECONNECT").create());
@@ -208,7 +210,8 @@ var myOwn = {
         }
         var recLink = document.getElementById(recName);
         recLink.classList.remove(recName);
-        recLink.classList.add(recName);
+        recLink.classList.remove('blink');
+        recLink.classList.add(classToSet);
         return recDiv;
     },
     removeReconnectionDiv() {
