@@ -168,8 +168,20 @@ var myOwn = {
         return Promise.resolve(confirm(message));
     },
     reconnectionDivName:function() { return 'reconnection_div'; },
+    scrollToTop:function (element, to, duration) {
+        if (duration <= 0) return;
+        var difference = to - element.scrollTop;
+        var perTick = difference / duration * 10;
+
+        setTimeout(function() {
+            element.scrollTop = element.scrollTop + perTick;
+            if(element.scrollTop == to) return;
+            scrollTo(element, to, duration - 10);
+        }, 10);
+    },
     createReconnectionDiv() {
-        document.body.scrollTop = document.documentElement.scrollTop = 0; // cross browser scrolling to top
+        //document.body.scrollTop = document.documentElement.scrollTop = 0; // cross browser scrolling to top
+        this.scrollToTop(document.body, 0, 1000);
         var recDiv = document.getElementById(this.reconnectionDivName());
         var recName = 'reconnect';
         if(! recDiv) {
