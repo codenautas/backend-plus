@@ -198,19 +198,20 @@ var myOwn = {
     createReconnectionDiv() {
         this.scrollToTop(document.body, 0, 500);
         var recDiv = document.getElementById(this.reconnectionDivName());
-        var recName = 'reconnect';
-        var classToSet = 'blink';
+        var recID = 'reconnect';
+        var classBlink = 'blink',
+            classPulse = 'pulse';
+        var classToSet = classBlink;
         if(! recDiv) {
-            classToSet = recName;
+            classToSet = classPulse;
             recDiv = html.div({id:this.reconnectionDivName()}).create();
             recDiv.appendChild(html.span("Disconnected! ").create());
-            recDiv.appendChild(html.a({id:recName, href:'login'}, "RECONNECT").create());
+            recDiv.appendChild(html.a({id:recID, href:'login'}, "RECONNECT").create());
             var body = document.body;
             body.insertBefore(recDiv, body.firstChild);
         }
-        var recLink = document.getElementById(recName);
-        recLink.classList.remove(recName);
-        recLink.classList.remove('blink');
+        var recLink = document.getElementById(recID);
+        recLink.classList.remove(classPulse, classBlink);
         recLink.classList.add(classToSet);
         return recDiv;
     },
