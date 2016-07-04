@@ -16,13 +16,18 @@ describe('backend-plus', function(){
         {base:''           ,root:true },
         {base:'/base'      ,root:false},
     ].forEach(function(opt){
-        describe('base:'+opt.param, function(){
+        describe('base:'+opt.base, function(){
             describe('not logged', function(){
+                var be;
                 var agent;
                 before(function (done) {
-                    createServerGetAgent({baseUrl:opt.base, loginPageServe:simpleLoginPageServe}).then(function(_agent){ 
-                        agent=_agent; 
+                    createServerGetAgent({server:{"base-url":opt.base}}).then(function(_be){ 
+                        be=_be;
+                        agent=request.agent(be.getMainApp());
                     }).then(done,done);
+                });
+                after(function (done) {
+                    be.close().then(done,done);
                 });
                 it('must redirect if not logged in', function(done){
                     agent
@@ -30,11 +35,11 @@ describe('backend-plus', function(){
                     .expect('location', opt.base+'/login')
                     .expect(302, /Redirecting to \/((doble\/)?base\/)?login/, done);
                 });
-                //it('must get login page when not logged in', function(done){
-                //    agent
-                //    .get(opt.base+'/login')
-                //    .expect(200, '<div>The login page', done);
-                //});
+                it('must get login page when not logged in', function(done){
+                    agent
+                    .get(opt.base+'/login')
+                    .expect(200, /username.*password/, done);
+                });
                 //it('must redirect to root if not logged in', function(done){
                 //    agent
                 //    .get(opt.base+'/this/and/this/algo.txt')
@@ -251,10 +256,9 @@ describe('backend-plus', function(){
 var INTERNAL_PORT=34444;
 
 function createServerGetAgent(opts) {
-    return Promises.make(function(resolve, reject){
-        var testBe = require('./simple-backend.js');
-        return testBe;
-    });
+    var appStarted = require('./simple-backend.js')(opts);
+    return appStarted;
+    /////////////////////////
     return Promises.make(function(resolve, reject){
         var app = express();
         app.use(cookieParser());
