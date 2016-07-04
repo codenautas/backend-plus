@@ -16,13 +16,19 @@ describe('backend-plus', function(){
         {base:''           ,root:true },
         {base:'/base'      ,root:false},
     ].forEach(function(opt){
-        describe('base:'+opt.param, function(){
+        describe('base:'+opt.base, function(){
             describe('not logged', function(){
+                var be;
                 var agent;
                 before(function (done) {
-                    createServerGetAgent({baseUrl:opt.base, loginPageServe:simpleLoginPageServe}).then(function(_agent){ 
-                        agent=_agent; 
+                    createServerGetAgent({server:{"base-url":opt.base}}).then(function(_be){ 
+                        be=_be;
+                        agent=request.agent(be.getMainApp());
                     }).then(done,done);
+                });
+                after(function (done) {
+                    console.log('xxxx-be.close',be)
+                    be.close();
                 });
                 it('must redirect if not logged in', function(done){
                     agent
@@ -251,10 +257,9 @@ describe('backend-plus', function(){
 var INTERNAL_PORT=34444;
 
 function createServerGetAgent(opts) {
-    return Promises.make(function(resolve, reject){
-        var testBe = require('./simple-backend.js');
-        return testBe;
-    });
+    var appStarted = require('./simple-backend.js')(opts);
+    return appStarted;
+    /////////////////////////
     return Promises.make(function(resolve, reject){
         var app = express();
         app.use(cookieParser());
