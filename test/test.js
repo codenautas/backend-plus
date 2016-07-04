@@ -27,8 +27,7 @@ describe('backend-plus', function(){
                     }).then(done,done);
                 });
                 after(function (done) {
-                    console.log('xxxx-be.close',be)
-                    be.close();
+                    be.close().then(done,done);
                 });
                 it('must redirect if not logged in', function(done){
                     agent
