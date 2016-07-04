@@ -110,7 +110,9 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                     })
                     tr.addEventListener('focusout', function(event){
                         if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
-                            saveRow(rowPendingForUpdate);
+                            if(Object.keys(rowPendingForUpdate).length){
+                                saveRow(rowPendingForUpdate);
+                            }
                         }
                     });
                 }

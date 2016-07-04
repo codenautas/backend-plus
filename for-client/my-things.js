@@ -157,9 +157,11 @@ var myOwn = {
                 element.style.backgroundColor='#F88';
             }
         }).then(function(){
-            setTimeout(function(){
-                element.style.display='none';
-            }, 2000);
+            if(element){
+                setTimeout(function(){
+                    element.style.display='none';
+                }, 2000);
+            }
         })
     },
     showQuestion(message){
