@@ -35,11 +35,11 @@ describe('backend-plus', function(){
                     .expect('location', opt.base+'/login')
                     .expect(302, /Redirecting to \/((doble\/)?base\/)?login/, done);
                 });
-                //it('must get login page when not logged in', function(done){
-                //    agent
-                //    .get(opt.base+'/login')
-                //    .expect(200, '<div>The login page', done);
-                //});
+                it('must get login page when not logged in', function(done){
+                    agent
+                    .get(opt.base+'/login')
+                    .expect(200, /username.*password/, done);
+                });
                 //it('must redirect to root if not logged in', function(done){
                 //    agent
                 //    .get(opt.base+'/this/and/this/algo.txt')
