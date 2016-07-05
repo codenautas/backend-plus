@@ -29,9 +29,14 @@ describe('backend-plus', function(){
                 after(function (done) {
                     be.close().then(done,done);
                 });
+                it('must set session cookie in the first connection', function(done){
+                    agent
+                    .get(opt.base+'/any-url')
+                    .expect('set-cookie',/connect.sid=/, done);
+                });
                 it('must redirect if not logged in', function(done){
                     agent
-                    .get(opt.base+'/private/data')
+                    .get(opt.base+'/echo')
                     .expect('location', opt.base+'/login')
                     .expect(302, /Redirecting to \/((doble\/)?base\/)?login/, done);
                 });
@@ -59,40 +64,28 @@ describe('backend-plus', function(){
                 //        .expect(404, done);
                 //    });
                 //};
-            });
-            //describe('to log', function(){
             //    var agent;
             //    before(function (done) {
             //        createServerGetAgent({baseUrl:opt.base, loginPageServe:simpleLoginPageServe, userFieldName:'userFieldName'}).then(function(_agent){ 
             //            agent=_agent; 
             //        }).then(done,done);
             //    });
-            //    it('must set cookie', function(done){
-            //        agent.get(opt.base+'/login')
-            //        .expect('set-cookie',/connect.sid=/)
-            //        .expect(function(res){
-            //            // console.dir(res,{depth:0});
-            //            // console.log(res.headers);
-            //            // console.log('set-cookies',res.headers["set-cookie"]);
-            //        })
-            //        .end(done);
-            //    });
-            //    it('must receive login parameters', function(done){
-            //        agent
-            //        .post(opt.base+'/login')
-            //        .type('form')
-            //        .send({username:'prueba', password:'prueba1'})
-            //        .expect(function(res){
-            //            // console.log('****');
-            //            //console.log('set-cookies',res.headers["set-cookie"]);
-            //        })
-            //        .expect(302, /Redirecting to \/.*index/, done);
-            //    });
-            //    it('must serve data if logged', function(done){
-            //        agent
-            //        .get(opt.base+'/private/data')
-            //        .expect('private: data',done);
-            //    });
+                it('must receive login parameters', function(done){
+                    agent
+                    .post(opt.base+'/login')
+                    .type('form')
+                    .send({username:'prueba', password:'prueba1'})
+                    .expect(function(res){
+                        // console.log('****');
+                        // console.log('set-cookies',res.headers["set-cookie"]);
+                    })
+                    .expect(302, /Redirecting to \/.*index/, done);
+                });
+                it('must serve data if logged', function(done){
+                    agent
+                    .get(opt.base+'/echo')
+                    .expect('echo',done);
+                });
             //    it('must serve data if logged 2', function(done){
             //        agent
             //        .get(opt.base+'/private/data2')
@@ -120,7 +113,7 @@ describe('backend-plus', function(){
             //            .expect(302, /Redirecting to \/.*login/, done);
             //        });
             //    });
-            //});
+            });
             //describe('loggin in', function(){
             //    var agent;
             //    before(function (done) {

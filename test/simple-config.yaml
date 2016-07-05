@@ -7,7 +7,7 @@ db:
   motor: postgresql
   host: localhost
   database: test_db
-  schema: testbe
+  schema: tst
   user: test_user
   password: test_pass
 login:
@@ -18,5 +18,5 @@ login:
   plus:
     fileStore: true
     loginForm:
-      formTitle: example tables
+      formTitle: simple app
       formImg: unlogged/tables-lock.png
