@@ -84,23 +84,26 @@ describe('backend-plus', function(){
                     .get(opt.base+'/echo')
                     .expect('echo',done);
                 });
-                'fixture-select'.split(',').forEach(function(fixtureName){
-                    return; 
-                    // var fixture = fsSync.readFileSync('test/fixtures/'+fixtureName+'.js', {encoding:'utf8'});
+                'fixture-select'.split(',').forEach(function(fixtureListName){
+                    return;
+                    var fixtures = eval(fsSync.readFileSync('test/fixtures/'+fixtureListName+'.js', {encoding:'utf8'}));
                     // console.log(fixture);
                     // var fixture = require('fixtures/'+fixtureName+'.js');
-                    var fixture = require('./test/fixtures/'+fixtureName+'.js');
-                    it('execute procedure for fixture:'+fixtureName, function(done){
-                        console.log('xxxx-empiezo',[fixture.method||'post'],opt.base+'/'+fixture.action+'?'+querystring.stringify(fixture.parameters))
-                        agent[fixture.method||'post'](opt.base+'/'+fixture.action+'?'+querystring.stringify(fixture.parameters))
-                        .expect(function(rec){
-                            console.log('xxxxxxrec', rec)
-                            if(be.procedure[fixture.action].encoding=='plain'){
-                                
-                            }else{
-                                
-                            }
-                            done();
+                    console.log(fixtures);
+                    fixtures.forEach(function(fixture,i){
+                        it('execute procedure for fixture:'+fixtureListName+'['+i+'] '+(fixture.name||fixture.action), function(done){
+                            console.log('xxxx-empiezo',[fixture.method||'post'],opt.base+'/'+fixture.action+'?'+querystring.stringify(fixture.parameters))
+                            // agent[fixture.method||'post'](opt.base+'/'+fixture.action+'?'+querystring.stringify(fixture.parameters))
+                            agent.post('table/data/?table=employees')
+                            .expect(function(res){
+                                console.log('xxxxxxrec', res)
+                                if(be.procedure[fixture.action].encoding=='plain'){
+                                    
+                                }else{
+                                    
+                                }
+                                done();
+                            });
                         });
                     });
                 });
