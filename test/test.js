@@ -13,6 +13,9 @@ var sinon = require('sinon');
 var fsSync = require('fs');
 var querystring = require('querystring');
 
+var assert = require('self-explain').assert;
+var differences = assert.differences;
+
 describe('backend-plus', function(){
     [
         {base:''           ,root:true },
@@ -104,13 +107,26 @@ describe('backend-plus', function(){
                                 console.log('xxx-volvio', res.headers)
                                 console.log('xxx-volvio', res.text)
                                 console.log('xxx f,b',fixture.action,be.procedure)
+                                var result;
                                 if(be.procedure[fixture.action].encoding=='plain'){
-                                    
+                                    result=res.text;
                                 }else{
-                                    
+                                    result=JSON.parse(res.text);
                                 }
-                                // done();
-                            }).expect(200,done);
+                                return ;
+                                var expected = fixture.expected;
+                                var dif=differences(result, expected);
+                                if(dif){
+                                    console.log('expected');
+                                    console.log(expected);
+                                    console.log('obtained');
+                                    console.log(result);
+                                    console.log('unexpected differences');
+                                    console.log(dif);
+                                    throw new Error('differences');
+                                }
+                            })
+                            .expect(200,done);
                         });
                     });
                 });
