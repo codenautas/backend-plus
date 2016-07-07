@@ -85,7 +85,6 @@ describe('backend-plus', function(){
                     .expect('echo',done);
                 });
                 'fixture-select'.split(',').forEach(function(fixtureListName){
-                    return;
                     var fixtures = eval(fsSync.readFileSync('test/fixtures/'+fixtureListName+'.js', {encoding:'utf8'}));
                     // console.log(fixture);
                     // var fixture = require('fixtures/'+fixtureName+'.js');
@@ -94,16 +93,24 @@ describe('backend-plus', function(){
                         it('execute procedure for fixture:'+fixtureListName+'['+i+'] '+(fixture.name||fixture.action), function(done){
                             console.log('xxxx-empiezo',[fixture.method||'post'],opt.base+'/'+fixture.action+'?'+querystring.stringify(fixture.parameters))
                             // agent[fixture.method||'post'](opt.base+'/'+fixture.action+'?'+querystring.stringify(fixture.parameters))
-                            agent.post('table/data/?table=employees')
+                            fixture.method=fixture.method||be.defaultMethod;
+                            (fixture.method==='get'?(
+                                agent.get(opt.base+'/'+fixture.action+'?'+querystring.stringify(fixture.parameters))
+                            ):(
+                                agent.post(opt.base+'/'+fixture.action).type('form').send(fixture.parameters)
+                            ))
                             .expect(function(res){
-                                console.log('xxxxxxrec', res)
+                                // console.log('xxxxxxrec', res)
+                                console.log('xxx-volvio', res.headers)
+                                console.log('xxx-volvio', res.text)
+                                console.log('xxx f,b',fixture.action,be.procedure)
                                 if(be.procedure[fixture.action].encoding=='plain'){
                                     
                                 }else{
                                     
                                 }
-                                done();
-                            });
+                                // done();
+                            }).expect(200,done);
                         });
                     });
                 });

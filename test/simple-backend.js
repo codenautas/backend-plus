@@ -13,6 +13,7 @@ class AppExample extends backendPlus.AppBackend{
         this.rootPath=Path.resolve(__dirname,'..');
         this.tableStructures = {};
         this.tableStructures.simple = require('./table-simple.js');
+        this.tableStructures.employees = require('./table-employees.js');
         this.optsForConfigList=opts;
     }
     configList(){
