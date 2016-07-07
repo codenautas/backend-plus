@@ -10,6 +10,8 @@ var Promises = require('promise-plus');
 var changing = require('best-globals').changing;
 var expect = require('expect.js');
 var sinon = require('sinon');
+var fsSync = require('fs');
+var querystring = require('querystring');
 
 describe('backend-plus', function(){
     [
@@ -75,16 +77,32 @@ describe('backend-plus', function(){
                     .post(opt.base+'/login')
                     .type('form')
                     .send({username:'prueba', password:'prueba1'})
-                    .expect(function(res){
-                        // console.log('****');
-                        // console.log('set-cookies',res.headers["set-cookie"]);
-                    })
                     .expect(302, /Redirecting to \/.*index/, done);
                 });
                 it('must serve data if logged', function(done){
                     agent
                     .get(opt.base+'/echo')
                     .expect('echo',done);
+                });
+                'fixture-select'.split(',').forEach(function(fixtureName){
+                    return; 
+                    // var fixture = fsSync.readFileSync('test/fixtures/'+fixtureName+'.js', {encoding:'utf8'});
+                    // console.log(fixture);
+                    // var fixture = require('fixtures/'+fixtureName+'.js');
+                    var fixture = require('./test/fixtures/'+fixtureName+'.js');
+                    it('execute procedure for fixture:'+fixtureName, function(done){
+                        console.log('xxxx-empiezo',[fixture.method||'post'],opt.base+'/'+fixture.action+'?'+querystring.stringify(fixture.parameters))
+                        agent[fixture.method||'post'](opt.base+'/'+fixture.action+'?'+querystring.stringify(fixture.parameters))
+                        .expect(function(rec){
+                            console.log('xxxxxxrec', rec)
+                            if(be.procedure[fixture.action].encoding=='plain'){
+                                
+                            }else{
+                                
+                            }
+                            done();
+                        });
+                    });
                 });
             //    it('must serve data if logged 2', function(done){
             //        agent
