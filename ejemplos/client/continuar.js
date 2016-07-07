@@ -86,6 +86,38 @@ function presentarFormulario(result, idFormulario, orden){
     }
     estructuraFormulario.celdas.forEach(function(celda){
         var contenidoCelda=[];
+        if(celda.tipo == 'especial'){
+            if(celda.texto=='harcodeado'){
+                if(orden<=10){
+                    var diccionario={'1': 'PRIMER',
+                                     '2': 'SEGUNDO',
+                                     '3': 'TERCER',
+                                     '4': 'CUARTO',
+                                     '5': 'QUINTO',
+                                     '6': 'SEXTO',
+                                     '7': 'SEPTIMO',
+                                     '8': 'OCTAVO',
+                                     '9': 'NOVENO',
+                                     '10': 'DECIMO'
+                    }
+                    contenidoCelda.push( html.div({"class":"especial"},[
+                        html.span({"class":"especial"},'Las siguientes preguntas refieren al '),
+                        html.span({"class":"especial-resaltar"},diccionario[orden]),
+                        html.span({"class":"especial"},' abono')
+                    ]));
+                }else{
+                    contenidoCelda.push( html.div({"class":"especial"},[
+                        html.span({"class":"especial"},'Las siguientes preguntas refieren al abono '),
+                        html.span({"class":"especial-resaltar"},orden)
+                    ]));
+                }
+            }else{
+                if(orden=='1'){
+                    contenidoCelda.push(html.div({"class":"orden-1"},celda.texto))
+                }
+            }
+        }
+
         if(celda.tipo=='titulo'){
             contenidoCelda.push(html.div({"class":"titulo", id:"titulo"},celda.titulo))
             if(celda.aclaracion){
@@ -97,6 +129,7 @@ function presentarFormulario(result, idFormulario, orden){
             if(celda.aclaracion){
                 contenidoCelda.push(html.div({"class":"aclaracion"},celda.aclaracion));
             }
+                
         }
         var divCelda;
         if(celda.tipo=='pregunta'){
