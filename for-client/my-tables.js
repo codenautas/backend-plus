@@ -6,6 +6,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         saveByField: true
     };
     layout.textContent = 'loading...';
+    var createRowElements ;
     var structureRequest = my.ajax.table.structure({
         table:tableName
     }).then(function(tableDef){
@@ -17,6 +18,9 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         buttonSaveMode.addEventListener('click',function(){
             modes.saveByField = !modes.saveByField;
             buttonSaveModeImg.src=getSaveModeImgSrc();
+        });
+        buttonInsert.addEventListener('click', function(){
+            createRowElements(0);
         });
         var tableElement = html.table({"class":"tedede-grid"},[
             html.caption(tableDef.title),
@@ -39,95 +43,93 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         return structureRequest.then(function(table){
             my.adaptData(table.def,rows);
             var tbody = table.element.tBodies[0];
-            rows.forEach(function(row){
-                var rowPendingForUpdate = {};
-                var primaryKeyValues;
-                var saveRow = function(tr){
-                    var changeIoStatus = function changeIoStatus(newStatus, title){
-                        fieldNames.forEach(function(name){ 
-                            var td=tr.info.rowControls[name];
-                            td.setAttribute('io-status', newStatus); 
-                            if(title){
-                                //td.title=err.message;
-                            }
-                        });
-                    }
-                    var fieldNames=Object.keys(tr.info.rowPendingForUpdate);
-                    changeIoStatus('updating');
-                    my.ajax.table['save-record']({
-                        table:tableName,
-                        primaryKeyValues:tr.info.primaryKeyValues,
-                        newRow:tr.info.rowPendingForUpdate
-                    }).then(function(updatedRow){
-                        my.adaptData(table.def,[updatedRow]);
-                        updateRowData(tr, updatedRow);
-                        tr.info.rowPendingForUpdate = {};
-                        changeIoStatus('temporal-ok');
-                        setTimeout(function(){
-                            changeIoStatus('ok');
-                        },3000);
-                    }).catch(function(err){
-                        changeIoStatus('error',err.message);
+            var updateRowData = function updateRowData(tr, updatedRow){
+                tr.info.row = updatedRow;
+                tr.info.primaryKeyValues = table.def.primaryKey.map(function(fieldName){ 
+                    return tr.info.row[fieldName]; 
+                });
+                table.def.fields.forEach(function(fieldDef){
+                    var td = tr.info.rowControls[fieldDef.name];
+                    td.setTypedValue(tr.info.row[fieldDef.name]);
+                });
+            }
+            var saveRow = function(tr){
+                var changeIoStatus = function changeIoStatus(newStatus, title){
+                    fieldNames.forEach(function(name){ 
+                        var td=tr.info.rowControls[name];
+                        td.setAttribute('io-status', newStatus); 
+                        if(title){
+                            //td.title=err.message;
+                        }
                     });
                 }
-                var createRowElements = function createRowElements(iRow, row){
-                    var tr = tbody.insertRow(iRow);
-                    tr.info = {
-                        rowControls:{},
-                        row: {},
-                        rowPendingForUpdate:{}
-                    };
-                    var buttonInsert=html.button({class:'table-button'}, [html.img({src:'img/insert.png'})]).create();
-                    var buttonDelete=html.button({class:'table-button'}, [html.img({src:'img/delete.png'})]).create();
-                    tr.appendChild(html.th([buttonInsert,buttonDelete]).create());
-                    table.def.fields.forEach(function(fieldDef){
-                        var td = html.td().create();
-                        Tedede.adaptElement(td, fieldDef);
-                        tr.info.rowControls[fieldDef.name] = td;
-                        td.contentEditable=true;
-                        td.addEventListener('update',function(){
-                            var value = this.getTypedValue();
-                            if(value!==tr.info.row[fieldDef.name]){
-                                this.setAttribute('io-status', 'pending');
-                                tr.info.rowPendingForUpdate[fieldDef.name] = value;
-                                if(modes.saveByField){
-                                    saveRow(tr);
-                                }
-                            }
-                        });
-                        tr.appendChild(td);
-                    });
-                    buttonDelete.addEventListener('click', function(){
-                        my.showQuestion('Delete '+JSON.stringify(tr.info.primaryKeyValues)+' ?').then(function(result){
-                            if(result){
-                                my.ajax.table['delete-record']({
-                                    table:tableName, 
-                                    primaryKeyValues:tr.info.primaryKeyValues
-                                }).then(function(){
-                                    my.fade(tr);
-                                });
-                            }
-                        });
-                    })
-                    tr.addEventListener('focusout', function(event){
-                        if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
-                            if(Object.keys(tr.info.rowPendingForUpdate).length){
+                var fieldNames=Object.keys(tr.info.rowPendingForUpdate);
+                changeIoStatus('updating');
+                my.ajax.table['save-record']({
+                    table:tableName,
+                    primaryKeyValues:tr.info.primaryKeyValues,
+                    newRow:tr.info.rowPendingForUpdate
+                }).then(function(updatedRow){
+                    my.adaptData(table.def,[updatedRow]);
+                    updateRowData(tr, updatedRow);
+                    tr.info.rowPendingForUpdate = {};
+                    changeIoStatus('temporal-ok');
+                    setTimeout(function(){
+                        changeIoStatus('ok');
+                    },3000);
+                }).catch(function(err){
+                    changeIoStatus('error',err.message);
+                });
+            }
+            createRowElements = function createRowElements(iRow, row){
+                var tr = tbody.insertRow(iRow);
+                tr.info = {
+                    rowControls:{},
+                    row: {},
+                    rowPendingForUpdate:{}
+                };
+                var buttonInsert=html.button({class:'table-button'}, [html.img({src:'img/insert.png'})]).create();
+                var buttonDelete=html.button({class:'table-button'}, [html.img({src:'img/delete.png'})]).create();
+                tr.appendChild(html.th([buttonInsert,buttonDelete]).create());
+                table.def.fields.forEach(function(fieldDef){
+                    var td = html.td().create();
+                    Tedede.adaptElement(td, fieldDef);
+                    tr.info.rowControls[fieldDef.name] = td;
+                    td.contentEditable=true;
+                    td.addEventListener('update',function(){
+                        var value = this.getTypedValue();
+                        if(value!==tr.info.row[fieldDef.name]){
+                            this.setAttribute('io-status', 'pending');
+                            tr.info.rowPendingForUpdate[fieldDef.name] = value;
+                            if(modes.saveByField){
                                 saveRow(tr);
                             }
                         }
                     });
-                    return tr;
-                }
-                var updateRowData = function updateRowData(tr, updatedRow){
-                    tr.info.row = updatedRow;
-                    tr.info.primaryKeyValues = table.def.primaryKey.map(function(fieldName){ 
-                        return tr.info.row[fieldName]; 
+                    tr.appendChild(td);
+                });
+                buttonDelete.addEventListener('click', function(){
+                    my.showQuestion('Delete '+JSON.stringify(tr.info.primaryKeyValues)+' ?').then(function(result){
+                        if(result){
+                            my.ajax.table['delete-record']({
+                                table:tableName, 
+                                primaryKeyValues:tr.info.primaryKeyValues
+                            }).then(function(){
+                                my.fade(tr);
+                            });
+                        }
                     });
-                    table.def.fields.forEach(function(fieldDef){
-                        var td = tr.info.rowControls[fieldDef.name];
-                        td.setTypedValue(tr.info.row[fieldDef.name]);
-                    });
-                }
+                })
+                tr.addEventListener('focusout', function(event){
+                    if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
+                        if(Object.keys(tr.info.rowPendingForUpdate).length){
+                            saveRow(tr);
+                        }
+                    }
+                });
+                return tr;
+            }
+            rows.forEach(function(row){
                 updateRowData(createRowElements(-1), row);
             });
         });
