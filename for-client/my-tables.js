@@ -89,6 +89,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                     rowControls:{},
                     row: {},
                     rowPendingForUpdate:{},
+                    primaryKeyValues:false,
                     status: 'new'
                 };
                 var buttonInsert=html.button({class:'table-button'}, [html.img({src:'img/insert.png'})]).create();
