@@ -38,5 +38,5 @@ create table employees(
 alter table tst.employees owner to test_user;
 
 insert into employees(id_type, id, first_name, last_name)
-  values ('card', 654213, 'Mary', 'Gomez')
-    ('card', 123456, 'Bob', 'Smith')
+  values ('card', 654213, 'Mary', 'Gomez'),
+         ('card', 123456, 'Bob', 'Smith');

@@ -14,7 +14,6 @@ var fsSync = require('fs');
 var querystring = require('querystring');
 
 var assert = require('self-explain').assert;
-var differences = assert.differences;
 
 describe('backend-plus', function(){
     [
@@ -89,13 +88,8 @@ describe('backend-plus', function(){
                 });
                 'fixture-select'.split(',').forEach(function(fixtureListName){
                     var fixtures = eval(fsSync.readFileSync('test/fixtures/'+fixtureListName+'.js', {encoding:'utf8'}));
-                    // console.log(fixture);
-                    // var fixture = require('fixtures/'+fixtureName+'.js');
-                    console.log(fixtures);
                     fixtures.forEach(function(fixture,i){
                         it('execute procedure for fixture:'+fixtureListName+'['+i+'] '+(fixture.name||fixture.action), function(done){
-                            console.log('xxxx-empiezo',[fixture.method||'post'],opt.base+'/'+fixture.action+'?'+querystring.stringify(fixture.parameters))
-                            // agent[fixture.method||'post'](opt.base+'/'+fixture.action+'?'+querystring.stringify(fixture.parameters))
                             fixture.method=fixture.method||be.defaultMethod;
                             (fixture.method==='get'?(
                                 agent.get(opt.base+'/'+fixture.action+'?'+querystring.stringify(fixture.parameters))
@@ -103,19 +97,14 @@ describe('backend-plus', function(){
                                 agent.post(opt.base+'/'+fixture.action).type('form').send(fixture.parameters)
                             ))
                             .expect(function(res){
-                                // console.log('xxxxxxrec', res)
-                                console.log('xxx-volvio', res.headers)
-                                console.log('xxx-volvio', res.text)
-                                console.log('xxx f,b',fixture.action,be.procedure)
                                 var result;
                                 if(be.procedure[fixture.action].encoding=='plain'){
                                     result=res.text;
                                 }else{
                                     result=JSON.parse(res.text);
                                 }
-                                return ;
                                 var expected = fixture.expected;
-                                var dif=differences(result, expected);
+                                var dif=result && expected && assert.allDifferences(result, expected);
                                 if(dif){
                                     console.log('expected');
                                     console.log(expected);
