@@ -54,7 +54,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                     td.setTypedValue(tr.info.row[fieldDef.name]);
                 });
             }
-            var saveRow = function(tr){
+            var saveRow = function(tr, opts){
                 var changeIoStatus = function changeIoStatus(newStatus, title){
                     fieldNames.forEach(function(name){ 
                         var td=tr.info.rowControls[name];
@@ -71,7 +71,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                     primaryKeyValues:tr.info.primaryKeyValues,
                     newRow:tr.info.rowPendingForUpdate,
                     status:tr.info.status
-                }).then(function(updatedRow){
+                },opts).then(function(updatedRow){
                     my.adaptData(table.def,[updatedRow]);
                     updateRowData(tr, updatedRow);
                     tr.info.rowPendingForUpdate = {};
@@ -109,7 +109,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                             this.setAttribute('io-status', 'pending');
                             tr.info.rowPendingForUpdate[fieldDef.name] = value;
                             if(modes.saveByField){
-                                saveRow(tr);
+                                saveRow(tr,{visiblyLogErrors:false});
                             }
                         }
                     });

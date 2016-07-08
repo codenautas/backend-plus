@@ -1,6 +1,7 @@
 "use strict";
 
 var coalesce=bestGlobals.coalesce;
+var changing=bestGlobals.changing;
 
 function id(x){return x;}
 
@@ -99,7 +100,11 @@ var myOwn = {
             return this.ajaxPromise;
         }
     },
-    ajaxPromise:function(procedureDef,data){
+    ajaxPromise:function(procedureDef,data,opts){
+        opts = opts || {};
+        if(!('visiblyLogErrors' in opts)){
+            opts.visiblyLogErrors=true;
+        }
         var my = this;
         return Promise.resolve().then(function(){
             var params={};
@@ -120,7 +125,7 @@ var myOwn = {
             }).then(function(result){
                 if(result && result[0]=="<" && result.match(/login/m)){
                     my.createReconnectionDiv();
-                    throw new Error('NOT LOGGED');
+                    throw changing(new Error('NOT LOGGED'),{displayed:true});
                 }
                 my.removeReconnectionDiv();
                 if(procedureDef.encoding=='plain'){
@@ -129,7 +134,9 @@ var myOwn = {
                     return JSON.parse(result);
                 }
             }).catch(function(err){
-                my.log(err);
+                if(!err.displayed && opts.visiblyLogErrors){
+                    my.log(err);
+                }
                 throw err;
             });
         });
