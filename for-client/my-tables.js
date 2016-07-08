@@ -93,6 +93,9 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                     status: 'new'
                 };
                 var buttonInsert=html.button({class:'table-button'}, [html.img({src:'img/insert.png'})]).create();
+                buttonInsert.addEventListener('click', function(){
+                    createRowElements(('xxsectionRowIndex' in tr?tr.sectionRowIndex:tr.rowIndex-table.element.tHead.rows.length)+1);
+                });
                 var buttonDelete=html.button({class:'table-button'}, [html.img({src:'img/delete.png'})]).create();
                 tr.appendChild(html.th([buttonInsert,buttonDelete]).create());
                 table.def.fields.forEach(function(fieldDef){
