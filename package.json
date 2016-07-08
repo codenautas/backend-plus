@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for tedede",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
