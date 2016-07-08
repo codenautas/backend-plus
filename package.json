@@ -57,6 +57,7 @@
   "scripts": {
     "start": "node ejemplos/encuesta-trac.js",
     "test": "mocha --reporter spec --bail  test/test.js",
+    "test-ci": "mocha --reporter spec --bail  test/test.js",
     "test-good": "mocha --reporter spec --bail --check-leaks test/test.js",
     "server-test": "node test/run-simple-backend.js",
     "example-tables": "node examples/tables/server/server-tables.js"
