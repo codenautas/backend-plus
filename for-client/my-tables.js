@@ -6,7 +6,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         saveByField: true
     };
     layout.textContent = 'loading...';
-    var createRowElements ;
+    var createRowElements;
     var structureRequest = my.ajax.table.structure({
         table:tableName
     }).then(function(tableDef){
@@ -115,10 +115,13 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 buttonDelete.addEventListener('click', function(){
                     my.showQuestion('Delete '+JSON.stringify(tr.info.primaryKeyValues)+' ?').then(function(result){
                         if(result){
-                            my.ajax.table['delete-record']({
-                                table:tableName, 
-                                primaryKeyValues:tr.info.primaryKeyValues
-                            }).then(function(){
+                            (tr.info.primaryKeyValues===false?
+                                Promise.resolve():
+                                my.ajax.table['delete-record']({
+                                    table:tableName, 
+                                    primaryKeyValues:tr.info.primaryKeyValues
+                                })
+                            ).then(function(){
                                 my.fade(tr);
                             });
                         }
