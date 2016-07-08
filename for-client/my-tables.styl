@@ -16,8 +16,14 @@ border-table()
 .tedede-grid
   border-table()
 
+nowrap()
+  white-space pre
+  overflow hidden
+  max-width 300px
+  
 .tedede-grid td
   border-table()
+  nowrap()
 
 .tedede-grid tr td x
   border-bottom   2px solid #666
@@ -25,6 +31,9 @@ border-table()
 
 .tedede-grid th
   border-table()
+
+.tedede-grid tbody th
+  nowrap()
 
 .tedede-grid caption
   border-table()
