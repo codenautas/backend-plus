@@ -45,6 +45,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             var tbody = table.element.tBodies[0];
             var updateRowData = function updateRowData(tr, updatedRow){
                 tr.info.row = updatedRow;
+                tr.info.status = 'retrieved';
                 tr.info.primaryKeyValues = table.def.primaryKey.map(function(fieldName){ 
                     return tr.info.row[fieldName]; 
                 });
@@ -68,7 +69,8 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 my.ajax.table['save-record']({
                     table:tableName,
                     primaryKeyValues:tr.info.primaryKeyValues,
-                    newRow:tr.info.rowPendingForUpdate
+                    newRow:tr.info.rowPendingForUpdate,
+                    status:tr.info.status
                 }).then(function(updatedRow){
                     my.adaptData(table.def,[updatedRow]);
                     updateRowData(tr, updatedRow);
@@ -86,7 +88,8 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 tr.info = {
                     rowControls:{},
                     row: {},
-                    rowPendingForUpdate:{}
+                    rowPendingForUpdate:{},
+                    status: 'new'
                 };
                 var buttonInsert=html.button({class:'table-button'}, [html.img({src:'img/insert.png'})]).create();
                 var buttonDelete=html.button({class:'table-button'}, [html.img({src:'img/delete.png'})]).create();
