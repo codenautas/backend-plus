@@ -6,6 +6,7 @@ function id(x){return x;}
 
 var myOwn = {
     debugging:false,
+    reconnectionDivName:'reconnection_div',
     autoSetup(){
         var my = this;
         var readProcedureDefinitions = function readProcedureDefinitions(){
@@ -167,7 +168,6 @@ var myOwn = {
     showQuestion(message){
         return Promise.resolve(confirm(message));
     },
-    reconnectionDivName:function() { return 'reconnection_div'; },
     easeInOut: function(currentTime, start, change, duration) {
         currentTime /= duration / 2;
         if (currentTime < 1) {
@@ -197,14 +197,14 @@ var myOwn = {
     },
     createReconnectionDiv() {
         this.scrollToTop(document.body, 0, 500);
-        var recDiv = document.getElementById(this.reconnectionDivName());
+        var recDiv = document.getElementById(this.reconnectionDivName);
         var recID = 'reconnect';
         var classBlink = 'blink',
             classPulse = 'pulse';
         var classToSet = classBlink;
         if(! recDiv) {
             classToSet = classPulse;
-            recDiv = html.div({id:this.reconnectionDivName()}).create();
+            recDiv = html.div({id:this.reconnectionDivName}).create();
             recDiv.appendChild(html.span("Disconnected! ").create());
             recDiv.appendChild(html.a({id:recID, href:'login'}, "RECONNECT").create());
             var body = document.body;
@@ -216,7 +216,7 @@ var myOwn = {
         return recDiv;
     },
     removeReconnectionDiv() {
-        var recDiv = document.getElementById(this.reconnectionDivName());
+        var recDiv = document.getElementById(this.reconnectionDivName);
         if(recDiv) { document.body.removeChild(recDiv); }
     }
 };
