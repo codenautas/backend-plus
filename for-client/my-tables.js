@@ -10,6 +10,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         table:tableName
     }).then(function(tableDef){
         console.log(tableDef);
+        var buttonInsert=html.button({class:'table-button'}, [html.img({src:'img/insert.png'})]).create();
         var getSaveModeImgSrc=function(){ return modes.saveByField?'img/tables-update-by-field.png':'img/tables-update-by-row.png';};
         var buttonSaveModeImg=html.img({src:getSaveModeImgSrc()}).create();
         var buttonSaveMode=html.button({class:'table-button'}, [buttonSaveModeImg]).create();
@@ -20,10 +21,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         var tableElement = html.table({"class":"tedede-grid"},[
             html.caption(tableDef.title),
             html.thead([
-                html.tr([
-                    html.button({class:'table-button'}, [html.img({src:'img/insert.png'})]),
-                    buttonSaveMode
-                ].concat(
+                html.tr([html.th([buttonInsert,buttonSaveMode])].concat(
                     tableDef.fields.map(function(fieldDef){
                         return html.th(fieldDef.title);
                     })
@@ -42,31 +40,28 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             my.adaptData(table.def,rows);
             var tbody = table.element.tBodies[0];
             rows.forEach(function(row){
-                var rowControls = {};
                 var rowPendingForUpdate = {};
                 var primaryKeyValues;
-                var saveRow = function(newRow){
+                var saveRow = function(tr){
                     var changeIoStatus = function changeIoStatus(newStatus, title){
                         fieldNames.forEach(function(name){ 
-                            var td=rowControls[name];
+                            var td=tr.info.rowControls[name];
                             td.setAttribute('io-status', newStatus); 
                             if(title){
                                 //td.title=err.message;
                             }
-
                         });
                     }
-                    var fieldNames=Object.keys(newRow);
+                    var fieldNames=Object.keys(tr.info.rowPendingForUpdate);
                     changeIoStatus('updating');
                     my.ajax.table['save-record']({
                         table:tableName,
-                        primaryKeyValues:primaryKeyValues,
-                        newRow:newRow
+                        primaryKeyValues:tr.info.primaryKeyValues,
+                        newRow:tr.info.rowPendingForUpdate
                     }).then(function(updatedRow){
                         my.adaptData(table.def,[updatedRow]);
-                        row = updatedRow;
-                        updateRowData();
-                        rowPendingForUpdate = {};
+                        updateRowData(tr, updatedRow);
+                        tr.info.rowPendingForUpdate = {};
                         changeIoStatus('temporal-ok');
                         setTimeout(function(){
                             changeIoStatus('ok');
@@ -75,34 +70,40 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                         changeIoStatus('error',err.message);
                     });
                 }
-                var createRowElements = function createRowElements(){
-                    var tr = tbody.insertRow(-1);
+                var createRowElements = function createRowElements(iRow, row){
+                    var tr = tbody.insertRow(iRow);
+                    tr.info = {
+                        rowControls:{},
+                        row: {},
+                        rowPendingForUpdate:{}
+                    };
+                    var buttonInsert=html.button({class:'table-button'}, [html.img({src:'img/insert.png'})]).create();
                     var buttonDelete=html.button({class:'table-button'}, [html.img({src:'img/delete.png'})]).create();
-                    tr.appendChild(html.th([
-                        html.button({class:'table-button'}, [html.img({src:'img/insert.png'})]),
-                        buttonDelete
-                    ]).create())
+                    tr.appendChild(html.th([buttonInsert,buttonDelete]).create());
                     table.def.fields.forEach(function(fieldDef){
                         var td = html.td().create();
                         Tedede.adaptElement(td, fieldDef);
-                        rowControls[fieldDef.name] = td;
+                        tr.info.rowControls[fieldDef.name] = td;
                         td.contentEditable=true;
                         td.addEventListener('update',function(){
                             var value = this.getTypedValue();
-                            if(value!==row[fieldDef.name]){
+                            if(value!==tr.info.row[fieldDef.name]){
                                 this.setAttribute('io-status', 'pending');
-                                rowPendingForUpdate[fieldDef.name] = value;
+                                tr.info.rowPendingForUpdate[fieldDef.name] = value;
                                 if(modes.saveByField){
-                                    saveRow(rowPendingForUpdate);
+                                    saveRow(tr);
                                 }
                             }
                         });
                         tr.appendChild(td);
                     });
                     buttonDelete.addEventListener('click', function(){
-                        my.showQuestion('Delete '+JSON.stringify(primaryKeyValues)+' ?').then(function(result){
+                        my.showQuestion('Delete '+JSON.stringify(tr.info.primaryKeyValues)+' ?').then(function(result){
                             if(result){
-                                my.ajax.table['delete-record']({table:tableName, primaryKeyValues:primaryKeyValues}).then(function(){
+                                my.ajax.table['delete-record']({
+                                    table:tableName, 
+                                    primaryKeyValues:tr.info.primaryKeyValues
+                                }).then(function(){
                                     my.fade(tr);
                                 });
                             }
@@ -110,21 +111,24 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                     })
                     tr.addEventListener('focusout', function(event){
                         if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
-                            if(Object.keys(rowPendingForUpdate).length){
-                                saveRow(rowPendingForUpdate);
+                            if(Object.keys(tr.info.rowPendingForUpdate).length){
+                                saveRow(tr);
                             }
                         }
                     });
+                    return tr;
                 }
-                var updateRowData = function updateRowData(){
-                    primaryKeyValues = table.def.primaryKey.map(function(fieldName){ return row[fieldName]; });
+                var updateRowData = function updateRowData(tr, updatedRow){
+                    tr.info.row = updatedRow;
+                    tr.info.primaryKeyValues = table.def.primaryKey.map(function(fieldName){ 
+                        return tr.info.row[fieldName]; 
+                    });
                     table.def.fields.forEach(function(fieldDef){
-                        var td = rowControls[fieldDef.name];
-                        td.setTypedValue(row[fieldDef.name]);
+                        var td = tr.info.rowControls[fieldDef.name];
+                        td.setTypedValue(tr.info.row[fieldDef.name]);
                     });
                 }
-                createRowElements();
-                updateRowData();
+                updateRowData(createRowElements(-1), row);
             });
         });
     }).catch(function(err){
