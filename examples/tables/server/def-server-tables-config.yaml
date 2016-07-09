@@ -19,6 +19,7 @@ login:
   lockedClausule: current_timestamp>=locked_since
   plus:
     fileStore: true
+    secret: secret cat in the table
     loginForm:
       formTitle: example tables
       formImg: unlogged/tables-lock.png
