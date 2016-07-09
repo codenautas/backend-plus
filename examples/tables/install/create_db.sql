@@ -25,6 +25,9 @@ insert into ext."users" (username, md5pass, rol, active_until)
 insert into ext."users" (username, md5pass, rol, active_until,locked_since)
   values ('locked', md5('lockedpass'||'locked'), 'boss', '2999-12-31','2016-07-02');
 
+insert into ext."users" (username, md5pass, rol, active_until)
+  values ('mat', md5('matpass'||'mat'), 'user', '2099-12-31');
+
 create table ext.pgroups(
   "group" text primary key,
   "class" text not null

@@ -4,4 +4,6 @@ log:
   req: true
 login:
   plus:
-    secret: the sarasa
+    secret: false
+devel:
+  forceShowAsEditable: true    
