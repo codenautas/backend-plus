@@ -1,5 +1,7 @@
 "use strict";
 
+myOwn.firstDisplayCount = 20;
+
 myOwn.tableGrid = function tableGrid(layout, tableName){
     var my = this;
     var modes = {
@@ -7,6 +9,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
     };
     layout.textContent = 'loading...';
     var createRowElements;
+    var footInfoElement;
     var structureRequest = my.ajax.table.structure({
         table:tableName
     }).then(function(tableDef){
@@ -22,16 +25,28 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         buttonInsert.addEventListener('click', function(){
             createRowElements(0);
         });
+        var columnsHeadElements = tableDef.fields.map(function(fieldDef){
+            return html.th(fieldDef.title);
+        });
+        footInfoElement = html.td({colspan:columnsHeadElements.length, "is-processing":"1"}).create();
+        [
+            {name:'displayFrom', value:'0'},
+            {name:'elipsis', value:' ... '},
+            {name:'displayTo', value:'?'},
+            {name:'rowCount', value:''}
+        ].forEach(function(info){
+            footInfoElement[info.name] = html.span(info.value).create();
+            footInfoElement.appendChild(footInfoElement[info.name]);
+        });
         var tableElement = html.table({"class":"tedede-grid"},[
             html.caption(tableDef.title),
             html.thead([
-                html.tr([html.th([buttonInsert,buttonSaveMode])].concat(
-                    tableDef.fields.map(function(fieldDef){
-                        return html.th(fieldDef.title);
-                    })
-                ))
+                html.tr([html.th([buttonInsert,buttonSaveMode])].concat(columnsHeadElements))
             ]),
-            html.tbody()
+            html.tbody(),
+            html.tfoot([
+                html.tr([html.th(),footInfoElement])
+            ])
         ]).create();
         layout.innerHTML='';
         layout.appendChild(tableElement);
@@ -139,9 +154,16 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 });
                 return tr;
             }
-            rows.forEach(function(row){
-                updateRowData(createRowElements(-1), row);
-            });
+            for(var iRow=0; iRow<my.firstDisplayCount && iRow<rows.length; iRow++){
+                (function(row){
+                    updateRowData(createRowElements(-1), row);
+                })(rows[iRow]);
+            }
+            footInfoElement.displayFrom.textContent=rows.length?1:0;
+            footInfoElement.displayTo.textContent=iRow;
+            if(iRow<rows.length){
+                footInfoElement.rowCount.textContent=' / '+(rows.length);
+            }
         });
     }).catch(function(err){
         my.log(err);
