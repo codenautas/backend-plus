@@ -1,6 +1,8 @@
 "use strict";
 
 myOwn.firstDisplayCount = 20;
+myOwn.displayCountBreaks = [100,250,1000];
+myOwn.displayCountBreaks = [50,100,500];
 
 myOwn.tableGrid = function tableGrid(layout, tableName){
     var my = this;
@@ -154,16 +156,35 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 });
                 return tr;
             }
-            for(var iRow=0; iRow<my.firstDisplayCount && iRow<rows.length; iRow++){
-                (function(row){
-                    updateRowData(createRowElements(-1), row);
-                })(rows[iRow]);
+            var displayRows = function displayRows(fromRowNumber, toRowNumber){
+                for(var iRow=fromRowNumber; iRow<toRowNumber; iRow++){
+                    (function(row){
+                        updateRowData(createRowElements(-1), row);
+                    })(rows[iRow]);
+                }
+                footInfoElement.displayFrom.textContent=rows.length?1:0;
+                footInfoElement.displayTo.textContent=iRow;
+                footInfoElement.rowCount.innerHTML='';
+                if(iRow<rows.length){
+                    // footInfoElement.rowCount.textContent=' / ';
+                    var addButtonRest = function addButtonRest(toNextRowNumber){
+                        var buttonRest=html.button("+..."+toNextRowNumber).create();
+                        footInfoElement.rowCount.appendChild(html.span('  ').create());
+                        footInfoElement.rowCount.appendChild(buttonRest);
+                        buttonRest.addEventListener('click',function(){
+                            displayRows(iRow+1, toNextRowNumber);
+                        });
+                    }
+                    my.displayCountBreaks.forEach(function(size, iSize){
+                        var cut=(iRow+size) - (iRow+size) % size;
+                        if(cut*5<=rows.length*3 && (iSize==my.displayCountBreaks.length-1 || cut*5<=my.displayCountBreaks[iSize+1]*3)){
+                            addButtonRest(cut);
+                        }
+                    });
+                    addButtonRest(rows.length);
+                }
             }
-            footInfoElement.displayFrom.textContent=rows.length?1:0;
-            footInfoElement.displayTo.textContent=iRow;
-            if(iRow<rows.length){
-                footInfoElement.rowCount.textContent=' / '+(rows.length);
-            }
+            displayRows(0, Math.min(my.firstDisplayCount,rows.length));
         });
     }).catch(function(err){
         my.log(err);
