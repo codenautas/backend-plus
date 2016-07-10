@@ -27,7 +27,7 @@
     "read-yaml-promise": "~1.0.2",
     "stylus": "~0.54.5",
 
-    "ajax-best-promise": "~0.0.7",
+    "ajax-best-promise": "~0.1.3",
     "basic-interfaces": "~0.0.2",
     "best-globals": "~0.4.8",
     "best-promise": "~0.2.4",

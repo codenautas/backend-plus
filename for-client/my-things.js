@@ -134,7 +134,7 @@ var myOwn = {
                     return JSON.parse(result);
                 }
             }).catch(function(err){
-                if(!err.displayed && opts.visiblyLogErrors){
+                if(!err.displayed && opts.visiblyLogErrors || err.status==403){
                     my.log(err);
                 }
                 throw err;

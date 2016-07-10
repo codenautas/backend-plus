@@ -67,6 +67,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             my.adaptData(table.def,rows);
             var tbody = table.element.tBodies[0];
             var updateRowData = function updateRowData(tr, updatedRow){
+                var forInsert = false; // not define how to detect
                 tr.info.row = updatedRow;
                 tr.info.status = 'retrieved';
                 tr.info.primaryKeyValues = table.def.primaryKey.map(function(fieldName){ 
@@ -74,6 +75,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 });
                 table.def.fields.forEach(function(fieldDef){
                     var td = tr.info.rowControls[fieldDef.name];
+                    td.contentEditable=table.def.allowUpdates && (forInsert?fieldDef.allowInserts:fieldDef.allowUpdates);
                     td.setTypedValue(tr.info.row[fieldDef.name]);
                 });
             }
@@ -107,6 +109,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 });
             }
             createRowElements = function createRowElements(iRow, row){
+                var forInsert = iRow>=0;
                 var tr = tbody.insertRow(iRow);
                 tr.info = {
                     rowControls:{},
@@ -146,19 +149,17 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                     var td = html.td().create();
                     Tedede.adaptElement(td, fieldDef);
                     tr.info.rowControls[fieldDef.name] = td;
-                    if(table.def.allowUpdates){
-                        td.contentEditable=true;
-                        td.addEventListener('update',function(){
-                            var value = this.getTypedValue();
-                            if(value!==tr.info.row[fieldDef.name]){
-                                this.setAttribute('io-status', 'pending');
-                                tr.info.rowPendingForUpdate[fieldDef.name] = value;
-                                if(modes.saveByField){
-                                    saveRow(tr,{visiblyLogErrors:false});
-                                }
+                    td.contentEditable=table.def.allowUpdates && (forInsert?fieldDef.allowInserts:fieldDef.allowUpdates);
+                    td.addEventListener('update',function(){
+                        var value = this.getTypedValue();
+                        if(value!==tr.info.row[fieldDef.name]){
+                            this.setAttribute('io-status', 'pending');
+                            tr.info.rowPendingForUpdate[fieldDef.name] = value;
+                            if(modes.saveByField){
+                                saveRow(tr,{visiblyLogErrors:false});
                             }
-                        });
-                    }
+                        }
+                    });
                     tr.appendChild(td);
                 });
                 tr.addEventListener('focusout', function(event){

@@ -46,7 +46,7 @@ insert into ext.pgroups("group", "class") values
 
 create table ext.ptable(
   atomic_number        integer primary key,
-  symbol               char(8) unique,
+  symbol               varchar(8) unique,
   name                 text not null,
   weight               numeric,
   "group"              text,
