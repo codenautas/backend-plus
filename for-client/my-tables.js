@@ -10,12 +10,13 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         saveByField: true
     };
     layout.textContent = 'loading...';
+    var grid={};
     var createRowElements;
     var footInfoElement;
     var structureRequest = my.ajax.table.structure({
-        table:tableName
+        table:tableName,
     }).then(function(tableDef){
-        console.log(tableDef);
+        grid.def=tableDef;
         var buttonInsert;
         var getSaveModeImgSrc=function(){ return modes.saveByField?'img/tables-update-by-field.png':'img/tables-update-by-row.png';};
         var buttonSaveModeImg=html.img({src:getSaveModeImgSrc()}).create();
@@ -30,7 +31,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         if(tableDef.allow.insert){
             buttonInsert=html.button({class:'table-button'}, [html.img({src:'img/insert.png'})]).create();
             buttonInsert.addEventListener('click', function(){
-                createRowElements(0);
+                grid.createRowElements(0);
             });
         }
         var columnsHeadElements = tableDef.fields.map(function(fieldDef){
@@ -46,7 +47,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             footInfoElement[info.name] = html.span(info.value).create();
             footInfoElement.appendChild(footInfoElement[info.name]);
         });
-        var tableElement = html.table({"class":"tedede-grid"},[
+        grid.element = html.table({"class":"tedede-grid"},[
             html.caption(tableDef.title),
             html.thead([
                 html.tr([html.th([buttonInsert,buttonSaveMode])].concat(columnsHeadElements))
@@ -57,25 +58,24 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             ])
         ]).create();
         layout.innerHTML='';
-        layout.appendChild(tableElement);
-        return {element: tableElement, def: tableDef};
+        layout.appendChild(grid.element);
     });
     my.ajax.table.data({
         table:tableName
     }).then(function(rows){
-        return structureRequest.then(function(table){
-            my.adaptData(table.def,rows);
-            var tbody = table.element.tBodies[0];
+        return structureRequest.then(function(){
+            my.adaptData(grid.def,rows);
+            var tbody = grid.element.tBodies[0];
             var updateRowData = function updateRowData(tr, updatedRow){
                 var forInsert = false; // not define how to detect
                 tr.info.row = updatedRow;
                 tr.info.status = 'retrieved';
-                tr.info.primaryKeyValues = table.def.primaryKey.map(function(fieldName){ 
+                tr.info.primaryKeyValues = grid.def.primaryKey.map(function(fieldName){ 
                     return tr.info.row[fieldName]; 
                 });
-                table.def.fields.forEach(function(fieldDef){
+                grid.def.fields.forEach(function(fieldDef){
                     var td = tr.info.rowControls[fieldDef.name];
-                    td.contentEditable=table.def.allow.update && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
+                    td.contentEditable=grid.def.allow.update && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
                     td.setTypedValue(tr.info.row[fieldDef.name]);
                 });
             }
@@ -97,7 +97,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                     newRow:tr.info.rowPendingForUpdate,
                     status:tr.info.status
                 },opts).then(function(updatedRow){
-                    my.adaptData(table.def,[updatedRow]);
+                    my.adaptData(grid.def,[updatedRow]);
                     updateRowData(tr, updatedRow);
                     tr.info.rowPendingForUpdate = {};
                     changeIoStatus('temporal-ok');
@@ -108,7 +108,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                     changeIoStatus('error',err.message);
                 });
             }
-            createRowElements = function createRowElements(iRow, row){
+            grid.createRowElements = function createRowElements(iRow, row){
                 var forInsert = iRow>=0;
                 var tr = tbody.insertRow(iRow);
                 tr.info = {
@@ -120,24 +120,24 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 };
                 var thActions=html.th().create();
                 tr.appendChild(thActions);
-                var actionNamesList = ['insert','delete'].concat(table.def.actionNamesList);
+                var actionNamesList = ['insert','delete'].concat(grid.def.actionNamesList);
                 actionNamesList.forEach(function(actionName){
                     var actionDef = my.tableAction[actionName];
-                    if(table.def.allow[actionName]){
+                    if(grid.def.allow[actionName]){
                         var buttonAction=html.button({class:'table-button'}, [
                             html.img({src:actionDef.img})
                         ]).create();
                         thActions.appendChild(buttonAction);
                         buttonAction.addEventListener('click', function(){
-                            actionDef.actionRow(my,table,tr);
+                            actionDef.actionRow(my,grid,tr);
                         });
                     }
                 });
-                table.def.fields.forEach(function(fieldDef){
+                grid.def.fields.forEach(function(fieldDef){
                     var td = html.td().create();
                     Tedede.adaptElement(td, fieldDef);
                     tr.info.rowControls[fieldDef.name] = td;
-                    td.contentEditable=table.def.allow.update && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
+                    td.contentEditable=grid.def.allow.update && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
                     td.addEventListener('update',function(){
                         var value = this.getTypedValue();
                         if(value!==tr.info.row[fieldDef.name]){
@@ -162,7 +162,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             var displayRows = function displayRows(fromRowNumber, toRowNumber){
                 for(var iRow=fromRowNumber; iRow<toRowNumber; iRow++){
                     (function(row){
-                        updateRowData(createRowElements(-1), row);
+                        updateRowData(grid.createRowElements(-1), row);
                     })(rows[iRow]);
                 }
                 footInfoElement.displayFrom.textContent=rows.length?1:0;
@@ -197,24 +197,24 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
 myOwn.tableAction={
     "insert":{
         img: 'img/insert.png',
-        actionRow: function(my, table, tr){
-            createRowElements(
+        actionRow: function(my, grid, tr){
+            grid.createRowElements(
                 ('sectionRowIndex' in tr?
                     tr.sectionRowIndex:
-                    tr.rowIndex-table.element.tHead.rows.length
+                    tr.rowIndex-grid.element.tHead.rows.length
                 )+1
             )
         }
     },
     "delete":{
         img: 'img/delete.png',
-        actionRow: function(my, table, tr){
+        actionRow: function(my, grid, tr){
             my.showQuestion('Delete '+JSON.stringify(tr.info.primaryKeyValues)+' ?').then(function(result){
                 if(result){
                     (tr.info.primaryKeyValues===false?
                         Promise.resolve():
                         my.ajax.table['delete-record']({
-                            table:table.def.name, 
+                            table:grid.def.name, 
                             primaryKeyValues:tr.info.primaryKeyValues
                         })
                     ).then(function(){
