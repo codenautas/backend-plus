@@ -26,6 +26,8 @@ module.exports = function(context){
         primaryKey:['atomic_number'],
         constraints:[
             {constraintType:'unique', fields:['symbol']}
-        ]
+        ],
+        actionNamesList:['showImg'],
+        allow:{showImg:true},
     });
 }

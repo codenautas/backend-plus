@@ -259,3 +259,28 @@ insert into ext.isotopes(atomic_number, "order", mass_number) values
 (7  ,1,14),
 (7  ,2,15),
 (9  ,1,19);
+
+create table ext.element_images(
+  atomic_number integer,
+  kind text,
+  mass_number integer default 0,
+  url text,
+  primary key (atomic_number, kind, mass_number)
+);
+alter table ext.element_images owner to beplus_example_user;
+
+insert into ext.element_images(atomic_number, kind, url) values 
+  (1,'atom','https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Protium.svg/170px-Protium.svg.png'),
+  (1,'spectrum','https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Emission_spectrum-H.svg/500px-Emission_spectrum-H.svg.png'),
+  (2,'spectrum','https://upload.wikimedia.org/wikipedia/commons/c/c3/Helium_spectra.jpg'),
+  (2,'tube','https://upload.wikimedia.org/wikipedia/commons/c/c3/Helium_spectra.jpg'),
+  (2,'atom','https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Blausen_0476_HeliumAtom.png/100px-Blausen_0476_HeliumAtom.png'),
+  (3,'spectrum','https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Spectrum_Lines_of_Li.png/220px-Spectrum_Lines_of_Li.png'),
+  (1,'crystal','https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Hexagonal.svg/50px-Hexagonal.svg.png'),
+  (2,'crystal','https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Hexagonal_close_packed.svg/50px-Hexagonal_close_packed.svg.png'),
+  (3,'crystal','https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Cubic-body-centered.svg/50px-Cubic-body-centered.svg.png'),
+  (4,'crystal','https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Hexagonal_close_packed.svg/50px-Hexagonal_close_packed.svg.png');
+
+insert into ext.element_images(atomic_number, kind, mass_number, url) values 
+  (1,'tube',1,'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Hydrogen_discharge_tube.jpg/220px-Hydrogen_discharge_tube.jpg'),
+  (2,'tube',2,'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Deuterium_discharge_tube.jpg/220px-Deuterium_discharge_tube.jpg');

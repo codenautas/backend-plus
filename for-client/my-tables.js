@@ -20,14 +20,14 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         var getSaveModeImgSrc=function(){ return modes.saveByField?'img/tables-update-by-field.png':'img/tables-update-by-row.png';};
         var buttonSaveModeImg=html.img({src:getSaveModeImgSrc()}).create();
         var buttonSaveMode;
-        if(tableDef.allowUpdates){
+        if(tableDef.allow.update){
             buttonSaveMode=html.button({class:'table-button'}, [buttonSaveModeImg]).create();
             buttonSaveMode.addEventListener('click',function(){
                 modes.saveByField = !modes.saveByField;
                 buttonSaveModeImg.src=getSaveModeImgSrc();
             });
         }
-        if(tableDef.allowInserts){
+        if(tableDef.allow.insert){
             buttonInsert=html.button({class:'table-button'}, [html.img({src:'img/insert.png'})]).create();
             buttonInsert.addEventListener('click', function(){
                 createRowElements(0);
@@ -75,7 +75,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 });
                 table.def.fields.forEach(function(fieldDef){
                     var td = tr.info.rowControls[fieldDef.name];
-                    td.contentEditable=table.def.allowUpdates && (forInsert?fieldDef.allowInserts:fieldDef.allowUpdates);
+                    td.contentEditable=table.def.allow.update && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
                     td.setTypedValue(tr.info.row[fieldDef.name]);
                 });
             }
@@ -118,38 +118,26 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                     primaryKeyValues:false,
                     status: 'new'
                 };
-                var buttonInsert;
-                var buttonDelete;
-                if(table.def.allowInserts){
-                    buttonInsert=html.button({class:'table-button'}, [html.img({src:'img/insert.png'})]).create();
-                    buttonInsert.addEventListener('click', function(){
-                        createRowElements(('xxsectionRowIndex' in tr?tr.sectionRowIndex:tr.rowIndex-table.element.tHead.rows.length)+1);
-                    });
-                }
-                if(table.def.allowDeletes){
-                    var buttonDelete=html.button({class:'table-button'}, [html.img({src:'img/delete.png'})]).create();
-                    buttonDelete.addEventListener('click', function(){
-                        my.showQuestion('Delete '+JSON.stringify(tr.info.primaryKeyValues)+' ?').then(function(result){
-                            if(result){
-                                (tr.info.primaryKeyValues===false?
-                                    Promise.resolve():
-                                    my.ajax.table['delete-record']({
-                                        table:tableName, 
-                                        primaryKeyValues:tr.info.primaryKeyValues
-                                    })
-                                ).then(function(){
-                                    my.fade(tr);
-                                });
-                            }
+                var thActions=html.th().create();
+                tr.appendChild(thActions);
+                var actionNamesList = ['insert','delete'].concat(table.def.actionNamesList);
+                actionNamesList.forEach(function(actionName){
+                    var actionDef = my.tableAction[actionName];
+                    if(table.def.allow[actionName]){
+                        var buttonAction=html.button({class:'table-button'}, [
+                            html.img({src:actionDef.img})
+                        ]).create();
+                        thActions.appendChild(buttonAction);
+                        buttonAction.addEventListener('click', function(){
+                            actionDef.actionRow(my,table,tr);
                         });
-                    })
-                }
-                tr.appendChild(html.th([buttonInsert,buttonDelete]).create());
+                    }
+                });
                 table.def.fields.forEach(function(fieldDef){
                     var td = html.td().create();
                     Tedede.adaptElement(td, fieldDef);
                     tr.info.rowControls[fieldDef.name] = td;
-                    td.contentEditable=table.def.allowUpdates && (forInsert?fieldDef.allowInserts:fieldDef.allowUpdates);
+                    td.contentEditable=table.def.allow.update && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
                     td.addEventListener('update',function(){
                         var value = this.getTypedValue();
                         if(value!==tr.info.row[fieldDef.name]){
@@ -204,4 +192,36 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
     }).catch(function(err){
         my.log(err);
     })
+}
+
+myOwn.tableAction={
+    "insert":{
+        img: 'img/insert.png',
+        actionRow: function(my, table, tr){
+            createRowElements(
+                ('sectionRowIndex' in tr?
+                    tr.sectionRowIndex:
+                    tr.rowIndex-table.element.tHead.rows.length
+                )+1
+            )
+        }
+    },
+    "delete":{
+        img: 'img/delete.png',
+        actionRow: function(my, table, tr){
+            my.showQuestion('Delete '+JSON.stringify(tr.info.primaryKeyValues)+' ?').then(function(result){
+                if(result){
+                    (tr.info.primaryKeyValues===false?
+                        Promise.resolve():
+                        my.ajax.table['delete-record']({
+                            table:table.def.name, 
+                            primaryKeyValues:tr.info.primaryKeyValues
+                        })
+                    ).then(function(){
+                        my.fade(tr);
+                    });
+                }
+            });
+        }
+    }
 }
