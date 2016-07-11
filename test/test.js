@@ -21,12 +21,15 @@ describe('backend-plus', function(){
         {base:'/base'      ,root:false},
     ].forEach(function(opt){
         describe('base:'+opt.base, function(){
-            describe('not logged', function(){
                 var be;
                 var agent;
                 before(function (done) {
                     createServerGetAgent({server:{"base-url":opt.base}}).then(function(_be){ 
                         be=_be;
+                        return be.getDbClient();
+                    }).then(function(client){
+                        return client.executeSqlScript('./test/populate_db.sql');
+                    }).then(function(){
                         agent=request.agent(be.getMainApp());
                     }).then(done,done);
                 });
@@ -89,16 +92,30 @@ describe('backend-plus', function(){
                 'fixture-select'.split(',').forEach(function(fixtureListName){
                     var fixtures = eval(fsSync.readFileSync('test/fixtures/'+fixtureListName+'.js', {encoding:'utf8'}));
                     fixtures.forEach(function(fixture,i){
-                        it('execute procedure for fixture:'+fixtureListName+'['+i+'] '+(fixture.name||fixture.action), function(done){
+                        var nameIt='execute procedure for fixture:'+fixtureListName+'['+i+'] '+(fixture.name||fixture.action);
+                        if(fixture.skip){
+                            it.skip(nameIt);
+                            return;
+                        }
+                        it(nameIt, function(done){
+                            var procedureDef = be.procedure[fixture.action];
                             fixture.method=fixture.method||be.defaultMethod;
+                            var parameters={};
+                            procedureDef.parameters.forEach(function(paramemeterDef){
+                                var value=fixture.parameters[paramemeterDef.name];
+                                if(paramemeterDef.encoding!=='plain'){
+                                    value=JSON.stringify(value);
+                                }
+                                parameters[paramemeterDef.name]=value;
+                            });
                             (fixture.method==='get'?(
-                                agent.get(opt.base+'/'+fixture.action+'?'+querystring.stringify(fixture.parameters))
+                                agent.get(opt.base+'/'+fixture.action+'?'+querystring.stringify(parameters))
                             ):(
-                                agent.post(opt.base+'/'+fixture.action).type('form').send(fixture.parameters)
+                                agent.post(opt.base+'/'+fixture.action).type('form').send(parameters)
                             ))
                             .expect(function(res){
                                 var result;
-                                if(be.procedure[fixture.action].encoding=='plain'){
+                                if(procedureDef.encoding=='plain'){
                                     result=res.text;
                                 }else{
                                     result=JSON.parse(res.text);
@@ -146,7 +163,6 @@ describe('backend-plus', function(){
             //            .expect(302, /Redirecting to \/.*login/, done);
             //        });
             //    });
-            });
             //describe('loggin in', function(){
             //    var agent;
             //    before(function (done) {

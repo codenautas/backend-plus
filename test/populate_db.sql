@@ -1,6 +1,7 @@
 drop schema if exists tst cascade;
 
 create schema tst authorization test_user;
+
 grant all on schema tst to test_user;
 
 set search_path = tst;
@@ -12,6 +13,7 @@ create table tst."users"(
   locked boolean default false,
   rol text
 );
+
 alter table tst."users" owner to test_user;
 
 insert into tst."users" (username, md5pass) values
@@ -24,6 +26,7 @@ create table tst."table 1"(
   date1    date,
   numeric1 numeric
 );
+
 alter table tst."table 1" owner to test_user;
 
 create table employees(
@@ -35,6 +38,7 @@ create table employees(
   salary      numeric,
   primary key (id_type, id)
 );  
+
 alter table tst.employees owner to test_user;
 
 insert into employees(id_type, id, first_name, last_name)
