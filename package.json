@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
-  "description": "Backend for tedede",
-  "version": "0.4.1",
+  "description": "Backend for typed controls",
+  "version": "0.4.2",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -40,7 +40,7 @@
     "regexplicit": "~0.0.4",
     "require-bro": "~0.1.1",
     "self-explain": "~0.10.6",
-    "tedede": "~0.2.4"
+    "typed-controls": "~0.3.1"
   },
   "devDependencies": {
     "expect.js": "~0.3.1",

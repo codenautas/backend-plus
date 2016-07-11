@@ -26,11 +26,11 @@ function validarRegistro(estructuraFormulario, registro, controles){
             var disabled = !eval(expresionEvaluable);
             controles[celda.variable].disabled = disabled;
             if(disabled){
-                controles[celda.variable].celda.setAttribute('tedede-disabled','disabled');
+                controles[celda.variable].celda.setAttribute('typed-controls-disabled','disabled');
                 controles[celda.variable].disable(true);
                 controles[celda.variable].setTypedValue(null)
             }else{
-                controles[celda.variable].celda.removeAttribute('tedede-disabled');
+                controles[celda.variable].celda.removeAttribute('typed-controls-disabled');
                 controles[celda.variable].disable(false);
             }
         }
@@ -67,7 +67,7 @@ function presentarFormulario(result, idFormulario, orden){
     }
     var celdasDesplegadas=[];
     var controles={};
-    var divFormulario=html.div({"tedede-formulario":"trac"}).create();
+    var divFormulario=html.div({"typed-controls-formulario":"trac"}).create();
     var luego = Promise.resolve();
     var contador=0;
     var divsOpcionesMultiples=[];
@@ -138,7 +138,7 @@ function presentarFormulario(result, idFormulario, orden){
             if(celda.aclaracion){
                 contenidoCelda.push(html.div({"class":"aclaracion"},celda.aclaracion));
             }
-            var controlVariable = Tedede.bestCtrl(celda.typeInfo).create();
+            var controlVariable = TypedControls.bestCtrl(celda.typeInfo).create();
             if(!(celda.variable in registro)){
                 registro[celda.variable] = coalesce(celda.defaultValue, null);
             }
@@ -149,9 +149,9 @@ function presentarFormulario(result, idFormulario, orden){
                 celdasEspecificarParaVariablesMultiples[celda.variable]=masInfoMultiple;
             }
             luego = luego.then(function(){
-                Tedede.adaptElement(controlVariable,celda.typeInfo);
+                TypedControls.adaptElement(controlVariable,celda.typeInfo);
                 controlVariable.setTypedValue(registro[celda.variable]);
-                controlVariable.setAttribute("tedede-var", celda.variable);
+                controlVariable.setAttribute("typed-controls-var", celda.variable);
                 controlVariable.addEventListener('update',function(){
                     tieneCambios=true;
                     sennialCambios.style.backgroundColor='orange';
@@ -179,7 +179,7 @@ function presentarFormulario(result, idFormulario, orden){
             })*/;
         }
        // console.log("celda.subtipo",celda.subtipo)
-        divCelda=html.div({"class":"celda", "tedede-tipo":celda.tipo, "tedede-subtipo":celda.subtipo}, contenidoCelda).create();
+        divCelda=html.div({"class":"celda", "typed-controls-tipo":celda.tipo, "typed-controls-subtipo":celda.subtipo}, contenidoCelda).create();
         // divCelda=html.div({"class":"celda"}, contenidoCelda).create();
         if(celda.deshabilitado){
             divCelda.setAttribute('deshabilitado',celda.deshabilitado);
@@ -236,11 +236,11 @@ function presentarFormulario(result, idFormulario, orden){
         });
         document.getElementById("modo-revisar").addEventListener('change', function(){
             var divContenedor=this;
-            while(divContenedor && !divContenedor.getAttribute("tedede-formulario")){
+            while(divContenedor && !divContenedor.getAttribute("typed-controls-formulario")){
                 divContenedor=divContenedor.parentNode;
             }
             if(!divContenedor){
-                throw new Error("No encontre en tedede-formulario");
+                throw new Error("No encontre en typed-controls-formulario");
             }
             classToggle(divContenedor, "modo-revisar", this.checked);
         });

@@ -2,10 +2,10 @@
 # backend-plus
 
 <!--lang:es-->
-Backend for tedede
+Backend for typed-controls
 
 <!--lang:en--]
-Backend for tedede
+Backend for typed-controls
 
 [!--lang:*-->
 

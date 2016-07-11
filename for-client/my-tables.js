@@ -47,7 +47,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             footInfoElement[info.name] = html.span(info.value).create();
             footInfoElement.appendChild(footInfoElement[info.name]);
         });
-        grid.element = html.table({"class":"tedede-grid"},[
+        grid.element = html.table({"class":"my-grid"},[
             html.caption(tableDef.title),
             html.thead([
                 html.tr([html.th([buttonInsert,buttonSaveMode])].concat(columnsHeadElements))
@@ -135,7 +135,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 });
                 grid.def.fields.forEach(function(fieldDef){
                     var td = html.td().create();
-                    Tedede.adaptElement(td, fieldDef);
+                    TypedControls.adaptElement(td, fieldDef);
                     tr.info.rowControls[fieldDef.name] = td;
                     td.contentEditable=grid.def.allow.update && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
                     td.addEventListener('update',function(){

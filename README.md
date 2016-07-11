@@ -1,6 +1,6 @@
 # backend-plus
 
-Backend for tedede
+Backend for typed-controls
 
 
 ![extending](https://img.shields.io/badge/stability-extending-orange.svg)
