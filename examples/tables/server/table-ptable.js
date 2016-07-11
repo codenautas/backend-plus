@@ -10,7 +10,7 @@ module.exports = function(context){
         fields:[
             {name:'atomic_number'       , typeName:'integer', nullable:false, editable:admin },
             {name:'symbol'              , typeName:'text'   , nullable:false, 'max-length':4 },
-            {name:'name'                , typeName:'text'   , allowInserts:admin             },
+            {name:'name'                , typeName:'text'   , allow:{insert:admin}           },
             {name:'weight'              , typeName:'number' , exact:true, decimals: true     },
             {name:'group'               , typeName:'text'   , editable:admin                 },
             {name:'discovered_date'     , typeName:'date'                                    },

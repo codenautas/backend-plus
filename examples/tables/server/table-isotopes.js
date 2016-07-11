@@ -4,9 +4,11 @@ module.exports = function(context){
     return context.be.tableDefCompleter({
         name:'isotopes',
         title:'stable isotopes',
-        allowInserts:context.user.rol==='boss',
-        allowDeletes:context.user.rol==='boss',
-        allowUpdates:context.user.rol==='boss',
+        allow:{
+            insert:context.user.rol==='boss',
+            delete:context.user.rol==='boss',
+            update:context.user.rol==='boss',
+        },
         fields:[
             {name:'atomic_number'       , typeName:'integer', nullable:false,                },
             {name:'mass_number'         , typeName:'integer'                                 },
