@@ -32,19 +32,20 @@
   100%
     opacity 1
 
-
+set-prop(prop, args)
+  {prop} args
+  -webkit-{prop} args
+  
+set-blink-animation()
+  set-prop('animation', blink-animation arguments)
+    
 .blink
-  animation blink-animation 1s steps(5, start)
-  -webkit-animation blink-animation 1s steps(5, start)
+  set-blink-animation 1s steps(5, start)
+
 
 @keyframes blink-animation
   to
-    visibility: hidden
-
-@-webkit-keyframes blink-animation
-  to
-    visibility: hidden
-
+    visibility hidden
 
 .pulse
   animation-name pulse
