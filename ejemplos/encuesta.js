@@ -16,6 +16,7 @@ var backendEncuesta={};
 
 require('best-globals').setGlobals(global);
 
+
 class AppEncuesta extends backendPlus.AppBackend{
     constructor(){
         super();
@@ -26,6 +27,136 @@ class AppEncuesta extends backendPlus.AppBackend{
             'ejemplos/local-config.yaml'
         ]);
     }
+    tipoCeldas(){
+        //var tiposCeldas = {
+        return {
+            titulo:{
+                completar: function completar(){
+                    
+                }
+            },
+            pregunta:{
+                completar: function completar(celda, be, idFormulario, celdasAgregadas){
+                    if(!celda.variable){
+                        celda.variable = celda.pregunta.toLowerCase();
+                    }
+                    if(!celda.typeInfo && !celda.typeName && !celda["tipo-dato"] && !celda.opciones){
+                        throw new Error("falta indicar typeInfo en celda");
+                    }
+                    if(!celda.typeInfo || typeof celda.typeInfo === 'string'){
+                        celda.typeInfo={typeName:celda.typeInfo};
+                        if(!celda.typeInfo.typeName){
+                            celda.typeInfo.typeName=celda["tipo-dato"]||celda.typeName;
+                            if(!celda.typeInfo.typeName){
+                                if(celda.opciones){
+                                    celda.typeInfo.typeName="enum";
+                                    celda.typeInfo.options=celda.opciones;
+                                }else{
+                                    throw new Error("falta indicar typeInfo en celda, no se pudo calcular");
+                                }
+                            }
+                        }
+                        (celda.typeInfo.options||[]).forEach(function(opcion){
+                            opcion.option = coalesce(opcion.option,opcion.opcion,coalesce.throwError);
+                            opcion.label  = coalesce(opcion.label ,opcion.texto ,coalesce.throwError);
+                            opcion.more = !!(opcion.salto || opcion.especifique);
+                        });
+                    }
+                    if(celda.typeInfo.typeName=='multiple'){
+                        celda.tipo='texto';
+                        celda.subtipo='multiple';
+                        celda.opciones.forEach(function(opcion){
+                            var variable=(celda.pregunta+'_'+opcion.opcion).toLowerCase();
+                            var celdaNueva={
+                                tipo: 'pregunta',
+                                subtipo: 'multiple',
+                                pregunta: celda.pregunta,
+                                variable: variable,
+                                texto: opcion.texto,
+                                typeInfo: {
+                                    typeName: 'boolean'
+                                },
+                            };
+                            if(celda['expresion-habilitar']){
+                                celdaNueva['expresion-habilitar']=celda['expresion-habilitar'];
+                            }
+                            celdasAgregadas.push(celdaNueva);
+                            be.registrosVacios[idFormulario][variable]=null;
+                        });
+                    }else{
+                        be.registrosVacios[idFormulario][celda.variable]=null;
+                    }
+                }
+            },
+            texto: {
+                completar: function completar(){
+                },
+                explicitar:true,
+            },
+            matriz:{
+                completar: function completar(){
+                    
+                }
+            },
+            especial:{
+                completar: function completar(){}
+            }
+        }; 
+    }
+    readStructure(fileName){
+        var be = this;
+        be.almacenVacio={
+            formularios:{}
+        };
+        be.registrosVacios={};
+        return readYaml(fileName).then(function(estructura){
+            _.forEach(estructura.formularios, function(formulario, idFormulario){
+                // var nuevoArregloCeldas=[]; // comentada por no usada
+                be.registrosVacios[idFormulario]={};
+                if(formulario.multiple){
+                    be.almacenVacio.formularios[idFormulario]=[{registro: be.registrosVacios[idFormulario]}]; // OJO generalizar, el problema es el boton continuar
+                }else{
+                    be.almacenVacio.formularios[idFormulario]={registro: be.registrosVacios[idFormulario]};
+                }
+                
+                formulario.celdas = formulario.celdas.reduce(function(nuevoArreglo ,celda){
+                    if(!celda.tipo){
+                        for(var tipoCelda in be.tipoCeldas()){
+                    //    for(var tipoCelda in be.tiposCeldas){
+//                            if(tipoCelda in celda && !(be.tiposCeldas[tipoCelda].explicitar)){
+                            if(tipoCelda in celda && !(be.tipoCeldas()[tipoCelda].explicitar)){
+                                celda.tipo = tipoCelda;
+                            }
+                        }
+                    }
+                    var defTipoCelda = be.tipoCeldas()[celda.tipo];
+                    
+                    if(!defTipoCelda){
+                        if(!celda.tipo){
+                            /*jshint forin: false */
+                            for(var tipoCelda2 in celda){
+                                throw new Error("falta el tipo de celda, se desconoce: "+tipoCelda2);
+                            }
+                            /*jshint forin: true */
+                        }
+                        throw new Error("tipo de celda desconocido: "+celda.tipo);
+                    }
+                    var celdasAgregadas=[];
+                    defTipoCelda.completar(celda, be, idFormulario, celdasAgregadas);
+                    celda.tipo=celda.tipo||'';
+                    celda.subtipo=celda.subtipo||'';
+                    nuevoArreglo.push(celda);
+                    while(celdasAgregadas.length){
+                        nuevoArreglo.push(celdasAgregadas.shift());
+                    }
+                    return nuevoArreglo;
+                }, []);
+            });
+            estructura.registrosVacios=be.registrosVacios;
+            return estructura;
+            
+        });
+    };
     postConfig(){
         this.releerMetadatos();
     }
