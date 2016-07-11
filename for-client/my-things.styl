@@ -1,5 +1,5 @@
 #status:empty
-  display:none
+  display none
   
 #status
   border-top 1px dotted #A88
@@ -18,46 +18,37 @@
   color #BBB
   padding 2px
 
-@keyframes pulse {
-  0% {
-    opacity: 0;
-  }
-  20% {
-    opacity: 0.2;
-  }
-  40% {
-    opacity: 0.4;
-  }
-  60% {
-    opacity: 0.6;
-  }
-  80% {
-    opacity: 0.8;
-  }
-  100% {
-    opacity: 1;
-  }
-}
+@keyframes pulse
+  0%
+    opacity 0
+  20%
+    opacity 0.2
+  40%
+    opacity 0.4
+  60%
+    opacity 0.6
+  80%
+    opacity 0.8
+  100%
+    opacity 1
 
-.blink {
-  animation: blink-animation 1s steps(5, start);
-  -webkit-animation: blink-animation 1s steps(5, start);
-}
 
-@keyframes blink-animation {
-  to {
-    visibility: hidden;
-  }
-}
-@-webkit-keyframes blink-animation {
-  to {
-    visibility: hidden;
-  }
-}
+.blink
+  animation blink-animation 1s steps(5, start)
+  -webkit-animation blink-animation 1s steps(5, start)
+
+@keyframes blink-animation
+  to
+    visibility: hidden
+
+@-webkit-keyframes blink-animation
+  to
+    visibility: hidden
+
 
 .pulse
-    animation-name pulse
-    animation-duration 1s
+  animation-name pulse
+  animation-duration 1s
 
 #keep-alive-signal
   position fixed
@@ -70,5 +61,5 @@
   font-size 70%
   text-align center
   z-index -1
-//  display none
+  //  display none
 
