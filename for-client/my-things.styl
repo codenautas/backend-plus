@@ -43,23 +43,19 @@
 set-prop(prop, args)
   {prop} args
   -webkit-{prop} args
-  
+
 set-blink-animation()
   set-prop('animation', blink-animation arguments)
-    
-//.blink
-//  set-blink-animation 1s steps(5, start)
-//
-//.pulse
-//  animation-name pulse
-//  animation-duration 1s
+
+// configure animnation time
+animation-time = 2s
 
 [rec-status=blink]
-  set-blink-animation 1s steps(5, start)
+  set-blink-animation animation-time steps(5, start)
 
 [rec-status=pulse]
   animation-name pulse
-  animation-duration 1s
+  animation-duration animation-time
 
 #keep-alive-signal
   position fixed
@@ -72,5 +68,3 @@ set-blink-animation()
   font-size 70%
   text-align center
   z-index -1
-  //  display none
-

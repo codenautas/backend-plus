@@ -217,8 +217,6 @@ var myOwn = {
         }
         var recLink = document.getElementById(recID);
         recLink.setAttribute('rec-status', attrToSet); 
-        // recLink.classList.remove('blink', 'pulse');
-        // recLink.classList.add(attrToSet);
         return recDiv;
     },
     removeReconnectionDiv() {
