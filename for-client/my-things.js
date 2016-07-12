@@ -119,13 +119,14 @@ var myOwn = {
                 }
                 params[paramDef.name]=value;
             });
+            var notLogged='NOT LOGGED';
             return AjaxBestPromise[procedureDef.method]({
                 url:procedureDef.action,
                 data:params
             }).then(function(result){
                 if(result && result[0]=="<" && result.match(/login/m)){
-                    my.createReconnectionDiv();
-                    throw changing(new Error('NOT LOGGED'),{displayed:true});
+                    my.createReconnectionDiv(1);
+                    throw changing(new Error(notLogged),{displayed:true});
                 }
                 my.removeReconnectionDiv();
                 if(procedureDef.encoding=='plain'){
@@ -134,6 +135,22 @@ var myOwn = {
                     return JSON.parse(result);
                 }
             }).catch(function(err){
+                if(err.message != notLogged) {
+                    my.removeReconnectionDiv();
+                    /*
+                    var mm=[];
+                    mm.push("Error: "+JSON.stringify(err));
+                    mm.push("window.navigator.onLine == "+(window.navigator.onLine?"TRUE":"false"))
+                    mm.push("!!err.originalError == "+(!!err.originalError?"TRUE":"false"))
+                    alert(mm.join("\n"));
+                    */
+                    if(! window.navigator.onLine) {
+                        my.createReconnectionDiv(3);
+                    }
+                    else if(!!err.originalError) {
+                        my.createReconnectionDiv(2);
+                    }
+                }
                 if(!err.displayed && opts.visiblyLogErrors || err.status==403){
                     my.log(err);
                 }
@@ -202,7 +219,10 @@ var myOwn = {
         };
         animateScroll(0);
     },
-    createReconnectionDiv() {
+    // status: 1="not logged in", 2="server inaccessible", 3="not connected to the network"
+    // ver https://github.com/codenautas/backend-plus/issues/14
+    createReconnectionDiv(status) {
+        var action = status || 3;
         this.scrollToTop(document.body, 0, 500);
         var recDiv = document.getElementById(this.reconnectionDivName);
         var recID = 'reconnect';
@@ -210,13 +230,16 @@ var myOwn = {
         if(! recDiv) {
             attrToSet = 'pulse';
             recDiv = html.div({id:this.reconnectionDivName}).create();
-            recDiv.appendChild(html.span("Disconnected! ").create());
-            recDiv.appendChild(html.a({id:recID, href:'login'}, "RECONNECT").create());
+            var label = status === 1 ? "Not logged in" :
+                        status === 2 ? "The server inaccessible" :
+                        "Not connected to the network";
+            recDiv.appendChild(html.span(label+"! ").create());
+            recDiv.appendChild(html.a({id:recID, href:'login'}, "RECONNECT").create()); 
             var body = document.body;
             body.insertBefore(recDiv, body.firstChild);
         }
         var recLink = document.getElementById(recID);
-        recLink.setAttribute('rec-status', attrToSet); 
+        recLink.setAttribute('rec-status', attrToSet);             
         return recDiv;
     },
     removeReconnectionDiv() {
