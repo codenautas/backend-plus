@@ -227,6 +227,7 @@ var myOwn = {
         noNetwork:{id:3, message:"Not connected to the network"},
     },
     createReconnectionDiv(status) {
+        //alert(JSON.stringify(status));
         this.scrollToTop(document.body, 0, 500);
         var recDiv = document.getElementById(this.reconnectionDivName);
         var recID = 'reconnect';
@@ -235,12 +236,16 @@ var myOwn = {
             attrToSet = 'pulse';
             recDiv = html.div({id:this.reconnectionDivName}).create();
             recDiv.appendChild(html.span(status.message+"! ").create());
-            recDiv.appendChild(html.a({id:recID, href:'login'}, "RECONNECT").create()); 
+            if(status.id==1) {
+               recDiv.appendChild(html.a({id:recID, href:'login'}, "RECONNECT").create()); 
+            }
             var body = document.body;
             body.insertBefore(recDiv, body.firstChild);
         }
-        var recLink = document.getElementById(recID);
-        recLink.setAttribute('rec-status', attrToSet);             
+        if(status.id==1) {
+            var recLink = document.getElementById(recID);
+            recLink.setAttribute('rec-status', attrToSet);
+        }
         return recDiv;
     },
     removeReconnectionDiv() {
