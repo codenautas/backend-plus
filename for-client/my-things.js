@@ -227,7 +227,7 @@ var myOwn = {
         noNetwork:{id:3, message:"Not connected to the network"},
     },
     createStatusDiv(status) {
-        alert(JSON.stringify(status));
+        //alert(JSON.stringify(status));
         this.scrollToTop(document.body, 0, 500);
         var recDiv = document.getElementById(this.reconnectionDivName);
         var recID = 'reconnect';
