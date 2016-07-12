@@ -120,12 +120,13 @@ var myOwn = {
                 params[paramDef.name]=value;
             });
             var notLogged='NOT LOGGED';
+            var conStat = my["connection-status"];
             return AjaxBestPromise[procedureDef.method]({
                 url:procedureDef.action,
                 data:params
             }).then(function(result){
                 if(result && result[0]=="<" && result.match(/login/m)){
-                    my.createReconnectionDiv(1);
+                    my.createReconnectionDiv(conStat.notLogged);
                     throw changing(new Error(notLogged),{displayed:true});
                 }
                 my.removeReconnectionDiv();
@@ -145,10 +146,10 @@ var myOwn = {
                     alert(mm.join("\n"));
                     */
                     if(! window.navigator.onLine) {
-                        my.createReconnectionDiv(3);
+                        my.createReconnectionDiv(conStat.noNetwork);
                     }
                     else if(!!err.originalError) {
-                        my.createReconnectionDiv(2);
+                        my.createReconnectionDiv(conStat.noServer);
                     }
                 }
                 if(!err.displayed && opts.visiblyLogErrors || err.status==403){
@@ -219,10 +220,13 @@ var myOwn = {
         };
         animateScroll(0);
     },
-    // status: 1="not logged in", 2="server inaccessible", 3="not connected to the network"
     // ver https://github.com/codenautas/backend-plus/issues/14
+    "connection-status":{
+        notLogged:{id:1, message:"Not logged in"},
+        noServer:{id:2, message:"The server inaccessible"},
+        noNetwork:{id:3, message:"Not connected to the network"},
+    },
     createReconnectionDiv(status) {
-        var action = status || 3;
         this.scrollToTop(document.body, 0, 500);
         var recDiv = document.getElementById(this.reconnectionDivName);
         var recID = 'reconnect';
@@ -230,10 +234,7 @@ var myOwn = {
         if(! recDiv) {
             attrToSet = 'pulse';
             recDiv = html.div({id:this.reconnectionDivName}).create();
-            var label = status === 1 ? "Not logged in" :
-                        status === 2 ? "The server inaccessible" :
-                        "Not connected to the network";
-            recDiv.appendChild(html.span(label+"! ").create());
+            recDiv.appendChild(html.span(status.message+"! ").create());
             recDiv.appendChild(html.a({id:recID, href:'login'}, "RECONNECT").create()); 
             var body = document.body;
             body.insertBefore(recDiv, body.firstChild);
