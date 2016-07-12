@@ -126,10 +126,10 @@ var myOwn = {
                 data:params
             }).then(function(result){
                 if(result && result[0]=="<" && result.match(/login/m)){
-                    my.createReconnectionDiv(conStat.notLogged);
+                    my.createStatusDiv(conStat.notLogged);
                     throw changing(new Error(notLogged),{displayed:true});
                 }
-                my.removeReconnectionDiv();
+                my.removeStatusDiv();
                 if(procedureDef.encoding=='plain'){
                     return result;
                 }else{
@@ -137,7 +137,7 @@ var myOwn = {
                 }
             }).catch(function(err){
                 if(err.message != notLogged) {
-                    my.removeReconnectionDiv();
+                    my.removeStatusDiv();
                     /*
                     var mm=[];
                     mm.push("Error: "+JSON.stringify(err));
@@ -146,10 +146,10 @@ var myOwn = {
                     alert(mm.join("\n"));
                     */
                     if(! window.navigator.onLine) {
-                        my.createReconnectionDiv(conStat.noNetwork);
+                        my.createStatusDiv(conStat.noNetwork);
                     }
                     else if(!!err.originalError) {
-                        my.createReconnectionDiv(conStat.noServer);
+                        my.createStatusDiv(conStat.noServer);
                     }
                 }
                 if(!err.displayed && opts.visiblyLogErrors || err.status==403){
@@ -226,8 +226,8 @@ var myOwn = {
         noServer:{id:2, message:"The server inaccessible"},
         noNetwork:{id:3, message:"Not connected to the network"},
     },
-    createReconnectionDiv(status) {
-        //alert(JSON.stringify(status));
+    createStatusDiv(status) {
+        alert(JSON.stringify(status));
         this.scrollToTop(document.body, 0, 500);
         var recDiv = document.getElementById(this.reconnectionDivName);
         var recID = 'reconnect';
@@ -237,7 +237,7 @@ var myOwn = {
             recDiv = html.div({id:this.reconnectionDivName}).create();
             recDiv.appendChild(html.span(status.message+"! ").create());
             if(status.id==1) {
-               recDiv.appendChild(html.a({id:recID, href:'login'}, "RECONNECT").create()); 
+               recDiv.appendChild(html.a({id:recID, href:'login'}, "Reconnect").create()); 
             }
             var body = document.body;
             body.insertBefore(recDiv, body.firstChild);
@@ -248,7 +248,7 @@ var myOwn = {
         }
         return recDiv;
     },
-    removeReconnectionDiv() {
+    removeStatusDiv() {
         var recDiv = document.getElementById(this.reconnectionDivName);
         if(recDiv) { document.body.removeChild(recDiv); }
     }
