@@ -137,19 +137,13 @@ var myOwn = {
                 }
             }).catch(function(err){
                 if(err.message != notLogged) {
-                    my.removeStatusDiv();
-                    /*
-                    var mm=[];
-                    mm.push("Error: "+JSON.stringify(err));
-                    mm.push("window.navigator.onLine == "+(window.navigator.onLine?"TRUE":"false"))
-                    mm.push("!!err.originalError == "+(!!err.originalError?"TRUE":"false"))
-                    alert(mm.join("\n"));
-                    */
                     if(! window.navigator.onLine) {
-                        my.createStatusDiv(conStat.noNetwork);
+                        my.createOrReplaceStatusDiv(conStat.noNetwork);
                     }
                     else if(!!err.originalError) {
-                        my.createStatusDiv(conStat.noServer);
+                        my.createOrReplaceStatusDiv(conStat.noServer);
+                    } else {
+                        my.removeStatusDiv();
                     }
                 }
                 if(!err.displayed && opts.visiblyLogErrors || err.status==403){
@@ -220,7 +214,6 @@ var myOwn = {
         };
         animateScroll(0);
     },
-    // ver https://github.com/codenautas/backend-plus/issues/14
     "connection-status":{
         notLogged:{id:1, message:"Not logged in"},
         noServer:{id:2, message:"The server inaccessible"},
@@ -246,7 +239,10 @@ var myOwn = {
             var recLink = document.getElementById(recID);
             recLink.setAttribute('rec-status', attrToSet);
         }
-        return recDiv;
+    },
+    createOrReplaceStatusDiv(status) {
+        this.removeStatusDiv();
+        this.createStatusDiv(status);
     },
     removeStatusDiv() {
         var recDiv = document.getElementById(this.reconnectionDivName);
