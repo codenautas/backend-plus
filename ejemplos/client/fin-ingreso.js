@@ -20,6 +20,7 @@ window.addEventListener("load",function(){
     }).then(function(resultJson){
         var result=JSON.parse(resultJson);
         var textoFinIngreso=result.estructura.textos.placas['fin-ingreso'];
+        agregaLogoAlElemento(pantallaIngreso)
         presentarPlacaFin(textoFinIngreso);
         document.getElementById('status').textContent = "";
     }).catch(function(err){

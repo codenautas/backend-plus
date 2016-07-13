@@ -2,7 +2,9 @@
 
 var html=jsToHtml.html;
 
+
 function presentarPlaca(estado) {
+    agregaLogoAlElemento(pantalla);
     var textoComienzaEncuesta=estado.estructura.textos.placas['bienvenido-'+estado.estado];
     var encabezado=textoComienzaEncuesta.encabezado;
     var parrafos=textoComienzaEncuesta.parrafos;

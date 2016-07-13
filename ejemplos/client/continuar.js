@@ -329,6 +329,8 @@ function alCargarOCambiarHash(){
             orden=partes[1]-0||0;
         }
         presentarAlmacen(result,idFormulario,orden);
+        
+        agregaLogoAlElemento(imagen);
     }).catch(function(err){
         document.getElementById('status').textContent = "Error "+err.message;
         document.getElementById('status').textContent += "\n"+err.stack;
