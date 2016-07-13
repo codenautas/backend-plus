@@ -23,3 +23,5 @@ login:
       autoLogin: true
 estructura:
   origen: ejemplos/estructura-ejemplo.yaml
+logo: 
+  path: ./ejemplos/client
