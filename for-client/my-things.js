@@ -7,7 +7,7 @@ function id(x){return x;}
 
 var myOwn = {
     debugging:false,
-    reconnectionDivName:'reconnection_div',
+    statusDivName:'reconnection_div',
     autoSetup(){
         var my = this;
         var readProcedureDefinitions = function readProcedureDefinitions(){
@@ -119,21 +119,33 @@ var myOwn = {
                 }
                 params[paramDef.name]=value;
             });
+            var notLogged='NOT LOGGED';
+            var conStat = my["connection-status"];
             return AjaxBestPromise[procedureDef.method]({
                 url:procedureDef.action,
                 data:params
             }).then(function(result){
                 if(result && result[0]=="<" && result.match(/login/m)){
-                    my.createReconnectionDiv();
-                    throw changing(new Error('NOT LOGGED'),{displayed:true});
+                    my.createOrReplaceStatusDiv(conStat.notLogged);
+                    throw changing(new Error(notLogged),{displayed:true});
                 }
-                my.removeReconnectionDiv();
+                my.removeStatusDiv();
                 if(procedureDef.encoding=='plain'){
                     return result;
                 }else{
                     return JSON.parse(result);
                 }
             }).catch(function(err){
+                if(err.message != notLogged) {
+                    if(! window.navigator.onLine) {
+                        my.createOrReplaceStatusDiv(conStat.noNetwork);
+                    }
+                    else if(!!err.originalError) {
+                        my.createOrReplaceStatusDiv(conStat.noServer);
+                    } else {
+                        my.removeStatusDiv();
+                    }
+                }
                 if(!err.displayed && opts.visiblyLogErrors || err.status==403){
                     my.log(err);
                 }
@@ -202,25 +214,46 @@ var myOwn = {
         };
         animateScroll(0);
     },
-    createReconnectionDiv() {
+    "connection-status":{
+        notLogged:{id:1, message:"Not logged in"},
+        noServer:{id:2, message:"The server inaccessible"},
+        noNetwork:{id:3, message:"Not connected to the network"},
+    },
+    createReplaceOrRemoveRecLink(status, recDiv) {
+        var recID = 'recID';
+        var recLink = document.getElementById(recID);
+        if(status.id !== 1) {
+            if(recLink) { recDiv.removeChild(recLink); }
+        } else {
+            var attrToSet = 'blink';
+            if(! recLink) {
+                attrToSet = 'pulse';
+                recLink = html.a({id:recID, href:'login'}, "Reconnect").create();
+                recDiv.appendChild(recLink); 
+            }
+            recLink.setAttribute('rec-status', attrToSet);
+        }
+    },
+    updateStatusDiv(status, recDiv) {
+        //alert(JSON.stringify(status));
         this.scrollToTop(document.body, 0, 500);
-        var recDiv = document.getElementById(this.reconnectionDivName);
-        var recID = 'reconnect';
-        var attrToSet = 'blink';
+        var statusMsg = status.message+"! ";
+        var msgID = 'recMsg';
         if(! recDiv) {
-            attrToSet = 'pulse';
-            recDiv = html.div({id:this.reconnectionDivName}).create();
-            recDiv.appendChild(html.span("Disconnected! ").create());
-            recDiv.appendChild(html.a({id:recID, href:'login'}, "RECONNECT").create());
+            recDiv = html.div({id:this.statusDivName}).create();
+            recDiv.appendChild(html.span({id:msgID}, statusMsg).create());
             var body = document.body;
             body.insertBefore(recDiv, body.firstChild);
+        } else {
+            document.getElementById(msgID).innerHTML = statusMsg;
         }
-        var recLink = document.getElementById(recID);
-        recLink.setAttribute('rec-status', attrToSet); 
-        return recDiv;
+        this.createReplaceOrRemoveRecLink(status, recDiv);
     },
-    removeReconnectionDiv() {
-        var recDiv = document.getElementById(this.reconnectionDivName);
+    createOrReplaceStatusDiv(status) {
+        this.updateStatusDiv(status, document.getElementById(this.statusDivName));
+    },
+    removeStatusDiv() {
+        var recDiv = document.getElementById(this.statusDivName);
         if(recDiv) { document.body.removeChild(recDiv); }
     }
 };
