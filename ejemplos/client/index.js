@@ -43,7 +43,7 @@ function presentarPlaca(estado) {
     default:
         throw new Error('Estado inexistente: '+estado.estado);
     }
-    placa.push(metadatos);
+    
     encContinuar.addEventListener('click', function() {
        postAction('set-status', {id:estado.id,estado:'pendiente'}).then(function(res) {
            window.location = 'continuar';
@@ -54,13 +54,12 @@ function presentarPlaca(estado) {
            window.location = 'continuar';
        });
     });
-    metadatos.addEventListener('click', function() {
-        window.location = 'metadatos';
-       /*postAction('set-status', {id:estado.id,estado:'vacio'}).then(function(res) {
-           console.log("res", res);
-           window.location = 'metadatos';
-       });*/
-    });
+    if(estado["modo-devel"]){
+        placa.push(metadatos);
+        metadatos.addEventListener('click', function() {
+            window.location = 'metadatos';
+        });
+    }
     encFinalizar.addEventListener('click',function(){
         window.location='fin-ingreso'
     })
