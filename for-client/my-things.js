@@ -44,6 +44,7 @@ var myOwn = {
             return my.ajaxPromise({
                 action:'def-procedures',
                 method:'get',
+                encoding:'JSON',
                 parameters:[],
             }).then(function(defSource){
                 my.proceduresDef=eval(defSource);
@@ -116,7 +117,7 @@ var myOwn = {
                     }
                 }
                 if(fieldDef.typeName=='date'){
-                    if(row[fieldDef.name]){
+                    if(row[fieldDef.name] && !(row[fieldDef.name] instanceof Date)){
                         row[fieldDef.name] = bestGlobals.date.iso(row[fieldDef.name]);
                     }
                 }
@@ -164,7 +165,7 @@ var myOwn = {
             var params={};
             procedureDef.parameters.forEach(function(paramDef){
                 var value=coalesce(data[paramDef.name],paramDef.def,coalesce.throwErrorIfUndefined("lack of parameter "+paramDef.name));
-                my.encoders[paramDef.encoding].stringify(value);
+                value = my.encoders[paramDef.encoding].stringify(value);
                 params[paramDef.name]=value;
             });
             var notLogged='NOT LOGGED';
@@ -178,7 +179,7 @@ var myOwn = {
                     throw changing(new Error(notLogged),{displayed:true});
                 }
                 my.removeStatusDiv();
-                my.encoders[procedureDef.encoding].parse(result);
+                return my.encoders[procedureDef.encoding].parse(result);
             }).catch(function(err){
                 if(err.message != notLogged) {
                     if(! window.navigator.onLine) {
