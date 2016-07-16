@@ -1,7 +1,37 @@
 "use strict";
+/*jshint eqnull:true */
+/*jshint node:true */
+
+(function codenautasModuleDefinition(root, name, factory) {
+    /* global define */
+    /* istanbul ignore next */
+    if(typeof root.globalModuleName !== 'string'){
+        root.globalModuleName = name;
+    }
+    /* istanbul ignore next */
+    if(typeof exports === 'object' && typeof module === 'object'){
+        module.exports = factory();
+    }else if(typeof define === 'function' && define.amd){
+        define(factory);
+    }else if(typeof exports === 'object'){
+        exports[root.globalModuleName] = factory();
+    }else{
+        root[root.globalModuleName] = factory();
+    }
+    root.globalModuleName = null;
+})(/*jshint -W040 */this, 'myOwn', function() {
+/*jshint +W040 */
+
+/*jshint -W004 */
+var myOwn = {};
+/*jshint +W004 */
+
+var bestGlobals = require('best-globals');
 
 var coalesce=bestGlobals.coalesce;
 var changing=bestGlobals.changing;
+
+var jsYaml = require('js-yaml');
 
 function id(x){return x;}
 
@@ -77,7 +107,7 @@ var myOwn = {
     fade:function(element){
         element.parentNode.removeChild(element);
     },
-    adaptData:function(tableDef, rows){
+    adaptData:function adaptData(tableDef, rows){
         rows.forEach(function(row){
             tableDef.fields.forEach(function(fieldDef){
                 if(fieldDef.typeName=='number' && fieldDef.exact && fieldDef.decimals){
@@ -100,6 +130,30 @@ var myOwn = {
             return this.ajaxPromise;
         }
     },
+    encoders:{
+        'JSON': { parse: JSON.parse, stringify: JSON.stringify },
+        'plain': { 
+            parse: function(x){return x;}, 
+            stringify: function(x){
+                if(typeof x === "object"){
+                    throw new Error("Invalid plain type "+(x==null?value:typeof x)+" detected");
+                }
+                return x;
+            }
+        },
+        'yaml': {
+            parse: jsYaml.load.bind(jsYaml),
+            stringify: jsYaml.safeDump.bind(jsYaml),
+            // parse: function(x){
+            //     var c=jsYaml.load(x);
+            //     return c;
+            // },
+            // stringify:  function(x){
+            //     var c=jsYaml.safeDump(x);
+            //     return c;
+            // }
+        }
+    },
     ajaxPromise:function(procedureDef,data,opts){
         opts = opts || {};
         if(!('visiblyLogErrors' in opts)){
@@ -110,13 +164,7 @@ var myOwn = {
             var params={};
             procedureDef.parameters.forEach(function(paramDef){
                 var value=coalesce(data[paramDef.name],paramDef.def,coalesce.throwErrorIfUndefined("lack of parameter "+paramDef.name));
-                if(paramDef.encoding=='plain'){
-                    if(typeof value === "object"){
-                        throw new Error("Invalid plain type "+(value==null?value:typeof value)+" detected");
-                    }
-                }else{
-                    value=JSON.stringify(value);
-                }
+                my.encoders[paramDef.encoding].stringify(value);
                 params[paramDef.name]=value;
             });
             var notLogged='NOT LOGGED';
@@ -130,11 +178,7 @@ var myOwn = {
                     throw changing(new Error(notLogged),{displayed:true});
                 }
                 my.removeStatusDiv();
-                if(procedureDef.encoding=='plain'){
-                    return result;
-                }else{
-                    return JSON.parse(result);
-                }
+                my.encoders[procedureDef.encoding].parse(result);
             }).catch(function(err){
                 if(err.message != notLogged) {
                     if(! window.navigator.onLine) {
@@ -235,7 +279,6 @@ var myOwn = {
         }
     },
     updateStatusDiv(status, recDiv) {
-        //alert(JSON.stringify(status));
         this.scrollToTop(document.body, 0, 500);
         var statusMsg = status.message+"! ";
         var msgID = 'recMsg';
@@ -258,3 +301,6 @@ var myOwn = {
     }
 };
 
+return myOwn;
+
+});

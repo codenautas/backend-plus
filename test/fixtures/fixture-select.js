@@ -15,7 +15,7 @@
     },
     expected: {id_type: 'passport',id: 123456,first_name: 'Bob' ,last_name: 'Smith',birth_date: null ,salary: null },
 },{
-    skip: true,
+    skip: !true,
     name: 'update dates',
     action: 'table/save-record',
     parameters: {

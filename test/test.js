@@ -15,6 +15,8 @@ var querystring = require('querystring');
 
 var assert = require('self-explain').assert;
 
+var myOwn = require('../for-client/my-things.js');
+
 describe('backend-plus', function(){
     [
         {base:''           ,root:true },
@@ -24,6 +26,7 @@ describe('backend-plus', function(){
                 var be;
                 var agent;
                 before(function (done) {
+                    this.timeout(50000);
                     createServerGetAgent({server:{"base-url":opt.base}}).then(function(_be){ 
                         be=_be;
                         return be.getDbClient();
@@ -101,12 +104,10 @@ describe('backend-plus', function(){
                             var procedureDef = be.procedure[fixture.action];
                             fixture.method=fixture.method||be.defaultMethod;
                             var parameters={};
-                            procedureDef.parameters.forEach(function(paramemeterDef){
-                                var value=fixture.parameters[paramemeterDef.name];
-                                if(paramemeterDef.encoding!=='plain'){
-                                    value=JSON.stringify(value);
-                                }
-                                parameters[paramemeterDef.name]=value;
+                            procedureDef.parameters.forEach(function(parameterDef){
+                                var value=fixture.parameters[parameterDef.name];
+                                value=myOwn.encoders[parameterDef.encoding].stringify(value);
+                                parameters[parameterDef.name]=value;
                             });
                             (fixture.method==='get'?(
                                 agent.get(opt.base+'/'+fixture.action+'?'+querystring.stringify(parameters))
@@ -115,10 +116,12 @@ describe('backend-plus', function(){
                             ))
                             .expect(function(res){
                                 var result;
-                                if(procedureDef.encoding=='plain'){
-                                    result=res.text;
-                                }else{
-                                    result=JSON.parse(res.text);
+                                result=myOwn.encoders[procedureDef.encoding].parse(res.text);
+                                if(parameters.table && !"now, I'm using yaml"){
+                                    if(result){
+                                        var structure=be.tableStructures[parameters.table]({be});
+                                        myOwn.adaptData(structure, (result instanceof Array?result:[result]));
+                                    }
                                 }
                                 var expected = fixture.expected;
                                 var dif=result && expected && assert.allDifferences(result, expected);
