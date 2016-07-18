@@ -199,7 +199,7 @@ myOwn.tableAction={
     "insert":{
         img: 'img/insert.png',
         actionRow: function(my, grid, tr){
-            grid.createRowElements(
+            return grid.createRowElements(
                 ('sectionRowIndex' in tr?
                     tr.sectionRowIndex:
                     tr.rowIndex-grid.element.tHead.rows.length
@@ -210,9 +210,9 @@ myOwn.tableAction={
     "delete":{
         img: 'img/delete.png',
         actionRow: function(my, grid, tr){
-            my.showQuestion('Delete '+JSON.stringify(tr.info.primaryKeyValues)+' ?').then(function(result){
+            return my.showQuestion('Delete '+JSON.stringify(tr.info.primaryKeyValues)+' ?').then(function(result){
                 if(result){
-                    (tr.info.primaryKeyValues===false?
+                    return (tr.info.primaryKeyValues===false?
                         Promise.resolve():
                         my.ajax.table['delete-record']({
                             table:grid.def.name, 

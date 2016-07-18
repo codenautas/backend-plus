@@ -9,7 +9,7 @@ my.tableAction.showImg={
     img: 'img/picture.png',
     actionRow: function(my, table, tr){
         var div=table.element.parentNode;
-        Promise.resolve().then(function(){
+        return Promise.resolve().then(function(){
             if('url' in tr.info.row){
                 return tr.info.row.url;
             }

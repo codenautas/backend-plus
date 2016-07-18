@@ -144,7 +144,7 @@ var myOwn = {
         },
         'yaml': {
             parse: jsYaml.load.bind(jsYaml),
-            stringify: jsYaml.safeDump.bind(jsYaml),
+            stringify: jsYaml.dump.bind(jsYaml),
             // parse: function(x){
             //     var c=jsYaml.load(x);
             //     return c;
