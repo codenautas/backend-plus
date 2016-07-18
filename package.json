@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for typed controls",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -17,6 +17,7 @@
     "body-parser": "~1.15.2",
     "cookie-parser": "~1.4.3",
     "es6-promise": "~3.2.1",
+    "escape-string-regexp": "~1.0.5",
     "express": "~4.14.0",
     "express-session": "~1.14.0",
     "fs-extra": "~0.30.0", 

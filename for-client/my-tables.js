@@ -47,7 +47,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             footInfoElement[info.name] = html.span(info.value).create();
             footInfoElement.appendChild(footInfoElement[info.name]);
         });
-        grid.element = html.table({"class":"my-grid"},[
+        grid.element = html.table({"class":"my-grid", "my-table": tableName},[
             html.caption(tableDef.title),
             html.thead([
                 html.tr([html.th([buttonInsert,buttonSaveMode])].concat(columnsHeadElements))
@@ -188,6 +188,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 }
             }
             displayRows(0, Math.min(my.firstDisplayCount,rows.length));
+            return grid;
         });
     }).catch(function(err){
         my.log(err);
