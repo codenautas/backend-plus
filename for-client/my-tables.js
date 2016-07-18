@@ -6,18 +6,21 @@ myOwn.displayCountBreaks = [50,100,500];
 
 myOwn.tableGrid = function tableGrid(layout, tableName){
     var my = this;
+    var inputColspan = 2;
     var modes = {
         saveByField: true
     };
     layout.textContent = 'loading...';
     var grid={};
     var createRowElements;
+    var createRowFilter;
     var footInfoElement;
     var structureRequest = my.ajax.table.structure({
         table:tableName,
     }).then(function(tableDef){
         grid.def=tableDef;
         var buttonInsert;
+        var buttonFilter;
         var getSaveModeImgSrc=function(){ return modes.saveByField?'img/tables-update-by-field.png':'img/tables-update-by-row.png';};
         var buttonSaveModeImg=html.img({src:getSaveModeImgSrc()}).create();
         var buttonSaveMode;
@@ -34,10 +37,16 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 grid.createRowElements(0);
             });
         }
+        if(tableDef.allow.filter){
+            buttonFilter=html.button({class:'table-button'}, [html.img({src:'img/filter.png'})]).create();
+            buttonFilter.addEventListener('click', function(){
+                grid.createRowFilter(0);
+            });
+        }
         var columnsHeadElements = tableDef.fields.map(function(fieldDef){
-            return html.th(fieldDef.title);
+            return html.th({colspan:inputColspan},fieldDef.title);
         });
-        footInfoElement = html.td({colspan:columnsHeadElements.length, "is-processing":"1"}).create();
+        footInfoElement = html.td({colspan:columnsHeadElements.length*inputColspan, "is-processing":"1"}).create();
         [
             {name:'displayFrom', value:'0'},
             {name:'elipsis', value:' ... '},
@@ -50,7 +59,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         grid.element = html.table({"class":"my-grid", "my-table": tableName},[
             html.caption(tableDef.title),
             html.thead([
-                html.tr([html.th([buttonInsert,buttonSaveMode])].concat(columnsHeadElements))
+                html.tr([html.th([buttonInsert,/*buttonSaveMode,*/buttonFilter])].concat(columnsHeadElements))
             ]),
             html.tbody(),
             html.tfoot([
@@ -134,7 +143,63 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                     }
                 });
                 grid.def.fields.forEach(function(fieldDef){
-                    var td = html.td().create();
+                    var td = html.td({colspan:inputColspan}).create();
+                    TypedControls.adaptElement(td, fieldDef);
+                    tr.info.rowControls[fieldDef.name] = td;
+                    td.contentEditable=grid.def.allow.update && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
+                    td.addEventListener('update',function(){
+                        var value = this.getTypedValue();
+                        if(value!==tr.info.row[fieldDef.name]){
+                            this.setAttribute('io-status', 'pending');
+                            tr.info.rowPendingForUpdate[fieldDef.name] = value;
+                            if(modes.saveByField){
+                                saveRow(tr,{visiblyLogErrors:false});
+                            }
+                        }
+                    });
+                    tr.appendChild(td);
+                });
+                tr.addEventListener('focusout', function(event){
+                    if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
+                        if(Object.keys(tr.info.rowPendingForUpdate).length){
+                            saveRow(tr);
+                        }
+                    }
+                });
+                return tr;
+            }
+            grid.createRowFilter = function createRowFilter(){
+                // var tr=html.tr().create();
+                var buttonFilter=html.button("Filter!").create();
+                var tr=html.tr([html.td([buttonFilter])]).create();
+                grid.element.tHead.appendChild(tr);
+                // tr.appendChild(html.td().create());
+                tr.info = {
+                    rowControls:{},
+                    row: {},
+                    rowSymbols: {},
+                    isFilterPending:false,
+                };
+                buttonFilter.addEventListener('click',function(){
+                    alert(JSON.stringify(tr.info.row));
+                });
+                grid.def.fields.forEach(function(fieldDef){
+                    var fieldName=fieldDef.name;
+                    tr.info.rowSymbols[fieldName]=fieldDef.typeName==='text'?'~':'=';
+                    var symbolFilter=html.td({"class":"autoFilter"},[html.button({"class":'auto-filter', tabindex:-1},tr.info.rowSymbols[fieldName])]).create();
+                    var valueFilter=html.td({"class":"filterDescription"}).create();
+                    valueFilter.contentEditable=true;
+                    tr.info.rowControls[fieldName]=valueFilter;
+                    valueFilter.addEventListener('update',function(){
+                        tr.info.row[fieldDef.name]=this.getTypedValue();
+                    });
+                    TypedControls.adaptElement(valueFilter,fieldDef);
+                    tr.appendChild(symbolFilter);
+                    tr.appendChild(valueFilter);
+                });
+                return;
+                grid.def.fields.forEach(function(fieldDef){
+                    var td = html.td({colspan:inputColspan}).create();
                     TypedControls.adaptElement(td, fieldDef);
                     tr.info.rowControls[fieldDef.name] = td;
                     td.contentEditable=grid.def.allow.update && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
