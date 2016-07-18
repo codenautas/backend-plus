@@ -18,19 +18,16 @@
   color #BBB
   padding 2px
 
+div100(n)
+  return n / 100
+
+pct(n)
+  {n}\%
+    opacity div100(n)
+  
 @keyframes pulse
-  0%
-    opacity 0
-  20%
-    opacity 0.2
-  40%
-    opacity 0.4
-  60%
-    opacity 0.6
-  80%
-    opacity 0.8
-  100%
-    opacity 1
+    for num in 0 20 40 60 80 100
+      pct(num)
 
 @keyframes blink-animation
   to
