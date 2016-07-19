@@ -200,11 +200,11 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                     var partialOk=true;
                     for(var columna in row){
                         var comparator={
-                            '=':function(stringToCheck,condition){
-                                    return stringToCheck == condition;
+                            '=':function(valueToCheck,condition){
+                                    return valueToCheck == condition;
                             },
-                            '~':function(stringToCheck,condition){
-                                    return stringToCheck.indexOf(condition)>=0;
+                            '~':function(valueToCheck,condition){
+                                    return valueToCheck.indexOf(condition)>=0;
                             }
                         }
                         if(filterData.row[columna]!=null){
