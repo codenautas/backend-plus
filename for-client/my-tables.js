@@ -177,7 +177,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 isFilterPending:false,
             };
             buttonFilter.addEventListener('click',function(){
-                grid.displayBody(tr.info.row);
+                grid.displayBody(tr.info);
             });
             grid.def.fields.forEach(function(fieldDef){
                 var fieldName=fieldDef.name;
@@ -196,9 +196,27 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         }
         grid.displayBody=function displayBody(filterData){
             if(filterData){
-                var rowsToDisplay= rows.filter(function(row,i){
-                    return i!=4;
-                })
+                var filterDataNotEmpty=false;
+                for(var filterField in filterData.row){
+                    if(filterData.row[filterField]){
+                        filterDataNotEmpty=true;
+                    }
+                }
+                if(filterDataNotEmpty){
+                    var rowsToDisplay= rows.filter(function(row,i){
+                        var test;
+                        for(var columna in row){
+                            if(filterData.row[columna]){
+                                if(row[columna]== filterData.row[columna]){
+                                    test=row;
+                                }
+                                return test
+                            }
+                        }
+                    })
+                }else{
+                    rowsToDisplay= rows
+                }
             }else{
                 var rowsToDisplay=rows;
             }
