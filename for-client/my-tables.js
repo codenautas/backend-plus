@@ -69,171 +69,150 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         layout.innerHTML='';
         layout.appendChild(grid.element);
     });
-    my.ajax.table.data({
-        table:tableName
-    }).then(function(rows){
-        return structureRequest.then(function(){
-            my.adaptData(grid.def,rows);
-            var tbody = grid.element.tBodies[0];
-            var updateRowData = function updateRowData(tr, updatedRow){
-                var forInsert = false; // not define how to detect
-                tr.info.row = updatedRow;
-                tr.info.status = 'retrieved';
-                tr.info.primaryKeyValues = grid.def.primaryKey.map(function(fieldName){ 
-                    return tr.info.row[fieldName]; 
-                });
-                grid.def.fields.forEach(function(fieldDef){
-                    var td = tr.info.rowControls[fieldDef.name];
-                    td.contentEditable=grid.def.allow.update && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
-                    td.setTypedValue(tr.info.row[fieldDef.name]);
+    var displayGrid = function displayGrid(rows){
+        var tbody = grid.element.tBodies[0];
+        var updateRowData = function updateRowData(tr, updatedRow){
+            var forInsert = false; // not define how to detect
+            tr.info.row = updatedRow;
+            tr.info.status = 'retrieved';
+            tr.info.primaryKeyValues = grid.def.primaryKey.map(function(fieldName){ 
+                return tr.info.row[fieldName]; 
+            });
+            grid.def.fields.forEach(function(fieldDef){
+                var td = tr.info.rowControls[fieldDef.name];
+                td.contentEditable=grid.def.allow.update && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
+                td.setTypedValue(tr.info.row[fieldDef.name]);
+            });
+        }
+        var saveRow = function(tr, opts){
+            var changeIoStatus = function changeIoStatus(newStatus, title){
+                fieldNames.forEach(function(name){ 
+                    var td=tr.info.rowControls[name];
+                    td.setAttribute('io-status', newStatus); 
+                    if(title){
+                        //td.title=err.message;
+                    }
                 });
             }
-            var saveRow = function(tr, opts){
-                var changeIoStatus = function changeIoStatus(newStatus, title){
-                    fieldNames.forEach(function(name){ 
-                        var td=tr.info.rowControls[name];
-                        td.setAttribute('io-status', newStatus); 
-                        if(title){
-                            //td.title=err.message;
-                        }
+            var fieldNames=Object.keys(tr.info.rowPendingForUpdate);
+            changeIoStatus('updating');
+            my.ajax.table['save-record']({
+                table:tableName,
+                primaryKeyValues:tr.info.primaryKeyValues,
+                newRow:tr.info.rowPendingForUpdate,
+                status:tr.info.status
+            },opts).then(function(updatedRow){
+                my.adaptData(grid.def,[updatedRow]);
+                updateRowData(tr, updatedRow);
+                tr.info.rowPendingForUpdate = {};
+                changeIoStatus('temporal-ok');
+                setTimeout(function(){
+                    changeIoStatus('ok');
+                },3000);
+            }).catch(function(err){
+                changeIoStatus('error',err.message);
+            });
+        }
+        grid.createRowElements = function createRowElements(iRow, row){
+            var forInsert = iRow>=0;
+            var tr = tbody.insertRow(iRow);
+            tr.info = {
+                rowControls:{},
+                row: {},
+                rowPendingForUpdate:{},
+                primaryKeyValues:false,
+                status: 'new'
+            };
+            var thActions=html.th().create();
+            tr.appendChild(thActions);
+            var actionNamesList = ['insert','delete'].concat(grid.def.actionNamesList);
+            actionNamesList.forEach(function(actionName){
+                var actionDef = my.tableAction[actionName];
+                if(grid.def.allow[actionName]){
+                    var buttonAction=html.button({class:'table-button'}, [
+                        html.img({src:actionDef.img})
+                    ]).create();
+                    thActions.appendChild(buttonAction);
+                    buttonAction.addEventListener('click', function(){
+                        actionDef.actionRow(my,grid,tr);
                     });
                 }
-                var fieldNames=Object.keys(tr.info.rowPendingForUpdate);
-                changeIoStatus('updating');
-                my.ajax.table['save-record']({
-                    table:tableName,
-                    primaryKeyValues:tr.info.primaryKeyValues,
-                    newRow:tr.info.rowPendingForUpdate,
-                    status:tr.info.status
-                },opts).then(function(updatedRow){
-                    my.adaptData(grid.def,[updatedRow]);
-                    updateRowData(tr, updatedRow);
-                    tr.info.rowPendingForUpdate = {};
-                    changeIoStatus('temporal-ok');
-                    setTimeout(function(){
-                        changeIoStatus('ok');
-                    },3000);
-                }).catch(function(err){
-                    changeIoStatus('error',err.message);
-                });
-            }
-            grid.createRowElements = function createRowElements(iRow, row){
-                var forInsert = iRow>=0;
-                var tr = tbody.insertRow(iRow);
-                tr.info = {
-                    rowControls:{},
-                    row: {},
-                    rowPendingForUpdate:{},
-                    primaryKeyValues:false,
-                    status: 'new'
-                };
-                var thActions=html.th().create();
-                tr.appendChild(thActions);
-                var actionNamesList = ['insert','delete'].concat(grid.def.actionNamesList);
-                actionNamesList.forEach(function(actionName){
-                    var actionDef = my.tableAction[actionName];
-                    if(grid.def.allow[actionName]){
-                        var buttonAction=html.button({class:'table-button'}, [
-                            html.img({src:actionDef.img})
-                        ]).create();
-                        thActions.appendChild(buttonAction);
-                        buttonAction.addEventListener('click', function(){
-                            actionDef.actionRow(my,grid,tr);
-                        });
-                    }
-                });
-                grid.def.fields.forEach(function(fieldDef){
-                    var td = html.td({colspan:inputColspan}).create();
-                    TypedControls.adaptElement(td, fieldDef);
-                    tr.info.rowControls[fieldDef.name] = td;
-                    td.contentEditable=grid.def.allow.update && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
-                    td.addEventListener('update',function(){
-                        var value = this.getTypedValue();
-                        if(value!==tr.info.row[fieldDef.name]){
-                            this.setAttribute('io-status', 'pending');
-                            tr.info.rowPendingForUpdate[fieldDef.name] = value;
-                            if(modes.saveByField){
-                                saveRow(tr,{visiblyLogErrors:false});
-                            }
-                        }
-                    });
-                    tr.appendChild(td);
-                });
-                tr.addEventListener('focusout', function(event){
-                    if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
-                        if(Object.keys(tr.info.rowPendingForUpdate).length){
-                            saveRow(tr);
+            });
+            grid.def.fields.forEach(function(fieldDef){
+                var td = html.td({colspan:inputColspan}).create();
+                TypedControls.adaptElement(td, fieldDef);
+                tr.info.rowControls[fieldDef.name] = td;
+                td.contentEditable=grid.def.allow.update && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
+                td.addEventListener('update',function(){
+                    var value = this.getTypedValue();
+                    if(value!==tr.info.row[fieldDef.name]){
+                        this.setAttribute('io-status', 'pending');
+                        tr.info.rowPendingForUpdate[fieldDef.name] = value;
+                        if(modes.saveByField){
+                            saveRow(tr,{visiblyLogErrors:false});
                         }
                     }
                 });
-                return tr;
-            }
-            grid.createRowFilter = function createRowFilter(){
-                // var tr=html.tr().create();
-                var buttonFilter=html.button("Filter!").create();
-                var tr=html.tr([html.td([buttonFilter])]).create();
-                grid.element.tHead.appendChild(tr);
-                // tr.appendChild(html.td().create());
-                tr.info = {
-                    rowControls:{},
-                    row: {},
-                    rowSymbols: {},
-                    isFilterPending:false,
-                };
-                buttonFilter.addEventListener('click',function(){
-                    alert(JSON.stringify(tr.info.row));
-                });
-                grid.def.fields.forEach(function(fieldDef){
-                    var fieldName=fieldDef.name;
-                    tr.info.rowSymbols[fieldName]=fieldDef.typeName==='text'?'~':'=';
-                    var symbolFilter=html.td({"class":"autoFilter"},[html.button({"class":'auto-filter', tabindex:-1},tr.info.rowSymbols[fieldName])]).create();
-                    var valueFilter=html.td({"class":"filterDescription"}).create();
-                    valueFilter.contentEditable=true;
-                    tr.info.rowControls[fieldName]=valueFilter;
-                    valueFilter.addEventListener('update',function(){
-                        tr.info.row[fieldDef.name]=this.getTypedValue();
-                    });
-                    TypedControls.adaptElement(valueFilter,fieldDef);
-                    tr.appendChild(symbolFilter);
-                    tr.appendChild(valueFilter);
-                });
-                return;
-                grid.def.fields.forEach(function(fieldDef){
-                    var td = html.td({colspan:inputColspan}).create();
-                    TypedControls.adaptElement(td, fieldDef);
-                    tr.info.rowControls[fieldDef.name] = td;
-                    td.contentEditable=grid.def.allow.update && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
-                    td.addEventListener('update',function(){
-                        var value = this.getTypedValue();
-                        if(value!==tr.info.row[fieldDef.name]){
-                            this.setAttribute('io-status', 'pending');
-                            tr.info.rowPendingForUpdate[fieldDef.name] = value;
-                            if(modes.saveByField){
-                                saveRow(tr,{visiblyLogErrors:false});
-                            }
-                        }
-                    });
-                    tr.appendChild(td);
-                });
-                tr.addEventListener('focusout', function(event){
-                    if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
-                        if(Object.keys(tr.info.rowPendingForUpdate).length){
-                            saveRow(tr);
-                        }
+                tr.appendChild(td);
+            });
+            tr.addEventListener('focusout', function(event){
+                if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
+                    if(Object.keys(tr.info.rowPendingForUpdate).length){
+                        saveRow(tr);
                     }
+                }
+            });
+            return tr;
+        }
+        grid.createRowFilter = function createRowFilter(){
+            // var tr=html.tr().create();
+            var buttonFilter=html.button("Filter!").create();
+            var tr=html.tr([html.td([buttonFilter])]).create();
+            grid.element.tHead.appendChild(tr);
+            // tr.appendChild(html.td().create());
+            tr.info = {
+                rowControls:{},
+                row: {},
+                rowSymbols: {},
+                isFilterPending:false,
+            };
+            buttonFilter.addEventListener('click',function(){
+                grid.displayBody(tr.info.row);
+            });
+            grid.def.fields.forEach(function(fieldDef){
+                var fieldName=fieldDef.name;
+                tr.info.rowSymbols[fieldName]=fieldDef.typeName==='text'?'~':'=';
+                var symbolFilter=html.td({"class":"autoFilter"},[html.button({"class":'auto-filter', tabindex:-1},tr.info.rowSymbols[fieldName])]).create();
+                var valueFilter=html.td({"class":"filterDescription"}).create();
+                valueFilter.contentEditable=true;
+                tr.info.rowControls[fieldName]=valueFilter;
+                valueFilter.addEventListener('update',function(){
+                    tr.info.row[fieldDef.name]=this.getTypedValue();
                 });
-                return tr;
+                TypedControls.adaptElement(valueFilter,fieldDef);
+                tr.appendChild(symbolFilter);
+                tr.appendChild(valueFilter);
+            });
+        }
+        grid.displayBody=function displayBody(filterData){
+            if(filterData){
+                var rowsToDisplay= rows.filter(function(row,i){
+                    return i!=4;
+                })
+            }else{
+                var rowsToDisplay=rows;
             }
             var displayRows = function displayRows(fromRowNumber, toRowNumber){
+                tbody.innerHTML='';
                 for(var iRow=fromRowNumber; iRow<toRowNumber; iRow++){
                     (function(row){
                         updateRowData(grid.createRowElements(-1), row);
-                    })(rows[iRow]);
+                    })(rowsToDisplay[iRow]);
                 }
-                footInfoElement.displayFrom.textContent=rows.length?1:0;
+                footInfoElement.displayFrom.textContent=rowsToDisplay.length?1:0;
                 footInfoElement.displayTo.textContent=iRow;
                 footInfoElement.rowCount.innerHTML='';
-                if(iRow<rows.length){
+                if(iRow<rowsToDisplay.length){
                     // footInfoElement.rowCount.textContent=' / ';
                     var addButtonRest = function addButtonRest(toNextRowNumber){
                         var buttonRest=html.button("+..."+toNextRowNumber).create();
@@ -245,14 +224,23 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                     }
                     my.displayCountBreaks.forEach(function(size, iSize){
                         var cut=(iRow+size) - (iRow+size) % size;
-                        if(cut*5<=rows.length*3 && (iSize==my.displayCountBreaks.length-1 || cut*5<=my.displayCountBreaks[iSize+1]*3)){
+                        if(cut*5<=rowsToDisplay.length*3 && (iSize==my.displayCountBreaks.length-1 || cut*5<=my.displayCountBreaks[iSize+1]*3)){
                             addButtonRest(cut);
                         }
                     });
-                    addButtonRest(rows.length);
+                    addButtonRest(rowsToDisplay.length);
                 }
             }
-            displayRows(0, Math.min(my.firstDisplayCount,rows.length));
+            displayRows(0, Math.min(my.firstDisplayCount,rowsToDisplay.length));
+        }
+        grid.displayBody();
+    }
+    my.ajax.table.data({
+        table:tableName
+    }).then(function(rows){
+        return structureRequest.then(function(){
+            my.adaptData(grid.def,rows);
+            displayGrid(rows);
             return grid;
         });
     }).catch(function(err){
