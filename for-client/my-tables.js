@@ -196,27 +196,27 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         }
         grid.displayBody=function displayBody(filterData){
             if(filterData){
-                var filterDataNotEmpty=false;
-                for(var filterField in filterData.row){
-                    if(filterData.row[filterField]){
-                        filterDataNotEmpty=true;
-                    }
-                }
-                if(filterDataNotEmpty){
-                    var rowsToDisplay= rows.filter(function(row,i){
-                        var test;
-                        for(var columna in row){
-                            if(filterData.row[columna]){
-                                if(row[columna]== filterData.row[columna]){
-                                    test=row;
-                                }
-                                return test
+                var rowsToDisplay= rows.filter(function(row,i){
+                    var partialOk=true;
+                    for(var columna in row){
+                        var comparator={
+                            '=':function(stringToCheck,condition){
+                                    return stringToCheck == condition;
+                            },
+                            '~':function(stringToCheck,condition){
+                                    return stringToCheck.indexOf(condition)>=0;
                             }
                         }
-                    })
-                }else{
-                    rowsToDisplay= rows
-                }
+                        if(filterData.row[columna]!=null){
+                            var areEqual=comparator[filterData.rowSymbols[columna]](row[columna],filterData.row[columna])
+                            if(!areEqual){
+//                            if(row[columna]!= filterData.row[columna]){
+                                partialOk=false;
+                            }
+                        }
+                    }
+                    return partialOk;
+                })
             }else{
                 var rowsToDisplay=rows;
             }
