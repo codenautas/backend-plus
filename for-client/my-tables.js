@@ -3,7 +3,16 @@
 myOwn.firstDisplayCount = 20;
 myOwn.displayCountBreaks = [100,250,1000];
 myOwn.displayCountBreaks = [50,100,500];
-
+myOwn.comparator={
+    '=':function(valueToCheck,condition){return valueToCheck == condition;},
+    '~':function(valueToCheck,condition){return valueToCheck.indexOf(condition)>=0;},
+    '\u2205':function(valueToCheck,condition){return true;},//\u2205 = conjunto vacío
+    '>':function(valueToCheck,condition){return (valueToCheck>condition)},
+    '>=':function(valueToCheck,condition){return (valueToCheck>=condition)},
+    '<':function(valueToCheck,condition){return (valueToCheck<condition)},
+    '<=':function(valueToCheck,condition){return (valueToCheck<=condition)},
+    'not-an-operator':function(valueToCheck,condition){ return 'Operator does not exist'}
+}
 myOwn.tableGrid = function tableGrid(layout, tableName){
     var my = this;
     var inputColspan = 2;
@@ -199,17 +208,10 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 var rowsToDisplay= rows.filter(function(row,i){
                     var partialOk=true;
                     for(var columna in row){
-                        var comparator={
-                            '=':function(valueToCheck,condition){
-                                    return valueToCheck == condition;
-                            },
-                            '~':function(valueToCheck,condition){
-                                    return valueToCheck.indexOf(condition)>=0;
-                            }
-                        }
+                        
                         if(filterData.row[columna]!=null){
-                            var areEqual=comparator[filterData.rowSymbols[columna]](row[columna],filterData.row[columna])
-                            if(!areEqual){
+                            var isSatisfied=my.comparator[filterData.rowSymbols[columna]](row[columna],filterData.row[columna])
+                            if(!isSatisfied){
 //                            if(row[columna]!= filterData.row[columna]){
                                 partialOk=false;
                             }
