@@ -231,7 +231,7 @@ var myOwn = {
         })
     },
     showQuestion(message){
-        return Promise.resolve(confirm(message));
+        return confirmPromise(message);
     },
     easeInOut: function(currentTime, start, change, duration) {
         currentTime /= duration / 2;

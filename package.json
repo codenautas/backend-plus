@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for typed controls",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -25,7 +25,7 @@
     "js-yaml": "~3.6.1",
     "lodash": "~4.13.1",
     "numeral": "~1.5.3",
-    "pug": "~2.0.0-beta3",
+    "pug": "~2.0.0-beta4",
     "read-yaml-promise": "~1.0.2",
     "stylus": "~0.54.5",
 
@@ -33,6 +33,7 @@
     "basic-interfaces": "~0.0.2",
     "best-globals": "~0.4.8",
     "best-promise": "~0.2.4",
+    "dialog-promise": "~0.1.2",
     "extension-serve-static": "~0.1.6",
     "js-to-html": "~0.9.2",
     "login-plus": "~0.6.1",
@@ -42,7 +43,7 @@
     "regexplicit": "~0.0.4",
     "require-bro": "~0.1.2",
     "self-explain": "~0.10.7",
-    "typed-controls": "~0.3.1"
+    "typed-controls": "~0.3.3"
   },
   "devDependencies": {
     "expect.js": "~0.3.1",
