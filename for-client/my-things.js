@@ -26,6 +26,20 @@
 var myOwn = {};
 /*jshint +W004 */
 
+myOwn.messages={
+    notLogged: "Not logged in",
+    noServer : "The server inaccessible",
+    noNetwork: "Not connected to the network",
+    reLogin  : "sign in"
+};
+
+myOwn.es={
+    notLogged: "Sin sesión activa",
+    noServer : "No se puede acceder al servidor",
+    noNetwork: "No se detecta conexión de red",
+    reLogin  : "Iniciar sesión",
+};
+
 var bestGlobals = require('best-globals');
 
 var coalesce=bestGlobals.coalesce;
@@ -261,9 +275,9 @@ var myOwn = {
         animateScroll(0);
     },
     "connection-status":{
-        notLogged:{id:1, message:"Not logged in"},
-        noServer:{id:2, message:"The server inaccessible"},
-        noNetwork:{id:3, message:"Not connected to the network"},
+        notLogged:{id:1, message:myOwn.notLogged},
+        noServer :{id:2, message:myOwn.noServer },
+        noNetwork:{id:3, message:myOwn.noNetwork},
     },
     createReplaceOrRemoveRecLink(status, recDiv) {
         var recID = 'recID';
@@ -274,7 +288,7 @@ var myOwn = {
             var attrToSet = 'blink';
             if(! recLink) {
                 attrToSet = 'pulse';
-                recLink = html.a({id:recID, href:'login'}, "Reconnect").create();
+                recLink = html.a({id:recID, href:'login'}, myOwn.messages.reLogin).create();
                 recDiv.appendChild(recLink); 
             }
             recLink.setAttribute('rec-status', attrToSet);

@@ -1,12 +1,28 @@
 "use strict";
 
+var changing = bestGlobals.changing;
+
+myOwn.messages=changing(myOwn.messages, {
+    loading: "loading",
+    Filter : "Filter",
+    Delete : "Delete",
+});
+
+myOwn.es=changing(myOwn.es, {
+    loading: "cargando",
+    Filter : "Filtrar",
+    Delete : "Eliminar",
+});
+
+var escapeRegExp = bestGlobals.escapeRegExp;
+
 myOwn.firstDisplayCount = 20;
 myOwn.displayCountBreaks = [100,250,1000];
 myOwn.displayCountBreaks = [50,100,500];
 myOwn.comparator={
     '=':function(valueToCheck,condition){return valueToCheck == condition;},
-    '~':function(valueToCheck,condition){return valueToCheck.indexOf(condition)>=0;},
-    '\u2205':function(valueToCheck,condition){return true;},//\u2205 = conjunto vacío
+    '~':function(valueToCheck,condition){return RegExp(condition,'i').test(valueToCheck);},
+    '\u2205':function(valueToCheck,condition){return valueToCheck == null;},//\u2205 = conjunto vacío
     '>':function(valueToCheck,condition){return (valueToCheck>condition)},
     '>=':function(valueToCheck,condition){return (valueToCheck>=condition)},
     '<':function(valueToCheck,condition){return (valueToCheck<condition)},
@@ -19,7 +35,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
     var modes = {
         saveByField: true
     };
-    layout.textContent = 'loading...';
+    layout.textContent = my.messages.loading+'...';
     var grid={};
     var createRowElements;
     var createRowFilter;
@@ -175,7 +191,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         }
         grid.createRowFilter = function createRowFilter(){
             // var tr=html.tr().create();
-            var buttonFilter=html.button("Filter!").create();
+            var buttonFilter=html.button(myOwn.messages.Filter+"!").create();
             var tr=html.tr([html.td([buttonFilter])]).create();
             grid.element.tHead.appendChild(tr);
             // tr.appendChild(html.td().create());
@@ -208,11 +224,9 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 var rowsToDisplay= rows.filter(function(row,i){
                     var partialOk=true;
                     for(var columna in row){
-                        
                         if(filterData.row[columna]!=null){
                             var isSatisfied=my.comparator[filterData.rowSymbols[columna]](row[columna],filterData.row[columna])
                             if(!isSatisfied){
-//                            if(row[columna]!= filterData.row[columna]){
                                 partialOk=false;
                             }
                         }
@@ -233,7 +247,6 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 footInfoElement.displayTo.textContent=iRow;
                 footInfoElement.rowCount.innerHTML='';
                 if(iRow<rowsToDisplay.length){
-                    // footInfoElement.rowCount.textContent=' / ';
                     var addButtonRest = function addButtonRest(toNextRowNumber){
                         var buttonRest=html.button("+..."+toNextRowNumber).create();
                         footInfoElement.rowCount.appendChild(html.span('  ').create());
@@ -283,7 +296,7 @@ myOwn.tableAction={
     "delete":{
         img: 'img/delete.png',
         actionRow: function(my, grid, tr){
-            return my.showQuestion('Delete '+JSON.stringify(tr.info.primaryKeyValues)+' ?').then(function(result){
+            return my.showQuestion(my.messages.Delete+' '+JSON.stringify(tr.info.primaryKeyValues)+' ?').then(function(result){
                 if(result){
                     return (tr.info.primaryKeyValues===false?
                         Promise.resolve():
