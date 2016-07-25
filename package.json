@@ -44,11 +44,7 @@
     "regexplicit": "~0.0.4",
     "require-bro": "~0.1.2",
     "self-explain": "~0.10.7",
-<<<<<<< HEAD
-    "typed-controls": "~0.3.2"
-=======
     "typed-controls": "~0.3.3"
->>>>>>> d2226a57f6cabb31415ae90b1792a88af88864ce
   },
   "devDependencies": {
     "expect.js": "~0.3.1",
