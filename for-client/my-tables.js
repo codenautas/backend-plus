@@ -192,15 +192,15 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 var fieldName=fieldDef.name;
                 tr.info.rowSymbols[fieldName]=fieldDef.typeName==='text'?'~':'=';
                 var symbolFilter=html.td({"class":"autoFilter"},[html.button({"class":'auto-filter', tabindex:-1},tr.info.rowSymbols[fieldName])]).create();
-                var valueFilter=html.td({"class":"filterDescription"}).create();
-                valueFilter.contentEditable=true;
-                tr.info.rowControls[fieldName]=valueFilter;
-                valueFilter.addEventListener('update',function(){
+                var elementFilter=html.td({"class":"filterDescription"}).create();
+                elementFilter.contentEditable=true;
+                tr.info.rowControls[fieldName]=elementFilter;
+                elementFilter.addEventListener('update',function(){
                     tr.info.row[fieldDef.name]=this.getTypedValue();
                 });
-                TypedControls.adaptElement(valueFilter,fieldDef);
+                TypedControls.adaptElement(elementFilter,fieldDef);
                 tr.appendChild(symbolFilter);
-                tr.appendChild(valueFilter);
+                tr.appendChild(elementFilter);
             });
         }
         grid.displayBody=function displayBody(filterData){
@@ -226,7 +226,8 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 tbody.innerHTML='';
                 for(var iRow=fromRowNumber; iRow<toRowNumber; iRow++){
                     (function(row){
-                        updateRowData(grid.createRowElements(-1), row);
+                        var tr=grid.createRowElements(-1);
+                        updateRowData(tr, row);
                     })(rowsToDisplay[iRow]);
                 }
                 footInfoElement.displayFrom.textContent=rowsToDisplay.length?1:0;
