@@ -21,7 +21,8 @@ myOwn.displayCountBreaks = [100,250,1000];
 myOwn.displayCountBreaks = [50,100,500];
 myOwn.comparator={
     '=':function(valueToCheck,condition){return valueToCheck == condition;},
-    '~':function(valueToCheck,condition){return RegExp(condition,'i').test(valueToCheck);},
+    '~':function(valueToCheck,condition){return RegExp(escapeRegExp(condition),'i').test(valueToCheck);},
+    '/R/i':function(valueToCheck,condition){return RegExp(condition,'i').test(valueToCheck);},
     '\u2205':function(valueToCheck,condition){return valueToCheck == null;},//\u2205 = conjunto vacío
     '>':function(valueToCheck,condition){return (valueToCheck>condition)},
     '>=':function(valueToCheck,condition){return (valueToCheck>=condition)},
