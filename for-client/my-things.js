@@ -28,9 +28,9 @@ var myOwn = {};
 
 myOwn.messages = {
     notLogged: "Not logged in",
-    noServer : "The server inaccessible",
+    noServer : "The server is inaccessible",
     noNetwork: "Not connected to the network",
-    reLogin  : "sign in"
+    reLogin  : "Sign in"
 };
 
 myOwn.es = {
