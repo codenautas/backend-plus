@@ -289,15 +289,15 @@ myOwn.scrollToTop = function(element, to, duration) {
 };
 
 myOwn["connection-status"] = {
-    notLogged:{id:1, message:myOwn.messages.notLogged},
-    noServer :{id:2, message:myOwn.messages.noServer },
-    noNetwork:{id:3, message:myOwn.messages.noNetwork},
+    notLogged:myOwn.messages.notLogged,
+    noServer :myOwn.messages.noServer,
+    noNetwork:myOwn.messages.noNetwork,
 };
 
 myOwn.createReplaceOrRemoveRecLink = function createReplaceOrRemoveRecLink(status, recDiv) {
     var recID = 'recID';
     var recLink = document.getElementById(recID);
-    if(status.id !== 1) {
+    if(status !== my["connection-status"].notLogged) {
         if(recLink) { recDiv.removeChild(recLink); }
     } else {
         var attrToSet = 'blink';
@@ -312,7 +312,7 @@ myOwn.createReplaceOrRemoveRecLink = function createReplaceOrRemoveRecLink(statu
 
 myOwn.updateStatusDiv = function updateStatusDiv(status, recDiv) {
     this.scrollToTop(document.body, 0, 500);
-    var statusMsg = status.message+"! ";
+    var statusMsg = status+"! ";
     var msgID = 'recMsg';
     if(! recDiv) {
         recDiv = html.div({id:this.statusDivName}).create();
