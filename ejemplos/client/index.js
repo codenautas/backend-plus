@@ -10,8 +10,9 @@ function presentarPlaca(estado) {
     var parrafos=textoComienzaEncuesta.parrafos;
     var mensaje;
     var placa = [];
-    var encContinuar = html.input({type:'button', id:'continuar', value:'Continuar'}).create();
-    var encNueva = html.input({type:'button', id:'nueva', value:'nueva'}).create();
+    var encContinuar = html.input({type:'button', id:'continuar', value:'Continuar con la encuesta'}).create();
+    var encIniciar = html.input({type:'button', id:'iniciar', value:'Iniciar encuesta'}).create();
+    var encNueva = html.input({type:'button', id:'nueva', value:'Nueva encuesta'}).create();
     var encFinalizar=html.input({type:'button',id:'ingresado-fin',value:'finalizar'}).create();
     var metadatos = html.input({type:'button', id:'metadatos', value:'Ir a los metadatos'}).create();
     //var metadatos = html.input({type:'button', style:"color:magenta", id:'metadatos', value:'Ir a los metadatos'}).create();
@@ -38,7 +39,7 @@ function presentarPlaca(estado) {
         parrafos.forEach(function(parrafo){
             placa.push(html.p(parrafo));
         })
-        placa.push(encNueva);
+        placa.push(encIniciar);
         break;
     default:
         throw new Error('Estado inexistente: '+estado.estado);
@@ -62,6 +63,11 @@ function presentarPlaca(estado) {
     }
     encFinalizar.addEventListener('click',function(){
         window.location='fin-ingreso'
+    });
+    encIniciar.addEventListener('click',function(){
+        postAction('blanquear', {id:estado.id,estado:'vacio'}).then(function(res) {
+           window.location = 'continuar';
+       });
     })
     pantalla.appendChild(html.div(placa).create());
 }
