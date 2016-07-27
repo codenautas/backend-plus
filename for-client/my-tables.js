@@ -237,8 +237,10 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             }else{
                 var rowsToDisplay=rows;
             }
-            var displayRows = function displayRows(fromRowNumber, toRowNumber){
-                tbody.innerHTML='';
+            var displayRows = function displayRows(fromRowNumber, toRowNumber, adding){
+                if(!adding){
+                    tbody.innerHTML='';
+                }
                 for(var iRow=fromRowNumber; iRow<toRowNumber; iRow++){
                     (function(row){
                         var tr=grid.createRowElements(-1);
@@ -254,7 +256,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                         footInfoElement.rowCount.appendChild(html.span('  ').create());
                         footInfoElement.rowCount.appendChild(buttonRest);
                         buttonRest.addEventListener('click',function(){
-                            displayRows(iRow+1, toNextRowNumber);
+                            displayRows(iRow, toNextRowNumber, true);
                         });
                     }
                     my.displayCountBreaks.forEach(function(size, iSize){
