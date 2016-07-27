@@ -294,6 +294,8 @@ myOwn["connection-status"] = {
     noNetwork:myOwn.messages.noNetwork,
 };
 
+// creo <div> para los mensajes, si no existe.
+// en base a status, genero etiqueta y link, si corresponde
 myOwn.createOrReplaceConnectionStatus = function createOrReplaceConnectionStatus(status) {
     var recDiv = document.getElementById(this.statusDivName);
     this.scrollToTop(document.body, 0, 500);
