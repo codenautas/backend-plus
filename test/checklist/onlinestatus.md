@@ -37,4 +37,6 @@ Los resultados específicos de los tests hechos en javascript para los navegador
   **3** | **C** | The server is inaccessible | n/a
   **4** | **D** | Not connected to the network | n/a
 
-  *Aclaraciones*: n/a: No Aplica
+7. *Aclaraciones*:
+  1. n/a significa "No Aplica"
+  2. Se espera que los estados conduzcan siempre al mismo resultado esperado independientemente de el estado anterior
