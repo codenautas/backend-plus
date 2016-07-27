@@ -21,10 +21,10 @@ Los resultados específicos de los tests hechos en javascript para los navegador
   * Este es el "**Estado A**"
 5. **Lista de estados**
 
-Estado | Descripción | Cómo conseguirlo
-----|----|----
-**A** | Sin error | El navegador puede ver los datos y modificarlos
-**B** | Invalidar sesión | Eliminar físicamente el archivo correspondiente de la carpeta "sessions" en la raíz del proyecto
-**C** | Detener servidor | Presionar Control+C en la terminal donde está corriendo el servidor
-**D** | Inerrumpir la conexión de red | Desenchufar el cable de la máquina del cliente o "Desconectar el adapatador" en una máquina virtual
+Estado | Descripción | Cómo generarlo | Cómo eliminarlo
+----|----|----|----
+**A** | Sin error | El navegador puede ver los datos y modificarlos | -
+**B** | Invalidar sesión | Eliminar físicamente el archivo correspondiente de la carpeta "sessions" en la raíz del proyecto | Realizar el /login
+**C** | Detener servidor | Presionar Control+C en la terminal donde está corriendo el servidor | Ejecutar npm run-script example-tables
+**D** | Interrumpir la conexión de red | Desenchufar el cable de red en la máquina del cliente | Enchufar el cable
 
