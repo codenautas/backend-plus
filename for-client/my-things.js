@@ -199,20 +199,20 @@ myOwn.ajaxPromise = function(procedureDef,data,opts){
             data:params
         }).then(function(result){
             if(result && result[0]=="<" && result.match(/login/m)){
-                my.createOrReplaceStatusDiv(conStat.notLogged);
+                my.createOrReplaceConnectionStatus(conStat.notLogged);
                 throw changing(new Error(notLogged),{displayed:true});
             }
-            my.removeStatusDiv();
+            my.removeConnectionStatus();
             return my.encoders[procedureDef.encoding].parse(result);
         }).catch(function(err){
             if(err.message != notLogged) {
                 if(! window.navigator.onLine) {
-                    my.createOrReplaceStatusDiv(conStat.noNetwork);
+                    my.createOrReplaceConnectionStatus(conStat.noNetwork);
                 }
                 else if(!!err.originalError) {
-                    my.createOrReplaceStatusDiv(conStat.noServer);
+                    my.createOrReplaceConnectionStatus(conStat.noServer);
                 } else {
-                    my.removeStatusDiv();
+                    my.removeConnectionStatus();
                 }
             }
             if(!err.displayed && opts.visiblyLogErrors || err.status==403){
@@ -294,7 +294,19 @@ myOwn["connection-status"] = {
     noNetwork:myOwn.messages.noNetwork,
 };
 
-myOwn.createReplaceOrRemoveRecLink = function createReplaceOrRemoveRecLink(status, recDiv) {
+myOwn.createOrReplaceConnectionStatus = function createOrReplaceConnectionStatus(status) {
+    var recDiv = document.getElementById(this.statusDivName);
+    this.scrollToTop(document.body, 0, 500);
+    var statusMsg = status+"!!!! ";
+    var msgID = 'recMsg';
+    if(! recDiv) {
+        recDiv = html.div({id:this.statusDivName}).create();
+        recDiv.appendChild(html.span({id:msgID}, statusMsg).create());
+        var body = document.body;
+        body.insertBefore(recDiv, body.firstChild);
+    } else {
+        document.getElementById(msgID).innerHTML = statusMsg;
+    }
     var recID = 'recID';
     var recLink = document.getElementById(recID);
     if(status !== my["connection-status"].notLogged) {
@@ -310,26 +322,7 @@ myOwn.createReplaceOrRemoveRecLink = function createReplaceOrRemoveRecLink(statu
     }
 };
 
-myOwn.updateStatusDiv = function updateStatusDiv(status, recDiv) {
-    this.scrollToTop(document.body, 0, 500);
-    var statusMsg = status+"! ";
-    var msgID = 'recMsg';
-    if(! recDiv) {
-        recDiv = html.div({id:this.statusDivName}).create();
-        recDiv.appendChild(html.span({id:msgID}, statusMsg).create());
-        var body = document.body;
-        body.insertBefore(recDiv, body.firstChild);
-    } else {
-        document.getElementById(msgID).innerHTML = statusMsg;
-    }
-    this.createReplaceOrRemoveRecLink(status, recDiv);
-};
-
-myOwn.createOrReplaceStatusDiv = function createOrReplaceStatusDiv(status) {
-    this.updateStatusDiv(status, document.getElementById(this.statusDivName));
-};
-
-myOwn.removeStatusDiv = function removeStatusDiv() {
+myOwn.removeConnectionStatus = function removeConnectionStatus() {
     var recDiv = document.getElementById(this.statusDivName);
     if(recDiv) { document.body.removeChild(recDiv); }
 };
