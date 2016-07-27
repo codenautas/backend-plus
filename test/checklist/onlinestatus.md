@@ -23,14 +23,18 @@ Los resultados específicos de los tests hechos en javascript para los navegador
   
   Estado | Descripción | Cómo generarlo | Cómo eliminarlo
   ----|----|----|----
-  **A** | Sin error | El navegador puede ver los datos y modificarlos | -
+  **A** | Sin error | El navegador puede ver los datos y modificarlos | n/a
   **B** | Invalidar sesión | Eliminar físicamente el archivo correspondiente de la carpeta "sessions" en la raíz del proyecto | Realizar el /login
   **C** | Detener servidor | Presionar Control+C en la terminal donde está corriendo el servidor | Ejecutar npm run-script example-tables
   **D** | Interrumpir la conexión de red | Desenchufar el cable de red en la máquina del cliente | Enchufar el cable
 
-6. Pruebe cada uno de los casos de la siguiente tabla y verifique los resultados:
+6. Pruebe cada uno de los casos de la siguiente tabla y verifique los mensajes recibidos en la parte superior de la página:
   
-  Caso | Estado | Mensaje esperado (arriba, en la página)
-  ----|----|----
-  **1** | **A** | Ninguno
+  Caso | Estado | Mensaje esperado | Link esperado
+  ----|----|----|----
+  **1** | **A** | n/a | n/a
+  **2** | **B** | Not logged in | Sign in
+  **3** | **C** | The server is inaccessible | n/a
+  **4** | **D** | Not connected to the network | n/a
 
+  *Aclaraciones*: n/a: No Aplica
