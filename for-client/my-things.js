@@ -49,7 +49,6 @@ var jsYaml = require('js-yaml');
 
 function id(x){return x;}
 
-myOwn.debugging = false;
 myOwn.statusDivName = 'reconnection_div';
 
 myOwn.autoSetup = function autoSetup(){
@@ -84,7 +83,7 @@ myOwn.autoSetup = function autoSetup(){
     };
     setInterval(function(){
         my.testKeepAlive();
-    },my.debugging?6*1000:60*1000);
+    },my.debuggingStatus?6*1000:60*1000);
     return readProcedureDefinitions();
 };
     
@@ -192,26 +191,24 @@ myOwn.ajaxPromise = function(procedureDef,data,opts){
             value = my.encoders[paramDef.encoding].stringify(value);
             params[paramDef.name]=value;
         });
-        var conStat = my["connection-status"];
         return AjaxBestPromise[procedureDef.method]({
             url:procedureDef.action,
             data:params
         }).then(function(result){
             if(result && result[0]=="<" && result.match(/login/m)){
-                my.createOrReplaceConnectionStatus(conStat.notLogged);
-                throw changing(new Error(conStat.notLogged.message),{displayed:true, isNotLoggedError:true});
+                my.informDetectedStatus('notLogged');
+                throw changing(new Error(my.messages.notLogged),{displayed:true, isNotLoggedError:true});
             }
-            my.removeConnectionStatus();
+            my.informDetectedStatus('logged');
             return my.encoders[procedureDef.encoding].parse(result);
         }).catch(function(err){
-            if(! err.isNotLoggedError) {
-                if(! window.navigator.onLine) {
-                    my.createOrReplaceConnectionStatus(conStat.noNetwork);
-                }
-                else if(!!err.originalError) {
-                    my.createOrReplaceConnectionStatus(conStat.noServer);
+            if(!err.isNotLoggedError) {
+                if(!window.navigator.onLine) {
+                    my.informDetectedStatus('noNetwork');
+                }else if(!!err.originalError) {
+                    my.informDetectedStatus('noServer');
                 } else {
-                    my.removeConnectionStatus();
+                    my.informDetectedStatus('logged');
                 }
             }
             if(!err.displayed && opts.visiblyLogErrors || err.status==403){
@@ -288,44 +285,75 @@ myOwn.scrollToTop = function(element, to, duration) {
 };
 
 myOwn["connection-status"]={
-   notLogged: { message: myOwn.messages.notLogged, mustAsk:myOwn.messages.reLogin},
-   noServer:  { message: myOwn.messages.noServer,  mustAsk: false },
-   noNetwork: { message: myOwn.messages.noNetwork, mustAsk: false },
+   logged   : { show: false , mustAsk: false },
+   notLogged: { show: true  , mustAsk: {idMessage:'reLogin', url:'login'}},
+   noServer : { show: true  , mustAsk: false },
+   noNetwork: { show: true  , mustAsk: false },
 };
 
-// creo <div> para los mensajes, si no existe.
-// en base a status, genero etiqueta y link, si corresponde
-myOwn.createOrReplaceConnectionStatus = function createOrReplaceConnectionStatus(status) {
-    var recDiv = document.getElementById(this.statusDivName);
-    this.scrollToTop(document.body, 0, 500);
-    var statusMsg = status.message+"!!!! ";
-    var msgID = 'recMsg';
-    if(! recDiv) {
-        recDiv = html.div({id:this.statusDivName}).create();
-        recDiv.appendChild(html.span({id:msgID}, statusMsg).create());
-        var body = document.body;
-        body.insertBefore(recDiv, body.firstChild);
-    } else {
-        document.getElementById(msgID).innerHTML = statusMsg;
-    }
-    var recID = 'recID';
-    var recLink = document.getElementById(recID);
-    if(status.mustAsk) {
-        var attrToSet = 'blink';
-        if(! recLink) {
-            attrToSet = 'pulse';
-            recLink = html.a({id:recID, href:'login'}, status.mustAsk).create();
-            recDiv.appendChild(recLink); 
+myOwn.debuggingStatus=false;  // /* 
+if(new Date()<bestGlobals.datetime.ymdHms(2016,7,28,1,50,0)){
+    myOwn.debuggingStatus=function(statusCode){
+        myOwn.debuggingStatus.count=(myOwn.debuggingStatus.count||0)+1
+        if(!window.debuggingStatusDiv){
+            var box=document.createElement('div');
+            box.style.position='fixed';
+            box.style.left='400px';
+            box.style.top='30px';
+            box.style.border='1px dashed green';
+            box.style.backgroundColor='rgba(230,230,180,0.5)';
+            box.textContent='actual status:';
+            window.debuggingStatusDiv=document.createElement('div');
+            document.body.appendChild(box);
+            box.appendChild(window.debuggingStatusDiv);
+            window.debuggingStatusDiv.id='debuggingStatusDiv';
         }
-        recLink.setAttribute('rec-status', attrToSet);
-    } else {
-        if(recLink) { recDiv.removeChild(recLink); }
-    }
-};
+        window.debuggingStatusDiv.textContent=statusCode+' '+myOwn.debuggingStatus.count;
+    };
+}
 
-myOwn.removeConnectionStatus = function removeConnectionStatus() {
-    var recDiv = document.getElementById(this.statusDivName);
-    if(recDiv) { document.body.removeChild(recDiv); }
+myOwn.informDetectedStatus = function informDetectedStatus(statusCode) {
+    if(myOwn.debuggingStatus){ myOwn.debuggingStatus(statusCode); }
+    if(my.previousStatusCode!=statusCode){
+        // var previousStatus = my["connection-status"][my.previousStatusCode];
+        var status = my["connection-status"][statusCode];
+        if(!status.show){
+            if(my.statusDiv){
+                my.fade(my.statusDiv);
+                my.statusDiv=null;
+            }
+        }else{
+            var statusMsg = my.messages[status];
+            if(!my.statusDiv){
+                my.scrollToTop(document.body, 0, 500);
+                my.statusDiv = html.div({class:'status-info'}).create();
+                my.statusDiv.messageSpan=html.span(statusMsg).create();
+                my.statusDiv.askLink=null;
+                my.statusDiv.appendChild(my.statusDiv.messageSpan);
+                var body = document.body;
+                body.insertBefore(my.statusDiv, body.firstChild);
+            }else{
+                my.statusDiv.messageSpan.textContent=statusMsg;
+            }
+            if(status.mustAsk){
+                if(!my.statusDiv.askLink){
+                    my.statusDiv.askLink=html.a().create();
+                    my.statusDiv.appendChild(my.statusDiv.askLink);
+                }
+                my.statusDiv.askLink.url=status.mustAsk.url;
+                my.statusDiv.askLink.textContent=my.messages[status.mustAsk.idMessage];
+            }else{
+                if(my.statusDiv.askLink){
+                    my.statusDiv.askLink.parentNode.remove(my.statusDiv.askLink);
+                    my.statusDiv.askLink=null;
+                }
+            }
+            var attrToSet = 'blink';
+            //attrToSet = 'pulse';
+            my.statusDiv.setAttribute('rec-status', attrToSet);
+        }
+        my.previousStatusCode=statusCode;
+    }
 };
 
 return myOwn;
