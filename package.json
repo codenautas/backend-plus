@@ -44,13 +44,13 @@
     "regexplicit": "~0.0.4",
     "require-bro": "~0.1.2",
     "self-explain": "~0.10.7",
-    "typed-controls": "~0.3.3"
+    "typed-controls": "~0.3.4"
   },
   "devDependencies": {
     "expect.js": "~0.3.1",
     "istanbul": "~0.4.4",
     "mocha": "~2.5.3",
-    "sinon": "~1.17.4",
+    "sinon": "~1.17.5",
     "supertest": "~1.2.0",
     
     "kill-9": "~0.4.2"
