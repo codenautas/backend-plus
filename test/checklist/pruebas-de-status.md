@@ -49,6 +49,27 @@ Vamos a llamar *current stauts* a un rectangulito amarillo de borde punteado ver
 
 ## casos de prueba
 
- 1. Correr `npm run example-tables`, loguearse con administrado `bob` e ir a tabla `ptable`
- 2. [_] Verificar `actual status: logged`.
-
+1. Correr `npm run example-tables`, loguearse con administrado `bob` e ir a tabla `ptable`
+    1. [_] Verificar `actual status: logged`.
+2. Abrir otra solapa en la pantalla de `/login` de modo de **deconectar** y volver a la pantalla donde se está probando
+    1. [_] Verificar `actual status: unLogged`.
+    2. [_] Aparece el cartel `not logged in Sign in`
+3. Interrumpir el servidor (**Ctrl C**)
+    1. [_] Verificar `actual status: noServer`.
+    2. [_] Aparece el cartel `the server is inaccesible`
+4. Re **arrancar** el servidor 
+    1. [_] Verificar `actual status: unLogged`.
+    2. [_] Vuelve el cartel `not logged in Sign in`
+5. Volver a **loguearse** (en otra solapa)
+    1. [_] Verificar `actual status: logged`.
+    2. [_] Desaparece el cartel
+6. Para ver el **scroll** (hacia el cartel) pedimos el contenido de ptable +50 (o +100) vamos hasta abajo de manera que ya no se vean los títulos
+7. Interrumpir el servidor (**Ctrl C**)
+    1. [_] Verificar `actual status: noServer`.
+    2. [_] Se produce un SCROLL y se ve `the server is inaccesible`
+6. Volvemos a hacer **scroll** para asegurarnos que se hace aún cuando haya habido ya un cartel. 
+8. Romper la red. En windows es en panel de control, centro de redes y recursos compartidos, cambiar configuración del adaptador, estado, deshabilitar
+    1. [_] Verificar `actual status: noNetwork` (ojo que si se activa otra red, el wifi u otra placa, vuelve a tener red).
+    2. [_] Se produce un SCROLL y se ve `the server is inaccesible`
+9. Rearmar la red. Activar la placa
+    1. [_] Verificar `actual status: noServer` 
