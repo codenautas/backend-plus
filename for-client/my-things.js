@@ -292,7 +292,7 @@ myOwn["connection-status"]={
 };
 
 myOwn.debuggingStatus=false;  // /* 
-if(new Date()<bestGlobals.datetime.ymdHms(2016,7,28,12,50,0)){
+if(new Date()<bestGlobals.datetime.ymdHms(2016,7,28,14,50,0)){
     myOwn.debuggingStatus=function(statusCode){
         myOwn.debuggingStatus.count=(myOwn.debuggingStatus.count||0)+1
         if(!window.debuggingStatusDiv){
@@ -313,7 +313,8 @@ if(new Date()<bestGlobals.datetime.ymdHms(2016,7,28,12,50,0)){
 }
 
 myOwn.informDetectedStatus = function informDetectedStatus(statusCode) {
-    if(myOwn.debuggingStatus){ myOwn.debuggingStatus(statusCode); }
+    var my=this;
+    if(my.debuggingStatus){ my.debuggingStatus(statusCode); }
     if(my.previousStatusCode!=statusCode){
         // var previousStatus = my["connection-status"][my.previousStatusCode];
         var status = my["connection-status"][statusCode];
@@ -323,9 +324,9 @@ myOwn.informDetectedStatus = function informDetectedStatus(statusCode) {
                 my.statusDiv=null;
             }
         }else{
-            var statusMsg = my.messages[status];
+            var statusMsg = my.messages[statusCode];
+            my.scrollToTop(document.body, 0, 500);
             if(!my.statusDiv){
-                my.scrollToTop(document.body, 0, 500);
                 my.statusDiv = html.div({class:'status-info'}).create();
                 my.statusDiv.messageSpan=html.span(statusMsg).create();
                 my.statusDiv.askLink=null;
@@ -340,11 +341,11 @@ myOwn.informDetectedStatus = function informDetectedStatus(statusCode) {
                     my.statusDiv.askLink=html.a().create();
                     my.statusDiv.appendChild(my.statusDiv.askLink);
                 }
-                my.statusDiv.askLink.url=status.mustAsk.url;
+                my.statusDiv.askLink.href=status.mustAsk.url;
                 my.statusDiv.askLink.textContent=my.messages[status.mustAsk.idMessage];
             }else{
                 if(my.statusDiv.askLink){
-                    my.statusDiv.askLink.parentNode.remove(my.statusDiv.askLink);
+                    my.statusDiv.askLink.parentNode.removeChild(my.statusDiv.askLink);
                     my.statusDiv.askLink=null;
                 }
             }
