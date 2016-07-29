@@ -13,7 +13,7 @@ function presentarPlaca(estado) {
     var encContinuar = html.input({type:'button', id:'continuar', value:'Continuar con la encuesta'}).create();
     var encIniciar = html.input({type:'button', id:'iniciar', value:'Iniciar encuesta'}).create();
     var encNueva = html.input({type:'button', id:'nueva', value:'Nueva encuesta'}).create();
-    var encFinalizar=html.input({type:'button',id:'ingresado-fin',value:'finalizar'}).create();
+    var encFinalizar=html.input({type:'button',id:'ingresado-fin',value:'Finalizar'}).create();
     var metadatos = html.input({type:'button', id:'metadatos', value:'Ir a los metadatos'}).create();
     //var metadatos = html.input({type:'button', style:"color:magenta", id:'metadatos', value:'Ir a los metadatos'}).create();
     switch(estado.estado) {
