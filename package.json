@@ -42,7 +42,7 @@
     "pg-promise-strict": "~0.2.4",
     "promise-plus": "~0.0.6",
     "regexplicit": "~0.0.4",
-    "require-bro": "~0.1.2",
+    "require-bro": "~0.1.3",
     "self-explain": "~0.10.7",
     "typed-controls": "~0.3.4"
   },
