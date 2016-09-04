@@ -46,7 +46,8 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
     }).then(function(tableDef){
         grid.def=tableDef;
         var buttonInsert;
-        var buttonFilter;
+        var buttonCreateFilter;
+        var buttonDestroyFilter;
         var getSaveModeImgSrc=function(){ return modes.saveByField?'img/tables-update-by-field.png':'img/tables-update-by-row.png';};
         var buttonSaveModeImg=html.img({src:getSaveModeImgSrc()}).create();
         var buttonSaveMode;
@@ -64,9 +65,13 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             });
         }
         if(tableDef.allow.filter){
-            buttonFilter=html.button({class:'table-button'}, [html.img({src:'img/filter.png'})]).create();
-            buttonFilter.addEventListener('click', function(){
+            buttonCreateFilter=html.button({class:'table-button', 'when-filter':'no'}, [html.img({src:'img/filter.png'})]).create();
+            buttonCreateFilter.addEventListener('click', function(){
                 grid.createRowFilter(0);
+            });
+            buttonDestroyFilter=html.button({class:'table-button', 'when-filter':'yes'}, [html.img({src:'img/destroy-filter.png'})]).create();
+            buttonDestroyFilter.addEventListener('click', function(){
+                grid.destroyRowFilter(0);
             });
         }
         var columnsHeadElements = tableDef.fields.map(function(fieldDef){
@@ -85,7 +90,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         grid.element = html.table({"class":"my-grid", "my-table": tableName},[
             html.caption(tableDef.title),
             html.thead([
-                html.tr([html.th([buttonInsert,/*buttonSaveMode,*/buttonFilter])].concat(columnsHeadElements))
+                html.tr([html.th([buttonInsert,/*buttonSaveMode,*/buttonCreateFilter,buttonDestroyFilter])].concat(columnsHeadElements))
             ]),
             html.tbody(),
             html.tfoot([
@@ -190,10 +195,22 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             });
             return tr;
         }
+        grid.destroyRowFilter = function destroyRowFilter(){
+            var tr=grid.hasFilterRow;
+            grid.element.setAttribute('has-filter',0);
+            grid.element.tHead.removeChild(tr);
+            delete grid.hasFilterRow;
+        }
+        grid.element.setAttribute('has-filter',0);
         grid.createRowFilter = function createRowFilter(){
             // var tr=html.tr().create();
+            if(grid.hasFilterRow){
+                return true;
+            }
             var buttonFilter=html.button(myOwn.messages.Filter+"!").create();
             var tr=html.tr([html.td([buttonFilter])]).create();
+            grid.hasFilterRow=tr;
+            grid.element.setAttribute('has-filter',1);
             grid.element.tHead.appendChild(tr);
             // tr.appendChild(html.td().create());
             tr.info = {

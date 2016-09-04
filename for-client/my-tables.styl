@@ -66,3 +66,14 @@ nowrap()
 .autoFilter
   width 30px
   
+[has-filter='1'] 
+  [when-filter=no] 
+    display none
+  [when-filter=yes] 
+    display inherit
+
+[has-filter='0']
+  [when-filter=yes] 
+    display none
+  [when-filter=no] 
+    display inherit
