@@ -32,7 +32,7 @@ myOwn.comparator={
 }
 myOwn.tableGrid = function tableGrid(layout, tableName){
     var my = this;
-    var inputColspan = 2;
+    var inputColspan = 1;
     var modes = {
         saveByField: true
     };
@@ -225,16 +225,15 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             grid.def.fields.forEach(function(fieldDef){
                 var fieldName=fieldDef.name;
                 tr.info.rowSymbols[fieldName]=fieldDef.typeName==='text'?'~':'=';
-                var symbolFilter=html.td({"class":"autoFilter"},[html.button({"class":'auto-filter', tabindex:-1},tr.info.rowSymbols[fieldName])]).create();
-                var elementFilter=html.td({"class":"filterDescription"}).create();
+                var symbolFilter=html.button({"class":'auto-filter', tabindex:-1},tr.info.rowSymbols[fieldName]).create();
+                var elementFilter=html.span({"class":"filterDescription"}).create();
                 elementFilter.contentEditable=true;
                 tr.info.rowControls[fieldName]=elementFilter;
                 elementFilter.addEventListener('update',function(){
                     tr.info.row[fieldDef.name]=this.getTypedValue();
                 });
                 TypedControls.adaptElement(elementFilter,fieldDef);
-                tr.appendChild(symbolFilter);
-                tr.appendChild(elementFilter);
+                tr.appendChild(html.td({"class":"autoFilter"},[symbolFilter,elementFilter]);
             });
         }
         grid.displayBody=function displayBody(filterData){
