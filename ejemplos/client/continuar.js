@@ -8,6 +8,14 @@ function classToggle(element,clase, sacoAgrego ){
     } 
 }
 
+function dropAllChilds(element){
+    var childrenToDrop = Array.prototype.slice.call(element.childNodes)
+    childrenToDrop.forEach(function(child){
+        element.removeChild(child);
+    });
+    // element.innerHTML="";
+}
+
 var html=jsToHtml.html;
 var coalesce = bestGlobals.coalesce;
 
@@ -38,14 +46,18 @@ function validarRegistro(estructuraFormulario, registro, controles){
 }
 
 function grabarYLuego(result){
-    sennialCambios.style.backgroundColor='lightblue';
+   // sennialCambios.style.backgroundColor='lightblue';
     placa_grabando.style.visibility='visible';
     return postAction('guardar',{
         id: result.id,
         almacen: result.almacen
     }).then(function(){
         tieneCambios=false;
-        sennialCambios.style.backgroundColor='lightgreen';
+       // sennialCambios.style.backgroundColor='lightgreen';
+    }).then(function(){
+        setTimeout(function(){
+            placa_grabando.style.visibility='hidden';
+        },100);
     });
 }
 
@@ -205,7 +217,7 @@ function presentarFormulario(result, idFormulario, orden){
         html.input({type: "checkbox", "id": "modo-revisar"}),
     ]).create());
     divFormulario.appendChild(html.div({"class":"bloque"},celdasDesplegadas).create());
-    pantalla.innerHTML='';
+    dropAllChilds(pantalla);
     pantalla.appendChild(divFormulario);
     pantalla.appendChild(html.input({
         type:"button",
@@ -225,7 +237,7 @@ function presentarFormulario(result, idFormulario, orden){
                 almacen: almacen
             };
             if(result.status.siguiente.formulario){
-                grabarEIr(result,'continuar', result.status.siguiente.formulario, result.status.siguiente.orden)
+                grabarEIr(result,'continuar', result.status.siguiente.formulario, result.status.siguiente.orden);
             }else{
                 postAction('finalizar', data).then(function(){
                     tieneCambios=false;
@@ -256,7 +268,7 @@ function presentarFormulario(result, idFormulario, orden){
 function presentarAlmacen(result, formAMostrar, ordenAMostrar){
     formAMostrar = formAMostrar || result.estructura['con-for'][result.id["tipo-abonado"]]["formulario-principal"];
     ordenAMostrar = ordenAMostrar || 0;
-    menu_bar.innerHTML='';
+    dropAllChilds(menu_bar);
     var botonera=[];
     result.status.siguiente={formulario:null, orden:null};
     // cambiar ese forEach por un forEach que devuelva primero el idFormulario (en el primer parámetro de function
@@ -312,9 +324,9 @@ function presentarAlmacen(result, formAMostrar, ordenAMostrar){
     });
 };
 
-function alCargarOCambiarHash(){
-   // document.getElementById('status').textContent = "Cargando...";
-    placa_grabando.style.visibility='hidden';
+function alCargarOCambiarHash(event){
+    console.log(event);
+    // document.getElementById('status').textContent = "Cargando...";
     AjaxBestPromise.post({
         url:'info-enc-act',
         data:{info:"{}"}
@@ -329,15 +341,17 @@ function alCargarOCambiarHash(){
             orden=partes[1]-0||0;
         }
         presentarAlmacen(result,idFormulario,orden);
-        
         agregaLogoAlElemento(imagen);
     }).catch(function(err){
+        console.log(err.message);
+        console.log(err);
         document.getElementById('status').textContent = "Error "+err.message;
         document.getElementById('status').textContent += "\n"+err.stack;
+    }).then(function(){
+        placa_grabando.style.visibility='hidden';
     });
 };
-
 window.addEventListener("load",alCargarOCambiarHash);
-window.addEventListener("haschange",alCargarOCambiarHash);
+window.addEventListener("hashchange",alCargarOCambiarHash);
 window.addEventListener("popstate",alCargarOCambiarHash);
 
