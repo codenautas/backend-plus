@@ -208,7 +208,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 return true;
             }
             var buttonFilter=html.button(myOwn.messages.Filter+"!").create();
-            var tr=html.tr([html.td([buttonFilter])]).create();
+            var tr=html.tr([html.th([buttonFilter])]).create();
             grid.hasFilterRow=tr;
             grid.element.setAttribute('has-filter',1);
             grid.element.tHead.appendChild(tr);
@@ -226,14 +226,14 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 var fieldName=fieldDef.name;
                 tr.info.rowSymbols[fieldName]=fieldDef.typeName==='text'?'~':'=';
                 var symbolFilter=html.button({"class":'auto-filter', tabindex:-1},tr.info.rowSymbols[fieldName]).create();
-                var elementFilter=html.span({"class":"filterDescription"}).create();
+                var elementFilter=html.span({"class":"filter-span"}).create();
                 elementFilter.contentEditable=true;
                 tr.info.rowControls[fieldName]=elementFilter;
                 elementFilter.addEventListener('update',function(){
                     tr.info.row[fieldDef.name]=this.getTypedValue();
                 });
                 TypedControls.adaptElement(elementFilter,fieldDef);
-                tr.appendChild(html.td({"class":"autoFilter"},[symbolFilter,elementFilter]);
+                tr.appendChild(html.td({"class":"autoFilter"},[symbolFilter,elementFilter]).create());
             });
         }
         grid.displayBody=function displayBody(filterData){
