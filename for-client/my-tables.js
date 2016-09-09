@@ -208,7 +208,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 return true;
             }
             var buttonFilter=html.button(myOwn.messages.Filter+"!").create();
-            var tr=html.tr([html.th([buttonFilter])]).create();
+            var tr=html.tr({'class':'filter-line'}, [html.th([buttonFilter])]).create();
             grid.hasFilterRow=tr;
             grid.element.setAttribute('has-filter',1);
             grid.element.tHead.appendChild(tr);
