@@ -16,8 +16,8 @@ login:
   plus:
     fileStore: true
     loginForm:
-      usernameLabel: abonado
-      passwordLabel: clave
+      usernameLabel: usuario
+      passwordLabel: contraseña
       formTitle: registro
       buttonLabel: entrar
       autoLogin: true
