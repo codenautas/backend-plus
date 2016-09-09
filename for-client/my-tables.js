@@ -45,6 +45,9 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         table:tableName,
     }).then(function(tableDef){
         grid.def=tableDef;
+        grid.view={
+            sortColumns:tableDef.sortColumns||[]
+        }
         var buttonInsert;
         var buttonCreateFilter;
         var buttonDestroyFilter;
@@ -75,7 +78,16 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             });
         }
         var columnsHeadElements = tableDef.fields.map(function(fieldDef){
-            return html.th({colspan:inputColspan},fieldDef.title);
+            var tr=html.th({colspan:inputColspan},fieldDef.title).create();
+            tr.addEventListener('click',function(){
+                var currentOrder=grid.view.sortColumns.length && grid.view.sortColumns[0].column==fieldDef.name?grid.view.sortColumns[0].order:null;
+                grid.view.sortColumns=grid.view.sortColumns.filter(function(sortColumn){
+                    return sortColumn.column != fieldDef.name;
+                })
+                grid.view.sortColumns.unshift({column:fieldDef.name, order:currentOrder?-currentOrder:1})
+                grid.displayBody(tr.info)
+            });
+            return tr;
         });
         footInfoElement = html.td({colspan:columnsHeadElements.length*inputColspan, "is-processing":"1"}).create();
         [
@@ -240,9 +252,9 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             if(filterData){
                 var rowsToDisplay= rows.filter(function(row,i){
                     var partialOk=true;
-                    for(var columna in row){
-                        if(filterData.row[columna]!=null){
-                            var isSatisfied=my.comparator[filterData.rowSymbols[columna]](row[columna],filterData.row[columna])
+                    for(var column in row){
+                        if(filterData.row[column]!=null){
+                            var isSatisfied=my.comparator[filterData.rowSymbols[column]](row[column],filterData.row[column])
                             if(!isSatisfied){
                                 partialOk=false;
                             }
@@ -252,6 +264,22 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 })
             }else{
                 var rowsToDisplay=rows;
+            }
+            if(grid.view.sortColumns.length>0){
+                rowsToDisplay.sort(function(a,b){
+                    var column;
+                    var i=0;
+                    do{
+                        column=grid.view.sortColumns[i].column;
+                        if(a[column]>b[column]){
+                            return 1*grid.view.sortColumns[i].order;
+                        }else if(a[column]<b[column]){
+                            return -1*grid.view.sortColumns[i].order;
+                        }
+                        i++;
+                    }while(i<grid.view.sortColumns.length);
+                    return 0;
+                });
             }
             var displayRows = function displayRows(fromRowNumber, toRowNumber, adding){
                 if(!adding){
