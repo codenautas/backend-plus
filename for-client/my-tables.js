@@ -271,6 +271,12 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                     var i=0;
                     do{
                         column=grid.view.sortColumns[i].column;
+                        if(row1[column]==null){
+                            return 1;
+                        }
+                        if(row2[column]==null){
+                            return -1;
+                        }
                         var a=bestGlobals.forOrder(row1[column]);
                         var b=bestGlobals.forOrder(row2[column]);
                         if(a>b){
