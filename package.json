@@ -31,10 +31,10 @@
 
     "ajax-best-promise": "~0.2.0",
     "basic-interfaces": "~0.0.2",
-    "best-globals": "~0.4.9",
+    "best-globals": "~0.4.10",
     "best-promise": "~0.2.4",
     "castellano": "~0.0.3",
-    "dialog-promise": "~0.1.2",
+    "dialog-promise": "~0.2.0",
     "extension-serve-static": "~0.1.6",
     "js-to-html": "~0.9.2",
     "login-plus": "~0.6.3",
