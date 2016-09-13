@@ -79,7 +79,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             });
         }
         var getSize = function getSize(th){
-            var ancho=th.offsetWidth.toString()+'px';
+            var ancho=th.offsetWidth;
             return ancho;
         }
         var columnsHeadElements = tableDef.fields.map(function(fieldDef){
@@ -250,13 +250,14 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 var symbolFilter=html.button({"class":'auto-filter', tabindex:-1},tr.info.rowSymbols[fieldName]).create();
                 var elementFilter=html.span({"class":"filter-span"}).create();
                 elementFilter.contentEditable=true;
-                elementFilter.style.width=sizesForFilters[fieldDef.name];
                 tr.info.rowControls[fieldName]=elementFilter;
                 elementFilter.addEventListener('update',function(){
                     tr.info.row[fieldDef.name]=this.getTypedValue();
                 });
                 TypedControls.adaptElement(elementFilter,fieldDef);
                 tr.appendChild(html.td({"class":"autoFilter"},[symbolFilter,elementFilter]).create());
+                elementFilter.width=sizesForFilters[fieldDef.name]/*-symbolFilter.offsetWidth-1*/;
+                elementFilter.style.width=elementFilter.width.toString()+'px';
                 console.log(sizesForFilters[fieldDef.name])
             });
         }
