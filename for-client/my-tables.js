@@ -41,6 +41,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
     var createRowElements;
     var createRowFilter;
     var footInfoElement;
+    var sizesForFilters={};
     var structureRequest = my.ajax.table.structure({
         table:tableName,
     }).then(function(tableDef){
@@ -77,6 +78,10 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 grid.destroyRowFilter(0);
             });
         }
+        var getSize = function getSize(th){
+            var ancho=th.offsetWidth.toString()+'px';
+            return ancho;
+        }
         var columnsHeadElements = tableDef.fields.map(function(fieldDef){
             var tr=html.th({colspan:inputColspan},fieldDef.title).create();
             tr.addEventListener('click',function(){
@@ -111,7 +116,11 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         ]).create();
         layout.innerHTML='';
         layout.appendChild(grid.element);
+        tableDef.fields.forEach(function(fieldDef,i){
+            sizesForFilters[fieldDef.name]=getSize(columnsHeadElements[i])
+        })
     });
+    
     var displayGrid = function displayGrid(rows){
         var tbody = grid.element.tBodies[0];
         var updateRowData = function updateRowData(tr, updatedRow){
@@ -157,6 +166,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             });
         }
         grid.createRowElements = function createRowElements(iRow, row){
+
             var forInsert = iRow>=0;
             var tr = tbody.insertRow(iRow);
             tr.info = {
@@ -240,12 +250,14 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 var symbolFilter=html.button({"class":'auto-filter', tabindex:-1},tr.info.rowSymbols[fieldName]).create();
                 var elementFilter=html.span({"class":"filter-span"}).create();
                 elementFilter.contentEditable=true;
+                elementFilter.style.width=sizesForFilters[fieldDef.name];
                 tr.info.rowControls[fieldName]=elementFilter;
                 elementFilter.addEventListener('update',function(){
                     tr.info.row[fieldDef.name]=this.getTypedValue();
                 });
                 TypedControls.adaptElement(elementFilter,fieldDef);
                 tr.appendChild(html.td({"class":"autoFilter"},[symbolFilter,elementFilter]).create());
+                console.log(sizesForFilters[fieldDef.name])
             });
         }
         grid.displayBody=function displayBody(filterData){
