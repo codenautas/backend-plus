@@ -42,6 +42,11 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
     var createRowFilter;
     var footInfoElement;
     var sizesForFilters={};
+    var columnsHeadElements;
+    var getSize = function getSize(th){
+        var ancho=th.offsetWidth;
+        return ancho;
+    };
     var structureRequest = my.ajax.table.structure({
         table:tableName,
     }).then(function(tableDef){
@@ -78,11 +83,8 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 grid.destroyRowFilter(0);
             });
         }
-        var getSize = function getSize(th){
-            var ancho=th.offsetWidth;
-            return ancho;
-        }
-        var columnsHeadElements = tableDef.fields.map(function(fieldDef){
+        //var columnsHeadElements = tableDef.fields.map(function(fieldDef){
+            columnsHeadElements = tableDef.fields.map(function(fieldDef){
             var tr=html.th({colspan:inputColspan},fieldDef.title).create();
             tr.addEventListener('click',function(){
                 var currentOrder=grid.view.sortColumns.length && grid.view.sortColumns[0].column==fieldDef.name?grid.view.sortColumns[0].order:null;
@@ -116,10 +118,11 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         ]).create();
         layout.innerHTML='';
         layout.appendChild(grid.element);
-        tableDef.fields.forEach(function(fieldDef,i){
-            sizesForFilters[fieldDef.name]=getSize(columnsHeadElements[i])
-        })
-    });
+    })/*.then(function(){
+        return new Promise(function(resolve, reject){
+            setInterval(resolve,3000);
+        });
+    })*/;
     
     var displayGrid = function displayGrid(rows){
         var tbody = grid.element.tBodies[0];
@@ -256,7 +259,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 });
                 TypedControls.adaptElement(elementFilter,fieldDef);
                 tr.appendChild(html.td({"class":"autoFilter"},[symbolFilter,elementFilter]).create());
-                elementFilter.width=sizesForFilters[fieldDef.name]/*-symbolFilter.offsetWidth-1*/;
+                elementFilter.width=sizesForFilters[fieldDef.name]-symbolFilter.offsetWidth-5;
                 elementFilter.style.width=elementFilter.width.toString()+'px';
                 console.log(sizesForFilters[fieldDef.name])
             });
@@ -343,6 +346,9 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         return structureRequest.then(function(){
             my.adaptData(grid.def,rows);
             displayGrid(rows);
+            grid.def.fields.forEach(function(fieldDef,i){
+            sizesForFilters[fieldDef.name]=getSize(columnsHeadElements[i])
+        });
             return grid;
         });
     }).catch(function(err){
