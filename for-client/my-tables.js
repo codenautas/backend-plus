@@ -262,10 +262,9 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 var filterImage='img/select-menu.png'
                 var imgFilter=html.img({src:filterImage}); 
                 imgFilter=html.img({src:filterImage}); 
-//                tr.info.rowSymbols[fieldName]=fieldDef.typeName==='text'?'~':'=';
+//                tr.info.rowSymbols[fieldName]=fieldDef.typeName==='text'?'~':'='; //00BA00
 //                var symbolFilter=html.button({"class":'auto-filter', tabindex:-1},tr.info.rowSymbols[fieldName]).create();
-                var symbolFilter=html.button({"class":'auto-filter', tabindex:-1},imgFilter).create();
-                tr.info.rowSymbols[fieldDef]=html.button({"class":'auto-filter', tabindex:-1},[tr.info.menuFilter]).create();;
+                var symbolFilter=html.button({"class":'table-button', tabindex:-1},imgFilter).create();
                 var elementFilter=html.span({"class":"filter-span"}).create();
                 elementFilter.contentEditable=true;
                 tr.info.rowControls[fieldName]=elementFilter;
@@ -275,13 +274,12 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 TypedControls.adaptElement(elementFilter,fieldDef);
                 tr.appendChild(html.td({"class":"autoFilter"},[symbolFilter,elementFilter]).create());
                 //tr.appendChild(html.td({"class":"autoFilter"},[tr.info.rowSymbols[fieldDef],elementFilter]).create());
-                elementFilter.width=sizesForFilters[fieldDef.name]-tr.info.rowSymbols[fieldDef].offsetWidth-5;
+                elementFilter.width=sizesForFilters[fieldDef.name]-symbolFilter.offsetWidth-5;
                 elementFilter.style.width=elementFilter.width.toString()+'px';
                 symbolFilter.addEventListener('click',function(){
                     miniMenuPromise([
                         {value:'=', img:'img/igual.png'},
                         {value:'~', img:'img/parecido.png'},
-                       // {value:'/R/i', img:'img/expresion-regular.png'},
                         {value:'\u2205', img:'img/vacio.png'},
                         {value:'>', img:'img/mayor.png'},
                         {value:'>=', img:'img/mayor-igual.png'},
