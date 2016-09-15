@@ -28,7 +28,17 @@ myOwn.comparator={
     '>=':function(valueToCheck,condition){return (valueToCheck>=condition)},
     '<':function(valueToCheck,condition){return (valueToCheck<condition)},
     '<=':function(valueToCheck,condition){return (valueToCheck<=condition)},
-    'not-an-operator':function(valueToCheck,condition){ return 'Operator does not exist'}
+    'not-an-operator':function(valueToCheck,condition){ return 'Operator does not exist'},
+    'traductor':{
+        '=':'igual',
+        '~':'parecido',
+        '/R/i':'expresion-regular',
+        '\u2205':'vacio',
+        '>':'mayor',
+        '>=':'mayor-igual',
+        '<':'menor',
+        '<=':'menor-igual'
+    }
 }
 myOwn.tableGrid = function tableGrid(layout, tableName){
     var my = this;
@@ -249,8 +259,13 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             });
             grid.def.fields.forEach(function(fieldDef){
                 var fieldName=fieldDef.name;
-                tr.info.rowSymbols[fieldName]=fieldDef.typeName==='text'?'~':'=';
-                var symbolFilter=html.button({"class":'auto-filter', tabindex:-1},tr.info.rowSymbols[fieldName]).create();
+                var filterImage='img/select-menu.png'
+                var imgFilter=html.img({src:filterImage}); 
+                imgFilter=html.img({src:filterImage}); 
+//                tr.info.rowSymbols[fieldName]=fieldDef.typeName==='text'?'~':'=';
+//                var symbolFilter=html.button({"class":'auto-filter', tabindex:-1},tr.info.rowSymbols[fieldName]).create();
+                var symbolFilter=html.button({"class":'auto-filter', tabindex:-1},imgFilter).create();
+                tr.info.rowSymbols[fieldDef]=html.button({"class":'auto-filter', tabindex:-1},[tr.info.menuFilter]).create();;
                 var elementFilter=html.span({"class":"filter-span"}).create();
                 elementFilter.contentEditable=true;
                 tr.info.rowControls[fieldName]=elementFilter;
@@ -259,9 +274,26 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 });
                 TypedControls.adaptElement(elementFilter,fieldDef);
                 tr.appendChild(html.td({"class":"autoFilter"},[symbolFilter,elementFilter]).create());
-                elementFilter.width=sizesForFilters[fieldDef.name]-symbolFilter.offsetWidth-5;
+                //tr.appendChild(html.td({"class":"autoFilter"},[tr.info.rowSymbols[fieldDef],elementFilter]).create());
+                elementFilter.width=sizesForFilters[fieldDef.name]-tr.info.rowSymbols[fieldDef].offsetWidth-5;
                 elementFilter.style.width=elementFilter.width.toString()+'px';
-                console.log(sizesForFilters[fieldDef.name])
+                symbolFilter.addEventListener('click',function(){
+                    miniMenuPromise([
+                        {value:'=', img:'img/igual.png'},
+                        {value:'~', img:'img/parecido.png'},
+                       // {value:'/R/i', img:'img/expresion-regular.png'},
+                        {value:'\u2205', img:'img/vacio.png'},
+                        {value:'>', img:'img/mayor.png'},
+                        {value:'>=', img:'img/mayor-igual.png'},
+                        {value:'<', img:'img/menor.png'},
+                        {value:'<=', img:'img/menor-igual.png'},
+                    ],{underElement:symbolFilter}).then(function(result){
+                        filterImage='img/'+my.comparator.traductor[result]+'.png';
+                       // imgFilter.src=filterImage;
+                        symbolFilter.childNodes[0].src=filterImage;
+                        tr.info.rowSymbols[fieldDef.name]=result;
+                    });
+                });
             });
         }
         grid.displayBody=function displayBody(filterData){
