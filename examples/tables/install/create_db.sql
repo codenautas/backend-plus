@@ -34,15 +34,18 @@ create table ext.pgroups(
 );
 alter table ext.pgroups owner to beplus_example_user;
 insert into ext.pgroups("group", "class") values
-  ('Metalloids', 'Metalloids'),
+  ('Metalloid', 'Metalloids'),
   ('Other nonmetals', 'Nonmetals'),
   ('Halogens', 'Nonmetals'),
-  ('Noble gases', 'Nonmetals'),
-  ('Alkali metals', 'Metals'),
-  ('Alkaline earth metals', 'Metals'),
-  ('Lanthanoids', 'Metals'),
-  ('Transition metals', 'Metals'),
-  ('Post-transition metals', 'Metals');
+  ('Noble gas', 'Nonmetals'),
+  ('Alkali metal', 'Metals'),
+  ('Alkaline earth metal', 'Metals'),
+  ('Lanthanide', 'Metals'),
+  ('Actinide', 'Metals'),
+  ('Transition metal', 'Metals'),
+  ('Post-transition metal', 'Metals'),
+  ('Diatomic nonmetal', 'Nonmetals'),
+  ('Polyatomic nonmetal', 'Nonmetals');
 
 create table ext.ptable(
   atomic_number        integer primary key,
@@ -58,7 +61,7 @@ create table ext.ptable(
   block                text,
   "state at STP"       text,
   ocurrence            text,
-  description          text
+  description          text references ext.pgroups ("group")
 );
 alter table ext.ptable owner to beplus_example_user;
 
@@ -194,16 +197,16 @@ insert into ext.ptable (atomic_number, name, symbol, "column", period, block, "s
 ('106', 'Seaborgium', 'Sg', '6', '7', 'd', '', 'Synthetic', 'Transition metal'),
 ('107', 'Bohrium', 'Bh', '7', '7', 'd', '', 'Synthetic', 'Transition metal'),
 ('108', 'Hassium', 'Hs', '8', '7', 'd', '', 'Synthetic', 'Transition metal'),
-('109', 'Meitnerium', 'Mt', '9', '7', 'd', '', 'Synthetic', ''),
-('110', 'Darmstadtium', 'Ds', '10', '7', 'd', '', 'Synthetic', ''),
-('111', 'Roentgenium', 'Rg', '11', '7', 'd', '', 'Synthetic', ''),
+('109', 'Meitnerium', 'Mt', '9', '7', 'd', '', 'Synthetic', null),
+('110', 'Darmstadtium', 'Ds', '10', '7', 'd', '', 'Synthetic', null),
+('111', 'Roentgenium', 'Rg', '11', '7', 'd', '', 'Synthetic', null),
 ('112', 'Copernicium', 'Cn', '12', '7', 'd', '', 'Synthetic', 'Transition metal'),
-('113', '(Ununtrium)', '(Uut)', '13', '7', 'p', '', 'Synthetic', ''),
+('113', '(Ununtrium)', '(Uut)', '13', '7', 'p', '', 'Synthetic', null),
 ('114', 'Flerovium', 'Fl', '14', '7', 'p', '', 'Synthetic', 'Post-transition metal'),
-('115', '(Ununpentium)', '(Uup)', '15', '7', 'p', '', 'Synthetic', ''),
-('116', 'Livermorium', 'Lv', '16', '7', 'p', '', 'Synthetic', ''),
-('117', '(Ununseptium)', '(Uus)', '17', '7', 'p', '', 'Synthetic', ''),
-('118', '(Ununoctium)', '(Uuo)', '18', '7', 'p', '', 'Synthetic', '');
+('115', '(Ununpentium)', '(Uup)', '15', '7', 'p', '', 'Synthetic', null),
+('116', 'Livermorium', 'Lv', '16', '7', 'p', '', 'Synthetic', null),
+('117', '(Ununseptium)', '(Uus)', '17', '7', 'p', '', 'Synthetic', null),
+('118', '(Ununoctium)', '(Uuo)', '18', '7', 'p', '', 'Synthetic', null);
 
 update ext.ptable set weight= 1.008      ,"group"='Other nonmetals'      ,discovered_date='1766-01-01', discovered_precision='year'   , bigbang=true  where atomic_number= 1;
 update ext.ptable set weight= 4.002602   ,"group"='Noble gases'          ,discovered_date='1895-03-26', discovered_precision='day'    , bigbang=true  where atomic_number= 2;
