@@ -312,28 +312,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 var rowsToDisplay=rows;
             }
             if(grid.view.sortColumns.length>0){
-                rowsToDisplay.sort(function(row1,row2){
-                    var column;
-                    var i=0;
-                    do{
-                        column=grid.view.sortColumns[i].column;
-                        if(row1[column]==null){
-                            return 1;
-                        }
-                        if(row2[column]==null){
-                            return -1;
-                        }
-                        var a=bestGlobals.forOrder(row1[column]);
-                        var b=bestGlobals.forOrder(row2[column]);
-                        if(a>b){
-                            return 1*grid.view.sortColumns[i].order;
-                        }else if(a<b){
-                            return -1*grid.view.sortColumns[i].order;
-                        }
-                        i++;
-                    }while(i<grid.view.sortColumns.length);
-                    return 0;
-                });
+                rowsToDisplay.sort(bestGlobals.compareForOrder(grid.view.sortColumns));
             }
             var displayRows = function displayRows(fromRowNumber, toRowNumber, adding){
                 if(!adding){
