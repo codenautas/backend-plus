@@ -30,7 +30,7 @@
     "stylus": "~0.54.5",
 
     "ajax-best-promise": "~0.2.0",
-    "best-globals": "~0.5.1",
+    "best-globals": "~0.5.3",
     "best-promise": "~0.2.4",
     "castellano": "~0.0.3",
     "dialog-promise": "~0.2.0",

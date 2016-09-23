@@ -36,5 +36,10 @@ function prepareTableButtons(){
 }
 
 window.addEventListener('load', function(){
+    document.body.style.backgroundColor='rgb('+[
+        Math.ceil(Math.random()*64+196),
+        Math.ceil(Math.random()*64+196),
+        Math.ceil(Math.random()*64+196),
+    ].join(',')+')';
     my.autoSetup().then(prepareTableButtons);
 });
