@@ -153,8 +153,8 @@ Object.defineProperty(myOwn, 'ajax', {
 });
 
 myOwn.encoders = {
-    'JSON': { parse: JSON.parse, stringify: JSON.stringify },
-    'plain': { 
+    JSON: { parse: JSON.parse, stringify: JSON.stringify },
+    plain: { 
         parse: function(x){return x;}, 
         stringify: function(x){
             if(typeof x === "object"){
@@ -163,19 +163,10 @@ myOwn.encoders = {
             return x;
         }
     },
-    'yaml': {
-        parse: jsYaml.load.bind(jsYaml),
+    yaml: {
         parse: jsYaml.load.bind(jsYaml),
         stringify: jsYaml.dump.bind(jsYaml),
-        // parse: function(x){
-        //     var c=jsYaml.load(x);
-        //     return c;
-        // },
-        // stringify:  function(x){
-        //     var c=jsYaml.safeDump(x);
-        //     return c;
-        // }
-    }
+    },
 };
 
 myOwn.ajaxPromise = function(procedureDef,data,opts){
