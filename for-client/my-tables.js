@@ -91,6 +91,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             buttonDestroyFilter=html.button({class:'table-button', 'when-filter':'yes'}, [html.img({src:'img/destroy-filter.png'})]).create();
             buttonDestroyFilter.addEventListener('click', function(){
                 grid.destroyRowFilter(0);
+                grid.displayBody();
             });
         }
         //var columnsHeadElements = tableDef.fields.map(function(fieldDef){
