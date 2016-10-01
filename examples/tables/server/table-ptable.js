@@ -2,7 +2,7 @@
 
 module.exports = function(context){
     var admin=context.user.rol==='boss';
-    return context.be.tableDefCompleter({
+    return context.be.tableDefAdapt({
         name:'ptable',
         title:'periodic table',
         editable:true,

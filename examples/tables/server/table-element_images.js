@@ -1,7 +1,7 @@
 "use strict";
 
 module.exports = function(context){
-    return context.be.tableDefCompleter({
+    return context.be.tableDefAdapt({
         name:'element_images',
         title:'images for elements and isotopes',
         editable:context.user.rol==='boss',

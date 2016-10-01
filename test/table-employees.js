@@ -1,7 +1,7 @@
 "use strict";
 
 module.exports = function(context){
-    return context.be.tableDefCompleter({
+    return context.be.tableDefAdapt({
         name:'employees',
         title:'employees of this company',
         editable:true,

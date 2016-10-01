@@ -30,7 +30,8 @@ insert into ext."users" (username, md5pass, rol, active_until)
 
 create table ext.pgroups(
   "group" text primary key,
-  "class" text not null
+  "class" text not null,
+  "color" text
 );
 alter table ext.pgroups owner to beplus_example_user;
 insert into ext.pgroups("group", "class") values
