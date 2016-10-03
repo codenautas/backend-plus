@@ -9,11 +9,11 @@ html(lang="en")
   body
     div#main_layout
       div#barra_superior
-        span tables
-        button#tables(id-table="ptable" ) ptable
-        button#tables(id-table="pgroups") pgroups
-        button#tables(id-table="isotopes") isotopes
-        button#tables(id-table="element_images") images
+        if isAdmin
+          p
+            b tablas
+            button#tables(id-table="fichas"  ) fichas
+            button#tables(id-table="usuarios") usuarios
       div#table_layout
     pre#status
     script(src='js-yaml.js')
@@ -27,6 +27,5 @@ html(lang="en")
     script(src='my-things.js')
     script(src='my-tables.js')
     script(src='my-inform-net-status.js')
-    if(false)
-      script(src='cliente-en-castellano.js') 
+    script(src='cliente-en-castellano.js') 
     script(src='index.js')

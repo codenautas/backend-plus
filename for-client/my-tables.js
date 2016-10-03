@@ -95,8 +95,11 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             });
         }
         //var columnsHeadElements = tableDef.fields.map(function(fieldDef){
-            columnsHeadElements = tableDef.fields.map(function(fieldDef){
-            var tr=html.th({colspan:inputColspan},fieldDef.title).create();
+        columnsHeadElements = tableDef.fields.map(function(fieldDef){
+            var tr=html.th({colspan:inputColspan, "my-colname":fieldDef.name},fieldDef.title).create();
+            if(fieldDef.width){
+                tr.style.width=fieldDef.width+'px';
+            }
             tr.addEventListener('click',function(){
                 var currentOrder=grid.view.sortColumns.length && grid.view.sortColumns[0].column==fieldDef.name?grid.view.sortColumns[0].order:null;
                 grid.view.sortColumns=grid.view.sortColumns.filter(function(sortColumn){
@@ -134,7 +137,6 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             setInterval(resolve,3000);
         });
     })*/;
-    
     var displayGrid = function displayGrid(rows){
         var tbody = grid.element.tBodies[0];
         var updateRowData = function updateRowData(tr, updatedRow){
@@ -180,7 +182,6 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             });
         }
         grid.createRowElements = function createRowElements(iRow, row){
-
             var forInsert = iRow>=0;
             var tr = tbody.insertRow(iRow);
             tr.info = {
@@ -206,7 +207,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 }
             });
             grid.def.fields.forEach(function(fieldDef){
-                var td = html.td({colspan:inputColspan}).create();
+                var td = html.td({colspan:inputColspan, "my-colname":fieldDef.name}).create();
                 TypedControls.adaptElement(td, fieldDef);
                 tr.info.rowControls[fieldDef.name] = td;
                 td.contentEditable=grid.def.allow.update && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
@@ -350,7 +351,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         }
         grid.displayBody();
     }
-    my.ajax.table.data({
+    return my.ajax.table.data({
         table:tableName
     }).then(function(rows){
         return structureRequest.then(function(){

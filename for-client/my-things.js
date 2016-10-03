@@ -47,6 +47,8 @@ var changing = bestGlobals.changing;
 
 var jsYaml = require('js-yaml');
 
+var JSON4all = require('json4all');
+
 function id(x){return x;}
 
 myOwn.statusDivName = 'reconnection_div';
@@ -166,6 +168,10 @@ myOwn.encoders = {
     yaml: {
         parse: jsYaml.load.bind(jsYaml),
         stringify: jsYaml.dump.bind(jsYaml),
+    },
+    JSON4all: {
+        parse: JSON4all.parse,
+        stringify: JSON4all.stringify,
     },
 };
 

@@ -10,10 +10,10 @@ module.exports = function(context){
             update:context.user.rol==='boss',
         },
         fields:[
-            {name:'atomic_number'       , typeName:'integer', nullable:false,                },
-            {name:'mass_number'         , typeName:'integer'                                 },
-            {name:'order'               , typeName:'integer'                                 },
-            {name:'stable'              , typeName:'boolean'                                 },
+            {name:'atomic_number'       , typeName:'integer', width:100, nullable:false,               },
+            {name:'mass_number'         , typeName:'integer', width:100,                               },
+            {name:'order'               , typeName:'integer', width:100,                               },
+            {name:'stable'              , typeName:'boolean', width:100,                               },
         ],
         primaryKey:['atomic_number','mass_number'],
         constraints:[
