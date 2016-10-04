@@ -39,7 +39,8 @@ myOwn.comparator={
         '<':'menor',
         '<=':'menor-igual'
     }
-}
+};
+
 myOwn.tableGrid = function tableGrid(layout, tableName){
     var my = this;
     var inputColspan = 1;
@@ -137,9 +138,11 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             setInterval(resolve,3000);
         });
     })*/;
-    var displayGrid = function displayGrid(rows){
+    grid.displayGrid = function displayGrid(rows){
+        var grid = this;
         var tbody = grid.element.tBodies[0];
-        var updateRowData = function updateRowData(tr, updatedRow){
+        grid.updateRowData = function updateRowData(tr, updatedRow){
+            var grid = this;
             var forInsert = false; // not define how to detect
             tr.info.row = updatedRow;
             tr.info.status = 'retrieved';
@@ -171,7 +174,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                 status:tr.info.status
             },opts).then(function(updatedRow){
                 my.adaptData(grid.def,[updatedRow]);
-                updateRowData(tr, updatedRow);
+                grid.updateRowData(tr, updatedRow);
                 tr.info.rowPendingForUpdate = {};
                 changeIoStatus('temporal-ok');
                 setTimeout(function(){
@@ -182,6 +185,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             });
         }
         grid.createRowElements = function createRowElements(iRow, row){
+            var grid = this;
             var forInsert = iRow>=0;
             var tr = tbody.insertRow(iRow);
             tr.info = {
@@ -240,6 +244,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
         }
         grid.element.setAttribute('has-filter',0);
         grid.createRowFilter = function createRowFilter(){
+            var grid = this;
             // var tr=html.tr().create();
             if(grid.hasFilterRow){
                 return true;
@@ -297,6 +302,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             });
         }
         grid.displayBody=function displayBody(filterData){
+            var grid = this;
             if(filterData){
                 var rowsToDisplay= rows.filter(function(row,i){
                     var partialOk=true;
@@ -316,14 +322,15 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
             if(grid.view.sortColumns.length>0){
                 rowsToDisplay.sort(bestGlobals.compareForOrder(grid.view.sortColumns));
             }
-            var displayRows = function displayRows(fromRowNumber, toRowNumber, adding){
+            grid.displayRows = function displayRows(fromRowNumber, toRowNumber, adding){
+                var grid = this;
                 if(!adding){
                     tbody.innerHTML='';
                 }
                 for(var iRow=fromRowNumber; iRow<toRowNumber; iRow++){
                     (function(row){
                         var tr=grid.createRowElements(-1);
-                        updateRowData(tr, row);
+                        grid.updateRowData(tr, row);
                     })(rowsToDisplay[iRow]);
                 }
                 footInfoElement.displayFrom.textContent=rowsToDisplay.length?1:0;
@@ -335,7 +342,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                         footInfoElement.rowCount.appendChild(html.span('  ').create());
                         footInfoElement.rowCount.appendChild(buttonRest);
                         buttonRest.addEventListener('click',function(){
-                            displayRows(iRow, toNextRowNumber, true);
+                            grid.displayRows(iRow, toNextRowNumber, true);
                         });
                     }
                     my.displayCountBreaks.forEach(function(size, iSize){
@@ -347,7 +354,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
                     addButtonRest(rowsToDisplay.length);
                 }
             }
-            displayRows(0, Math.min(my.firstDisplayCount,rowsToDisplay.length));
+            grid.displayRows(0, Math.min(my.firstDisplayCount,rowsToDisplay.length));
         }
         grid.displayBody();
     }
@@ -356,7 +363,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
     }).then(function(rows){
         return structureRequest.then(function(){
             my.adaptData(grid.def,rows);
-            displayGrid(rows);
+            grid.displayGrid(rows);
             grid.def.fields.forEach(function(fieldDef,i){
             sizesForFilters[fieldDef.name]=getSize(columnsHeadElements[i])
         });
@@ -365,7 +372,7 @@ myOwn.tableGrid = function tableGrid(layout, tableName){
     }).catch(function(err){
         my.log(err);
     })
-}
+};
 
 myOwn.tableAction={
     "insert":{
