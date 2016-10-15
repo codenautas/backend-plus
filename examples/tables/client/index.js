@@ -30,7 +30,7 @@ function prepareTableButtons(){
     Array.prototype.forEach.call(buttons, function(button){
         button.addEventListener('click', function(){
             var layout = document.getElementById('table_layout');
-            my.tableGrid(layout,this.getAttribute('id-table'));
+            my.tableGrid(this.getAttribute('id-table'),layout);
         });
     });
 }
