@@ -21,8 +21,8 @@ myOwn.displayCountBreaks = [100,250,1000];
 myOwn.displayCountBreaks = [50,100,500];
 myOwn.comparator={
     '=':function(valueToCheck,condition){return valueToCheck == condition;},
-    '~':function(valueToCheck,condition){return RegExp(escapeRegExp(condition),'i').test(valueToCheck);},
-    '/R/i':function(valueToCheck,condition){return RegExp(condition,'i').test(valueToCheck);},
+    '~':function(valueToCheck,condition){return condition==null || RegExp(escapeRegExp(condition),'i').test(valueToCheck);},
+    '/R/i':function(valueToCheck,condition){return condition==null || RegExp(condition,'i').test(valueToCheck);},
     '\u2205':function(valueToCheck,condition){return valueToCheck == null;},//\u2205 = conjunto vacío
     '>':function(valueToCheck,condition){return (valueToCheck>condition)},
     '>=':function(valueToCheck,condition){return (valueToCheck>=condition)},
@@ -115,6 +115,30 @@ myOwn.TableGrid.prototype.displayPreLoadMessage = function displayPreLoadMessage
     this.dom.main.textContent = my.messages.loading+'...';
 };
 
+myOwn.TableGrid.prototype.createDepotFromRow = function createDepotFromRow(row, status){
+    var grid = this;
+    var depot = {
+        my: grid.my,
+        def: grid.def,
+        connector: grid.connector, 
+        manager: grid,
+        rowControls:{},
+        row: row,
+        rowPendingForUpdate:{},
+        primaryKeyValues:false,
+        status: status||'preparing',
+    }
+    return depot;
+}
+
+myOwn.TableGrid.prototype.prepareDepots = function prepareDepots(rows){
+    var grid = this;
+    grid.depots = rows.map(grid.createDepotFromRow.bind(grid));
+    grid.view = {
+        sortColumns:grid.def.sortColumns||[]
+    };
+}
+
 myOwn.TableGrid.prototype.prepareAndDisplayGrid = function prepareAndDisplayGrid(){
     var grid = this;
     grid.displayPreLoadMessage();
@@ -124,7 +148,8 @@ myOwn.TableGrid.prototype.prepareAndDisplayGrid = function prepareAndDisplayGrid
     });
     return grid.connector.getData().then(function(rows){
         return structureRequest.then(function(){
-            grid.displayGrid(rows);
+            grid.prepareDepots(rows);
+            grid.displayGrid();
             return grid;
         });
     }).catch(function(err){
@@ -134,9 +159,6 @@ myOwn.TableGrid.prototype.prepareAndDisplayGrid = function prepareAndDisplayGrid
 
 myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     var grid = this;
-    grid.view={
-        sortColumns:grid.def.sortColumns||[]
-    }
     var buttonInsert;
     var buttonCreateFilter;
     var buttonDestroyFilter;
@@ -207,32 +229,33 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     grid.dom.main.appendChild(grid.dom.table);
 };
 
-myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElements(depot){
+myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElements(belowDepot){
     var grid = this;
-    var tr = depot.tr;
-    return grid.createRowElements(
-        ('sectionRowIndex' in tr?
-            tr.sectionRowIndex:
-            tr.rowIndex-grid.dom.table.tHead.rows.length
-        )+1
-    );
+    var belowTr = belowDepot.tr;
+    var position = ('sectionRowIndex' in belowTr?
+        belowTr.sectionRowIndex:
+        belowTr.rowIndex-grid.dom.table.tHead.rows.length
+    )+1;
+    var depotForInsert = grid.createDepotFromRow({}, 'new');
+    grid.depots.splice(Math.min(grid.depots.length,Math.max(0,position)),0,depotForInsert);
+    return grid.createRowElements(position, depotForInsert);
 };
 
-myOwn.TableGrid.prototype.displayGrid = function displayGrid(rows){
+myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
     var grid = this;
     var tbody = grid.dom.table.tBodies[0];
-    grid.updateRowData = function updateRowData(tr, updatedRow){
+    grid.updateRowData = function updateRowData(depot){
         var grid = this;
         var forInsert = false; // not define how to detect
-        tr.info.row = updatedRow;
-        tr.info.status = 'retrieved';
-        tr.info.primaryKeyValues = grid.def.primaryKey.map(function(fieldName){ 
-            return tr.info.row[fieldName]; 
+        var tr = depot;
+        depot.status = 'loaded';
+        depot.primaryKeyValues = grid.def.primaryKey.map(function(fieldName){ 
+            return depot.row[fieldName]; 
         });
         grid.def.fields.forEach(function(fieldDef){
-            var td = tr.info.rowControls[fieldDef.name];
+            var td = depot.rowControls[fieldDef.name];
             td.contentEditable=grid.def.allow.update && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
-            td.setTypedValue(tr.info.row[fieldDef.name]);
+            td.setTypedValue(depot.row[fieldDef.name]);
         });
     }
     var saveRow = function(depot, opts){
@@ -248,8 +271,9 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(rows){
         }
         changeIoStatus('updating');
         grid.connector.saveRecord(depot, opts).then(function(updatedRow){
-            grid.updateRowData(depot, updatedRow);
+            depot.row = updatedRow;
             depot.rowPendingForUpdate = {};
+            grid.updateRowData(depot);
             changeIoStatus('temporal-ok');
             setTimeout(function(){
                 changeIoStatus('ok');
@@ -262,18 +286,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(rows){
         var grid = this;
         var forInsert = iRow>=0;
         var tr = tbody.insertRow(iRow);
-        var depot = depot || {
-            my: grid.my,
-            def: grid.def,
-            connector: grid.connector, 
-            manager: grid,
-            rowControls:{},
-            row: {},
-            rowPendingForUpdate:{},
-            primaryKeyValues:false,
-            status: 'new',
-            tr: tr
-        };
+        depot.tr = tr;
         var thActions=html.th().create();
         tr.appendChild(thActions);
         var actionNamesList = ['insert','delete'].concat(grid.def.actionNamesList);
@@ -308,7 +321,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(rows){
         });
         tr.addEventListener('focusout', function(event){
             if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
-                if(Object.keys(tr.depot.rowPendingForUpdate).length){
+                if(Object.keys(depot.rowPendingForUpdate).length){
                     saveRow(depot);
                 }
             }
@@ -340,7 +353,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(rows){
         grid.dom.table.setAttribute('has-filter',1);
         grid.dom.table.tHead.appendChild(tr);
         // tr.appendChild(html.td().create());
-        tr.depot = {
+        var depot = {
             special: 'filter',
             my: grid.my,
             def: grid.def,
@@ -353,7 +366,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(rows){
             tr: tr
         };
         buttonFilter.addEventListener('click',function(){
-            grid.view.filter=tr.info;
+            grid.view.filter=depot;
             grid.displayBody();
         });
         grid.def.fields.forEach(function(fieldDef){
@@ -361,18 +374,15 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(rows){
             var filterImage='img/select-menu.png'
             var imgFilter=html.img({src:filterImage}); 
             imgFilter=html.img({src:filterImage}); 
-//                tr.info.rowSymbols[fieldName]=fieldDef.typeName==='text'?'~':'='; //00BA00
-//                var symbolFilter=html.button({"class":'auto-filter', tabindex:-1},tr.info.rowSymbols[fieldName]).create();
             var symbolFilter=html.button({"class":'table-button', tabindex:-1},imgFilter).create();
             var elementFilter=html.span({"class":"filter-span"}).create();
             elementFilter.contentEditable=true;
-            tr.depot.rowControls[fieldName]=elementFilter;
+            depot.rowControls[fieldName]=elementFilter;
             elementFilter.addEventListener('update',function(){
-                tr.depot.row[fieldDef.name]=this.getTypedValue();
+                depot.row[fieldDef.name]=this.getTypedValue();
             });
             TypedControls.adaptElement(elementFilter,fieldDef);
             tr.appendChild(html.td({"class":"autoFilter"},[symbolFilter,elementFilter]).create());
-            //tr.appendChild(html.td({"class":"autoFilter"},[tr.info.rowSymbols[fieldDef],elementFilter]).create());
             elementFilter.width=sizesForFilters[fieldDef.name]-symbolFilter.offsetWidth-5;
             elementFilter.style.width=elementFilter.width.toString()+'px';
             symbolFilter.addEventListener('click',function(){
@@ -388,7 +398,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(rows){
                     filterImage='img/'+my.comparator.traductor[result]+'.png';
                    // imgFilter.src=filterImage;
                     symbolFilter.childNodes[0].src=filterImage;
-                    tr.depot.rowSymbols[fieldDef.name]=result;
+                    depot.rowSymbols[fieldDef.name]=result;
                 });
             });
         });
@@ -397,11 +407,11 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(rows){
         var grid = this;
         var filterData = grid.view.filter;
         if(filterData){
-            var rowsToDisplay= rows.filter(function(row,i){
+            var depotsToDisplay = grid.depots.filter(function(depot,i){
                 var partialOk=true;
-                for(var column in row){
-                    if(filterData.row[column]!=null){
-                        var isSatisfied=my.comparator[filterData.rowSymbols[column]](row[column],filterData.row[column])
+                for(var column in depot.row){
+                    if(filterData.rowSymbols[column] && my.comparator[filterData.rowSymbols[column]]){
+                        var isSatisfied=my.comparator[filterData.rowSymbols[column]](depot.row[column],filterData.row[column])
                         if(!isSatisfied){
                             partialOk=false;
                         }
@@ -410,10 +420,12 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(rows){
                 return partialOk;
             })
         }else{
-            var rowsToDisplay=rows;
+            var depotsToDisplay = grid.depots;
         }
         if(grid.view.sortColumns.length>0){
-            rowsToDisplay.sort(bestGlobals.compareForOrder(grid.view.sortColumns));
+            depotsToDisplay.sort(function(depot1, depot2){ 
+                return bestGlobals.compareForOrder(grid.view.sortColumns)(depot1.row, depot2.row);
+            });
         }
         grid.displayRows = function displayRows(fromRowNumber, toRowNumber, adding){
             var grid = this;
@@ -421,15 +433,15 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(rows){
                 tbody.innerHTML='';
             }
             for(var iRow=fromRowNumber; iRow<toRowNumber; iRow++){
-                (function(row){
-                    var tr=grid.createRowElements(-1);
-                    grid.updateRowData(tr, row);
-                })(rowsToDisplay[iRow]);
+                (function(depot){
+                    var tr=grid.createRowElements(-1, depot);
+                    grid.updateRowData(depot);
+                })(depotsToDisplay[iRow]);
             }
-            grid.dom.footInfo.displayFrom.textContent=rowsToDisplay.length?1:0;
+            grid.dom.footInfo.displayFrom.textContent=depotsToDisplay.length?1:0;
             grid.dom.footInfo.displayTo.textContent=iRow;
             grid.dom.footInfo.rowCount.innerHTML='';
-            if(iRow<rowsToDisplay.length){
+            if(iRow<depotsToDisplay.length){
                 var addButtonRest = function addButtonRest(toNextRowNumber){
                     var buttonRest=html.button("+..."+toNextRowNumber).create();
                     grid.dom.footInfo.rowCount.appendChild(html.span('  ').create());
@@ -440,19 +452,27 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(rows){
                 }
                 my.displayCountBreaks.forEach(function(size, iSize){
                     var cut=(iRow+size) - (iRow+size) % size;
-                    if(cut*5<=rowsToDisplay.length*3 && (iSize==my.displayCountBreaks.length-1 || cut*5<=my.displayCountBreaks[iSize+1]*3)){
+                    if(cut*5<=depotsToDisplay.length*3 && (iSize==my.displayCountBreaks.length-1 || cut*5<=my.displayCountBreaks[iSize+1]*3)){
                         addButtonRest(cut);
                     }
                 });
-                addButtonRest(rowsToDisplay.length);
+                addButtonRest(depotsToDisplay.length);
             }
         }
-        grid.displayRows(0, Math.min(my.firstDisplayCount,rowsToDisplay.length));
+        grid.displayRows(0, Math.min(my.firstDisplayCount,depotsToDisplay.length));
     }
     grid.displayBody();
 };
 
 myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot){
+    var grid = this;
+    var position = Math.min(grid.depots.length,Math.max(0,depot.tr.sectionRowIndex));
+    if(grid.depots[position] !== depot){
+        position = grid.depots.indexOf(depot);
+    }
+    if(position>=0){
+        grid.depots.splice(position,1);
+    }
     depot.my.fade(depot.tr);
     var newCount=depot.manager.dom.footInfo.displayTo.textContent-1;
     if(newCount>=0){
