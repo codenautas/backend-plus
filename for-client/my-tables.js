@@ -21,7 +21,7 @@ myOwn.displayCountBreaks = [100,250,1000];
 myOwn.displayCountBreaks = [50,100,500];
 myOwn.comparator={
     '=':function(valueToCheck,condition){return valueToCheck == condition;},
-    '~':function(valueToCheck,condition){return condition==null || RegExp(escapeRegExp(condition),'i').test(valueToCheck);},
+    '~':function(valueToCheck,condition){return condition==null || RegExp(escapeRegExp(condition.toString()),'i').test(valueToCheck);},
     '/R/i':function(valueToCheck,condition){return condition==null || RegExp(condition,'i').test(valueToCheck);},
     '\u2205':function(valueToCheck,condition){return valueToCheck == null;},//\u2205 = conjunto vacío
     '>':function(valueToCheck,condition){return (valueToCheck>condition)},
@@ -371,9 +371,9 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         });
         grid.def.fields.forEach(function(fieldDef){
             var fieldName=fieldDef.name;
-            var filterImage='img/select-menu.png'
+            depot.rowSymbols[fieldDef.name]='~';
+            var filterImage='img/'+my.comparator.traductor['~']+'.png';
             var imgFilter=html.img({src:filterImage}); 
-            imgFilter=html.img({src:filterImage}); 
             var symbolFilter=html.button({"class":'table-button', tabindex:-1},imgFilter).create();
             var elementFilter=html.span({"class":"filter-span"}).create();
             elementFilter.contentEditable=true;
