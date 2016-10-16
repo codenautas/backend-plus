@@ -84,7 +84,7 @@ myOwn.TableConnector.prototype.saveRecord = function saveRecord(depot, opts){
     return depot.my.ajax.table['save-record']({
         table: depot.def.name,
         primaryKeyValues: depot.primaryKeyValues,
-        newRow: depot.newRow,
+        newRow: depot.rowPendingForUpdate,
         status: depot.status
     },opts).then(function(updatedRow){
         depot.my.adaptData(depot.def,[updatedRow]);
@@ -209,10 +209,11 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
 
 myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElements(depot){
     var grid = this;
+    var tr = depot.tr;
     return grid.createRowElements(
-        ('sectionRowIndex' in depot.tr?
-            depot.tr.sectionRowIndex:
-            depot.tr.rowIndex-grid.dom.table.tHead.rows.length
+        ('sectionRowIndex' in tr?
+            tr.sectionRowIndex:
+            tr.rowIndex-grid.dom.table.tHead.rows.length
         )+1
     );
 };
@@ -234,29 +235,21 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(rows){
             td.setTypedValue(tr.info.row[fieldDef.name]);
         });
     }
-    var saveRow = function(tr, opts){
+    var saveRow = function(depot, opts){
+        var fieldNames=Object.keys(depot.rowPendingForUpdate);
         var changeIoStatus = function changeIoStatus(newStatus, title){
             fieldNames.forEach(function(name){ 
-                var td=tr.info.rowControls[name];
+                var td=depot.rowControls[name];
                 td.setAttribute('io-status', newStatus); 
                 if(title){
                     //td.title=err.message;
                 }
             });
         }
-        var fieldNames=Object.keys(tr.info.rowPendingForUpdate);
         changeIoStatus('updating');
-        grid.connector.saveRecord({ /*depot*/
-            my: grid.my,
-            def: grid.def,
-            connector: grid.connector, 
-            manager: grid,
-            primaryKeyValues: tr.info.primaryKeyValues,
-            newRow: tr.info.rowPendingForUpdate,
-            status: tr.info.status
-        }, opts).then(function(updatedRow){
-            grid.updateRowData(tr, updatedRow);
-            tr.info.rowPendingForUpdate = {};
+        grid.connector.saveRecord(depot, opts).then(function(updatedRow){
+            grid.updateRowData(depot, updatedRow);
+            depot.rowPendingForUpdate = {};
             changeIoStatus('temporal-ok');
             setTimeout(function(){
                 changeIoStatus('ok');
@@ -265,16 +258,21 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(rows){
             changeIoStatus('error',err.message);
         });
     }
-    grid.createRowElements = function createRowElements(iRow, row){
+    grid.createRowElements = function createRowElements(iRow, depot){
         var grid = this;
         var forInsert = iRow>=0;
         var tr = tbody.insertRow(iRow);
-        tr.info = {
+        var depot = depot || {
+            my: grid.my,
+            def: grid.def,
+            connector: grid.connector, 
+            manager: grid,
             rowControls:{},
             row: {},
             rowPendingForUpdate:{},
             primaryKeyValues:false,
-            status: 'new'
+            status: 'new',
+            tr: tr
         };
         var thActions=html.th().create();
         tr.appendChild(thActions);
@@ -287,29 +285,22 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(rows){
                 ]).create();
                 thActions.appendChild(buttonAction);
                 buttonAction.addEventListener('click', function(){
-                    actionDef.actionRow({ /*depot*/
-                        my: grid.my,
-                        def: grid.def,
-                        connector: grid.connector, 
-                        manager: grid,
-                        primaryKeyValues: tr.info.primaryKeyValues,
-                        tr: tr
-                    });
+                    actionDef.actionRow(depot);
                 });
             }
         });
         grid.def.fields.forEach(function(fieldDef){
             var td = html.td({colspan:grid.modes.inputColspan, "my-colname":fieldDef.name}).create();
             TypedControls.adaptElement(td, fieldDef);
-            tr.info.rowControls[fieldDef.name] = td;
+            depot.rowControls[fieldDef.name] = td;
             td.contentEditable=grid.def.allow.update && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
             td.addEventListener('update',function(){
                 var value = this.getTypedValue();
-                if(value!==tr.info.row[fieldDef.name]){
+                if(value!==depot.row[fieldDef.name]){
                     this.setAttribute('io-status', 'pending');
-                    tr.info.rowPendingForUpdate[fieldDef.name] = value;
+                    depot.rowPendingForUpdate[fieldDef.name] = value;
                     if(grid.modes.saveByField){
-                        saveRow(tr,{visiblyLogErrors:false});
+                        saveRow(depot,{visiblyLogErrors:false});
                     }
                 }
             });
@@ -317,12 +308,12 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(rows){
         });
         tr.addEventListener('focusout', function(event){
             if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
-                if(Object.keys(tr.info.rowPendingForUpdate).length){
-                    saveRow(tr);
+                if(Object.keys(tr.depot.rowPendingForUpdate).length){
+                    saveRow(depot);
                 }
             }
         });
-        return tr;
+        return depot;
     }
     grid.destroyRowFilter = function destroyRowFilter(){
         var tr=grid.hasFilterRow;
@@ -349,15 +340,21 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(rows){
         grid.dom.table.setAttribute('has-filter',1);
         grid.dom.table.tHead.appendChild(tr);
         // tr.appendChild(html.td().create());
-        tr.info = {
+        tr.depot = {
+            special: 'filter',
+            my: grid.my,
+            def: grid.def,
+            connector: grid.connector, 
+            manager: grid,
             rowControls:{},
             row: {},
             rowSymbols: {},
             isFilterPending:false,
+            tr: tr
         };
         buttonFilter.addEventListener('click',function(){
             grid.view.filter=tr.info;
-            grid.displayBody(tr.info);
+            grid.displayBody();
         });
         grid.def.fields.forEach(function(fieldDef){
             var fieldName=fieldDef.name;
@@ -369,9 +366,9 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(rows){
             var symbolFilter=html.button({"class":'table-button', tabindex:-1},imgFilter).create();
             var elementFilter=html.span({"class":"filter-span"}).create();
             elementFilter.contentEditable=true;
-            tr.info.rowControls[fieldName]=elementFilter;
+            tr.depot.rowControls[fieldName]=elementFilter;
             elementFilter.addEventListener('update',function(){
-                tr.info.row[fieldDef.name]=this.getTypedValue();
+                tr.depot.row[fieldDef.name]=this.getTypedValue();
             });
             TypedControls.adaptElement(elementFilter,fieldDef);
             tr.appendChild(html.td({"class":"autoFilter"},[symbolFilter,elementFilter]).create());
@@ -391,7 +388,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(rows){
                     filterImage='img/'+my.comparator.traductor[result]+'.png';
                    // imgFilter.src=filterImage;
                     symbolFilter.childNodes[0].src=filterImage;
-                    tr.info.rowSymbols[fieldDef.name]=result;
+                    tr.depot.rowSymbols[fieldDef.name]=result;
                 });
             });
         });
