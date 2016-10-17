@@ -7,21 +7,28 @@ var my = myOwn;
 
 my.tableAction.showImg={
     img: 'img/picture.png',
-    actionRow: function(my, table, tr){
-        var div=table.element.parentNode;
+    actionRow: function(depot){
+        var div=depot.manager.dom.main;
         return Promise.resolve().then(function(){
-            if('url' in tr.info.row){
-                return tr.info.row.url;
+            if('url' in depot.row){
+                return depot.row.url;
             }
-            return my.ajax.getpictureurl({atomic_number:tr.info.row.atomic_number}).then(function(urlList){
+            return depot.my.ajax.getpictureurl({atomic_number:depot.row.atomic_number}).then(function(urlList){
                 return urlList.length?urlList[0].url:false;
             });
         }).then(function(url){
             if(url){
                 var img=html.img({src:url}).create();
-                div.insertBefore(img,table.element);
+                div.insertBefore(img,depot.manager.dom.table);
             }
         });
+    }
+};
+
+my.clientSides.colorSample={
+    action: function(depot, fieldName){
+        depot.row[fieldName]=depot.row.color;
+        depot.rowControls[fieldName].style.backgroundColor='#'+depot.row[fieldName];
     }
 };
 

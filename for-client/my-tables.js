@@ -254,8 +254,14 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         });
         grid.def.fields.forEach(function(fieldDef){
             var td = depot.rowControls[fieldDef.name];
-            td.contentEditable=grid.def.allow.update && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
-            td.setTypedValue(depot.row[fieldDef.name]);
+            var editable=grid.def.allow.update && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
+            td.contentEditable=editable;
+            if(fieldDef.clientSide){
+                grid.my.clientSides[fieldDef.clientSide].action(depot, fieldDef.name);
+            }
+            if(editable){
+                td.setTypedValue(depot.row[fieldDef.name]);
+            }
         });
     }
     var saveRow = function(depot, opts){
@@ -499,4 +505,7 @@ myOwn.tableAction={
             });
         }
     }
+}
+
+myOwn.clientSides={
 }

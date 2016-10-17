@@ -7,10 +7,10 @@ module.exports = function(context){
         title:'groups of elements of periodic table',
         editable:admin,
         fields:[
-            {name:'group'              , typeName:'text'   , nullable:false       },
-            {name:'class'              , typeName:'text'                          },
-            {name:'color'              , typeName:'text'   , allow:{select:admin} },
-            {name:'color_'             , typeName:'text'   , clientSide:true      },
+            {name:'group'              , typeName:'text'   , nullable:false          },
+            {name:'class'              , typeName:'text'                             },
+            {name:'color'              , typeName:'text'   , allow:{select:admin}    },
+            {name:'color_'             , typeName:'text'   , clientSide:'colorSample', allow:{update:false}},
         ],
         primaryKey:['group'],
     });
