@@ -2,10 +2,11 @@
 create database beplus_example_db owner beplus_example_user;
 \c beplus_example_db
 
-
 drop schema if exists ext cascade;
 create schema ext authorization beplus_example_user;
 grant all on schema ext to beplus_example_user;
+
+set search_path = ext;
 
 create table ext.users(
   username text primary key,
@@ -53,7 +54,7 @@ create table ext.ptable(
   symbol               varchar(8) unique,
   name                 text not null,
   weight               numeric,
-  "group"              text,
+  "group"              text references pgroups("group"),
   discovered_date      date,
   discovered_precision text,
   bigbang              boolean,
@@ -209,16 +210,16 @@ insert into ext.ptable (atomic_number, name, symbol, "column", period, block, "s
 ('117', '(Ununseptium)', '(Uus)', '17', '7', 'p', '', 'Synthetic', null),
 ('118', '(Ununoctium)', '(Uuo)', '18', '7', 'p', '', 'Synthetic', null);
 
-update ext.ptable set weight= 1.008      ,"group"='Other nonmetals'      ,discovered_date='1766-01-01', discovered_precision='year'   , bigbang=true  where atomic_number= 1;
-update ext.ptable set weight= 4.002602   ,"group"='Noble gases'          ,discovered_date='1895-03-26', discovered_precision='day'    , bigbang=true  where atomic_number= 2;
-update ext.ptable set weight= 6.942      ,"group"='Alkali metals'        ,discovered_date='1817-01-01', discovered_precision='year'   , bigbang=true  where atomic_number= 3;
-update ext.ptable set weight= 9.01218313 ,"group"='Alkaliny earth metals',discovered_date='1797-01-01', discovered_precision='year'   , bigbang=false where atomic_number= 4;
-update ext.ptable set weight=10.81       ,"group"='Metalloids'           ,discovered_date='1766-01-01', discovered_precision='year'   , bigbang=false where atomic_number= 5;
-update ext.ptable set weight=12.011      ,"group"='Nonmetal'             ,discovered_date=null        , discovered_precision='unknown', bigbang=false where atomic_number= 6;
-update ext.ptable set weight=14.007      ,"group"='Nonmetal'             ,discovered_date='1772-01-01', discovered_precision='year'   , bigbang=false where atomic_number= 7;
-update ext.ptable set weight=15.999      ,"group"='Nonmetal'             ,discovered_date='1774-01-01', discovered_precision='year'   , bigbang=false where atomic_number= 8;
-update ext.ptable set weight=18.998403163,"group"='Halogen'              ,discovered_date='1886-06-26', discovered_precision='year'   , bigbang=false where atomic_number= 9;
-update ext.ptable set weight=20.1797     ,"group"='Noble'                ,discovered_date='1898-06-26', discovered_precision='year'   , bigbang=false where atomic_number=10;
+update ext.ptable set weight= 1.008      ,discovered_date='1766-01-01', discovered_precision='year'   , bigbang=true  where atomic_number= 1;
+update ext.ptable set weight= 4.002602   ,discovered_date='1895-03-26', discovered_precision='day'    , bigbang=true  where atomic_number= 2;
+update ext.ptable set weight= 6.942      ,discovered_date='1817-01-01', discovered_precision='year'   , bigbang=true  where atomic_number= 3;
+update ext.ptable set weight= 9.01218313 ,discovered_date='1797-01-01', discovered_precision='year'   , bigbang=false where atomic_number= 4;
+update ext.ptable set weight=10.81       ,discovered_date='1766-01-01', discovered_precision='year'   , bigbang=false where atomic_number= 5;
+update ext.ptable set weight=12.011      ,discovered_date=null        , discovered_precision='unknown', bigbang=false where atomic_number= 6;
+update ext.ptable set weight=14.007      ,discovered_date='1772-01-01', discovered_precision='year'   , bigbang=false where atomic_number= 7;
+update ext.ptable set weight=15.999      ,discovered_date='1774-01-01', discovered_precision='year'   , bigbang=false where atomic_number= 8;
+update ext.ptable set weight=18.998403163,discovered_date='1886-06-26', discovered_precision='year'   , bigbang=false where atomic_number= 9;
+update ext.ptable set weight=20.1797     ,discovered_date='1898-06-26', discovered_precision='year'   , bigbang=false where atomic_number=10;
 
 
 create table ext."parameters"(

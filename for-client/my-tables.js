@@ -127,6 +127,7 @@ myOwn.TableGrid.prototype.createDepotFromRow = function createDepotFromRow(row, 
         rowPendingForUpdate:{},
         primaryKeyValues:false,
         status: status||'preparing',
+        detailTable:{}
     }
     return depot;
 }
@@ -190,6 +191,10 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
             grid.displayBody();
         });
     }
+    var detailHead = grid.def.detailTables.map(function(detailTableDef){
+        var th=html.th({"my-defname":detailTableDef.table, title:detailTableDef.label},detailTableDef.abr);
+        return th;
+    });
     this.dom.columnsHead = grid.def.fields.map(function(fieldDef){
         var th=html.th({colspan:grid.modes.inputColspan, "my-colname":fieldDef.name},fieldDef.title).create();
         if(fieldDef.width){
@@ -205,7 +210,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         });
         return th;
     });
-    grid.dom.footInfo = html.td({colspan:grid.dom.columnsHead.length*grid.modes.inputColspan, "is-processing":"1"}).create();
+    grid.dom.footInfo = html.td({colspan:grid.dom.columnsHead.length*grid.modes.inputColspan+detailHead.length, "is-processing":"1"}).create();
     [
         {name:'displayFrom', value:'0'},
         {name:'elipsis', value:' ... '},
@@ -218,7 +223,9 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     grid.dom.table = html.table({"class":"my-grid", "my-table": grid.def.name},[
         html.caption(grid.def.title),
         html.thead([
-            html.tr([html.th([buttonInsert,/*buttonSaveMode,*/buttonCreateFilter,buttonDestroyFilter])].concat(grid.dom.columnsHead))
+            html.tr([
+                html.th([buttonInsert,/*buttonSaveMode,*/buttonCreateFilter,buttonDestroyFilter])
+            ].concat(detailHead).concat(grid.dom.columnsHead))
         ]),
         html.tbody(),
         html.tfoot([
@@ -307,6 +314,27 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     actionDef.actionRow(depot);
                 });
             }
+        });
+        grid.def.detailTables.forEach(function(detailTableDef){
+            var button = html.button({class:'table-button'}, [
+                html.img({src:'img/detail-unknown.png'})
+            ]).create();
+            var td = html.td({"my-relname":detailTableDef.table}, button).create();
+            tr.appendChild(td);
+            button.addEventListener('click',function(){
+                if(!button.showingGrid){
+                    var newTr = button.showingGrid = grid.my.insertRow({under:tr});
+                    var tdMargin = newTr.insertCell(-1);
+                    tdMargin.colSpan = td.cellIndex+1;
+                    var tdGrid = newTr.insertCell(-1);
+                    tdGrid.colSpan = tr.cells.length-td.cellIndex;
+                    tdGrid.style.maxWidth='inherit';
+                    var newGrid = grid.my.tableGrid(detailTableDef.table, tdGrid);
+                }else{
+                    grid.my.fade(button.showingGrid);
+                    button.showingGrid = null;
+                }
+            });
         });
         grid.def.fields.forEach(function(fieldDef){
             var td = html.td({colspan:grid.modes.inputColspan, "my-colname":fieldDef.name}).create();

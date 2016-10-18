@@ -13,5 +13,8 @@ module.exports = function(context){
             {name:'color_'             , typeName:'text'   , clientSide:'colorSample', allow:{update:false}},
         ],
         primaryKey:['group'],
+        detailTables:[
+            {table: 'ptable', sourceFields:['group'], targetFields:['group'], abr:'E', label:'elements in ptable'}
+        ]
     });
 }

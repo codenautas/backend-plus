@@ -127,6 +127,13 @@ myOwn.fade = function fade(element){
     element.parentNode.removeChild(element);
 };
 
+myOwn.insertRow = function insertRow(where){
+    if(where.under){
+        var iRow = where.under.sectionRowIndex;
+        return where.under.parentNode.insertRow(iRow+1);
+    }
+};
+
 myOwn.adaptData = function adaptData(tableDef, rows){
     rows.forEach(function(row){
         tableDef.fields.forEach(function(fieldDef){
