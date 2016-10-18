@@ -316,13 +316,13 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             }
         });
         grid.def.detailTables.forEach(function(detailTableDef){
-            var button = html.button({class:'table-button'}, [
-                html.img({src:'img/detail-unknown.png'})
-            ]).create();
+            var img = html.img({src:'img/detail-unknown.png'}).create();
+            var button = html.button({class:'table-button'}, [img]).create();
             var td = html.td({"my-relname":detailTableDef.table}, button).create();
             tr.appendChild(td);
             button.addEventListener('click',function(){
                 if(!button.showingGrid){
+                    img.src='img/detail-contract.png';
                     var newTr = button.showingGrid = grid.my.insertRow({under:tr});
                     var tdMargin = newTr.insertCell(-1);
                     tdMargin.colSpan = td.cellIndex+1;
@@ -331,6 +331,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     tdGrid.style.maxWidth='inherit';
                     var newGrid = grid.my.tableGrid(detailTableDef.table, tdGrid);
                 }else{
+                    img.src='img/detail-expand.png';
                     grid.my.fade(button.showingGrid);
                     button.showingGrid = null;
                 }
