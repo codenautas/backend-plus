@@ -62,8 +62,7 @@ create table ext.ptable(
   period               integer,
   block                text,
   "state at STP"       text,
-  ocurrence            text,
-  description          text references ext.pgroups ("group")
+  ocurrence            text
 );
 alter table ext.ptable owner to beplus_example_user;
 
@@ -90,7 +89,7 @@ CREATE TRIGGER ptable_state_camel_trg
   EXECUTE PROCEDURE ext.ptable_state_camel_trg();
 
 
-insert into ext.ptable (atomic_number, name, symbol, "column", period, block, "state at STP", ocurrence, description) values
+insert into ext.ptable (atomic_number, name, symbol, "column", period, block, "state at STP", ocurrence, "group") values
 ('1', 'Hydrogen', 'H', '1', '1', 's', 'Gas', 'Primordial', 'Diatomic nonmetal'),
 ('2', 'Helium', 'He', '18', '1', 's', 'Gas', 'Primordial', 'Noble gas'),
 ('3', 'Lithium', 'Li', '1', '2', 's', 'Solid', 'Primordial', 'Alkali metal'),

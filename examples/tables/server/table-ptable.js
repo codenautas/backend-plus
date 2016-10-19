@@ -21,7 +21,6 @@ module.exports = function(context){
             {name:'block'               , typeName:'text'                                    },
             {name:'state at STP'        , typeName:'text'                                    },
             {name:'ocurrence'           , typeName:'text'                                    },
-            {name:'description'         , typeName:'text'                                    },
         ],
         primaryKey:['atomic_number'],
         constraints:[

@@ -14,7 +14,7 @@ module.exports = function(context){
         ],
         primaryKey:['group'],
         detailTables:[
-            {table: 'ptable', sourceFields:['group'], targetFields:['group'], abr:'E', label:'elements in ptable'}
+            {table: 'ptable', fields:[{source:'group', target:'group'}], abr:'E', label:'elements in ptable'}
         ]
     });
 }

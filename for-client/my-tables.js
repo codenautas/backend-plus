@@ -61,7 +61,8 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
 myOwn.TableConnector.prototype.getData = function getData(){
     var connector = this;
     return connector.my.ajax.table.data({
-        table:connector.tableName
+        table:connector.tableName,
+        fixedFields:connector.fixedFields
     }).then(function(rows){
         return connector.whenStructureReady.then(function(){
             connector.my.adaptData(connector.def, rows);
@@ -103,11 +104,19 @@ myOwn.TableGrid = function(context, mainElement){
         inputColspan: 1,
         saveByField: true
     };
+    this.view = {
+    }
 };
 
-myOwn.tableGrid = function tableGrid(tableName, mainElement){
+myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
     var grid = new my.TableGrid({my: this}, mainElement);
+    opts = opts || {};
     grid.connector = new my.TableConnector({my:this, tableName: tableName});
+    grid.connector.fixedFields = opts.fixedFields || [];
+    grid.connector.fixedField = {};
+    grid.connector.fixedFields.forEach(function(pair){
+        grid.connector.fixedField[pair.fieldName] = pair.value;
+    });
     return grid.prepareAndDisplayGrid();
 };
 
@@ -135,9 +144,7 @@ myOwn.TableGrid.prototype.createDepotFromRow = function createDepotFromRow(row, 
 myOwn.TableGrid.prototype.prepareDepots = function prepareDepots(rows){
     var grid = this;
     grid.depots = rows.map(grid.createDepotFromRow.bind(grid));
-    grid.view = {
-        sortColumns:grid.def.sortColumns||[]
-    };
+    grid.view.sortColumns=grid.view.sortColumns||grid.def.sortColumns||[];
 }
 
 myOwn.TableGrid.prototype.prepareAndDisplayGrid = function prepareAndDisplayGrid(){
@@ -244,6 +251,9 @@ myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElem
         belowTr.rowIndex-grid.dom.table.tHead.rows.length
     )+1;
     var depotForInsert = grid.createDepotFromRow({}, 'new');
+    grid.connector.fixedFields.forEach(function(pair){
+        depotForInsert.row[pair.fieldName] = pair.value;
+    });
     grid.depots.splice(Math.min(grid.depots.length,Math.max(0,position)),0,depotForInsert);
     return grid.createRowElements(position, depotForInsert);
 };
@@ -261,7 +271,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         });
         grid.def.fields.forEach(function(fieldDef){
             var td = depot.rowControls[fieldDef.name];
-            var editable=grid.def.allow.update && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
+            var editable=grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
             td.contentEditable=editable;
             if(fieldDef.clientSide){
                 grid.my.clientSides[fieldDef.clientSide].action(depot, fieldDef.name);
@@ -329,7 +339,10 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     var tdGrid = newTr.insertCell(-1);
                     tdGrid.colSpan = tr.cells.length-td.cellIndex;
                     tdGrid.style.maxWidth='inherit';
-                    var newGrid = grid.my.tableGrid(detailTableDef.table, tdGrid);
+                    var fixedFields = detailTableDef.fields.map(function(pair){
+                        return {fieldName: pair.target, value:depot.row[pair.source]};
+                    });
+                    var newGrid = grid.my.tableGrid(detailTableDef.table, tdGrid, {fixedFields: fixedFields});
                 }else{
                     img.src='img/detail-expand.png';
                     grid.my.fade(button.showingGrid);
@@ -341,7 +354,10 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             var td = html.td({colspan:grid.modes.inputColspan, "my-colname":fieldDef.name}).create();
             TypedControls.adaptElement(td, fieldDef);
             depot.rowControls[fieldDef.name] = td;
-            td.contentEditable=grid.def.allow.update && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
+            td.contentEditable=grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
+            if(depot.row[fieldDef.name]!=null){
+                td.setTypedValue(depot.row[fieldDef.name]);
+            }
             td.addEventListener('update',function(){
                 var value = this.getTypedValue();
                 if(value!==depot.row[fieldDef.name]){
