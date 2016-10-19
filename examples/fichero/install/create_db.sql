@@ -33,24 +33,26 @@ create table fichas(
 autor          text       ,
 fichanro       integer    primary key,
 titulo         text       ,
-annio          date       ,
-medida1        numeric     ,
-medida2        numeric     ,
-medida3        numeric     ,
+annio          numeric    ,
+medida1        numeric    ,
+medida2        numeric    ,
+medida3        numeric    ,
 tecnica        text       ,
 ubicación      text       ,
 propietario    text       ,
-publicado      bool       ,
+publicado      boolean    ,
 enmarcado      text       ,
 imagenadelante text       ,
 imagenatras    text       ,
 observaciones  text       ,
-costo          numeric     ,
-notas          numeric     
+costo          numeric    ,
+notas          text    
 );
+alter table fichas owner to beplus_example_user;
 
 create table publicaciones(
   fichanro integer references fichas (fichanro),
   dondepublicado text,
   primary key (fichanro, dondepublicado)
 );
+alter table publicaciones owner to beplus_example_user;
