@@ -1,0 +1,9 @@
+db:
+  port: 5435
+log:
+  req: true
+login:
+  plus:
+    secret: false
+devel:
+  forceShowAsEditable: true    

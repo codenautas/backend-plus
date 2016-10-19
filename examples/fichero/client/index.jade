@@ -9,11 +9,12 @@ html(lang="en")
   body
     div#main_layout
       div#barra_superior
-        if isAdmin
+        div if isAdmin || isUser
           p
             b tablas
             button#tables(id-table="fichas"  ) fichas
-            button#tables(id-table="usuarios") usuarios
+            div if isAdmin
+              button#tables(id-table="usuarios") usuarios
       div#table_layout
     pre#status
     script(src='js-yaml.js')

@@ -64,7 +64,8 @@
     "test-ci": "mocha --reporter spec --bail  test/test.js",
     "test-good": "mocha --reporter spec --bail --check-leaks test/test.js",
     "server-test": "node test/run-simple-backend.js",
-    "example-tables": "node examples/tables/server/server-tables.js"
+    "example-tables": "node examples/tables/server/server-tables.js",
+    "example-fichas": "node examples/fichero/server/server-fichas.js"
   },
   "qa-control": {
     "package-version": "0.3.0",

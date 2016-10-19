@@ -1,0 +1,25 @@
+server:
+  port: 3033
+  kill-9:
+    pid: 1234
+    master-pass: 3920192
+db:
+  motor: postgresql
+  host: localhost
+  database: beplus_example_db
+  schema: fic
+  user: beplus_example_user
+  password: beplus_example_3948812bdz
+login:
+  table: users
+  userFieldName: username
+  passFieldName: md5pass
+  infoFieldList: [username, rol]
+  activeClausule: current_timestamp<=active_until
+  lockedClausule: current_timestamp>=locked_since
+  plus:
+    fileStore: true
+    secret: secret cat in 1 of the tables
+    loginForm:
+      formTitle: fichas
+      formImg: unlogged/tables-lock.png
