@@ -183,7 +183,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     if(grid.def.allow.insert){
         buttonInsert=html.button({class:'table-button'}, [html.img({src:'img/insert.png'})]).create();
         buttonInsert.addEventListener('click', function(){
-            grid.createRowElements(0);
+            grid.createRowInsertElements();
         });
     }
     if(grid.def.allow.filter){
@@ -245,11 +245,16 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
 
 myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElements(belowDepot){
     var grid = this;
-    var belowTr = belowDepot.tr;
-    var position = ('sectionRowIndex' in belowTr?
-        belowTr.sectionRowIndex:
-        belowTr.rowIndex-grid.dom.table.tHead.rows.length
-    )+1;
+    var position;
+    if(belowDepot){
+        var belowTr = belowDepot.tr;
+        position = ('sectionRowIndex' in belowTr?
+            belowTr.sectionRowIndex:
+            belowTr.rowIndex-grid.dom.table.tHead.rows.length
+        )+1;
+    }else{
+        position = -1;
+    }
     var depotForInsert = grid.createDepotFromRow({}, 'new');
     grid.connector.fixedFields.forEach(function(pair){
         depotForInsert.row[pair.fieldName] = pair.value;
