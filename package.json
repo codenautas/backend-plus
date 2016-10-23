@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for typed controls",
-  "version": "0.4.18",
+  "version": "0.5.0",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -60,9 +60,9 @@
   },
   "scripts": {
     "start": "node ejemplos/encuesta-trac.js",
-    "test": "mocha --reporter spec --bail  test/test.js",
-    "test-ci": "mocha --reporter spec --bail  test/test.js",
-    "test-good": "mocha --reporter spec --bail --check-leaks test/test.js",
+    "test": "mocha --reporter spec --bail  test/test*.js",
+    "test-ci": "mocha --reporter spec --bail  test/test*.js",
+    "test-good": "mocha --reporter spec --bail --check-leaks test/test*.js",
     "server-test": "node test/run-simple-backend.js",
     "example-tables": "node examples/tables/server/server-tables.js",
     "example-fichas": "node examples/fichero/server/server-fichas.js"

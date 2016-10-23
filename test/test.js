@@ -6,7 +6,6 @@
 
 var request = require('supertest');
 
-var Promises = require('promise-plus');
 var changing = require('best-globals').changing;
 var expect = require('expect.js');
 var sinon = require('sinon');
@@ -304,7 +303,7 @@ function createServerGetAgent(opts) {
     var appStarted = require('./simple-backend.js')(opts);
     return appStarted;
     /////////////////////////
-    return Promises.make(function(resolve, reject){
+    return new Promise(function(resolve, reject){
         var app = express();
         app.use(cookieParser());
         var concat = require('concat-stream');
