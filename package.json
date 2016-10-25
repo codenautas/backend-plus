@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for typed controls",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -44,14 +44,14 @@
     "regexplicit": "~0.0.6",
     "require-bro": "~0.1.4",
     "self-explain": "~0.10.8",
-    "typed-controls": "~0.4.0"
+    "typed-controls": "~0.4.1"
   },
   "devDependencies": {
     "expect.js": "~0.3.1",
     "istanbul": "~0.4.5",
     "mocha": "~3.1.2",
     "sinon": "~1.17.6",
-    "supertest": "~2.0.0",
+    "supertest": "~2.0.1",
     
     "kill-9": "~0.4.2"
   },
