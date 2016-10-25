@@ -296,7 +296,7 @@ myOwn["connection-status"]={
 };
 
 myOwn.debuggingStatus=false;  // /* 
-if(new Date()<bestGlobals.datetime.ymdHms(2016,7,28,14,50,0)){
+if(new Date()<bestGlobals.datetime.ymdHms(2016,10,25,14,50,0)){
     myOwn.debuggingStatus=function(statusCode){
         myOwn.debuggingStatus.count=(myOwn.debuggingStatus.count||0)+1
         if(!window.debuggingStatusDiv){
