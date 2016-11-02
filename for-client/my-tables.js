@@ -335,8 +335,10 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             var button = html.button({class:'table-button'}, [img]).create();
             var td = html.td({"my-relname":detailTableDef.table}, button).create();
             tr.appendChild(td);
+            var depotDetail = depot.detailTable[detailTableDef.table] || { show:false };
+            depot.detailTable[detailTableDef.table] = depotDetail;
             button.addEventListener('click',function(){
-                if(!button.showingGrid){
+                if(!depotDetail.show){
                     img.src='img/detail-contract.png';
                     var newTr = button.showingGrid = grid.my.insertRow({under:tr});
                     var tdMargin = newTr.insertCell(-1);
@@ -347,11 +349,19 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     var fixedFields = detailTableDef.fields.map(function(pair){
                         return {fieldName: pair.target, value:depot.row[pair.source]};
                     });
-                    var newGrid = grid.my.tableGrid(detailTableDef.table, tdGrid, {fixedFields: fixedFields});
+                    if(!depotDetail.grid){
+                        grid.my.tableGrid(detailTableDef.table, tdGrid, {fixedFields: fixedFields}).then(function(g){
+                            depotDetail.grid=g.dom.table;
+                        });
+                    }else{
+                        tdGrid.appendChild(depotDetail.grid);
+                    }
+                    depotDetail.show = true;
                 }else{
                     img.src='img/detail-expand.png';
                     grid.my.fade(button.showingGrid);
                     button.showingGrid = null;
+                    depotDetail.show = false;
                 }
             });
         });
