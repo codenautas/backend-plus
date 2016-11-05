@@ -136,7 +136,8 @@ myOwn.TableGrid.prototype.createDepotFromRow = function createDepotFromRow(row, 
         rowPendingForUpdate:{},
         primaryKeyValues:false,
         status: status||'preparing',
-        detailTable:{}
+        detailControls:{},
+        detailRows:[]
     }
     return depot;
 }
@@ -333,16 +334,17 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             }
         });
         grid.def.detailTables.forEach(function(detailTableDef){
-            var img = html.img({src:'img/detail-unknown.png'}).create();
-            var button = html.button({class:'table-button'}, [img]).create();
+            var detailControl = depot.detailControls[detailTableDef.table] || { show:false };
+            detailControl.img = html.img({src:'img/detail-unknown.png'}).create();
+            var button = html.button({class:'table-button'}, [detailControl.img]).create();
             var td = html.td({class:['grid-th','grid-th-details'], "my-relname":detailTableDef.table}, button).create();
             tr.appendChild(td);
-            var depotDetail = depot.detailTable[detailTableDef.table] || { show:false };
-            depot.detailTable[detailTableDef.table] = depotDetail;
+            depot.detailControls[detailTableDef.table] = detailControl;
             button.addEventListener('click',function(){
-                if(!depotDetail.show){
-                    img.src='img/detail-contract.png';
-                    var newTr = button.showingGrid = grid.my.insertRow({under:tr,smooth:{height:70}});
+                if(!detailControl.show){
+                    detailControl.img.src='img/detail-contract.png';
+                    var newTr = grid.my.insertRow({under:tr,smooth:{height:70}});
+                    detailControl.tr = newTr;
                     var tdMargin = newTr.insertCell(-1);
                     tdMargin.colSpan = td.cellIndex+1;
                     var tdGrid = newTr.insertCell(-1);
@@ -351,19 +353,22 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     var fixedFields = detailTableDef.fields.map(function(pair){
                         return {fieldName: pair.target, value:depot.row[pair.source]};
                     });
-                    if(!depotDetail.grid){
+                    if(!detailControl.grid){
                         grid.my.tableGrid(detailTableDef.table, tdGrid, {fixedFields: fixedFields}).then(function(g){
-                            depotDetail.grid=g.dom.table;
+                            detailControl.grid=g.dom.table;
                         });
                     }else{
-                        tdGrid.appendChild(depotDetail.grid);
+                        tdGrid.appendChild(detailControl.grid);
                     }
-                    depotDetail.show = true;
+                    detailControl.show = true;
+                    newTr.detailTableName=detailTableDef.table;
+                    depot.detailRows.push(newTr);
                 }else{
-                    img.src='img/detail-expand.png';
-                    grid.my.fade(button.showingGrid);
-                    button.showingGrid = null;
-                    depotDetail.show = false;
+                    detailControl.img.src='img/detail-expand.png';
+                    grid.my.fade(detailControl.tr);
+                    detailControl.tr = null;
+                    detailControl.show = false;
+                    depot.detailRows = depot.detailRows.filter(function(tr){ return tr!==newTr;});
                 }
             });
         });
@@ -394,6 +399,18 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 }
             }
         });
+        if(iRow===-1){
+            depot.detailRows.forEach(function(detailTr){
+                var detailControl = depot.detailControls[detailTr.detailTableName];
+                detailControl.tr = detailTr;
+                if(detailControl.show){
+                    tbody.appendChild(detailTr);
+                    detailControl.img.src='img/detail-contract.png';
+                }else{
+                    detailControl.img.src='img/detail-expand.png';
+                }
+            });
+        }
         return depot;
     }
     grid.destroyRowFilter = function destroyRowFilter(){
