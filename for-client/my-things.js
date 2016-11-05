@@ -160,8 +160,28 @@ myOwn.insertRow = function insertRow(where){
     }else{
         throw new Error('my-tables insert without good where');
     }
-    var newTr = section.insertRow(iRow);
-    return newTr;
+    var tr = section.insertRow(iRow);
+    if(where.smooth){
+        if(where.smooth===true){ 
+            where.smooth={};
+        }
+        var trDummy = section.insertRow(iRow);
+        tr.style.display='none';
+        for(var i=0; i<(where.smooth.colCount||3); i++){
+            var cell=trDummy.insertCell(-1);
+        }
+        var divDummy=html.div({class:'grid-dummy-cell-ini'}).create();
+        trDummy.appendChild(divDummy);
+        setTimeout(function(){
+            divDummy.style.height=(where.smooth.height||20)+'px';
+        },10);
+        setTimeout(function(){
+            trDummy.style.display='none';
+            tr.style.display='';
+            section.removeChild(trDummy);
+        },500);
+    }
+    return tr;
 };
 
 myOwn.adaptData = function adaptData(tableDef, rows){
