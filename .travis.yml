@@ -1,12 +1,12 @@
 language: node_js
 node_js:
   - "4"
-  - "5"
   - "6"
+  - "7"
 matrix:
   fast_finish: true
   allow_failures:
-    - node_js: "6"
+    - node_js: "7"
 script: "npm run-script test-ci"
 after_script: "npm install coveralls@2.11.9 && cat ./coverage/lcov.info | coveralls"
 addons:

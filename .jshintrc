@@ -1,0 +1,8 @@
+{
+    "asi": false,
+    "curly": true,
+    "node": true,
+    "strict": "global",
+    "eqnull": true,
+    "esversion": 6
+}
