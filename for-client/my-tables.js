@@ -366,9 +366,9 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 }else{
                     detailControl.img.src='img/detail-expand.png';
                     grid.my.fade(detailControl.tr);
-                    detailControl.tr = null;
                     detailControl.show = false;
-                    depot.detailRows = depot.detailRows.filter(function(tr){ return tr!==newTr;});
+                    depot.detailRows = depot.detailRows.filter(function(tr){ return tr!==detailControl.tr;});
+                    detailControl.tr = null;
                 }
             });
         });
