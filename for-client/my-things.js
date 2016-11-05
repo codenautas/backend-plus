@@ -124,7 +124,29 @@ myOwn.log = function log(severity, message){
 };
 
 myOwn.fade = function fade(element){
-    element.parentNode.removeChild(element);
+    if(element.tagName.toUpperCase()==='TR' && element.parentNode.replaceChild){
+        var parent=element.parentNode;
+        var dummyTr=document.createElement(element.tagName);
+        dummyTr.className=element.className;
+        Array.prototype.forEach.call(element.cells, function(cell){
+            var dummyCell=document.createElement(cell.tagName);
+            dummyTr.appendChild(dummyCell);
+            dummyCell.className=cell.className;
+        });
+        var div=document.createElement('div');
+        dummyTr.cells[0].appendChild(div);
+        div.style.height=(element.cells[0].offsetHeight-2)+'px';
+        div.style.transition='height 0.6s ease';
+        parent.replaceChild(dummyTr, element);
+        setTimeout(function(){
+            div.style.height='1px';
+        },10);
+        setTimeout(function(){
+            parent.removeChild(dummyTr);
+        },500);
+    }else{
+        element.parentNode.removeChild(element);
+    }
 };
 
 myOwn.insertRow = function insertRow(where){

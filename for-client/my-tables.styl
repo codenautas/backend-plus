@@ -96,4 +96,16 @@ nowrap()
   td
     padding 0px
     vertical-align bottom
-    
+
+.grid-dummy-cell-ini
+  height: 1px;
+  width: 1px;
+  transition: height 0.6s ease;
+
+.grid-dummy-cell-del
+  transition: height 0.6s ease;
+
+@keyframes animateheight {
+    from {transform: scaleY(0.1)}
+    to {transform: scaleY(1)}
+}

@@ -314,8 +314,18 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         var grid = this;
         var forInsert = iRow>=0;
         var tr = tbody.insertRow(iRow);
+        var trDummy;
+        if(depot.status==='new'){
+            trDummy = tbody.insertRow(iRow);
+            tr.style.display='none';
+            for(var i=0; i<grid.def.detailTables.length + grid.def.fields.length; i++){
+                var cell=trDummy.insertCell(-1);
+            }
+            var divDummy=html.div({class:'grid-dummy-cell-ini'}).create();
+            trDummy.appendChild(divDummy);
+        }
         depot.tr = tr;
-        var thActions=html.th().create();
+        var thActions=html.th({class:['grid-th','grid-th-actions']}).create();
         tr.appendChild(thActions);
         var actionNamesList = ['insert','delete'].concat(grid.def.actionNamesList);
         actionNamesList.forEach(function(actionName){
@@ -333,7 +343,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         grid.def.detailTables.forEach(function(detailTableDef){
             var img = html.img({src:'img/detail-unknown.png'}).create();
             var button = html.button({class:'table-button'}, [img]).create();
-            var td = html.td({"my-relname":detailTableDef.table}, button).create();
+            var td = html.td({class:['grid-th','grid-th-details'], "my-relname":detailTableDef.table}, button).create();
             tr.appendChild(td);
             var depotDetail = depot.detailTable[detailTableDef.table] || { show:false };
             depot.detailTable[detailTableDef.table] = depotDetail;
@@ -392,6 +402,15 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 }
             }
         });
+        if(trDummy){
+            setTimeout(function(){
+                divDummy.style.height='20px';
+            },10);
+            setTimeout(function(){
+                trDummy.style.display='none';
+                tr.style.display='';
+            },500);
+        }
         return depot;
     }
     grid.destroyRowFilter = function destroyRowFilter(){
