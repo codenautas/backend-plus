@@ -150,10 +150,18 @@ myOwn.fade = function fade(element){
 };
 
 myOwn.insertRow = function insertRow(where){
+    var section, iRow, newTr;
     if(where.under){
-        var iRow = where.under.sectionRowIndex;
-        return where.under.parentNode.insertRow(iRow+1);
+        section = where.under.parentNode;
+        iRow = where.under.sectionRowIndex+1;
+    }else if(where.iRow && (where.table||where.section)){
+        section = where.table||where.section;
+        iRow = where.iRow;
+    }else{
+        throw new Error('my-tables insert without good where');
     }
+    var newTr = section.insertRow(iRow);
+    return newTr;
 };
 
 myOwn.adaptData = function adaptData(tableDef, rows){

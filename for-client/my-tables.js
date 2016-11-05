@@ -313,7 +313,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
     grid.createRowElements = function createRowElements(iRow, depot){
         var grid = this;
         var forInsert = iRow>=0;
-        var tr = tbody.insertRow(iRow);
+        var tr = grid.my.insertRow({section:tbody, iRow:iRow});
         var trDummy;
         if(depot.status==='new'){
             trDummy = tbody.insertRow(iRow);
