@@ -117,7 +117,13 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
     grid.connector.fixedFields.forEach(function(pair){
         grid.connector.fixedField[pair.fieldName] = pair.value;
     });
-    return grid.prepareAndDisplayGrid();
+    var preparing = grid.prepareAndDisplayGrid();
+    grid.waitForReady = function waitForReady(fun){
+        return preparing.then(function(){
+            return grid;
+        }).then(fun||function(){});
+    }
+    return grid;
 };
 
 myOwn.TableGrid.prototype.displayPreLoadMessage = function displayPreLoadMessage(){
@@ -353,12 +359,12 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     var fixedFields = detailTableDef.fields.map(function(pair){
                         return {fieldName: pair.target, value:depot.row[pair.source]};
                     });
-                    if(!detailControl.grid){
-                        grid.my.tableGrid(detailTableDef.table, tdGrid, {fixedFields: fixedFields}).then(function(g){
-                            detailControl.grid=g.dom.table;
+                    if(!detailControl.table){
+                        grid.my.tableGrid(detailTableDef.table, tdGrid, {fixedFields: fixedFields}).waitForReady(function(g){
+                            detailControl.table=g.dom.table;
                         });
                     }else{
-                        tdGrid.appendChild(detailControl.grid);
+                        tdGrid.appendChild(detailControl.table);
                     }
                     detailControl.show = true;
                     newTr.detailTableName=detailTableDef.table;
