@@ -265,6 +265,7 @@ myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElem
     var depotForInsert = grid.createDepotFromRow({}, 'new');
     grid.connector.fixedFields.forEach(function(pair){
         depotForInsert.row[pair.fieldName] = pair.value;
+        depotForInsert.rowPendingForUpdate[pair.fieldName] = pair.value;
     });
     grid.depots.splice(Math.min(grid.depots.length,Math.max(0,position)),0,depotForInsert);
     return grid.createRowElements(position, depotForInsert);
