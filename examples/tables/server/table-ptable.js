@@ -23,6 +23,10 @@ module.exports = function(context){
             {name:'ocurrence'           , typeName:'text'                                    },
         ],
         primaryKey:['atomic_number'],
+        detailTables:[
+            {table: 'isotopes'      , fields:[{source:'atomic_number', target:'atomic_number'}], abr:'iso', label:'isotopes'},
+            {table: 'element_images', fields:[{source:'atomic_number', target:'atomic_number'}], abr:'img', label:'images'}
+        ],
         constraints:[
             {constraintType:'unique', fields:['symbol']}
         ],
