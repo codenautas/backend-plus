@@ -83,6 +83,7 @@ myOwn.autoSetup = function autoSetup(){
             });
         });
     };
+    my.captureKeys();
     setInterval(function(){
         my.testKeepAlive();
     },my.debuggingStatus?6*1000:60*1000);
@@ -370,6 +371,71 @@ myOwn.informDetectedStatus = function informDetectedStatus(statusCode, logged) {
     if(!logged){
         window.location.href='login';
     }
+};
+
+function es_elemento_interactivo(elemento){
+"use strict";
+    return (
+               (elemento instanceof HTMLInputElement 
+                || elemento instanceof HTMLButtonElement 
+                || elemento instanceof HTMLTextAreaElement
+               ) && !elemento.disabled
+              || elemento instanceof HTMLElement && elemento.contentEditable=="true"
+           ) && elemento.style.display!='none' && elemento.style.visibility!='hidden' && !elemento.saltearEnter;
+}
+
+function proximo_elemento(elemento){
+"use strict";
+    var proximo=elemento;
+    var no_me_voy_a_colgar=200;
+    if(elemento.children.length){
+        while(proximo.children.length>0 && no_me_voy_a_colgar--){
+            proximo=proximo.children[0];
+        }
+        return proximo;
+    }else{
+        while(proximo && proximo.nextElementSibling===null && no_me_voy_a_colgar--){
+            proximo=proximo.parentNode;
+        }
+        if(proximo){
+            return proximo.nextElementSibling;
+        }
+    }
+    return null;
+}
+
+function proximo_elemento_que_sea(elemento, controlador){
+"use strict";
+    var proximo=proximo_elemento(elemento);
+    var no_me_voy_a_colgar=2000;
+    while(proximo && !controlador(proximo) && no_me_voy_a_colgar--){
+        proximo=proximo_elemento(proximo);
+    }
+    return proximo;
+}
+
+function enter_hace_tab_en_este_elemento(elemento){
+    return elemento.tagName!="TEXTAREA";
+}
+
+myOwn.captureKeys = function captureKeys() {
+    return ;
+    document.addEventListener('keypress', function(evento){
+        if(evento.which==13){ // Enter
+            var enfoco=this.activeElement;
+            var este=this.activeElement;
+            if(enter_hace_tab_en_este_elemento(este)){
+                var no_me_voy_a_colgar=2000;
+                while(este && this.activeElement===enfoco && no_me_voy_a_colgar--){
+                    este=proximo_elemento_que_sea(este,es_elemento_interactivo);
+                    este.focus();
+                }
+                if(este){
+                    evento.preventDefault();
+                }
+            }
+        }
+    });
 };
 
 return myOwn;
