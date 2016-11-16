@@ -324,7 +324,7 @@ function createServerGetAgent(opts) {
         });
         // loginPlus.logAll=true;
         loginPlusManager.init(app,opts);
-        loginPlusManager.setValidator(function(username, password, done){
+        loginPlusManager.setValidatorStrategy(function(req, username, password, done){
             // console.log('********* intento de entrar de ',username,password);
             if(username=='prueba' && password=='prueba1'){
                 if(opts2.userFieldName){
