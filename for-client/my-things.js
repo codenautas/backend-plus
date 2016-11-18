@@ -373,15 +373,13 @@ myOwn.informDetectedStatus = function informDetectedStatus(statusCode, logged) {
     }
 };
 
-function es_elemento_interactivo(elemento){
+function isInteracive(element){
 "use strict";
     return (
-               (elemento instanceof HTMLInputElement 
-                || elemento instanceof HTMLButtonElement 
-                || elemento instanceof HTMLTextAreaElement
-               ) && !elemento.disabled
-              || elemento instanceof HTMLElement && elemento.contentEditable=="true"
-           ) && elemento.style.display!='none' && elemento.style.visibility!='hidden' && !elemento.saltearEnter;
+        (element instanceof HTMLInputElement || element instanceof HTMLButtonElement || element instanceof HTMLTextAreaElement)
+        && !element.disabled
+        || element instanceof HTMLElement && element.contentEditable=="true"
+    ) && element.style.display!='none' && element.style.visibility!='hidden' && !element.saltearEnter && element.saltearEnter>=0;
 }
 
 function proximo_elemento(elemento){
@@ -419,7 +417,6 @@ function enter_hace_tab_en_este_elemento(elemento){
 }
 
 myOwn.captureKeys = function captureKeys() {
-    return ;
     document.addEventListener('keypress', function(evento){
         if(evento.which==13){ // Enter
             var enfoco=this.activeElement;
@@ -427,7 +424,7 @@ myOwn.captureKeys = function captureKeys() {
             if(enter_hace_tab_en_este_elemento(este)){
                 var no_me_voy_a_colgar=2000;
                 while(este && this.activeElement===enfoco && no_me_voy_a_colgar--){
-                    este=proximo_elemento_que_sea(este,es_elemento_interactivo);
+                    este=proximo_elemento_que_sea(este,isInteracive);
                     este.focus();
                 }
                 if(este){
