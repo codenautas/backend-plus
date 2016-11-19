@@ -33,6 +33,7 @@ describe("table-def-adapt", function(){
                   "update": false
                 },
                 "name": "id",
+                "label": "id",
                 "title": "id"
               }
             },
@@ -46,6 +47,7 @@ describe("table-def-adapt", function(){
                   "update": false
                 },
                 "name": "id",
+                "label": "id",
                 "title": "id"
               }
             ],

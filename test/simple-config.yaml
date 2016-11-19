@@ -16,6 +16,7 @@ login:
   passFieldName: md5pass
   infoFieldList: [username, rol]
   plus:
+    allowHttpLogin: true
     fileStore: true
     loginForm:
       formTitle: simple app
