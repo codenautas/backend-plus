@@ -18,6 +18,7 @@ login:
   activeClausule: current_timestamp<=active_until
   lockedClausule: current_timestamp>=locked_since
   plus:
+    allowHttpLogin: true
     fileStore: true
     secret: secret cat in the table
     loginForm:

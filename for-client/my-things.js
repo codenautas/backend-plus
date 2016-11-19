@@ -83,6 +83,7 @@ myOwn.autoSetup = function autoSetup(){
             });
         });
     };
+    my.captureKeys();
     setInterval(function(){
         my.testKeepAlive();
     },my.debuggingStatus?6*1000:60*1000);
@@ -370,6 +371,68 @@ myOwn.informDetectedStatus = function informDetectedStatus(statusCode, logged) {
     if(!logged){
         window.location.href='login';
     }
+};
+
+function isInteracive(element){
+"use strict";
+    return (
+        (element instanceof HTMLInputElement || element instanceof HTMLButtonElement || element instanceof HTMLTextAreaElement)
+        && !element.disabled
+        || element instanceof HTMLElement && element.contentEditable=="true"
+    ) && element.style.display!='none' && element.style.visibility!='hidden' && !element.saltearEnter && element.saltearEnter>=0;
+}
+
+function proximo_elemento(elemento){
+"use strict";
+    var proximo=elemento;
+    var no_me_voy_a_colgar=200;
+    if(elemento.children.length){
+        while(proximo.children.length>0 && no_me_voy_a_colgar--){
+            proximo=proximo.children[0];
+        }
+        return proximo;
+    }else{
+        while(proximo && proximo.nextElementSibling===null && no_me_voy_a_colgar--){
+            proximo=proximo.parentNode;
+        }
+        if(proximo){
+            return proximo.nextElementSibling;
+        }
+    }
+    return null;
+}
+
+function proximo_elemento_que_sea(elemento, controlador){
+"use strict";
+    var proximo=proximo_elemento(elemento);
+    var no_me_voy_a_colgar=2000;
+    while(proximo && !controlador(proximo) && no_me_voy_a_colgar--){
+        proximo=proximo_elemento(proximo);
+    }
+    return proximo;
+}
+
+function enter_hace_tab_en_este_elemento(elemento){
+    return elemento.tagName!="TEXTAREA";
+}
+
+myOwn.captureKeys = function captureKeys() {
+    document.addEventListener('keypress', function(evento){
+        if(evento.which==13){ // Enter
+            var enfoco=this.activeElement;
+            var este=this.activeElement;
+            if(enter_hace_tab_en_este_elemento(este)){
+                var no_me_voy_a_colgar=2000;
+                while(este && this.activeElement===enfoco && no_me_voy_a_colgar--){
+                    este=proximo_elemento_que_sea(este,isInteracive);
+                    este.focus();
+                }
+                if(este){
+                    evento.preventDefault();
+                }
+            }
+        }
+    });
 };
 
 return myOwn;
