@@ -10,7 +10,7 @@ module.exports = function(context){
             update:context.user.rol==='boss',
         },
         fields:[
-            {name:'atomic_number'       , typeName:'integer', width:100, nullable:false,               },
+            {name:'atomic_number', title:'A#', typeName:'integer', width:100, nullable:false,               },
             {name:'mass_number'         , typeName:'integer', width:100,                               },
             {name:'order'               , typeName:'integer', width:100,                               },
             {name:'stable'              , typeName:'boolean', width:100,                               },

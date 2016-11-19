@@ -8,7 +8,7 @@ module.exports = function(context){
         editable:true,
         editableFieldDef:true,
         fields:[
-            {name:'atomic_number'       , typeName:'integer', nullable:false, editable:admin },
+            {name:'atomic_number', title:'A#', typeName:'integer', nullable:false, editable:admin },
             {name:'symbol'              , typeName:'text'   , nullable:false, 'max-length':4 },
             {name:'name'                , typeName:'text'   , allow:{insert:admin}           },
             {name:'weight'              , typeName:'number' , exact:true, decimals: true     },

@@ -101,8 +101,8 @@ myOwn.TableGrid = function(context, mainElement){
         main: mainElement
     }
     this.modes = {
-        inputColspan: 1,
-        saveByField: true
+        saveByField: true,
+        withColumnDetails: null, // null = autodetect
     };
     this.view = {
     }
@@ -172,27 +172,38 @@ myOwn.TableGrid.prototype.prepareAndDisplayGrid = function prepareAndDisplayGrid
     })
 };
 
-myOwn.ColumnGrid = function ColumnGrid(){
+myOwn.ColumnGrid = function ColumnGrid(opts){
+    for(var optName in opts){
+        this[optName] = opts[optName];
+    }
+}
+
+myOwn.ColumnGrid.prototype.th = function th(){
+    return html.th();
+}
+
+myOwn.ColumnGrid.prototype.thDetail = function thLabel(){
+    return html.th({class:'th-detail'}, (this.fieldDef||{}).label);
 }
 
 myOwn.ActionColumnGrid = function ActionColumnGrid(opts){
-    this.params = opts;
+    myOwn.ColumnGrid.call(this,opts);
 }
 myOwn.ActionColumnGrid.prototype = Object.create(myOwn.ColumnGrid.prototype);
 
 myOwn.ActionColumnGrid.prototype.th = function th(){
-    return html.th(this.params.actions);
+    return html.th(this.actions);
 }
 
-myOwn.DataColumnGrid = function ActionColumnGrid(opts){
-    this.params = opts;
+myOwn.DataColumnGrid = function DataColumnGrid(opts){
+    myOwn.ColumnGrid.call(this,opts);
 }
 myOwn.DataColumnGrid.prototype = Object.create(myOwn.ColumnGrid.prototype);
 
 myOwn.DataColumnGrid.prototype.th = function th(){
-    var fieldDef = this.params.fieldDef;
-    var grid = this.params.grid;
-    var th=html.th({colspan:grid.modes.inputColspan, "my-colname":fieldDef.name},fieldDef.title).create();
+    var fieldDef = this.fieldDef;
+    var grid = this.grid;
+    var th=html.th({class: "th-name", "my-colname":fieldDef.name},fieldDef.title).create();
     if(fieldDef.width){
         th.style.width=fieldDef.width+'px';
     }
@@ -207,11 +218,16 @@ myOwn.DataColumnGrid.prototype.th = function th(){
     return th;
 }
 
-myOwn.DetailColumnGrid = function ActionColumnGrid(){
-    this.params = opts;
+myOwn.DetailColumnGrid = function DetailColumnGrid(opts){
+    myOwn.ColumnGrid.call(this,opts);
 }
 
 myOwn.DetailColumnGrid.prototype = Object.create(myOwn.ColumnGrid.prototype);
+
+myOwn.DetailColumnGrid.prototype.th = function th(){
+    var th=html.th({"my-defname":this.detailTableDef.table, title:this.detailTableDef.label},this.detailTableDef.abr);
+    return th;
+};
 
 myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     var grid = this;
@@ -248,17 +264,15 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         });
     }
     grid.columns=[new my.ActionColumnGrid({actions:[buttonInsert,/*buttonSaveMode,*/buttonCreateFilter,buttonDestroyFilter]})].concat(
+        grid.def.detailTables.map(function(detailTableDef){ return new my.DetailColumnGrid({grid:grid, detailTableDef:detailTableDef}); })
     ).concat(
         grid.def.fields.map(function(fieldDef){ return new my.DataColumnGrid({grid:grid, fieldDef:fieldDef}); })
     ).concat(
     );
-    var detailHead = grid.def.detailTables.map(function(detailTableDef){
-        var th=html.th({"my-defname":detailTableDef.table, title:detailTableDef.label},detailTableDef.abr);
-        return th;
-    });
-    this.dom.columnsHead = grid.def.fields.map(function(fieldDef){
-    });
-    grid.dom.footInfo = html.td({colspan:grid.dom.columnsHead.length*grid.modes.inputColspan+detailHead.length, "is-processing":"1"}).create();
+    if(grid.modes.withColumnDetails==null){
+        grid.modes.withColumnDetails=grid.def.fields.some(function(fieldDef){ return fieldDef.label!=fieldDef.title; });
+    }
+    grid.dom.footInfo = html.td({colspan:grid.columns.length, "is-processing":"1"}).create();
     [
         {name:'displayFrom', value:'0'},
         {name:'elipsis', value:' ... '},
@@ -271,12 +285,8 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     grid.dom.table = html.table({"class":"my-grid", "my-table": grid.def.name},[
         html.caption(grid.def.title),
         html.thead([
-            html.tr(grid.columns.map(function(column){ return column.th(); }))
-///////////            
-            [
-                html.th()
-            ].
-            concat(detailHead).concat(grid.dom.columnsHead))
+            html.tr(grid.columns.map(function(column){ return column.th(); })),
+            grid.modes.withColumnDetails?html.tr(grid.columns.map(function(column){ return column.thDetail(); })):null,
         ]),
         html.tbody(),
         html.tfoot([
@@ -417,7 +427,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             });
         });
         grid.def.fields.forEach(function(fieldDef){
-            var td = html.td({colspan:grid.modes.inputColspan, "my-colname":fieldDef.name}).create();
+            var td = html.td({"my-colname":fieldDef.name}).create();
             TypedControls.adaptElement(td, fieldDef);
             depot.rowControls[fieldDef.name] = td;
             td.contentEditable=grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
