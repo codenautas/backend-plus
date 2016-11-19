@@ -172,8 +172,50 @@ myOwn.TableGrid.prototype.prepareAndDisplayGrid = function prepareAndDisplayGrid
     })
 };
 
+myOwn.ColumnGrid = function ColumnGrid(){
+}
+
+myOwn.ActionColumnGrid = function ActionColumnGrid(opts){
+    this.params = opts;
+}
+myOwn.ActionColumnGrid.prototype = Object.create(myOwn.ColumnGrid.prototype);
+
+myOwn.ActionColumnGrid.prototype.th = function th(){
+    return html.th(this.params.actions);
+}
+
+myOwn.DataColumnGrid = function ActionColumnGrid(opts){
+    this.params = opts;
+}
+myOwn.DataColumnGrid.prototype = Object.create(myOwn.ColumnGrid.prototype);
+
+myOwn.DataColumnGrid.prototype.th = function th(){
+    var fieldDef = this.params.fieldDef;
+    var grid = this.params.grid;
+    var th=html.th({colspan:grid.modes.inputColspan, "my-colname":fieldDef.name},fieldDef.title).create();
+    if(fieldDef.width){
+        th.style.width=fieldDef.width+'px';
+    }
+    th.addEventListener('click',function(){
+        var currentOrder=grid.view.sortColumns.length && grid.view.sortColumns[0].column==fieldDef.name?grid.view.sortColumns[0].order:null;
+        grid.view.sortColumns=grid.view.sortColumns.filter(function(sortColumn){
+            return sortColumn.column != fieldDef.name;
+        })
+        grid.view.sortColumns.unshift({column:fieldDef.name, order:currentOrder?-currentOrder:1})
+        grid.displayBody()
+    });
+    return th;
+}
+
+myOwn.DetailColumnGrid = function ActionColumnGrid(){
+    this.params = opts;
+}
+
+myOwn.DetailColumnGrid.prototype = Object.create(myOwn.ColumnGrid.prototype);
+
 myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     var grid = this;
+    var my = grid.my;
     var buttonInsert;
     var buttonCreateFilter;
     var buttonDestroyFilter;
@@ -205,24 +247,16 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
             grid.displayBody();
         });
     }
+    grid.columns=[new my.ActionColumnGrid({actions:[buttonInsert,/*buttonSaveMode,*/buttonCreateFilter,buttonDestroyFilter]})].concat(
+    ).concat(
+        grid.def.fields.map(function(fieldDef){ return new my.DataColumnGrid({grid:grid, fieldDef:fieldDef}); })
+    ).concat(
+    );
     var detailHead = grid.def.detailTables.map(function(detailTableDef){
         var th=html.th({"my-defname":detailTableDef.table, title:detailTableDef.label},detailTableDef.abr);
         return th;
     });
     this.dom.columnsHead = grid.def.fields.map(function(fieldDef){
-        var th=html.th({colspan:grid.modes.inputColspan, "my-colname":fieldDef.name},fieldDef.title).create();
-        if(fieldDef.width){
-            th.style.width=fieldDef.width+'px';
-        }
-        th.addEventListener('click',function(){
-            var currentOrder=grid.view.sortColumns.length && grid.view.sortColumns[0].column==fieldDef.name?grid.view.sortColumns[0].order:null;
-            grid.view.sortColumns=grid.view.sortColumns.filter(function(sortColumn){
-                return sortColumn.column != fieldDef.name;
-            })
-            grid.view.sortColumns.unshift({column:fieldDef.name, order:currentOrder?-currentOrder:1})
-            grid.displayBody()
-        });
-        return th;
     });
     grid.dom.footInfo = html.td({colspan:grid.dom.columnsHead.length*grid.modes.inputColspan+detailHead.length, "is-processing":"1"}).create();
     [
@@ -237,9 +271,12 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     grid.dom.table = html.table({"class":"my-grid", "my-table": grid.def.name},[
         html.caption(grid.def.title),
         html.thead([
-            html.tr([
-                html.th([buttonInsert,/*buttonSaveMode,*/buttonCreateFilter,buttonDestroyFilter])
-            ].concat(detailHead).concat(grid.dom.columnsHead))
+            html.tr(grid.columns.map(function(column){ return column.th(); }))
+///////////            
+            [
+                html.th()
+            ].
+            concat(detailHead).concat(grid.dom.columnsHead))
         ]),
         html.tbody(),
         html.tfoot([
