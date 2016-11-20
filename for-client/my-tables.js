@@ -307,7 +307,7 @@ myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElem
             belowTr.rowIndex-grid.dom.table.tHead.rows.length
         )+1;
     }else{
-        position = -1;
+        position = 0;
     }
     var depotForInsert = grid.createDepotFromRow({}, 'new');
     grid.connector.fixedFields.forEach(function(pair){

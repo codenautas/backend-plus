@@ -155,7 +155,7 @@ myOwn.insertRow = function insertRow(where){
     if(where.under){
         section = where.under.parentNode;
         iRow = where.under.sectionRowIndex+1;
-    }else if(where.iRow && (where.table||where.section)){
+    }else if('iRow' in where && (where.table||where.section)){
         section = where.table||where.section;
         iRow = where.iRow;
     }else{
