@@ -19,6 +19,7 @@ var escapeRegExp = bestGlobals.escapeRegExp;
 myOwn.firstDisplayCount = 20;
 myOwn.displayCountBreaks = [100,250,1000];
 myOwn.displayCountBreaks = [50,100,500];
+myOwn.comparatorWidth = 16;
 myOwn.comparator={
     '=':function(valueToCheck,condition){return valueToCheck == condition;},
     '~':function(valueToCheck,condition){return condition==null || RegExp(escapeRegExp(condition.toString()),'i').test(valueToCheck);},
@@ -248,7 +249,7 @@ myOwn.DataColumnGrid.prototype.thFilter = function thFilter(depot, iColumn){
     });
     TypedControls.adaptElement(elementFilter,fieldDef);
     var th=html.td({"class":"autoFilter"},[symbolFilter,elementFilter]).create();
-    elementFilter.width=grid.sizesForFilters[iColumn]-symbolFilter.offsetWidth-5;
+    elementFilter.width=grid.sizesForFilters[iColumn]-myOwn.comparatorWidth-5;
     elementFilter.style.width=elementFilter.width.toString()+'px';
     symbolFilter.addEventListener('click',function(){
         miniMenuPromise([
