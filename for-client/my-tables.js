@@ -186,6 +186,10 @@ myOwn.ColumnGrid.prototype.thDetail = function thLabel(){
     return html.th({class:'th-detail'}, (this.fieldDef||{}).label);
 }
 
+myOwn.ColumnGrid.prototype.thFilter = function thFilter(){
+    return html.th();
+}
+
 myOwn.ActionColumnGrid = function ActionColumnGrid(opts){
     myOwn.ColumnGrid.call(this,opts);
 }
@@ -193,6 +197,16 @@ myOwn.ActionColumnGrid.prototype = Object.create(myOwn.ColumnGrid.prototype);
 
 myOwn.ActionColumnGrid.prototype.th = function th(){
     return html.th(this.actions);
+}
+
+myOwn.ActionColumnGrid.prototype.thFilter = function thFilter(depot){
+    var buttonFilter=html.button(myOwn.messages.Filter+"!").create();
+    var grid = this.grid;
+    buttonFilter.addEventListener('click',function(){
+        grid.view.filter=depot;
+        grid.displayBody();
+    });
+    return html.th([buttonFilter]);
 }
 
 myOwn.DataColumnGrid = function DataColumnGrid(opts){
@@ -218,6 +232,43 @@ myOwn.DataColumnGrid.prototype.th = function th(){
     return th;
 }
 
+myOwn.DataColumnGrid.prototype.thFilter = function thFilter(depot, iColumn){
+    var grid = this.grid;
+    var fieldDef = this.fieldDef;
+    var fieldName=fieldDef.name;
+    depot.rowSymbols[fieldDef.name]='~';
+    var filterImage='img/'+my.comparator.traductor['~']+'.png';
+    var imgFilter=html.img({src:filterImage}); 
+    var symbolFilter=html.button({"class":'table-button', tabindex:-1},imgFilter).create();
+    var elementFilter=html.span({"class":"filter-span"}).create();
+    elementFilter.contentEditable=true;
+    depot.rowControls[fieldName]=elementFilter;
+    elementFilter.addEventListener('update',function(){
+        depot.row[fieldDef.name]=this.getTypedValue();
+    });
+    TypedControls.adaptElement(elementFilter,fieldDef);
+    var th=html.td({"class":"autoFilter"},[symbolFilter,elementFilter]).create();
+    elementFilter.width=grid.sizesForFilters[iColumn]-symbolFilter.offsetWidth-5;
+    elementFilter.style.width=elementFilter.width.toString()+'px';
+    symbolFilter.addEventListener('click',function(){
+        miniMenuPromise([
+            {value:'=', img:'img/igual.png'},
+            {value:'~', img:'img/parecido.png'},
+            {value:'\u2205', img:'img/vacio.png'},
+            {value:'>', img:'img/mayor.png'},
+            {value:'>=', img:'img/mayor-igual.png'},
+            {value:'<', img:'img/menor.png'},
+            {value:'<=', img:'img/menor-igual.png'},
+        ],{underElement:symbolFilter}).then(function(result){
+            filterImage='img/'+my.comparator.traductor[result]+'.png';
+           // imgFilter.src=filterImage;
+            symbolFilter.childNodes[0].src=filterImage;
+            depot.rowSymbols[fieldDef.name]=result;
+        });
+    });
+    return th;
+}
+
 myOwn.DetailColumnGrid = function DetailColumnGrid(opts){
     myOwn.ColumnGrid.call(this,opts);
 }
@@ -228,6 +279,17 @@ myOwn.DetailColumnGrid.prototype.th = function th(){
     var th=html.th({"my-defname":this.detailTableDef.table, title:this.detailTableDef.label},this.detailTableDef.abr);
     return th;
 };
+
+myOwn.SpecialColumnGrid = function SpecialColumnGrid(opts){
+    myOwn.ColumnGrid.call(this,opts);
+}
+myOwn.SpecialColumnGrid.prototype = Object.create(myOwn.ColumnGrid.prototype);
+
+myOwn.SpecialColumnGrid.prototype.th = function th(){
+    return html.th({class:this.class});
+}
+
+myOwn.SpecialColumnGrid.prototype.thDetail = myOwn.SpecialColumnGrid.prototype.th;
 
 myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     var grid = this;
@@ -263,11 +325,12 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
             grid.displayBody();
         });
     }
-    grid.columns=[new my.ActionColumnGrid({actions:[buttonInsert,/*buttonSaveMode,*/buttonCreateFilter,buttonDestroyFilter]})].concat(
+    grid.columns=[new my.ActionColumnGrid({grid:grid, actions:[buttonInsert,/*buttonSaveMode,*/buttonCreateFilter,buttonDestroyFilter]})].concat(
         grid.def.detailTables.map(function(detailTableDef){ return new my.DetailColumnGrid({grid:grid, detailTableDef:detailTableDef}); })
     ).concat(
         grid.def.fields.map(function(fieldDef){ return new my.DataColumnGrid({grid:grid, fieldDef:fieldDef}); })
     ).concat(
+        [new my.SpecialColumnGrid({class:"empty-rigth-column"})]
     );
     if(grid.modes.withColumnDetails==null){
         grid.modes.withColumnDetails=grid.def.fields.some(function(fieldDef){ return fieldDef.label!=fieldDef.title; });
@@ -476,22 +539,12 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
     grid.dom.table.setAttribute('has-filter',0);
     grid.createRowFilter = function createRowFilter(){
         var grid = this;
-        // relocalizado:
-        var sizesForFilters={};
-        grid.def.fields.forEach(function(fieldDef, i_fieldDef){
-            // TODO: garantizar la relación entre name y posición i_fieldDef
-            sizesForFilters[fieldDef.name]=grid.dom.columnsHead[i_fieldDef].offsetWidth
-        });
-        // fin-reloc
         if(grid.hasFilterRow){
             return true;
         }
-        var buttonFilter=html.button(myOwn.messages.Filter+"!").create();
-        var tr=html.tr({'class':'filter-line'}, [html.th([buttonFilter])]).create();
-        grid.hasFilterRow=tr;
-        grid.dom.table.setAttribute('has-filter',1);
-        grid.dom.table.tHead.appendChild(tr);
-        // tr.appendChild(html.td().create());
+        grid.sizesForFilters=Array.prototype.map.call(grid.dom.table.rows[0].cells,function(cell){
+            return cell.offsetWidth;
+        });
         var depot = {
             special: 'filter',
             my: grid.my,
@@ -504,42 +557,15 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             isFilterPending:false,
             tr: tr
         };
-        buttonFilter.addEventListener('click',function(){
-            grid.view.filter=depot;
-            grid.displayBody();
-        });
+        var tr=html.tr({'class':'filter-line'}, grid.columns.map(function(column, iColumn){
+            return column.thFilter(depot, iColumn);
+        })).create();
+        grid.hasFilterRow=tr;
+        grid.dom.table.setAttribute('has-filter',1);
+        grid.dom.table.tHead.appendChild(tr);
+        return true;
+        // tr.appendChild(html.td().create());
         grid.def.fields.forEach(function(fieldDef){
-            var fieldName=fieldDef.name;
-            depot.rowSymbols[fieldDef.name]='~';
-            var filterImage='img/'+my.comparator.traductor['~']+'.png';
-            var imgFilter=html.img({src:filterImage}); 
-            var symbolFilter=html.button({"class":'table-button', tabindex:-1},imgFilter).create();
-            var elementFilter=html.span({"class":"filter-span"}).create();
-            elementFilter.contentEditable=true;
-            depot.rowControls[fieldName]=elementFilter;
-            elementFilter.addEventListener('update',function(){
-                depot.row[fieldDef.name]=this.getTypedValue();
-            });
-            TypedControls.adaptElement(elementFilter,fieldDef);
-            tr.appendChild(html.td({"class":"autoFilter"},[symbolFilter,elementFilter]).create());
-            elementFilter.width=sizesForFilters[fieldDef.name]-symbolFilter.offsetWidth-5;
-            elementFilter.style.width=elementFilter.width.toString()+'px';
-            symbolFilter.addEventListener('click',function(){
-                miniMenuPromise([
-                    {value:'=', img:'img/igual.png'},
-                    {value:'~', img:'img/parecido.png'},
-                    {value:'\u2205', img:'img/vacio.png'},
-                    {value:'>', img:'img/mayor.png'},
-                    {value:'>=', img:'img/mayor-igual.png'},
-                    {value:'<', img:'img/menor.png'},
-                    {value:'<=', img:'img/menor-igual.png'},
-                ],{underElement:symbolFilter}).then(function(result){
-                    filterImage='img/'+my.comparator.traductor[result]+'.png';
-                   // imgFilter.src=filterImage;
-                    symbolFilter.childNodes[0].src=filterImage;
-                    depot.rowSymbols[fieldDef.name]=result;
-                });
-            });
         });
     }
     grid.displayBody=function displayBody(){
