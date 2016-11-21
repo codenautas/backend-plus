@@ -379,15 +379,19 @@ function isInteracive(element){
         (element instanceof HTMLInputElement || element instanceof HTMLButtonElement || element instanceof HTMLTextAreaElement)
         && !element.disabled
         || element instanceof HTMLElement && element.contentEditable=="true"
-    ) && element.style.display!='none' && element.style.visibility!='hidden' && !element.saltearEnter && element.saltearEnter>=0;
+    )
+    && element.style.display!='none'
+    && element.style.visibility!='hidden'
+    && !element.saltearEnter 
+    && (element.tabIndex==null || element.tabIndex>=0);
 }
 
-function proximo_elemento(elemento){
+function nextElement(elemento, noGoDownWhen){
 "use strict";
     var proximo=elemento;
     var no_me_voy_a_colgar=200;
-    if(elemento.children.length){
-        while(proximo.children.length>0 && no_me_voy_a_colgar--){
+    if(elemento.children.length && !noGoDownWhen(proximo)){
+        while(proximo.children.length>0 && no_me_voy_a_colgar-- && !noGoDownWhen(proximo)){
             proximo=proximo.children[0];
         }
         return proximo;
@@ -404,10 +408,10 @@ function proximo_elemento(elemento){
 
 function proximo_elemento_que_sea(elemento, controlador){
 "use strict";
-    var proximo=proximo_elemento(elemento);
+    var proximo=nextElement(elemento,controlador);
     var no_me_voy_a_colgar=2000;
     while(proximo && !controlador(proximo) && no_me_voy_a_colgar--){
-        proximo=proximo_elemento(proximo);
+        proximo=nextElement(proximo,controlador);
     }
     return proximo;
 }
