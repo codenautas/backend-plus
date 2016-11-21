@@ -115,23 +115,38 @@ describe('backend-plus', function(){
                             ))
                             .expect(function(res){
                                 var result;
-                                result=myOwn.encoders[procedureDef.encoding].parse(res.text);
-                                if(parameters.table && !"now, I'm using yaml"){
-                                    if(result){
-                                        var structure=be.tableStructures[parameters.table]({be});
-                                        myOwn.adaptData(structure, (result instanceof Array?result:[result]));
-                                    }
+                                if(res.error && !fixture.expectedError){
+                                    console.log("ERROR IN FIXTURE");
+                                    console.log(res.error);
+                                    console.log(res.error.stack);
+                                    throw new Error("unexpected error");
                                 }
-                                var expected = fixture.expected;
-                                var dif=result && expected && assert.allDifferences(result, expected);
-                                if(dif){
-                                    console.log('expected');
-                                    console.log(expected);
-                                    console.log('obtained');
-                                    console.log(result);
-                                    console.log('unexpected differences');
-                                    console.log(dif);
-                                    throw new Error('differences');
+                                if(!res.error && fixture.expectedError){
+                                    console.log("EXPECTED ERROR BUT NOT");
+                                    console.log(fixture.expectedError);
+                                    throw new Error("EXPECTED ERROR BUT NOT");
+                                }
+                                if(res.error && fixture.expectedError){
+                                    expect(res.error.message).to.match(fixture.expectedError);
+                                }else{
+                                    result=myOwn.encoders[procedureDef.encoding].parse(res.text);
+                                    if(parameters.table && !"now, I'm using yaml"){
+                                        if(result){
+                                            var structure=be.tableStructures[parameters.table]({be});
+                                            myOwn.adaptData(structure, (result instanceof Array?result:[result]));
+                                        }
+                                    }
+                                    var expected = fixture.expected;
+                                    var dif=result && expected && assert.allDifferences(result, expected);
+                                    if(dif){
+                                        console.log('expected');
+                                        console.log(expected);
+                                        console.log('obtained');
+                                        console.log(result);
+                                        console.log('unexpected differences');
+                                        console.log(dif);
+                                        throw new Error('differences');
+                                    }
                                 }
                             })
                             .expect(200,done);

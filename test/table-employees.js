@@ -8,8 +8,8 @@ module.exports = function(context){
         fields:[
             {name:'id_type'            , typeName:'text'   , nullable:false},
             {name:'id'                 , typeName:'integer', nullable:false},
-            {name:'first_name'         , typeName:'integer', nullable:false},
-            {name:'last_name'          , typeName:'integer', nullable:false},
+            {name:'first_name'         , typeName:'text'   , nullable:false},
+            {name:'last_name'          , typeName:'text'   , nullable:false},
             {name:'birth_date'         , typeName:'date'                   },
             {name:'salary'             , typeName:'numeric'                },
         ],

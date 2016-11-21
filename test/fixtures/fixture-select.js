@@ -25,4 +25,12 @@
         status: 'retrieved'
     },
     expected: {id_type: 'passport',id: 123456,first_name: 'Bob' ,last_name: 'Smith',birth_date: new Date(1990,1-1,8),salary: null },
+},{
+    skip: '#25',
+    // name: 'double update',
+    action: 'double-update-employees',
+    parameters: {
+        value: 5,
+    },
+    expectedError: /algo/,
 }]
