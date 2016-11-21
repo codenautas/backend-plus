@@ -373,11 +373,18 @@ myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElem
     }else{
         position = 0;
     }
+    while(
+        position<grid.dom.table.tBodies[0].rows.length && 
+        grid.dom.table.tBodies[0].rows[position].isDetail
+    ){
+        position++;
+    }
     var depotForInsert = grid.createDepotFromRow({}, 'new');
     grid.connector.fixedFields.forEach(function(pair){
         depotForInsert.row[pair.fieldName] = pair.value;
         depotForInsert.rowPendingForUpdate[pair.fieldName] = pair.value;
     });
+    //TODO: mejorar la posición dentro del splice o concluir que no sirve el splice
     grid.depots.splice(Math.min(grid.depots.length,Math.max(0,position)),0,depotForInsert);
     return grid.createRowElements(position, depotForInsert);
 };
@@ -480,6 +487,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     }
                     detailControl.show = true;
                     newTr.detailTableName=detailTableDef.table;
+                    newTr.isDetail=true;
                     depot.detailRows.push(newTr);
                 }else{
                     detailControl.img.src='img/detail-expand.png';
