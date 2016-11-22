@@ -3,6 +3,7 @@
 var Path = require('path');
 var backendPlus = require("../../..");
 var MiniTools = require('mini-tools');
+var changing = require('best-globals').changing;
 
 class AppExample extends backendPlus.AppBackend{
     constructor(){
@@ -10,7 +11,7 @@ class AppExample extends backendPlus.AppBackend{
         this.rootPath=Path.resolve(__dirname,'..');
         console.log('rootPath',this.rootPath);
         this.tableStructures = {};
-        this.tableStructures.usuarios = require('./table-usuarios.js');
+        this.tableStructures.users = require('./table-users.js');
         this.tableStructures.fichas = require('./table-fichas.js');
         this.tableStructures.publicaciones = require('./table-publicaciones.js');
     }
@@ -24,8 +25,14 @@ class AppExample extends backendPlus.AppBackend{
         var be = this;
         var indexOpts = {};
         be.app.get('/',function(req, res, next){
-            return MiniTools.serveJade(be.rootPath+'client/index', changing(indexOpts,{
+            return MiniTools.serveJade(be.rootPath+'/client/index', changing(indexOpts,{
                 isAdmin:req.user.rol=='admin',
+                isUser:req.user.rol=='admin' || req.user.rol=='user'
+            }))(req, res, next);
+        });
+        be.app.get('/admin',function(req, res, next){
+            return MiniTools.serveJade(be.rootPath+'/client/admin', changing(indexOpts,{
+                isAdmin:req.user.rol=='admin' || true,
                 isUser:req.user.rol=='admin' || req.user.rol=='user'
             }))(req, res, next);
         });

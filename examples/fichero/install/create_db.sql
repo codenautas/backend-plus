@@ -33,10 +33,10 @@ create table fichas(
 autor          text       ,
 fichanro       integer    primary key,
 titulo         text       ,
-annio          numeric    ,
-medida1        numeric    ,
-medida2        numeric    ,
-medida3        numeric    ,
+annio          integer    ,
+medida1        integer    ,
+medida2        integer    ,
+medida3        integer    ,
 tecnica        text       ,
 ubicación      text       ,
 propietario    text       ,
@@ -45,7 +45,7 @@ enmarcado      text       ,
 imagenadelante text       ,
 imagenatras    text       ,
 observaciones  text       ,
-costo          numeric    ,
+costo          integer    ,
 notas          text    
 );
 alter table fichas owner to beplus_example_user;

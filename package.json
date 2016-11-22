@@ -25,7 +25,7 @@
     "fs-promise": "~1.0.0", 
     "js-yaml": "~3.7.0",
     "lodash": "~4.17.2",
-    "numeral": "~1.5.3",
+    "numeral": "~1.5.5",
     "pug": "~2.0.0-beta6",
     "read-yaml-promise": "~1.0.2",
     "stylus": "~0.54.5",
