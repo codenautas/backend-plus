@@ -21,13 +21,21 @@ class AppExample extends backendPlus.AppBackend{
             __dirname+'/local-config.yaml'
         ]);
     }
-    addPublicServices(){
+    addPublicServices(mainApp, baseUrl){
+        super.addPublicServices(mainApp, baseUrl);
         var be = this;
         var indexOpts = {};
-        be.app.get('/index',function(req, res, next){
+        ['index.js'].forEach(function(fileName){
+            mainApp.use(baseUrl+'/'+fileName, 
+                MiniTools.serveFile(Path.join(be.rootPath+'/client/',fileName))
+            );
+        });
+        mainApp.get(baseUrl+'/index.css',MiniTools.serveStylus(be.rootPath+'/client/index.styl'));
+        mainApp.get(baseUrl+'/index',function(req, res, next){
+            var rol = (req.user||{}).rol
             return MiniTools.serveJade(be.rootPath+'/client/index', changing(indexOpts,{
-                isAdmin:req.user.rol=='admin',
-                isUser:req.user.rol=='admin' || req.user.rol=='user'
+                isAdmin:rol=='admin',
+                isUser:rol=='admin' || rol=='user'
             }))(req, res, next);
         });
     }

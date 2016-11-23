@@ -23,6 +23,8 @@ class AppExample extends backendPlus.AppBackend{
             __dirname+'/local-config.yaml'
         ]);
     }
+    addPublicServices(){
+    }
     addLoggedServices(){
         var be = this;
         super.addLoggedServices();
