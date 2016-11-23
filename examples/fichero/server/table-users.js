@@ -12,6 +12,7 @@ module.exports = function(context){
             {name:'active_until'    , typeName:'date'                   },
             {name:'locked_since'    , typeName:'date'                   },
             {name:'rol'             , typeName:'text'                   },
+            {name:'clave_nueva'     , typeName:'text', clientSide:'newPass', allow:{select:admin, update:false, insert:false} },
         ],
         primaryKey:['username'],
         sql:{

@@ -12,7 +12,18 @@ function linkButtons(selector, f){
     });
 }
 
+function centrar(){
+    imgCentral.style.position='fixed';
+    imgCentral.style.left=(window.innerWidth-imgCentral.offsetWidth)/2+'px';
+    imgCentral.style.top=(window.innerHeight-imgCentral.offsetHeight)/2+'px';
+}
+
+window.addEventListener('resize', function(){
+    centrar();
+});
+
 window.addEventListener('load', function(){
+    imgCentral.onload=centrar();
     my.autoSetup().then(function(){
         linkButtons('button.tables', function(){
             var layout = document.getElementById('table_layout');

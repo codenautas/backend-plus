@@ -5,18 +5,14 @@ html(lang="en")
     link(rel='stylesheet', href='dialog-promise.css')
     link(rel='stylesheet', href='my-things.css')
     link(rel='stylesheet', href='my-tables.css')
-    link(rel='stylesheet', href='admin.css')
+    link(rel='stylesheet', href='index.css')
   body
     div#main_layout
-      div#barra_superior
-        button.link#index index
-        if isAdmin || isUser
-          button.tables(id-table="fichas"  ) fichas
-          if isAdmin
-            button.tables(id-table="users") usuarios
-        button.link#chpass cambio clave
-        button.link#logout salir
-      div#table_layout
+      div#div_fichas
+        a#tools(href='admin')
+          img(src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Tools-spanner-hammer.svg/48px-Tools-spanner-hammer.svg.png')
+        img#imgCentral(src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Pittura-Painting6.JPG/640px-Pittura-Painting6.JPG')
+      div#div_miniaturas
     pre#status
     script(src='js-yaml.js')
     script(src='require-bro.js')
@@ -30,4 +26,4 @@ html(lang="en")
     script(src='my-tables.js')
     script(src='my-inform-net-status.js')
     script(src='cliente-en-castellano.js') 
-    script(src='admin.js')
+    script(src='index.js')

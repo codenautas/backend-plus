@@ -676,4 +676,28 @@ myOwn.tableAction={
 }
 
 myOwn.clientSides={
+    newPass:{
+        action: function(depot, fieldName){
+            var td=depot.rowControls[fieldName];
+            td.contentEditable=true;
+            TypedControls.adaptElement(td, 'text');
+            td.addEventListener('update', function(event){
+                var newPass = td.getTypedValue();
+                td.setAttribute('io-status','updating');
+                depot.row[fieldName] = newPass;
+                var my=depot.manager.my;
+                my.ajax.admin.chpass({
+                    user:depot.row[depot.manager.def.primaryKey[depot.manager.def.primaryKey.length-1]],
+                    newpass:newPass
+                }).then(function(){
+                    td.setAttribute('io-status','temporal-ok');
+                    setTimeout(function(){
+                        td.setAttribute('io-status','ok');
+                    },3000);
+                },function(){
+                    td.setAttribute('io-status','error');
+                });
+            }, true);
+        }
+    }
 }

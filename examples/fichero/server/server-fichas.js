@@ -21,18 +21,22 @@ class AppExample extends backendPlus.AppBackend{
             __dirname+'/local-config.yaml'
         ]);
     }
-    addLoggedServices(){
+    addPublicServices(){
         var be = this;
         var indexOpts = {};
-        be.app.get('/',function(req, res, next){
+        be.app.get('/index',function(req, res, next){
             return MiniTools.serveJade(be.rootPath+'/client/index', changing(indexOpts,{
                 isAdmin:req.user.rol=='admin',
                 isUser:req.user.rol=='admin' || req.user.rol=='user'
             }))(req, res, next);
         });
+    }
+    addLoggedServices(){
+        var be = this;
+        var indexOpts = {};
         be.app.get('/admin',function(req, res, next){
             return MiniTools.serveJade(be.rootPath+'/client/admin', changing(indexOpts,{
-                isAdmin:req.user.rol=='admin' || true,
+                isAdmin:req.user.rol=='admin',
                 isUser:req.user.rol=='admin' || req.user.rol=='user'
             }))(req, res, next);
         });
