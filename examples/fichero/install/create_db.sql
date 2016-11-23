@@ -44,6 +44,7 @@ publicado      boolean    ,
 enmarcado      text       ,
 imagenadelante text       ,
 imagenatras    text       ,
+miniatura      text       ,
 observaciones  text       ,
 costo          integer    ,
 notas          text    

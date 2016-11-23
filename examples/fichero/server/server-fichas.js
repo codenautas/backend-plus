@@ -22,7 +22,6 @@ class AppExample extends backendPlus.AppBackend{
         ]);
     }
     addPublicServices(mainApp, baseUrl){
-        super.addPublicServices(mainApp, baseUrl);
         var be = this;
         var indexOpts = {};
         ['index.js'].forEach(function(fileName){
@@ -38,6 +37,7 @@ class AppExample extends backendPlus.AppBackend{
                 isUser:rol=='admin' || rol=='user'
             }))(req, res, next);
         });
+        super.addPublicServices(mainApp, baseUrl);
     }
     addLoggedServices(){
         var be = this;
