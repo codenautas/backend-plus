@@ -506,16 +506,18 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             if(depot.row[fieldDef.name]!=null){
                 td.setTypedValue(depot.row[fieldDef.name]);
             }
-            td.addEventListener('update',function(){
-                var value = this.getTypedValue();
-                if(value!==depot.row[fieldDef.name]){
-                    this.setAttribute('io-status', 'pending');
-                    depot.rowPendingForUpdate[fieldDef.name] = value;
-                    if(grid.modes.saveByField){
-                        saveRow(depot,{visiblyLogErrors:false});
+            if(!fieldDef.clientSide){
+                td.addEventListener('update',function(){
+                    var value = this.getTypedValue();
+                    if(value!==depot.row[fieldDef.name]){
+                        this.setAttribute('io-status', 'pending');
+                        depot.rowPendingForUpdate[fieldDef.name] = value;
+                        if(grid.modes.saveByField){
+                            saveRow(depot,{visiblyLogErrors:false});
+                        }
                     }
-                }
-            });
+                });
+            }
             tr.appendChild(td);
         });
         tr.addEventListener('focusout', function(event){
