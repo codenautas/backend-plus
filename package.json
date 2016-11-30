@@ -31,27 +31,27 @@
     "stylus": "~0.54.5",
 
     "ajax-best-promise": "~0.2.1",
-    "best-globals": "~0.5.5",
+    "best-globals": "~0.7.0",
     "best-promise": "~0.2.4",
     "castellano": "~0.0.3",
     "dialog-promise": "~0.3.2",
     "extension-serve-static": "~0.1.6",
     "js-to-html": "~0.9.2",
-    "json4all": "~0.2.2",
+    "json4all": "~0.2.4",
     "login-plus": "~1.0.1",
     "mini-tools": "~0.3.8",
     "pg-promise-strict": "~0.2.5",
     "promise-plus": "~0.0.6",
     "regexplicit": "~0.0.8",
     "require-bro": "~0.1.4",
-    "self-explain": "~0.10.9",
+    "self-explain": "~0.10.10",
     "serve-content": "~0.2.0",
-    "typed-controls": "~0.4.1"
+    "typed-controls": "~0.4.3"
   },
   "devDependencies": {
     "expect.js": "~0.3.1",
     "istanbul": "~0.4.5",
-    "mocha": "~3.1.2",
+    "mocha": "~3.2.0",
     "sinon": "~1.17.6",
     "supertest": "~2.0.1",
     
