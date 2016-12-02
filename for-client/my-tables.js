@@ -419,11 +419,6 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             }
             if(editable){
                 td.setTypedValue(depot.row[fieldDef.name]);
-                td.addEventListener('blur',function(){
-                    return depot.connector.enterRecord(depot).then(function(result){
-                        console.log(result,td)
-                    });
-                })
             }
         });
     }
@@ -542,6 +537,13 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 }
             }
         });
+        tr.addEventListener('focusin',function(event){
+            if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
+                return depot.connector.enterRecord(depot).then(function(result){
+                    console.log(result);
+                });
+            }
+        })
         if(iRow===-1){
             depot.detailRows.forEach(function(detailTr){
                 var detailControl = depot.detailControls[detailTr.detailTableName];
