@@ -94,6 +94,16 @@ myOwn.TableConnector.prototype.saveRecord = function saveRecord(depot, opts){
     });
 };
 
+myOwn.TableConnector.prototype.enterRecord = function enterRecord(depot){
+    return (depot.primaryKeyValues===false?
+        Promise.resolve():
+        depot.my.ajax.table['enter-record']({
+            table:depot.def.name, 
+            primaryKeyValues:depot.primaryKeyValues
+        })
+    );
+};
+
 myOwn.TableGrid = function(context, mainElement){
     for(var attr in context){
         this[attr] = context[attr];
@@ -409,6 +419,11 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             }
             if(editable){
                 td.setTypedValue(depot.row[fieldDef.name]);
+                td.addEventListener('blur',function(){
+                    return depot.connector.enterRecord(depot).then(function(result){
+                        console.log(result,td)
+                    });
+                })
             }
         });
     }
