@@ -28,8 +28,8 @@ module.exports = function(context){
         ],
         sql:{
             from:`(select dondepublicado as publicacion, count(*)::integer as cantidad, 
-                    case when count(*)=1 then min(anniopublicado)::text
-                      when count(*)=2 then min(anniopublicado) ||', '|| max(anniopublicado)
+                    case when count(distinct anniopublicado)=1 then min(anniopublicado)::text
+                      when count(distinct anniopublicado)=2 then min(anniopublicado) ||', '|| max(anniopublicado)
                       else min(anniopublicado) ||'...'|| max(anniopublicado)
                     end as annio
                 from publicaciones group by publicacion) p`
