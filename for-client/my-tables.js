@@ -251,8 +251,7 @@ myOwn.DataColumnGrid.prototype.thFilter = function thFilter(depot, iColumn){
     var filterImage='img/'+my.comparator.traductor['~']+'.png';
     var imgFilter=html.img({src:filterImage}); 
     var symbolFilter=html.button({"class":'table-button', tabindex:-1},imgFilter).create();
-    var elementFilter=html.span({"class":"filter-span"}).create();
-    elementFilter.contentEditable=true;
+    var elementFilter=html.span({"class":"filter-span", "typed-controls-direct-input":true}).create();
     depot.rowControls[fieldName]=elementFilter;
     elementFilter.addEventListener('update',function(){
         depot.row[fieldDef.name]=this.getTypedValue();
@@ -413,7 +412,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         grid.def.fields.forEach(function(fieldDef){
             var td = depot.rowControls[fieldDef.name];
             var editable=grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
-            td.contentEditable=editable;
+            td.disable(!editable);
             if(fieldDef.clientSide){
                 grid.my.clientSides[fieldDef.clientSide].action(depot, fieldDef.name);
             }
@@ -509,10 +508,10 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             });
         });
         grid.def.fields.forEach(function(fieldDef){
-            var td = html.td({"my-colname":fieldDef.name}).create();
+            var directInput=grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
+            var td = html.td({"my-colname":fieldDef.name, "typed-controls-direct-input":directInput}).create();
             TypedControls.adaptElement(td, fieldDef);
             depot.rowControls[fieldDef.name] = td;
-            td.contentEditable=grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
             if(depot.row[fieldDef.name]!=null){
                 td.setTypedValue(depot.row[fieldDef.name]);
             }
@@ -698,7 +697,7 @@ myOwn.clientSides={
     newPass:{
         action: function(depot, fieldName){
             var td=depot.rowControls[fieldName];
-            td.contentEditable=true;
+            td.disable(false);
             TypedControls.adaptElement(td, 'text');
             td.addEventListener('update', function(event){
                 var newPass = td.getTypedValue();

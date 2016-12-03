@@ -46,7 +46,7 @@
     "require-bro": "~0.1.4",
     "self-explain": "~0.10.10",
     "serve-content": "~0.2.0",
-    "typed-controls": "~0.4.3"
+    "typed-controls": "~0.5.0"
   },
   "devDependencies": {
     "expect.js": "~0.3.1",
