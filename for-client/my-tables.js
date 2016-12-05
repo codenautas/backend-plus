@@ -103,6 +103,15 @@ myOwn.TableConnector.prototype.enterRecord = function enterRecord(depot){
         })
     );
 };
+myOwn.TableConnector.prototype.deleteEnter = function enterRecord(depot){
+    return (depot.primaryKeyValues===false?
+        Promise.resolve():
+        depot.my.ajax.table['delete-enter']({
+            table:depot.def.name, 
+            primaryKeyValues:depot.primaryKeyValues
+        })
+    );
+};
 
 myOwn.TableGrid = function(context, mainElement){
     for(var attr in context){
@@ -397,7 +406,6 @@ myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElem
     grid.depots.splice(Math.min(grid.depots.length,Math.max(0,position)),0,depotForInsert);
     return grid.createRowElements(position, depotForInsert);
 };
-
 myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
     var grid = this;
     var tbody = grid.dom.table.tBodies[0];
@@ -531,15 +539,19 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         });
         tr.addEventListener('focusout', function(event){
             if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
+                depot.connector.deleteEnter(depot).then(function(result){
+                    console.log(result);
+                });
                 if(Object.keys(depot.rowPendingForUpdate).length){
                     saveRow(depot);
                 }
             }
         });
+        
         tr.addEventListener('focusin',function(event){
             if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
                 return depot.connector.enterRecord(depot).then(function(result){
-                    console.log(result);
+                    //console.log(result);
                 });
             }
         })
