@@ -551,7 +551,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         tr.addEventListener('focusin',function(event){
             if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
                 return depot.connector.enterRecord(depot).then(function(result){
-                    //console.log(result);
+                    console.log(result);
                 });
             }
         })
