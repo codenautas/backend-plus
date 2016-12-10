@@ -24,3 +24,5 @@ login:
     loginForm:
       formTitle: example tables
       formImg: unlogged/tables-lock.png
+client-setup:
+  cursors: true

@@ -57,13 +57,13 @@ myOwn.autoSetup = function autoSetup(){
     var my = this;
     var readProcedureDefinitions = function readProcedureDefinitions(){
         return my.ajaxPromise({
-            action:'def-procedures',
+            action:'client-setup',
             method:'get',
             encoding:'JSON',
             parameters:[],
-        }).then(function(defSource){
-            my.proceduresDef=eval(defSource);
-            my.proceduresDef.forEach(function(procedureDef){
+        }).then(function(setup){
+            my.config = setup;
+            my.config.procedures.forEach(function(procedureDef){
                 var target;
                 var lastName = null;
                 var partsNames=procedureDef.action.split('/').filter(id).forEach(function(name){
@@ -193,18 +193,20 @@ myOwn.adaptData = function adaptData(tableDef, rows){
                     row[fieldDef.name] = row[fieldDef.name]-0;
                 }
             }
+            /*
             if(fieldDef.typeName=='date'){
                 if(row[fieldDef.name] && !(row[fieldDef.name] instanceof Date)){
                     row[fieldDef.name] = bestGlobals.date.iso(row[fieldDef.name]);
                 }
             }
+            */
         });
     });
 };
 
 Object.defineProperty(myOwn, 'ajax', {
     get: function ajax(){
-        if(!this.proceduresDef){
+        if(!this.config){
             throw new Error("before use myOwn.ajax, myOwn.autoSetup() must be called");
         }else{
             return this.ajaxPromise;

@@ -1,17 +1,29 @@
 "use strict";
 
+var JSON4all = require('json4all');
+
 var changing = bestGlobals.changing;
+
+function sameValue(a,b){
+    return a==b || a instanceof Date && b instanceof Date && a.getTime() == b.getTime();
+}
 
 myOwn.messages=changing(myOwn.messages, {
     loading: "loading",
     Filter : "Filter",
     Delete : "Delete",
+    anotherUserChangedTheRow: "Another user changed the row",
+    oldValue: "old value",
+    actualValueInDB: "actual value in database"
 });
 
 myOwn.es=changing(myOwn.es, {
     loading: "cargando",
     Filter : "Filtrar",
     Delete : "Eliminar",
+    anotherUserChangedTheRow: "Otro usuario modificó el registro",
+    oldValue: "valor anterior",
+    actualValueInDB: "valor actual en la base de datos"
 });
 
 var escapeRegExp = bestGlobals.escapeRegExp;
@@ -82,20 +94,26 @@ myOwn.TableConnector.prototype.deleteRecord = function deleteRecord(depot){
     );
 };
 
+myOwn.cloneRow = function cloneRow(row){
+    return JSON4all.parse(JSON4all.stringify(row));
+}
+
 myOwn.TableConnector.prototype.saveRecord = function saveRecord(depot, opts){
+    var sendedForUpdate = depot.my.cloneRow(depot.rowPendingForUpdate);
     return depot.my.ajax.table['save-record']({
         table: depot.def.name,
         primaryKeyValues: depot.primaryKeyValues,
         newRow: depot.rowPendingForUpdate,
+        oldRow: depot.retrievedRow,
         status: depot.status
     },opts).then(function(updatedRow){
         depot.my.adaptData(depot.def,[updatedRow]);
-        return updatedRow;
+        return {sendedForUpdate:sendedForUpdate, updatedRow:updatedRow};
     });
 };
 
 myOwn.TableConnector.prototype.enterRecord = function enterRecord(depot){
-    return (depot.primaryKeyValues===false?
+    return (!this.my.config.cursor || depot.primaryKeyValues===false?
         Promise.resolve():
         depot.my.ajax.table['enter-record']({
             table:depot.def.name, 
@@ -104,7 +122,7 @@ myOwn.TableConnector.prototype.enterRecord = function enterRecord(depot){
     );
 };
 myOwn.TableConnector.prototype.deleteEnter = function enterRecord(depot){
-    return (depot.primaryKeyValues===false?
+    return (!this.my.config.cursor || depot.primaryKeyValues===false?
         Promise.resolve():
         depot.my.ajax.table['delete-enter']({
             table:depot.def.name, 
@@ -159,6 +177,7 @@ myOwn.TableGrid.prototype.createDepotFromRow = function createDepotFromRow(row, 
         manager: grid,
         rowControls:{},
         row: row,
+        retrievedRow: row,
         rowPendingForUpdate:{},
         primaryKeyValues:false,
         status: status||'preparing',
@@ -430,27 +449,77 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         });
     }
     var saveRow = function(depot, opts){
-        var fieldNames=Object.keys(depot.rowPendingForUpdate);
-        var changeIoStatus = function changeIoStatus(newStatus, title){
+        if(!('saving' in depot)){
+            depot.saving = Promise.resolve();
+        }
+        var changeIoStatus = function changeIoStatus(newStatus, objectWithFieldsOrListOfFieldNames, title){
+            var fieldNames=typeof objectWithFieldsOrListOfFieldNames === "string"?[objectWithFieldsOrListOfFieldNames]:(
+                objectWithFieldsOrListOfFieldNames instanceof Array?objectWithFieldsOrListOfFieldNames:Object.keys(objectWithFieldsOrListOfFieldNames)
+            );
             fieldNames.forEach(function(name){ 
                 var td=depot.rowControls[name];
                 td.setAttribute('io-status', newStatus); 
                 if(title){
-                    //td.title=err.message;
+                    td.title=title;
+                }else{
+                    td.title='';
                 }
             });
         }
-        changeIoStatus('updating');
-        grid.connector.saveRecord(depot, opts).then(function(updatedRow){
-            depot.row = updatedRow;
-            depot.rowPendingForUpdate = {};
-            grid.updateRowData(depot);
-            changeIoStatus('temporal-ok');
-            setTimeout(function(){
-                changeIoStatus('ok');
-            },3000);
-        }).catch(function(err){
-            changeIoStatus('error',err.message);
+        changeIoStatus('updating',depot.rowPendingForUpdate);
+        depot.saving = depot.saving.then(function(){
+            if(!Object.keys(depot.rowPendingForUpdate).length){
+                return Promise.resolve();
+            }
+            return grid.connector.saveRecord(depot, opts).then(function(result){
+                var retrievedRow = result.updatedRow;
+                for(var fieldName in retrievedRow){
+                    if(!grid.def.field[fieldName].clientSide){
+                        var value = depot.rowControls[fieldName].getTypedValue();
+                        if(!sameValue(depot.row[fieldName], value)){
+                            depot.rowPendingForUpdate[fieldName] = value;
+                            depot.row[fieldName] = value;
+                        }
+                    }
+                    if(fieldName in depot.rowPendingForUpdate){
+                        var source = fieldName in result.sendedForUpdate?result.sendedForUpdate:depot.retrievedRow;
+                        if(sameValue(depot.rowPendingForUpdate[fieldName], retrievedRow[fieldName])){
+                            // ok, lo que viene coincide con lo pendiente
+                            delete depot.rowPendingForUpdate[fieldName];
+                            changeIoStatus('temporal-ok', fieldName);
+                            setTimeout(function(fieldName){
+                                changeIoStatus('ok', fieldName);
+                            },3000,fieldName);
+                        }else if(sameValue(retrievedRow[fieldName], source[fieldName])){
+                            // ok, si bien lo que viene no coincide con lo pendiente que sigue pendiente, 
+                            // sí coincide con lo que estaba antes de mandar a grabar, 
+                            // entonces no hay conflicto el usuario sabe sobre qué está modificando
+                        }else{
+                            // no coincide con lo pendiente ni con lo anterior, 
+                            // hay un conflicto con el conocimiento del usuario que modificó algo que estaba en otro estado
+                            changeIoStatus('write-read-conflict', 
+                                fieldName, 
+                                myOwn.messages.anotherUserChangedTheRow+'. \n'+
+                                myOwn.messages.oldValue+': '+source[fieldName]+' \n'+
+                                myOwn.messages.actualValueInDB+': '+retrievedRow[fieldName]
+                            );
+                        }
+                    }else{
+                        if(!sameValue(retrievedRow[fieldName], depot.row[fieldName])){
+                            changeIoStatus('background-change', fieldName);
+                            depot.row[fieldName] = retrievedRow[fieldName];
+                            depot.rowControls[fieldName].setTypedValue(retrievedRow[fieldName]);
+                            setTimeout(function(fieldName){
+                                changeIoStatus('ok', fieldName);
+                            },3000,fieldName);
+                        }
+                    }
+                }
+                depot.retrievedRow = retrievedRow;
+                grid.updateRowData(depot);
+            }).catch(function(err){
+                changeIoStatus('error',depot.rowPendingForUpdate,err.message);
+            });
         });
     }
     grid.createRowElements = function createRowElements(iRow, depot){
@@ -529,6 +598,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     if(value!==depot.row[fieldDef.name]){
                         this.setAttribute('io-status', 'pending');
                         depot.rowPendingForUpdate[fieldDef.name] = value;
+                        depot.row[fieldDef.name] = value;
                         if(grid.modes.saveByField){
                             saveRow(depot,{visiblyLogErrors:false});
                         }
