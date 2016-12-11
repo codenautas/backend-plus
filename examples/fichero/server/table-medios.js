@@ -14,7 +14,7 @@ module.exports = function(context){
     var W={select:true, udpate:false, delete:false, insert:false};
     var RO={select:true, udpate:false, delete:false, insert:false};
     return context.be.tableDefAdapt({
-        name:'publicaciones',
+        name:'medios',
         editable:context.user.rol==='admin',
         fields:[
             {name:'medionro'    ,typeName:'integer' , allow:A},
@@ -30,14 +30,6 @@ module.exports = function(context){
         detailTables:[
             {table: 'apariciones', fields:['medionro'], abr:'F', label:'fichas'}
         ],
-        sql:{
-            from:`(select dondepublicado as publicacion, count(*)::integer as cantidad, 
-                    case when count(distinct anniopublicado)=1 then min(anniopublicado)::text
-                      when count(distinct anniopublicado)=2 then min(anniopublicado) ||', '|| max(anniopublicado)
-                      else min(anniopublicado) ||'...'|| max(anniopublicado)
-                    end as annio
-                from publicaciones group by publicacion) p`
-        }
     });
 }
 

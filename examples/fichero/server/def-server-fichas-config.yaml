@@ -7,13 +7,14 @@ db:
   motor: postgresql
   host: localhost
   database: beplus_example_db
-  schema: fic
+  schema: fch
   user: beplus_example_user
   password: beplus_example_3948812bdz
 login:
   table: users
   userFieldName: username
   passFieldName: md5pass
+  rolFieldName: rol
   infoFieldList: [username, rol]
   activeClausule: current_timestamp<=active_until
   lockedClausule: current_timestamp>=locked_since

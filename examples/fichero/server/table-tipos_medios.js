@@ -12,19 +12,18 @@ module.exports = function(context){
     var A=allow({admin: true});
     var U=allow({admin: true, user:true});
     var W={select:true, udpate:false, delete:false, insert:false};
+    var RO={select:true, udpate:false, delete:false, insert:false};
     return context.be.tableDefAdapt({
-        name:'apariciones',
+        name:'tipos_medios',
+        title:'tipos de medios',
         editable:context.user.rol==='admin',
         fields:[
-            {name:'medionro'       ,typeName:'integer' ,title:'medio'        ,label:'Nro de medio'         , allow:W},
-            {name:'fichanro'       ,typeName:'integer' ,title:'ficha'        ,label:'Nro de ficha'         , allow:W},
-            {name:'observaciones'  ,typeName:'text'    ,title:'observaciones'                              , allow:W},
+            {name:'tipo_medio'  ,typeName:'text'    , allow:A},
         ],
-        primaryKey:['medionro', 'fichanro'],
-        foreignKeys:[
-            {references:'medios', fields:['medionro']},
-            {references:'fichas', fields:['fichanro']}
-        ],
+        primaryKey:['tipo_medio'],
+        detailTables:[
+            {table: 'tipos_medios', fields:['tipo_medio'], abr:'M', label:'medios'}
+        ], 
     });
 }
 

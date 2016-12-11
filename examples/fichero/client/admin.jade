@@ -11,9 +11,11 @@ html(lang="en")
       div#barra_superior
         button.link#index index
         if isAdmin || isUser
-          button.tables(id-table="fichas"  ) fichas
-          button.tables(id-table="publicaciones-g") publicaciones
-          button.tables(id-table="publicaciones-f") publicaciones-fichas
+          button.tables(id-table="fichas") fichas
+          button.tables(id-table="medios") medios
+          button.tables(id-table="autores") autores
+          button.tables(id-table="tipos_medios") tipos de medios
+          button.tables(id-table="apariciones") apariciones
           if isAdmin
             button.tables(id-table="users") usuarios
         button.link#chpass cambio clave

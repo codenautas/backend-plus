@@ -13,8 +13,7 @@ module.exports = function(context){
     var U=allow({admin: true, user:true});
     var W={select:true, insert:true, update:true, delete:true};
     return context.be.tableDefAdapt({
-        name:'fichas',
-        title:'fichas',
+        name:'autores',
         editable:true,
         editableFieldDef:true,
         fields:[
