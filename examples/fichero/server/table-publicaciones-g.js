@@ -14,17 +14,17 @@ module.exports = function(context){
     var W={select:true, udpate:false, delete:false, insert:false};
     var RO={select:true, udpate:false, delete:false, insert:false};
     return context.be.tableDefAdapt({
-        name:'publicaciones-g',
-        title:'publicaciones',
+        name:'publicaciones',
         editable:context.user.rol==='admin',
         fields:[
-            {name:'publicacion' ,typeName:'text'    , allow:RO},
-            {name:'cantidad'    ,typeName:'integer' , allow:RO},
-            {name:'annio'       ,typeName:'text'    , title:'año', allow:RO},
+            {name:'medionro'    ,typeName:'integer' , allow:A},
+            {name:'tipo_medio'  ,typeName:'text'    , allow:A},
+            {name:'publicacion' ,typeName:'text'    , allow:U},
+            {name:'periodo'     ,typeName:'text'    , label:'año/mes/fecha/período', allow:U},
         ],
         primaryKey:['publicacion'],
         detailTables:[
-            {table: 'publicaciones-f', fields:[{source:'publicacion', target:'dondepublicado'}], abr:'F', label:'fichas'}
+            {table: 'apariciones', fields:['medionro'], abr:'F', label:'fichas'}
         ],
         sql:{
             from:`(select dondepublicado as publicacion, count(*)::integer as cantidad, 

@@ -13,15 +13,14 @@ module.exports = function(context){
     var U=allow({admin: true, user:true});
     var W={select:true, udpate:false, delete:false, insert:false};
     return context.be.tableDefAdapt({
-        name:'publicaciones',
-        title:'publicaciones',
+        name:'apariciones',
         editable:context.user.rol==='admin',
         fields:[
-            {name:'fichanro'       ,typeName:'integer' ,title:'ficha',label:'Nro de ficha'         , allow:W},
-            {name:'dondepublicado' ,typeName:'text'    ,title:'lugar',label:'¿Dónde fue publicado?', allow:W},
-            {name:'anniopublicado' ,typeName:'integer' ,title:'año'  ,label:'Año de publicación'   , allow:W},
+            {name:'medionro'       ,typeName:'integer' ,title:'medio'        ,label:'Nro de medio'         , allow:W},
+            {name:'fichanro'       ,typeName:'integer' ,title:'ficha'        ,label:'Nro de ficha'         , allow:W},
+            {name:'observaciones'  ,typeName:'text'    ,title:'observaciones'                              , allow:W},
         ],
-        primaryKey:['fichanro', 'dondepublicado'],
+        primaryKey:['medionro', 'fichanro'],
     });
 }
 

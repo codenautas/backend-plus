@@ -38,8 +38,11 @@ module.exports = function(context){
             {name:'notas'          ,typeName:'text'    ,label:'Notas internas'       , allow:A},
         ],
         primaryKey:['fichanro'],
+        foreignKeys:[
+            {references:'autores', fields:['autor']}
+        ],
         detailTables:[
-            {table: 'publicaciones', fields:[{source:'fichanro', target:'fichanro'}], abr:'P', label:'publicaciones'}
+            {table: 'apariciones', fields:['fichanro', 'fichanro'], abr:'A', label:'apariciones'}
         ]
     });
 }
