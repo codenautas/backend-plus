@@ -19,10 +19,14 @@ module.exports = function(context){
         fields:[
             {name:'medionro'    ,typeName:'integer' , allow:A},
             {name:'tipo_medio'  ,typeName:'text'    , allow:A},
-            {name:'publicacion' ,typeName:'text'    , allow:U},
+            {name:'nombre'      ,typeName:'text'    , allow:U},
             {name:'periodo'     ,typeName:'text'    , label:'año/mes/fecha/período', allow:U},
+            {name:'link'        ,typeName:'text'    , allow:U},
         ],
-        primaryKey:['publicacion'],
+        primaryKey:['medionro'],
+        foreignKeys:[
+            {references: 'tipos_medios', fields:['tipo_medio']}
+        ], 
         detailTables:[
             {table: 'apariciones', fields:['medionro'], abr:'F', label:'fichas'}
         ],

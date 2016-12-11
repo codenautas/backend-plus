@@ -12,10 +12,11 @@ class AppExample extends backendPlus.AppBackend{
         console.log('rootPath',this.rootPath);
         this.tableStructures = {};
         this.tableStructures.users = require('./table-users.js');
+        this.tableStructures.autores = require('./table-tipos_medios.js');
+        this.tableStructures.autores = require('./table-medios.js');
+        this.tableStructures.autores = require('./table-autores.js');
         this.tableStructures.fichas = require('./table-fichas.js');
-        this.tableStructures.publicaciones = require('./table-publicaciones.js');
-        this.tableStructures["publicaciones-f"] = require('./table-publicaciones-f.js');
-        this.tableStructures["publicaciones-g"] = require('./table-publicaciones-g.js');
+        this.tableStructures.apariciones = require('./table-apariciones.js');
     }
     configList(){
         return super.configList().concat([

@@ -29,7 +29,7 @@ module.exports = function(context){
             {name:'ubicacion'      ,typeName:'text'    ,label:'Ubicación'            , allow:U},
             {name:'propietario'    ,typeName:'text'    ,label:'Propietario'          , allow:U},
             {name:'publicado'      ,typeName:'boolean' ,label:'¿Se ha publicado?'    , allow:W},
-            {name:'enmarcado'      ,typeName:'text'    ,label:'¿Está enmarcado?'     , allow:U},
+            {name:'enmarcado'      ,typeName:'boolean' ,label:'¿Está enmarcado?'     , allow:U},
             {name:'imagenadelante' ,typeName:'text'    ,label:'Imagen principal'     , allow:W},
             {name:'imagenatras'    ,typeName:'text'    ,label:'Imagen secundaria'    , allow:U},
             {name:'miniatura'      ,typeName:'text'    ,label:'Imagen en miniatura'  , allow:U},
