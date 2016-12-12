@@ -10,6 +10,7 @@ describe("table-def-adapt", function(){
     it("set all defaults", function(){
         var result = tableDefAdapt({
             action: 'all/defaults',
+            name: 'the-table-name',
             fields:[{name: 'id'}]
         });
         var expected = {
@@ -51,12 +52,15 @@ describe("table-def-adapt", function(){
                 "title": "id"
               }
             ],
+            "foreignKeys":[],
+            "name": "the-table-name",
             "sql": {
+              "from": '"the-table-name"',
               "select": [
                 '"id"'
               ]
             },
-            "title": undefined
+            "title": "the-table-name",
         }
         expect(result).to.eql(expected);
     });

@@ -22,7 +22,7 @@ module.exports = function(context){
         ],
         primaryKey:['tipo_medio'],
         detailTables:[
-            {table: 'tipos_medios', fields:['tipo_medio'], abr:'M', label:'medios'}
+            {table: 'medios', fields:['tipo_medio'], abr:'M', label:'medios'}
         ], 
     });
 }
