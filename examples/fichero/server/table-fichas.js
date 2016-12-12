@@ -42,7 +42,7 @@ module.exports = function(context){
             {references:'autores', fields:['autor']}
         ],
         detailTables:[
-            {table: 'apariciones', fields:['fichanro', 'fichanro'], abr:'A', label:'apariciones'}
+            {table: 'apariciones-medios', fields:['fichanro', 'fichanro'], abr:'A', label:'apariciones'}
         ]
     });
 }
