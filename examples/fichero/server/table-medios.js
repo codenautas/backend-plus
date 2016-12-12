@@ -28,7 +28,7 @@ module.exports = function(context){
             {references: 'tipos_medios', fields:['tipo_medio']}
         ], 
         detailTables:[
-            {table: 'apariciones', fields:['medionro'], abr:'F', label:'fichas'}
+            {table: 'apariciones-fichas', fields:['medionro'], abr:'F', label:'fichas'}
         ],
     });
 }

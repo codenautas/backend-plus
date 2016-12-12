@@ -17,6 +17,7 @@ class AppExample extends backendPlus.AppBackend{
         this.tableStructures.autores = require('./table-autores.js');
         this.tableStructures.fichas = require('./table-fichas.js');
         this.tableStructures.apariciones = require('./table-apariciones.js');
+        this.tableStructures["apariciones-fichas"] = require('./table-apariciones-fichas.js');
     }
     configList(){
         return super.configList().concat([
