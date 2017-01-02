@@ -588,6 +588,30 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             var directInput=grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
             var td = html.td({"my-colname":fieldDef.name, "typed-controls-direct-input":directInput}).create();
             TypedControls.adaptElement(td, fieldDef);
+            td.addEventListener('click', function(){
+                var actualControl = this;
+                var rect = this.getBoundingClientRect();
+                if(grid.buttonLupa){
+                    document.body.removeChild(grid.buttonLupa);
+                    if(grid.buttonLupaTimmer){
+                        clearTimeout(grid.buttonLupaTimmer);
+                    }
+                }
+                grid.buttonLupa=html.img({class:'img-lupa', src:'img/lupa.png'}).create();
+                document.body.appendChild(grid.buttonLupa);
+                grid.buttonLupa.style.position='absolute';
+                grid.buttonLupa.style.left=rect.left+rect.width-8+'px';
+                grid.buttonLupa.style.top=rect.top-8+'px';
+                grid.buttonLupa.addEventListener('click', function(){
+                    promptPromise(fieldDef.label, actualControl.getTypedValue()).then(function(value){
+                        actualControl.setTypedValue(value);
+                    });
+                });
+                grid.buttonLupaTimmer=setTimeout(function(){
+                    document.body.removeChild(grid.buttonLupa);
+                    grid.buttonLupa=null;
+                },3000);
+            });
             depot.rowControls[fieldDef.name] = td;
             if(depot.row[fieldDef.name]!=null){
                 td.setTypedValue(depot.row[fieldDef.name]);
