@@ -40,13 +40,13 @@
     "json4all": "~0.2.6",
     "login-plus": "~1.0.2",
     "mini-tools": "~0.3.9",
-    "pg-promise-strict": "~0.2.7",
+    "pg-promise-strict": "~0.2.8",
     "promise-plus": "~0.0.6",
     "regexplicit": "~0.0.8",
     "require-bro": "~0.1.4",
     "self-explain": "~0.10.11",
     "serve-content": "~0.2.0",
-    "type-store": "~0.0.3",
+    "type-store": "~0.0.6",
     "typed-controls": "~0.5.3"
   },
   "devDependencies": {

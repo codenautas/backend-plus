@@ -5,7 +5,7 @@ var JSON4all = require('json4all');
 var changing = bestGlobals.changing;
 
 function sameValue(a,b){
-    return a==b || a instanceof Date && b instanceof Date && a.getTime() == b.getTime();
+    return a==b || a instanceof Date && b instanceof Date && a.getTime() == b.getTime() || a && a.sameValue && a.sameValue(b);
 }
 
 myOwn.messages=changing(myOwn.messages, {
