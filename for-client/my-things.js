@@ -125,21 +125,36 @@ myOwn.log = function log(severity, message){
     }
 };
 
-myOwn.fade = function fade(element){
+myOwn.fade = function fade(element, options){
     if(element.tagName.toUpperCase()==='TR' && element.parentNode.replaceChild){
         var parent=element.parentNode;
         var dummyTr=document.createElement(element.tagName);
         dummyTr.className=element.className;
-        Array.prototype.forEach.call(element.cells, function(cell){
+        options=options||{};
+        options.smooth=options.smooth||{};
+        var spans=options.smooth.spans;
+        var sourceRow;
+        if(spans){
+            sourceRow=spans.map(function(span){
+                return {tagName:'td', colSpan:span};
+            })
+        }else{
+            sourceRow=Array.prototype.slice.call(element.cells);
+        }
+        sourceRow.forEach(function(cell){
             var dummyCell=document.createElement(cell.tagName);
             dummyTr.appendChild(dummyCell);
             dummyCell.className=cell.className;
+            dummyCell.colSpan=cell.colSpan;
         });
         var div=document.createElement('div');
-        dummyTr.cells[0].appendChild(div);
+        dummyTr.cells[1].appendChild(div);
         div.style.height=(element.cells[0].offsetHeight-2)+'px';
         div.style.transition='height 0.6s ease';
         parent.replaceChild(dummyTr, element);
+        if(options.smooth.content){
+            div.appendChild(options.smooth.content);
+        }
         setTimeout(function(){
             div.style.height='1px';
         },10);
@@ -169,8 +184,9 @@ myOwn.insertRow = function insertRow(where){
         }
         var trDummy = section.insertRow(iRow);
         tr.style.display='none';
-        for(var i=0; i<(where.smooth.colCount||3); i++){
+        for(var i=0; i<(where.smooth.colCount||1); i++){
             var cell=trDummy.insertCell(-1);
+            cell.colSpan=(where.smooth.spans||{})[i]||1;
         }
         var divDummy=html.div({class:'grid-dummy-cell-ini'}).create();
         trDummy.appendChild(divDummy);

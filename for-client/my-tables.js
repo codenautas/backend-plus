@@ -544,7 +544,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 });
             }
         });
-        grid.def.detailTables.forEach(function(detailTableDef){
+        grid.def.detailTables.forEach(function(detailTableDef, i_dt){
             var detailControl = depot.detailControls[detailTableDef.table] || { show:false };
             detailControl.img = html.img({src:'img/detail-unknown.png'}).create();
             var button = html.button({class:'table-button'}, [detailControl.img]).create();
@@ -552,9 +552,10 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             tr.appendChild(td);
             depot.detailControls[detailTableDef.table] = detailControl;
             button.addEventListener('click',function(){
+                var spansForSmooth = [i_dt+2, 999];
                 if(!detailControl.show){
                     detailControl.img.src='img/detail-contract.png';
-                    var newTr = grid.my.insertRow({under:tr,smooth:{height:70}});
+                    var newTr = grid.my.insertRow({under:tr,smooth:{height:70, spans:spansForSmooth}});
                     detailControl.tr = newTr;
                     var tdMargin = newTr.insertCell(-1);
                     tdMargin.colSpan = td.cellIndex+1;
@@ -577,7 +578,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     depot.detailRows.push(newTr);
                 }else{
                     detailControl.img.src='img/detail-expand.png';
-                    grid.my.fade(detailControl.tr);
+                    grid.my.fade(detailControl.tr, {smooth:{spans:spansForSmooth, content:detailControl.table}});
                     detailControl.show = false;
                     depot.detailRows = depot.detailRows.filter(function(tr){ return tr!==detailControl.tr;});
                     detailControl.tr = null;

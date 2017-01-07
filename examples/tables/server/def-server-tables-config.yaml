@@ -27,3 +27,5 @@ login:
       formImg: unlogged/tables-lock.png
 client-setup:
   cursors: true
+logo: 
+  path: client/img
