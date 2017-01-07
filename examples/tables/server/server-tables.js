@@ -25,6 +25,7 @@ class AppExample extends backendPlus.AppBackend{
             __dirname+'/local-config.yaml'
         ]);
     }
+    /*
     addPublicServices(mainApp, baseUrl){
         var be = this;
         var indexOpts = {};
@@ -43,6 +44,7 @@ class AppExample extends backendPlus.AppBackend{
         });
         super.addPublicServices(mainApp, baseUrl);
     }
+    */
     addLoggedServices(){
         var be = this;
         super.addLoggedServices();
