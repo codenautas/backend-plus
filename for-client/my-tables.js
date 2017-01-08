@@ -602,7 +602,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 document.body.appendChild(grid.buttonLupa);
                 grid.buttonLupa.style.position='absolute';
                 grid.buttonLupa.style.left=rect.left+rect.width-8+'px';
-                grid.buttonLupa.style.top=rect.top-8+'px';
+                grid.buttonLupa.style.top=rect.top+rect.height-8+'px';
                 grid.buttonLupa.addEventListener('click', function(){
                     promptPromise(fieldDef.label, actualControl.getTypedValue()).then(function(value){
                         actualControl.setTypedValue(value);
@@ -808,20 +808,22 @@ myOwn.clientSides={
             TypedControls.adaptElement(td, 'text');
             td.addEventListener('update', function(event){
                 var newPass = td.getTypedValue();
-                td.setAttribute('io-status','updating');
-                depot.row[fieldName] = newPass;
-                var my=depot.manager.my;
-                my.ajax.admin.chpass({
-                    user:depot.row[depot.manager.def.primaryKey[depot.manager.def.primaryKey.length-1]],
-                    newpass:newPass
-                }).then(function(){
-                    td.setAttribute('io-status','temporal-ok');
-                    setTimeout(function(){
-                        td.setAttribute('io-status','ok');
-                    },3000);
-                },function(err){
-                    td.setAttribute('io-status','error');
-                });
+                if(newPass.trim()){
+                    td.setAttribute('io-status','updating');
+                    depot.row[fieldName] = newPass;
+                    var my=depot.manager.my;
+                    my.ajax.admin.chpass({
+                        user:depot.row[depot.manager.def.primaryKey[depot.manager.def.primaryKey.length-1]],
+                        newpass:newPass
+                    }).then(function(){
+                        td.setAttribute('io-status','temporal-ok');
+                        setTimeout(function(){
+                            td.setAttribute('io-status','ok');
+                        },3000);
+                    },function(err){
+                        td.setAttribute('io-status','error');
+                    });
+                }
             }, true);
         }
     }
