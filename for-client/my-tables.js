@@ -591,7 +591,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             TypedControls.adaptElement(td, fieldDef);
             td.addEventListener('click', function(){
                 var actualControl = this;
-                var rect = this.getBoundingClientRect();
+                var rect = my.getRect(actualControl);
                 if(grid.buttonLupa){
                     document.body.removeChild(grid.buttonLupa);
                     if(grid.buttonLupaTimmer){
@@ -601,7 +601,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 grid.buttonLupa=html.img({class:'img-lupa', src:'img/lupa.png'}).create();
                 document.body.appendChild(grid.buttonLupa);
                 grid.buttonLupa.style.position='absolute';
-                grid.buttonLupa.style.left=rect.left+rect.width-8+'px';
+                grid.buttonLupa.style.left=rect.left+rect.width-6+'px';
                 grid.buttonLupa.style.top=rect.top+rect.height-8+'px';
                 grid.buttonLupa.addEventListener('click', function(){
                     promptPromise(fieldDef.label, actualControl.getTypedValue()).then(function(value){
