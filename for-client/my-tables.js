@@ -592,26 +592,27 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             td.addEventListener('click', function(){
                 var actualControl = this;
                 var rect = my.getRect(actualControl);
-                if(grid.buttonLupa){
-                    document.body.removeChild(grid.buttonLupa);
-                    if(grid.buttonLupaTimmer){
-                        clearTimeout(grid.buttonLupaTimmer);
+                var buttonContainer = document;
+                var buttonLupa = buttonContainer.buttonLupa;
+                if(buttonLupa){
+                    document.body.removeChild(buttonLupa);
+                    if(buttonContainer.buttonLupaTimmer){
+                        clearTimeout(buttonContainer.buttonLupaTimmer);
                     }
                 }
-                grid.buttonLupa=html.img({class:'img-lupa', src:'img/lupa.png'}).create();
-                document.body.appendChild(grid.buttonLupa);
-                grid.buttonLupa.style.position='absolute';
-                grid.buttonLupa.style.left=rect.left+rect.width-6+'px';
-                grid.buttonLupa.style.top=rect.top+rect.height-8+'px';
-                grid.buttonLupa.addEventListener('click', function(){
-                    promptPromise(fieldDef.label, actualControl.getTypedValue()).then(function(value){
+                buttonLupa=html.img({class:'img-lupa', src:'img/lupa.png'}).create();
+                buttonLupa.forElement=actualControl;
+                buttonContainer.buttonLupa=buttonLupa;
+                document.body.appendChild(buttonLupa);
+                buttonLupa.style.position='absolute';
+                buttonLupa.style.left=rect.left+rect.width-6+'px';
+                buttonLupa.style.top=rect.top+rect.height-8+'px';
+                buttonLupa.addEventListener('click', function(){
+                    promptPromise(fieldDef.label, actualControl.getTypedValue(), {underElement:actualControl}).then(function(value){
                         actualControl.setTypedValue(value);
                     });
                 });
-                grid.buttonLupaTimmer=setTimeout(function(){
-                    document.body.removeChild(grid.buttonLupa);
-                    grid.buttonLupa=null;
-                },3000);
+                buttonContainer.buttonLupaTimmer=setTimeout(my.quitarLupa,3000);
             });
             depot.rowControls[fieldDef.name] = td;
             if(depot.row[fieldDef.name]!=null){

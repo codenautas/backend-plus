@@ -85,6 +85,11 @@ myOwn.autoSetup = function autoSetup(){
         });
     };
     my.captureKeys();
+    document.addEventListener('click', function(event){
+        if(document.buttonLupa && document.buttonLupa.forElement!==event.target){
+            my.quitarLupa();
+        }
+    });
     setInterval(function(){
         my.testKeepAlive();
     },my.debuggingStatus?6*1000:60*1000);
@@ -467,6 +472,14 @@ myOwn.getRect = function getRect(element){
     }
     return rect;
 }
+
+myOwn.quitarLupa = function quitarLupa(){
+    if(document.buttonLupa){
+        document.body.removeChild(document.buttonLupa);
+        document.buttonLupa=null;
+    }
+}
+
 
 return myOwn;
 
