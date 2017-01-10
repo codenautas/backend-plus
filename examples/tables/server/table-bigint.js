@@ -7,9 +7,10 @@ module.exports = function(context){
         title:'prueba de bigint type',
         editable:admin,
         fields:[
-            {name:'id'              , typeName:'number'   , nullable:false},
+            {name:'id'              , typeName:'integer'  , nullable:false},
             {name:'nombre'          , typeName:'text'                     },
             {name:'col_bigint'      , typeName:'bigint'                   },
+            {name:'col_number'      , typeName:'number'                   },
         ],
         primaryKey:['id']
     });

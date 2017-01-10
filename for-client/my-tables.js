@@ -4,9 +4,16 @@ var JSON4all = require('json4all');
 
 var changing = bestGlobals.changing;
 
+var MAX_SAFE_INTEGER = 9007199254740991;
+
 function sameValue(a,b){
-    return a==b || a instanceof Date && b instanceof Date && a.getTime() == b.getTime() || a && a.sameValue && a.sameValue(b);
+    return a==b 
+      || a instanceof Date && b instanceof Date && a.getTime() == b.getTime() 
+      || typeof a === 'number' && (a>MAX_SAFE_INTEGER || a< -MAX_SAFE_INTEGER) && Math.abs(a/b)<1.00000000000001 && Math.abs(a/b)>0.99999999999999
+      || a && !!a.sameValue && a.sameValue(b);
 }
+
+sameValue(3,4);
 
 myOwn.messages=changing(myOwn.messages, {
     loading: "loading",
