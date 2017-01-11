@@ -390,17 +390,35 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         grid.dom.footInfo[info.name] = html.span(info.value).create();
         grid.dom.footInfo.appendChild(grid.dom.footInfo[info.name]);
     });
-    grid.dom.table = html.table({"class":"my-grid", "my-table": grid.def.name},[
-        html.caption(grid.def.title),
-        html.thead([
-            html.tr(grid.columns.map(function(column){ return column.th(); })),
-            grid.modes.withColumnDetails?html.tr(grid.columns.map(function(column){ return column.thDetail(); })):null,
-        ]),
-        html.tbody(),
-        html.tfoot([
-            html.tr([html.th(),grid.dom.footInfo])
-        ])
-    ]).create();
+    // grid.vertical=true;
+    if(grid.vertical){
+        grid.dom.table = html.table({"class":"my-grid", "my-table": grid.def.name},[
+            html.caption(grid.def.title),
+            html.tbody(
+                grid.columns.map(function(column){ 
+                    return html.tr([
+                        column.th(),
+                        grid.modes.withColumnDetails?html.tr(grid.columns.map(function(column){ return column.thDetail(); })):null
+                    ]); 
+                })
+            ),
+            html.tfoot([
+                html.tr([html.th(),grid.dom.footInfo])
+            ])
+        ]).create();
+    }else{
+        grid.dom.table = html.table({"class":"my-grid", "my-table": grid.def.name},[
+            html.caption(grid.def.title),
+            html.thead([
+                html.tr(grid.columns.map(function(column){ return column.th(); })),
+                grid.modes.withColumnDetails?html.tr(grid.columns.map(function(column){ return column.thDetail(); })):null,
+            ]),
+            html.tbody(),
+            html.tfoot([
+                html.tr([html.th(),grid.dom.footInfo])
+            ])
+        ]).create();
+    }
     grid.dom.main.innerHTML='';
     grid.dom.main.appendChild(grid.dom.table);
 };
@@ -408,20 +426,24 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
 myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElements(belowDepot){
     var grid = this;
     var position;
-    if(belowDepot){
-        var belowTr = belowDepot.tr;
-        position = ('sectionRowIndex' in belowTr?
-            belowTr.sectionRowIndex:
-            belowTr.rowIndex-grid.dom.table.tHead.rows.length
-        )+1;
+    if(grid.vertical){
+        position=1;
     }else{
-        position = 0;
-    }
-    while(
-        position<grid.dom.table.tBodies[0].rows.length && 
-        grid.dom.table.tBodies[0].rows[position].isDetail
-    ){
-        position++;
+        if(belowDepot){
+            var belowTr = belowDepot.tr;
+            position = ('sectionRowIndex' in belowTr?
+                belowTr.sectionRowIndex:
+                belowTr.rowIndex-grid.dom.table.tHead.rows.length
+            )+1;
+        }else{
+            position = 0;
+        }
+        while(
+            position<grid.dom.table.tBodies[0].rows.length && 
+            grid.dom.table.tBodies[0].rows[position].isDetail
+        ){
+            position++;
+        }
     }
     var depotForInsert = grid.createDepotFromRow({}, 'new');
     grid.connector.fixedFields.forEach(function(pair){
@@ -532,9 +554,14 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
     grid.createRowElements = function createRowElements(iRow, depot){
         var grid = this;
         var forInsert = iRow>=0;
-        var tr = grid.my.insertRow({section:tbody, iRow:iRow, smooth:depot.status==='new'?{ 
-            colCount:grid.def.detailTables.length + grid.def.fields.length
-        }:false});
+        var tr;
+        if(grid.vertical){
+            tr=grid.dom.table.rows[0];
+        }else{
+            tr = grid.my.insertRow({section:tbody, iRow:iRow, smooth:depot.status==='new'?{ 
+                colCount:grid.def.detailTables.length + grid.def.fields.length
+            }:false});
+        }
         depot.tr = tr;
         var thActions=html.th({class:['grid-th','grid-th-actions']}).create();
         tr.appendChild(thActions);
@@ -556,6 +583,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             detailControl.img = html.img({src:'img/detail-unknown.png'}).create();
             var button = html.button({class:'table-button'}, [detailControl.img]).create();
             var td = html.td({class:['grid-th','grid-th-details'], "my-relname":detailTableDef.table}, button).create();
+            if(grid.vertical){ tr = tr.nextSibling; }
             tr.appendChild(td);
             depot.detailControls[detailTableDef.table] = detailControl;
             button.addEventListener('click',function(){
@@ -660,6 +688,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     }
                 });
             }
+            if(grid.vertical){ tr = tr.nextSibling; }
             tr.appendChild(td);
         });
         tr.addEventListener('focusout', function(event){
@@ -759,7 +788,9 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         grid.displayRows = function displayRows(fromRowNumber, toRowNumber, adding){
             var grid = this;
             if(!adding){
-                tbody.innerHTML='';
+                if(!grid.vertical){
+                    tbody.innerHTML='';
+                }
             }
             for(var iRow=fromRowNumber; iRow<toRowNumber; iRow++){
                 (function(depot){
