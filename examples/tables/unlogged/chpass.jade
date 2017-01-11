@@ -1,0 +1,31 @@
+h2=formTitle
+form(id="chPassForm", action="chpass", method="post")
+  table
+    tr
+      td
+        label=oldPasswordLabel
+      td
+        input(id="oldPassword", type="password", name="oldPassword")
+      td(rowspan=4)
+        img(src=formImg, style="height:128px")
+    tr
+      td
+        label=newPasswordLabel
+      td
+        input(id="newPassword", type="password", name="newPassword")
+      td#resultStrength
+    tr
+      td
+        label=repPasswordLabel
+      td
+        input(id="repPassword", type="password", name="repPassword")
+      td#resultDiff
+    tr
+      td
+      td
+        input(type="submit", value=buttonLabel)
+    each errorLine in (flash.error||[])
+      tr(style={color:'red'})
+        td(colspan=5)=errorLine
+if strength
+  script(src="strength-pass.js")

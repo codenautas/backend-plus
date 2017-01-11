@@ -1,0 +1,30 @@
+doctype html
+html
+  head
+    link(rel='stylesheet', href="login.css")
+  body
+    h1 se ve
+    h2=formTitle
+    form(id="loginForm", action="login", method="post")
+      table
+        tr
+          td
+            label=usernameLabel
+          td
+            input(id="username", type="text", name="username", autofocus=true)
+          td(rowspan=4)
+            img(src=formImg, style="height:128px")
+        tr
+          td
+            label=passwordLabel
+          td
+            input(id="password", type="password", name="password")
+        tr
+          td
+          td
+            input(type="submit", value=buttonLabel)
+        each errorLine in (flash.error||[])
+          tr(style={color:'red'})
+            td(colspan=5)=errorLine
+    if autoLogin
+      script(src="auto-login.js")

@@ -25,6 +25,7 @@ login:
     loginForm:
       formTitle: example tables
       formImg: unlogged/tables-lock.png
+    loginPagePath: examples/tables/unlogged
 client-setup:
   cursors: true
 logo: 
