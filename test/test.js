@@ -84,7 +84,7 @@ describe('backend-plus', function(){
                     .post(opt.base+'/login')
                     .type('form')
                     .send({username:'prueba', password:'prueba1'})
-                    .expect(302, /Redirecting to \/.*index/, done);
+                    .expect(302, /Redirecting to \/.*menu/, done);
                 });
                 it('must serve data if logged', function(done){
                     agent
