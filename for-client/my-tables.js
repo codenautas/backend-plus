@@ -615,9 +615,31 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 buttonLupa.style.left=rect.left+rect.width-6+'px';
                 buttonLupa.style.top=rect.top+rect.height-8+'px';
                 buttonLupa.addEventListener('click', function(){
-                    promptPromise(fieldDef.label, actualControl.getTypedValue(), {underElement:actualControl}).then(function(value){
-                        actualControl.setTypedValue(value);
-                    });
+                    var actualValue=actualControl.getTypedValue();
+                    var optDialog={underElement:actualControl};
+                    // if(fieldDef.typeName=='date'){
+                    // probar con https://www.npmjs.com/package/pikaday
+                    //     dialogPromise(function(dialogWindow, closeWindow){
+                    //         var button=html.button('Ok').create();
+                    //         var input=html.input({type:'date'}).create();
+                    //         input.valueAsDate=actualValue;
+                    //         button.addEventListener('click',function(){
+                    //             closeWindow(input.valueAsDate);
+                    //         });
+                    //         dialogWindow.appendChild(html.div([
+                    //             html.div(fieldDef.label),
+                    //             html.div([input]),
+                    //             html.div([button])
+                    //         ]).create());
+                    //     }, optDialog).then(function(value){
+                    //         actualControl.setTypedValue(value);
+                    //     });
+                    // }else
+                    {
+                        promptPromise(fieldDef.label, actualValue,optDialog ).then(function(value){
+                            actualControl.setTypedValue(value);
+                        });
+                    }
                 });
                 buttonContainer.buttonLupaTimmer=setTimeout(my.quitarLupa,3000);
             });
@@ -628,7 +650,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             if(!fieldDef.clientSide){
                 td.addEventListener('update',function(){
                     var value = this.getTypedValue();
-                    if(value!==depot.row[fieldDef.name]){
+                    if(!sameValue(value,depot.row[fieldDef.name])){
                         this.setAttribute('io-status', 'pending');
                         depot.rowPendingForUpdate[fieldDef.name] = value;
                         depot.row[fieldDef.name] = value;

@@ -86,7 +86,7 @@ myOwn.autoSetup = function autoSetup(){
     };
     my.captureKeys();
     document.addEventListener('click', function(event){
-        if(document.buttonLupa && document.buttonLupa.forElement!==event.target){
+        if(document.buttonLupa && !document.buttonLupa.forElement.contains(event.target)){
             my.quitarLupa();
         }
     });
@@ -476,6 +476,8 @@ myOwn.getRect = function getRect(element){
 myOwn.quitarLupa = function quitarLupa(){
     if(document.buttonLupa){
         document.body.removeChild(document.buttonLupa);
+        clearTimeout(document.buttonLupaTimmer);
+        document.buttonLupaTimmer=null;
         document.buttonLupa=null;
     }
 }
