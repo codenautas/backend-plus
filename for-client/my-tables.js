@@ -651,15 +651,16 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                         dialogPromise(function(dialogWindow, closeWindow){
                             var button=html.button('Ok').create();
                             var divPicker=html.div({id:'datepicker'}).create();
+                            TypedControls.adaptElement(divPicker,{typeName: 'date'});
                             var picker = new Pikaday({
                                 onSelect: function(date) {
-                                    divPicker.textContent = picker.toString();
-                                    closeWindow(new Date(divPicker.textContent));
+                                    divPicker.setTypedValue(new Date(picker.toString()));
+                                    closeWindow(divPicker.getTypedValue());
                                 }
                             });
                             divPicker.appendChild(picker.el);
                             button.addEventListener('click',function(){
-                                closeWindow(divPicker.textContent);
+                                closeWindow(divPicker.getTypedValue());
                             });
                             dialogWindow.appendChild(html.div([
                                  html.div(fieldDef.label),
