@@ -29,6 +29,7 @@
     "pug": "~2.0.0-beta6",
     "read-yaml-promise": "~1.0.2",
     "stylus": "~0.54.5",
+    "pikaday":"~1.5.1",
     
     "ajax-best-promise": "~0.2.1",
     "best-globals": "~0.7.1",

@@ -4,6 +4,8 @@ var JSON4all = require('json4all');
 
 var changing = bestGlobals.changing;
 
+var pikaday = require('pikaday');
+
 var MAX_SAFE_INTEGER = 9007199254740991;
 
 function sameValue(a,b){
@@ -390,7 +392,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         grid.dom.footInfo[info.name] = html.span(info.value).create();
         grid.dom.footInfo.appendChild(grid.dom.footInfo[info.name]);
     });
-    // grid.vertical=true;
+    //grid.vertical=true;
     if(grid.vertical){
         grid.dom.table = html.table({"class":"my-grid", "my-table": grid.def.name},[
             html.caption(grid.def.title),
@@ -645,7 +647,30 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 buttonLupa.addEventListener('click', function(){
                     var actualValue=actualControl.getTypedValue();
                     var optDialog={underElement:actualControl};
-                    // if(fieldDef.typeName=='date'){
+                    if(fieldDef.typeName=='date'){
+                        dialogPromise(function(dialogWindow, closeWindow){
+                            var button=html.button('Ok').create();
+                            var divPicker=html.div({id:'datepicker'}).create();
+                            var picker = new Pikaday({
+                                onSelect: function(date) {
+                                    divPicker.textContent = picker.toString();
+                                    closeWindow(new Date(divPicker.textContent));
+                                }
+                            });
+                            divPicker.appendChild(picker.el);
+                            button.addEventListener('click',function(){
+                                closeWindow(divPicker.textContent);
+                            });
+                            dialogWindow.appendChild(html.div([
+                                 html.div(fieldDef.label),
+                                 html.div([divPicker]),
+                                 html.div([button])
+                            ]).create());
+                        }, optDialog).then(function(value){
+                             actualControl.setTypedValue(value);
+                         });
+                    }else
+                    // if(fieldDef.typeName=='date'){ 
                     // probar con https://www.npmjs.com/package/pikaday
                     //     dialogPromise(function(dialogWindow, closeWindow){
                     //         var button=html.button('Ok').create();
