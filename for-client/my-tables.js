@@ -669,6 +669,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                             ]).create());
                         }, optDialog).then(function(value){
                              actualControl.setTypedValue(value);
+                             actualControl.setAttribute('io-status', 'pending');
                          });
                     }else
                     // if(fieldDef.typeName=='date'){ 
