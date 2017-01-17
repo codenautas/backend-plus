@@ -344,6 +344,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     var buttonInsert;
     var buttonCreateFilter;
     var buttonDestroyFilter;
+    var buttonOrientation;
     var getSaveModeImgSrc=function(){ return grid.modes.saveByField?'img/tables-update-by-field.png':'img/tables-update-by-row.png';};
     var buttonSaveModeImg=html.img({src:getSaveModeImgSrc()}).create();
     var buttonSaveMode;
@@ -372,7 +373,19 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
             grid.displayBody();
         });
     }
-    grid.columns=[new my.ActionColumnGrid({grid:grid, actions:[buttonInsert,/*buttonSaveMode,*/buttonCreateFilter,buttonDestroyFilter]})].concat(
+    if(grid.def.allow.orientation){
+        buttonOrientation=html.button({class:'table-button'},'orientación').create();
+        buttonOrientation.addEventListener('click',function(){
+            if(!grid.vertical || grid.vertical==false){
+                grid.vertical=true;
+            }else{
+                grid.vertical=false;
+            }
+            grid.prepareGrid();
+            grid.displayGrid();
+        });
+    }
+    grid.columns=[new my.ActionColumnGrid({grid:grid, actions:[buttonInsert,/*buttonSaveMode,*/buttonCreateFilter,buttonDestroyFilter,buttonOrientation]})].concat(
         grid.def.detailTables.map(function(detailTableDef){ return new my.DetailColumnGrid({grid:grid, detailTableDef:detailTableDef}); })
     ).concat(
         grid.def.fields.map(function(fieldDef){ return new my.DataColumnGrid({grid:grid, fieldDef:fieldDef}); })
@@ -392,7 +405,6 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         grid.dom.footInfo[info.name] = html.span(info.value).create();
         grid.dom.footInfo.appendChild(grid.dom.footInfo[info.name]);
     });
-    //grid.vertical=true;
     if(grid.vertical){
         grid.dom.table = html.table({"class":"my-grid", "my-table": grid.def.name},[
             html.caption(grid.def.title),
@@ -424,6 +436,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     grid.dom.main.innerHTML='';
     grid.dom.main.appendChild(grid.dom.table);
 };
+
 
 myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElements(belowDepot){
     var grid = this;
@@ -556,7 +569,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
     grid.createRowElements = function createRowElements(iRow, depot){
         var grid = this;
         var forInsert = iRow>=0;
-        var tr;
+        var tr={};
         if(grid.vertical){
             tr=grid.dom.table.rows[0];
         }else{
@@ -585,7 +598,9 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             detailControl.img = html.img({src:'img/detail-unknown.png'}).create();
             var button = html.button({class:'table-button'}, [detailControl.img]).create();
             var td = html.td({class:['grid-th','grid-th-details'], "my-relname":detailTableDef.table}, button).create();
-            if(grid.vertical){ tr = tr.nextSibling; }
+            if(grid.vertical){ 
+                tr = tr.nextSibling;
+            }
             tr.appendChild(td);
             depot.detailControls[detailTableDef.table] = detailControl;
             button.addEventListener('click',function(){
@@ -757,6 +772,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         delete grid.hasFilterRow;
     }
     grid.dom.table.setAttribute('has-filter',0);
+    
     grid.createRowFilter = function createRowFilter(){
         var grid = this;
         if(grid.hasFilterRow){
