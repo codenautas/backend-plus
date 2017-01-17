@@ -681,7 +681,6 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                         }, optDialog).then(function(value){
                             actualControl.setTypedValue(value);
                             actualControl.dispatchEvent(new CustomEvent('update'));
-                            // actualControl.setAttribute('io-status', 'pending');
                          });
                     }else{
                         promptPromise(fieldDef.label, actualValue,optDialog ).then(function(value){
@@ -810,7 +809,14 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             var grid = this;
             if(!adding){
                 if(grid.vertical){
-                    // recorrer todos los tr del tbody y dejar solo las primeras columnas? 
+                    // recorrer todos los tr del tbody y dejar solo las primeras columnas?
+                    Array.prototype.forEach.call(tbody.rows,function(tr){
+                       Array.prototype.forEach.call(tr.cells,function(td,i_td){
+                            if(i_td){
+                                tr.removeChild(td);
+                            }
+                        })
+                    });
                 }else{
                     tbody.innerHTML='';
                 }
