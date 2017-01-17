@@ -20,6 +20,7 @@ describe("table-def-adapt", function(){
               "delete": false,
               "filter": true ,
               "insert": false,
+              "orientation": true,
               "select": true ,
               "update": false
             },
@@ -53,6 +54,9 @@ describe("table-def-adapt", function(){
               }
             ],
             "foreignKeys":[],
+            "layout":{
+                "vertical": false
+            },
             "name": "the-table-name",
             "sql": {
               "from": '"the-table-name"',

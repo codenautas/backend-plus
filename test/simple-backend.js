@@ -5,8 +5,6 @@ var backendPlus = require("../lib/backend-plus");
 var MiniTools = require('mini-tools');
 var changing = require('best-globals').changing;
 
-var Promises = require('best-promise');
-
 class AppExample extends backendPlus.AppBackend{
     constructor(opts){
         super();
