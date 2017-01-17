@@ -14,5 +14,6 @@ module.exports = function(context){
         primaryKey:['atomic_number','mass_number','kind'],
         actionNamesList:['showImg'],
         allow:{showImg:true},
+        layout:{vertical:true}
     });
 }

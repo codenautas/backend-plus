@@ -207,6 +207,7 @@ myOwn.TableGrid.prototype.prepareAndDisplayGrid = function prepareAndDisplayGrid
     grid.displayPreLoadMessage();
     var structureRequest = grid.connector.getStructure().then(function(tableDef){
         grid.def = tableDef;
+        grid.vertical = tableDef.layout.vertical;
         return grid.prepareGrid();
     });
     return grid.connector.getData().then(function(rows){
@@ -374,13 +375,9 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         });
     }
     if(grid.def.allow.orientation){
-        buttonOrientation=html.button({class:'table-button'},'orientación').create();
+        buttonOrientation=html.button({class:'table-button'}, [html.img({src:'img/orientation-toggle.png'})]).create();
         buttonOrientation.addEventListener('click',function(){
-            if(!grid.vertical || grid.vertical==false){
-                grid.vertical=true;
-            }else{
-                grid.vertical=false;
-            }
+            grid.vertical = !grid.vertical;
             grid.prepareGrid();
             grid.displayGrid();
         });
@@ -666,16 +663,15 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                         dialogPromise(function(dialogWindow, closeWindow){
                             var button=html.button('Ok').create();
                             var divPicker=html.div({id:'datepicker'}).create();
-                            TypedControls.adaptElement(divPicker,{typeName: 'date'});
                             var picker = new Pikaday({
+                                defaultDate: actualValue,
                                 onSelect: function(date) {
-                                    divPicker.setTypedValue(new Date(picker.toString()));
-                                    closeWindow(divPicker.getTypedValue());
+                                    closeWindow(new Date(picker.toString()));
                                 }
                             });
                             divPicker.appendChild(picker.el);
                             button.addEventListener('click',function(){
-                                closeWindow(divPicker.getTypedValue());
+                                closeWindow(new Date(picker.toString()));
                             });
                             dialogWindow.appendChild(html.div([
                                  html.div(fieldDef.label),
@@ -683,29 +679,11 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                                  html.div([button])
                             ]).create());
                         }, optDialog).then(function(value){
-                             actualControl.setTypedValue(value);
-                             actualControl.setAttribute('io-status', 'pending');
+                            actualControl.setTypedValue(value);
+                            actualControl.dispatchEvent(new CustomEvent('update'));
+                            // actualControl.setAttribute('io-status', 'pending');
                          });
-                    }else
-                    // if(fieldDef.typeName=='date'){ 
-                    // probar con https://www.npmjs.com/package/pikaday
-                    //     dialogPromise(function(dialogWindow, closeWindow){
-                    //         var button=html.button('Ok').create();
-                    //         var input=html.input({type:'date'}).create();
-                    //         input.valueAsDate=actualValue;
-                    //         button.addEventListener('click',function(){
-                    //             closeWindow(input.valueAsDate);
-                    //         });
-                    //         dialogWindow.appendChild(html.div([
-                    //             html.div(fieldDef.label),
-                    //             html.div([input]),
-                    //             html.div([button])
-                    //         ]).create());
-                    //     }, optDialog).then(function(value){
-                    //         actualControl.setTypedValue(value);
-                    //     });
-                    // }else
-                    {
+                    }else{
                         promptPromise(fieldDef.label, actualValue,optDialog ).then(function(value){
                             actualControl.setTypedValue(value);
                         });
@@ -831,7 +809,9 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         grid.displayRows = function displayRows(fromRowNumber, toRowNumber, adding){
             var grid = this;
             if(!adding){
-                if(!grid.vertical){
+                if(grid.vertical){
+                    // recorrer todos los tr del tbody y dejar solo las primeras columnas? 
+                }else{
                     tbody.innerHTML='';
                 }
             }
