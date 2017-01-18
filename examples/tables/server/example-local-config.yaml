@@ -7,3 +7,8 @@ login:
     secret: false
 devel:
   forceShowAsEditable: true    
+client-setup:
+  skin: "confort"
+  skins:
+    confort:
+      local-path: ../backend-skins/dist/

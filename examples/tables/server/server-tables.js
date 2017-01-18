@@ -25,26 +25,6 @@ class AppExample extends backendPlus.AppBackend{
             __dirname+'/local-config.yaml'
         ]);
     }
-    /*
-    addPublicServices(mainApp, baseUrl){
-        var be = this;
-        var indexOpts = {};
-        ['index.js'].forEach(function(fileName){
-            mainApp.use(baseUrl+'/'+fileName, 
-                MiniTools.serveFile(Path.join(be.rootPath+'/client/',fileName))
-            );
-        });
-        mainApp.get(baseUrl+'/index.css',MiniTools.serveStylus(be.rootPath+'/client/index.styl'));
-        mainApp.get(baseUrl+'/index',function(req, res, next){
-            var rol = (req.user||{}).rol
-            return MiniTools.serveJade(be.rootPath+'/client/index', changing(indexOpts,{
-                isAdmin:rol=='admin',
-                isUser:rol=='admin' || rol=='user'
-            }))(req, res, next);
-        });
-        super.addPublicServices(mainApp, baseUrl);
-    }
-    */
     addLoggedServices(){
         var be = this;
         super.addLoggedServices();

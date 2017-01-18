@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for typed controls",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -14,7 +14,7 @@
     { "name": "Emilio Platzer", "email": "emilioplatzer@gmail.com" }
   ],
   "dependencies": {
-    "body-parser": "~1.15.2",
+    "body-parser": "~1.16.0",
     "cookie-parser": "~1.4.3",
     "es6-promise": "~4.0.5",
     "escape-string-regexp": "~1.0.5",
@@ -31,6 +31,7 @@
     "pikaday":"~1.5.1",
     
     "ajax-best-promise": "~0.2.1",
+    "backend-skins": "~0.0.2",
     "best-globals": "~0.7.1",
     "castellano": "~0.0.3",
     "dialog-promise": "~0.3.5",
@@ -43,7 +44,7 @@
     "regexplicit": "~0.0.8",
     "require-bro": "~0.1.4",
     "self-explain": "~0.10.11",
-    "serve-content": "~0.3.0",
+    "serve-content": "~0.3.3",
     "type-store": "~0.0.7",
     "typed-controls": "~0.5.6"
   },

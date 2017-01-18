@@ -28,5 +28,9 @@ login:
     loginPagePath: examples/tables/client
 client-setup:
   cursors: true
+  skin: confort
+  skins:
+    confort:
+      local-path: node_modules/backend-skins/dist/
 logo: 
   path: client/img

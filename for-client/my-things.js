@@ -482,6 +482,9 @@ myOwn.quitarLupa = function quitarLupa(){
     }
 }
 
+myOwn.path={
+    img:'img/'
+}
 
 return myOwn;
 

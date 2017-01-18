@@ -6,7 +6,7 @@ var html=jsToHtml.html;
 var my = myOwn;
 
 my.tableAction.showImg={
-    img: 'img/picture.png',
+    img: my.path.img+'picture.png',
     actionRow: function(depot){
         var div=depot.manager.dom.main;
         return Promise.resolve().then(function(){
@@ -42,6 +42,7 @@ function prepareTableButtons(){
     });
 }
 
+
 window.addEventListener('load', function(){
     document.body.style.backgroundColor='rgb('+[
         Math.ceil(Math.random()*64+196),
@@ -50,3 +51,4 @@ window.addEventListener('load', function(){
     ].join(',')+')';
     my.autoSetup().then(prepareTableButtons);
 });
+

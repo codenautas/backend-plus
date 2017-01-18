@@ -286,7 +286,7 @@ myOwn.DataColumnGrid.prototype.thFilter = function thFilter(depot, iColumn){
     var fieldDef = this.fieldDef;
     var fieldName=fieldDef.name;
     depot.rowSymbols[fieldDef.name]='~';
-    var filterImage='img/'+my.comparator.traductor['~']+'.png';
+    var filterImage=my.path.img+my.comparator.traductor['~']+'.png';
     var imgFilter=html.img({src:filterImage}); 
     var symbolFilter=html.button({"class":'table-button', tabindex:-1},imgFilter).create();
     var elementFilter=html.span({"class":"filter-span", "typed-controls-direct-input":true}).create();
@@ -300,15 +300,15 @@ myOwn.DataColumnGrid.prototype.thFilter = function thFilter(depot, iColumn){
     elementFilter.style.width=elementFilter.width.toString()+'px';
     symbolFilter.addEventListener('click',function(){
         miniMenuPromise([
-            {value:'=', img:'img/igual.png'},
-            {value:'~', img:'img/parecido.png'},
-            {value:'\u2205', img:'img/vacio.png'},
-            {value:'>', img:'img/mayor.png'},
-            {value:'>=', img:'img/mayor-igual.png'},
-            {value:'<', img:'img/menor.png'},
-            {value:'<=', img:'img/menor-igual.png'},
+            {value:'=',     img:my.path.img+'igual.png'},
+            {value:'~',     img:my.path.img+'parecido.png'},
+            {value:'\u2205',img:my.path.img+'vacio.png'},
+            {value:'>',     img:my.path.img+'mayor.png'},
+            {value:'>=',    img:my.path.img+'mayor-igual.png'},
+            {value:'<',     img:my.path.img+'menor.png'},
+            {value:'<=',    img:my.path.img+'menor-igual.png'},
         ],{underElement:symbolFilter}).then(function(result){
-            filterImage='img/'+my.comparator.traductor[result]+'.png';
+            filterImage=my.path.img+my.comparator.traductor[result]+'.png';
            // imgFilter.src=filterImage;
             symbolFilter.childNodes[0].src=filterImage;
             depot.rowSymbols[fieldDef.name]=result;
@@ -346,7 +346,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     var buttonCreateFilter;
     var buttonDestroyFilter;
     var buttonOrientation;
-    var getSaveModeImgSrc=function(){ return grid.modes.saveByField?'img/tables-update-by-field.png':'img/tables-update-by-row.png';};
+    var getSaveModeImgSrc=function(){ return my.path.img+(grid.modes.saveByField?'tables-update-by-field.png':'tables-update-by-row.png');};
     var buttonSaveModeImg=html.img({src:getSaveModeImgSrc()}).create();
     var buttonSaveMode;
     if(grid.def.allow.update){
@@ -357,17 +357,17 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         });
     }
     if(grid.def.allow.insert){
-        buttonInsert=html.button({class:'table-button'}, [html.img({src:'img/insert.png'})]).create();
+        buttonInsert=html.button({class:'table-button'}, [html.img({src:my.path.img+'insert.png'})]).create();
         buttonInsert.addEventListener('click', function(){
             grid.createRowInsertElements();
         });
     }
     if(grid.def.allow.filter){
-        buttonCreateFilter=html.button({class:'table-button', 'when-filter':'no'}, [html.img({src:'img/filter.png'})]).create();
+        buttonCreateFilter=html.button({class:'table-button', 'when-filter':'no'}, [html.img({src:my.path.img+'filter.png'})]).create();
         buttonCreateFilter.addEventListener('click', function(){
             grid.createRowFilter(0);
         });
-        buttonDestroyFilter=html.button({class:'table-button', 'when-filter':'yes'}, [html.img({src:'img/destroy-filter.png'})]).create();
+        buttonDestroyFilter=html.button({class:'table-button', 'when-filter':'yes'}, [html.img({src:my.path.img+'destroy-filter.png'})]).create();
         buttonDestroyFilter.addEventListener('click', function(){
             grid.destroyRowFilter(0);
             grid.view.filter=false;
@@ -375,7 +375,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         });
     }
     if(grid.def.allow.orientation){
-        buttonOrientation=html.button({class:'table-button'}, [html.img({src:'img/orientation-toggle.png'})]).create();
+        buttonOrientation=html.button({class:'table-button'}, [html.img({src:my.path.img+'orientation-toggle.png'})]).create();
         buttonOrientation.addEventListener('click',function(){
             grid.vertical = !grid.vertical;
             grid.prepareGrid();
@@ -592,7 +592,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         });
         grid.def.detailTables.forEach(function(detailTableDef, i_dt){
             var detailControl = depot.detailControls[detailTableDef.table] || { show:false };
-            detailControl.img = html.img({src:'img/detail-unknown.png'}).create();
+            detailControl.img = html.img({src:my.path.img+'detail-unknown.png'}).create();
             var button = html.button({class:'table-button'}, [detailControl.img]).create();
             var td = html.td({class:['grid-th','grid-th-details'], "my-relname":detailTableDef.table}, button).create();
             if(grid.vertical){ 
@@ -603,7 +603,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             button.addEventListener('click',function(){
                 var spansForSmooth = [i_dt+2, 999];
                 if(!detailControl.show){
-                    detailControl.img.src='img/detail-contract.png';
+                    detailControl.img.src=my.path.img+'detail-contract.png';
                     var newTr = grid.my.insertRow({under:tr,smooth:{height:70, spans:spansForSmooth}});
                     detailControl.tr = newTr;
                     var tdMargin = newTr.insertCell(-1);
@@ -626,7 +626,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     newTr.isDetail=true;
                     depot.detailRows.push(newTr);
                 }else{
-                    detailControl.img.src='img/detail-expand.png';
+                    detailControl.img.src=my.path.img+'detail-expand.png';
                     grid.my.fade(detailControl.tr, {smooth:{spans:spansForSmooth, content:detailControl.table}});
                     detailControl.show = false;
                     depot.detailRows = depot.detailRows.filter(function(tr){ return tr!==detailControl.tr;});
@@ -649,7 +649,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                         clearTimeout(buttonContainer.buttonLupaTimmer);
                     }
                 }
-                buttonLupa=html.img({class:'img-lupa', src:'img/lupa.png'}).create();
+                buttonLupa=html.img({class:'img-lupa', src:my.path.img+'lupa.png'}).create();
                 buttonLupa.forElement=actualControl;
                 buttonContainer.buttonLupa=buttonLupa;
                 document.body.appendChild(buttonLupa);
@@ -734,9 +734,9 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 detailControl.tr = detailTr;
                 if(detailControl.show){
                     tbody.appendChild(detailTr);
-                    detailControl.img.src='img/detail-contract.png';
+                    detailControl.img.src=my.path.img+'detail-contract.png';
                 }else{
-                    detailControl.img.src='img/detail-expand.png';
+                    detailControl.img.src=my.path.img+'detail-expand.png';
                 }
             });
         }
@@ -871,13 +871,13 @@ myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot){
 
 myOwn.tableAction={
     "insert":{
-        img: 'img/insert.png',
+        img: myOwn.path.img+'insert.png',
         actionRow: function(depot){
             return depot.manager.createRowInsertElements(depot);
         }
     },
     "delete":{
-        img: 'img/delete.png',
+        img: myOwn.path.img+'delete.png',
         actionRow: function(depot){
             return depot.my.showQuestion(depot.my.messages.Delete+' '+JSON.stringify(depot.primaryKeyValues)+' ?').then(function(result){
                 if(result){
