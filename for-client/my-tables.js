@@ -811,11 +811,10 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 if(grid.vertical){
                     // recorrer todos los tr del tbody y dejar solo las primeras columnas?
                     Array.prototype.forEach.call(tbody.rows,function(tr){
-                       Array.prototype.forEach.call(tr.cells,function(td,i_td){
-                            if(i_td){
-                                tr.removeChild(td);
-                            }
-                        })
+                        var howManyCellsMayNotBeDeleted=1;
+                        while(tr.cells.length>howManyCellsMayNotBeDeleted){
+                            tr.removeChild(tr.cells[howManyCellsMayNotBeDeleted]);
+                        }
                     });
                 }else{
                     tbody.innerHTML='';

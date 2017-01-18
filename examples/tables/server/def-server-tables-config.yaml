@@ -30,6 +30,8 @@ client-setup:
   cursors: true
   skin: confort
   skins:
+    "":
+      local-path: client/
     confort:
       local-path: node_modules/backend-skins/dist/
 logo: 
