@@ -577,7 +577,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         depot.tr = tr;
         var thActions=html.th({class:['grid-th','grid-th-actions']}).create();
         tr.appendChild(thActions);
-        var actionNamesList = ['insert','delete'].concat(grid.def.actionNamesList);
+        var actionNamesList = ['insert','delete','vertical-edit'].concat(grid.def.actionNamesList);
         actionNamesList.forEach(function(actionName){
             var actionDef = my.tableAction[actionName];
             if(grid.def.allow[actionName]){
@@ -720,7 +720,6 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 }
             }
         });
-        
         tr.addEventListener('focusin',function(event){
             if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
                 return depot.connector.enterRecord(depot).then(function(result){
@@ -885,6 +884,27 @@ myOwn.tableAction={
                     });
                 }
             });
+        }
+    },
+    "vertical-edit":{
+        img: myOwn.path.img+'vertical-edit.png',
+        actionRow: function(depot){
+            var grid = depot.manager;
+            if(grid.vertical){
+                grid.vertical = false;
+                if(grid.allDepots){
+                    grid.depots = grid.allDepots;
+                }
+                grid.prepareGrid();
+                grid.displayGrid();
+            }else{
+                grid.allDepots = grid.depots;
+                grid.depots = [depot];
+                grid.vertical = true;
+                grid.prepareGrid();
+                grid.displayGrid();
+            }
+            grid.dom.table.setAttribute("my-orientation",grid.vertical?'vertical':'horizontal');
         }
     }
 }
