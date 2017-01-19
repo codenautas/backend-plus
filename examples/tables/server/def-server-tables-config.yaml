@@ -3,6 +3,11 @@ server:
   kill-9:
     pid: 1234
     master-pass: 3920192
+  skins:
+    "":
+      local-path: client/
+    confort:
+      local-path: node_modules/backend-skins/dist/
 db:
   motor: postgresql
   host: localhost
@@ -29,10 +34,5 @@ login:
 client-setup:
   cursors: true
   skin: confort
-  skins:
-    "":
-      local-path: client/
-    confort:
-      local-path: node_modules/backend-skins/dist/
 logo: 
   path: client/img
