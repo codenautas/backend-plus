@@ -1,0 +1,118 @@
+.dialog-promise{
+    background-color: white;
+    text-align: center;
+    margin: 0px;
+    padding: 0px;
+    display: none;
+    z-index: 1;
+    width: auto;
+    max-width: 90%;
+    height: auto;
+    max-height: 90%;
+    overflow: auto;
+    position: fixed;
+    top: 5%;
+    left: 5%;
+    -webkit-animation: animatezoom 0.3s;
+    animation: animatezoom 0.3s;
+}
+
+.dialog-promise[docked=under]{
+    transform-origin: top left;
+}
+
+.dialog-promise[docked=under-right]{
+    transform-origin: top right;
+}
+
+.dialog-promise>*{
+    margin: 10px 10px 5px 10px; 
+}
+
+.dialog-promise>div:nth-child(2){
+    margin-top: 20px; 
+}
+
+.dialog-promise button{
+    margin:10px;
+}
+
+@-webkit-keyframes animatezoom {
+    from {-webkit-transform: scale(0.25)}
+    to {-webkit-transform: scale(1)}
+}
+
+@keyframes animatezoom {
+    from {transform: scale(0.25)}
+    to {transform: scale(1)}
+}
+
+@keyframes animatezoom {
+    from {transform: scale(0.25)}
+    to {transform: scale(1)}
+}
+
+.dialog-promise-background {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    padding-top: 60px;
+}
+
+.dialog-promise .dialog-promise-close-button{
+    margin:0px;
+    float:right;
+    background-color:red;
+    width:24px;
+    height:16px;
+    color:white;
+    font-weight:bold;
+    font-size:60%;
+}
+
+.dialog-promise-close-button:before{
+    content:'X';
+}
+
+.dialog-menu label{
+    margin-left:4px;
+    vertical-align: 20%;
+    white-space: nowrap;
+}
+
+.dialog-menu td{
+    text-align:left;
+}
+
+.dialog-menu-line{
+    height: 2px;
+    background-color: rgba(100,100,100,0.3);
+}
+
+.dialog-menu-non-option{
+    background-color: rgba(150,150,150,0.3);
+}
+
+.dialog-menu-option:hover{
+    background-color:#DDF;
+    opacity: 0.9;
+}
+
+.dialog-0 *{
+    padding:0px;
+    margin:0px;
+    border:0px;
+    border-image-width:0px;
+    vertical-align: bottom;
+}
+
+.dialog-0 table{
+    border-collapse: collapse;
+}

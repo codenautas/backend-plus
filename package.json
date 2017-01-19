@@ -31,7 +31,7 @@
     "pikaday":"~1.5.1",
     
     "ajax-best-promise": "~0.2.1",
-    "backend-skins": "~0.0.3",
+    "backend-skins": "~0.0.4",
     "best-globals": "~0.7.1",
     "castellano": "~0.0.3",
     "dialog-promise": "~0.3.5",
