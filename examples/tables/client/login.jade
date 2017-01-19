@@ -1,28 +1,29 @@
 doctype html
 html
   head
-    link(rel='stylesheet', href="login.css")
+    link(rel='stylesheet', href='login.css')
   body
-    h1 se ve
-    h2=formTitle
     form(id="loginForm", action="login", method="post")
-      table
+      table.logintable
         tr
-          td
-            label=usernameLabel
-          td
-            input(id="username", type="text", name="username", autofocus=true)
-          td(rowspan=4)
-            img(src=formImg, style="height:128px")
+          td(colspan=2).formtitle
+            h2=formTitle
         tr
-          td
-            label=passwordLabel
-          td
-            input(id="password", type="password", name="password")
+          td(colspan=2)
+            img.formImg(src=skinUrl+formImg)
         tr
-          td
-          td
-            input(type="submit", value=buttonLabel)
+          td.iconostd
+            img.iconoslog(src='confort/'+'img/iconousuario.png')
+          td.formtd
+            input(id="username", type="text", name="username", autofocus=true, placeholder=usernameLabel)
+        tr
+          td.iconostd
+            img.iconoslog(src=skinUrl+'iconopass.png') 
+          td.formtd    
+            input(id="password", type="password", name="password" placeholder=passwordLabel)
+        tr
+          td(colspan=2)
+            input.submit(type="submit", value=buttonLabel)
         each errorLine in (flash.error||[])
           tr(style={color:'red'})
             td(colspan=5)=errorLine
