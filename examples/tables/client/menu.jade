@@ -1,5 +1,5 @@
 doctype html
-html(lang="en")
+html(lang=lang)
   head
     title index
     link(rel='stylesheet', href='dialog-promise.css')
@@ -21,21 +21,8 @@ html(lang="en")
         button#tables(id-table="bigint") bigint
       div#table_layout
     pre#status
-    script(src='js-yaml.js')
-    script(src='require-bro.js')
-    script(src='best-globals.js')
-    script(src='json4all.js')
-    script(src='dialog-promise.js')
-    script(src='js-to-html.js')
-    script(src='pikaday/pikaday.js')
-    script(src='big.js')
-    script(src='type-store.js')
-    script(src='typed-controls.js')
-    script(src='ajax-best-promise.js')
-    script(src='my-things.js')
-    script(src='my-skin.js')
-    script(src='my-tables.js')
-    script(src='my-inform-net-status.js')
-    if(false)
+    each script in modules.scripts
+      script(src=script.src)
+    if(lang=='es')
       script(src='cliente-en-castellano.js') 
     script(src='menu.js')
