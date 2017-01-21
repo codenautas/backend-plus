@@ -38,6 +38,7 @@ myOwn.es=changing(myOwn.es, {
 var escapeRegExp = bestGlobals.escapeRegExp;
 
 myOwn.firstDisplayCount = 20;
+myOwn.firstDisplayOverLimit = 30;
 myOwn.displayCountBreaks = [100,250,1000];
 myOwn.displayCountBreaks = [50,100,500];
 myOwn.comparatorWidth = 16;
@@ -751,7 +752,6 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         delete grid.hasFilterRow;
     }
     grid.dom.table.setAttribute('has-filter',0);
-    
     grid.createRowFilter = function createRowFilter(){
         var grid = this;
         if(grid.hasFilterRow){
@@ -849,7 +849,8 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 addButtonRest(depotsToDisplay.length);
             }
         }
-        grid.displayRows(0, Math.min(my.firstDisplayCount,depotsToDisplay.length));
+        var linesToDisplay=depotsToDisplay.length<=myOwn.firstDisplayOverLimit?depotsToDisplay.length:my.firstDisplayCount;
+        grid.displayRows(0, linesToDisplay);
     }
     grid.displayBody();
 };
