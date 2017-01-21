@@ -249,7 +249,7 @@ myOwn.ActionColumnGrid.prototype.th = function th(){
 }
 
 myOwn.ActionColumnGrid.prototype.thFilter = function thFilter(depot){
-    var buttonFilter=html.button(myOwn.messages.Filter+"!").create();
+    var buttonFilter=html.button({id:'button-filter'},myOwn.messages.Filter+"!").create();
     var grid = this.grid;
     buttonFilter.addEventListener('click',function(){
         grid.view.filter=depot;
@@ -833,7 +833,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             grid.dom.footInfo.rowCount.innerHTML='';
             if(iRow<depotsToDisplay.length){
                 var addButtonRest = function addButtonRest(toNextRowNumber){
-                    var buttonRest=html.button("+..."+toNextRowNumber).create();
+                    var buttonRest=html.button({class:'foot-info'},"+..."+toNextRowNumber).create();
                     grid.dom.footInfo.rowCount.appendChild(html.span('  ').create());
                     grid.dom.footInfo.rowCount.appendChild(buttonRest);
                     buttonRest.addEventListener('click',function(){
