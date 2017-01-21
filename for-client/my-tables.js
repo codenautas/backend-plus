@@ -392,6 +392,9 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     if(grid.modes.withColumnDetails==null){
         grid.modes.withColumnDetails=grid.def.fields.some(function(fieldDef){ return fieldDef.label!=fieldDef.title; });
     }
+    if(grid.vertical){
+        grid.modes.withColumnDetails=false;
+    }
     grid.dom.footInfo = html.td({colspan:grid.columns.length, "is-processing":"1"}).create();
     [
         {name:'displayFrom', value:'0'},
