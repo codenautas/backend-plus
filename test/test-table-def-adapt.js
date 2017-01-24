@@ -22,7 +22,8 @@ describe("table-def-adapt", function(){
               "insert": false,
               "orientation": true,
               "select": true ,
-              "update": false
+              "update": false,
+              "vertical-edit": true
             },
             "detailTables": [],
             "field": {
@@ -46,7 +47,7 @@ describe("table-def-adapt", function(){
                   "filter": true ,
                   "insert": false,
                   "select": true ,
-                  "update": false
+                  "update": false,
                 },
                 "name": "id",
                 "label": "id",
@@ -60,6 +61,7 @@ describe("table-def-adapt", function(){
             "name": "the-table-name",
             "sql": {
               "from": '"the-table-name"',
+              "isTable": true,
               "select": [
                 '"id"'
               ]
