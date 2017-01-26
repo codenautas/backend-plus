@@ -1,7 +1,7 @@
 doctype html
 html
   head
-    link(rel='stylesheet', href='login.css')
+    link(rel='stylesheet', href=skinUrl+'css/login.css')
   body
     form(id="loginForm", action="login", method="post")
       table.logintable
@@ -9,11 +9,12 @@ html
           td(colspan=2).formtitle
             h2=formTitle
         tr
-          td(colspan=2)
-            img.formImg(src=skinUrl+formImg)
-        tr
+          td(colspan=3)
+          td(rowspan=4)
+            img.formImg(src=skinUrl+'img/tables-lock.png')
+            tr
           td.iconostd
-            img.iconoslog(src='confort/'+'img/iconousuario.png')
+            img.iconoslog(src=skinUrl+'img/iconousuario.png')
           td.formtd
             input(id="username", type="text", name="username", autofocus=true, placeholder=usernameLabel)
         tr

@@ -30,7 +30,7 @@ login:
     loginForm:
       formTitle: example tables
       formImg: unlogged/tables-lock.png
-    loginPagePath: examples/tables/client
+    x-loginPagePath: false
 client-setup:
   cursors: true
   skin: confort
