@@ -8,6 +8,8 @@ server:
       local-path: client/
     confort:
       local-path: node_modules/backend-skins/dist/
+    confort-bis:
+      local-path: node_modules/backend-skins/dist/
 db:
   motor: postgresql
   host: localhost
@@ -33,6 +35,6 @@ login:
     x-loginPagePath: false
 client-setup:
   cursors: true
-  skin: confort
+  skin: confort-bis
 logo: 
   path: client/img

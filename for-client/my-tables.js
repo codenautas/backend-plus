@@ -38,6 +38,7 @@ myOwn.es=changing(myOwn.es, {
 var escapeRegExp = bestGlobals.escapeRegExp;
 
 myOwn.firstDisplayCount = 20;
+myOwn.firstDisplayOverLimit = 30;
 myOwn.displayCountBreaks = [100,250,1000];
 myOwn.displayCountBreaks = [50,100,500];
 myOwn.comparatorWidth = 16;
@@ -249,7 +250,7 @@ myOwn.ActionColumnGrid.prototype.th = function th(){
 }
 
 myOwn.ActionColumnGrid.prototype.thFilter = function thFilter(depot){
-    var buttonFilter=html.button(myOwn.messages.Filter+"!").create();
+    var buttonFilter=html.button({id:'button-filter'},myOwn.messages.Filter+"!").create();
     var grid = this.grid;
     buttonFilter.addEventListener('click',function(){
         grid.view.filter=depot;
@@ -391,6 +392,9 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     );
     if(grid.modes.withColumnDetails==null){
         grid.modes.withColumnDetails=grid.def.fields.some(function(fieldDef){ return fieldDef.label!=fieldDef.title; });
+    }
+    if(grid.vertical){
+        grid.modes.withColumnDetails=false;
     }
     grid.dom.footInfo = html.td({colspan:grid.columns.length, "is-processing":"1"}).create();
     [
@@ -748,7 +752,6 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         delete grid.hasFilterRow;
     }
     grid.dom.table.setAttribute('has-filter',0);
-    
     grid.createRowFilter = function createRowFilter(){
         var grid = this;
         if(grid.hasFilterRow){
@@ -830,7 +833,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             grid.dom.footInfo.rowCount.innerHTML='';
             if(iRow<depotsToDisplay.length){
                 var addButtonRest = function addButtonRest(toNextRowNumber){
-                    var buttonRest=html.button("+..."+toNextRowNumber).create();
+                    var buttonRest=html.button({class:'foot-info'},"+..."+toNextRowNumber).create();
                     grid.dom.footInfo.rowCount.appendChild(html.span('  ').create());
                     grid.dom.footInfo.rowCount.appendChild(buttonRest);
                     buttonRest.addEventListener('click',function(){
@@ -846,7 +849,8 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 addButtonRest(depotsToDisplay.length);
             }
         }
-        grid.displayRows(0, Math.min(my.firstDisplayCount,depotsToDisplay.length));
+        var linesToDisplay=depotsToDisplay.length<=myOwn.firstDisplayOverLimit?depotsToDisplay.length:my.firstDisplayCount;
+        grid.displayRows(0, linesToDisplay);
     }
     grid.displayBody();
 };
