@@ -36,5 +36,6 @@ login:
 client-setup:
   cursors: true
   skin: confort-bis
+  formTitle: example-tables
 logo: 
   path: client/img
