@@ -9,7 +9,7 @@ server:
     confort:
       local-path: node_modules/backend-skins/dist/
     confort-bis:
-      local-path: node_modules/backend-skins/dist/
+      local-path: node_modules/backend-skins/dist/confort-bis
 db:
   motor: postgresql
   host: localhost
@@ -27,6 +27,7 @@ login:
   lockedClausule: current_timestamp>=locked_since
   plus:
     allowHttpLogin: true
+    chPassUrlPath: false
     fileStore: true
     secret: secret cat in the table
     loginForm:
