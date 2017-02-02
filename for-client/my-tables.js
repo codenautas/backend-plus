@@ -522,7 +522,9 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     if(!grid.def.field[fieldName].clientSide){
                         var value = depot.rowControls[fieldName].getTypedValue();
                         if(!sameValue(depot.row[fieldName], value)){
-                            depot.rowPendingForUpdate[fieldName] = value;
+                            if(grid.def.field[fieldName].allow.update){
+                                depot.rowPendingForUpdate[fieldName] = value;
+                            }
                             depot.row[fieldName] = value;
                         }
                     }

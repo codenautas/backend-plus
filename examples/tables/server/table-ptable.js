@@ -21,6 +21,8 @@ module.exports = function(context){
             {name:'block'               , typeName:'text'                                    },
             {name:'state at STP'        , typeName:'text'                                    },
             {name:'ocurrence'           , typeName:'text'                                    },
+            {name:'isotopes'            , typeName:'ARRAY:text', editable:false              },
+            {name:'cant_images'         , typeName:'integer'   , editable:false              },
         ],
         primaryKey:['atomic_number'],
         detailTables:[
@@ -32,5 +34,12 @@ module.exports = function(context){
         ],
         actionNamesList:['showImg'],
         allow:{showImg:true},
+        sql:{
+            from:`(
+                select * from ptable p,
+                  lateral (select array_agg(mass_number::text order by "order") as isotopes from isotopes i where i.atomic_number = p.atomic_number) i,
+                  lateral (select count(url)::integer as cant_images from element_images e where e.atomic_number = p.atomic_number) e
+            ) x`
+        }
     });
 }

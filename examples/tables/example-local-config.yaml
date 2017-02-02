@@ -9,6 +9,7 @@ devel:
   forceShowAsEditable: true    
 client-setup:
   skin: "confort"
+server:  
   skins:
     confort:
       local-path: ../backend-skins/dist/

@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for typed controls",
-  "version": "0.8.9",
+  "version": "0.9.0",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -19,7 +19,7 @@
     "cookie-parser": "~1.4.3",
     "es6-promise": "~4.0.5",
     "escape-string-regexp": "~1.0.5",
-    "express": "~4.14.0",
+    "express": "~4.14.1",
     "express-session": "~1.15.0",
     "express-useragent": "~1.0.6",
     "fs-extra": "~2.0.0", 
@@ -32,7 +32,7 @@
     "pikaday":"~1.5.1",
     
     "ajax-best-promise": "~0.2.1",
-    "backend-skins": "~0.0.4",
+    "backend-skins": "~0.0.5",
     "best-globals": "~0.7.1",
     "castellano": "~0.0.3",
     "dialog-promise": "~0.3.5",
@@ -41,20 +41,20 @@
     "json4all": "~0.3.0",
     "login-plus": "~1.1.2",
     "mini-tools": "~0.3.10",
-    "pg-promise-strict": "~0.2.9",
+    "pg-promise-strict": "~0.2.11",
     "regexplicit": "~0.0.8",
     "require-bro": "~0.1.4",
     "self-explain": "~0.10.11",
     "serve-content": "~0.3.5",
-    "type-store": "~0.0.7",
-    "typed-controls": "~0.5.6"
+    "type-store": "~0.0.9",
+    "typed-controls": "~0.5.7"
   },
   "devDependencies": {
     "expect.js": "~0.3.1",
     "istanbul": "~0.4.5",
     "mocha": "~3.2.0",
     "sinon": "~1.17.7",
-    "supertest": "~2.0.1",
+    "supertest": "~3.0.0",
     
     "kill-9": "~0.4.2"
   },
@@ -67,7 +67,7 @@
     "test-ci": "mocha --reporter spec --bail  test/test*.js",
     "test-good": "mocha --reporter spec --bail --check-leaks test/test*.js",
     "server-test": "node test/run-simple-backend.js",
-    "example-tables": "node examples/tables/server/server-tables.js",
+    "example-tables": "node examples/tables/server/server-tables.js --dir-x examples/tables",
     "example-fichas": "node examples/fichero/server/server-fichas.js"
   },
   "qa-control": {
