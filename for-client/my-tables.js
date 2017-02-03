@@ -381,6 +381,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
             grid.vertical = !grid.vertical;
             grid.prepareGrid();
             grid.displayGrid();
+            grid.dom.table.setAttribute("my-orientation",grid.vertical?'vertical':'horizontal');
         });
     }
     grid.columns=[new my.ActionColumnGrid({grid:grid, actions:[buttonInsert,/*buttonSaveMode,*/buttonCreateFilter,buttonDestroyFilter,buttonOrientation]})].concat(
