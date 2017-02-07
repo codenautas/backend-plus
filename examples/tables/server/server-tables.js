@@ -19,12 +19,6 @@ class AppExample extends backendPlus.AppBackend{
         this.tableStructures.cursors = require('./table-cursors.js');
         this.tableStructures.bigint = require('./table-bigint.js');
     }
-    configList(){
-        return super.configList().concat([
-            __dirname+'/def-server-tables-config.yaml',
-            __dirname+'/local-config.yaml'
-        ]);
-    }
     addLoggedServices(){
         var be = this;
         super.addLoggedServices();
