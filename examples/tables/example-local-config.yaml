@@ -1,0 +1,15 @@
+db:
+  port: 5435
+log:
+  req: true
+login:
+  plus:
+    secret: false
+devel:
+  forceShowAsEditable: true    
+client-setup:
+  skin: "confort"
+server:  
+  skins:
+    confort:
+      local-path: ../backend-skins/dist/
