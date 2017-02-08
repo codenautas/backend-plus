@@ -1,4 +1,4 @@
 server:
   port: 3044
 client-setup:
-  skin: ""
+  skin: confort-dark

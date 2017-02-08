@@ -1,0 +1,50 @@
+doctype html
+html(lang="en")
+  head
+    link(rel='stylesheet', href=skinUrl+'css/chpass.css')
+  body
+    form(id="chPassForm", action="chpass", method="post")
+      table.chpasstable
+        tr
+          td(colspan=4)
+            h2.formtitle=msgs.chpass.title
+        tr.chpasstableImgRow
+          td(colspan=3)
+            img.formImg(src=skinUrl+'img/chpass-icon.png')
+        tr
+          td.iconostd
+            label(for="oldPassword")
+              img.iconoslog(src=skinUrl+'img/iconoOldPasswd.png')
+          td.formlabel
+            label(for="oldPassword")=msgs.chpass.oldPassword
+          td.formtd
+            input(id="oldPassword", type="password", name="oldPassword", autofocus=true, placeholder=msgs.chpass.oldPassword)
+          td.chpasstableRightImg(rowspan=3)
+            img.formImg#chpassFormRightImg(src=skinUrl+'img/chpass-icon.png')
+        tr
+          td.iconostd
+            label(for="newPassword")=newPassword
+              img.iconosnewPassword(src=skinUrl+'img/icononewPassword.png')
+          td.formlabel
+            label(for="newPassword")=msgs.chpass.newPassword
+          td.formtd
+            input(id="newPassword", type="password", name="newPassword", placeholder=msgs.chpass.newPassword)
+          td#resultStrength
+        tr
+          td.iconostd
+            label(for="repPassword")=repPassword
+              img.iconosrepPassword(src=skinUrl+'img/iconorepPassword.png')
+          td.formlabel
+            label(for="repPassword")=msgs.chpass.repPassword
+          td.formtd
+            input(id="repPassword", type="password", name="repPassword", placeholder=msgs.chpass.repPassword)
+          td#resultDiff
+        tr
+          td
+          td
+            input(type="submit", value=msgs.chpass.button)
+        each errorLine in (flash.error||[])
+          tr(style={color:'red'})
+            td(colspan=5)=errorLine
+    if strength
+      script(src="strength-pass.js")

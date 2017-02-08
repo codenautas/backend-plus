@@ -1,0 +1,41 @@
+doctype html
+html
+  head
+    link(rel='stylesheet', href=skinUrl+'css/login.css')
+  body
+    form(id="loginForm", action="login", method="post")
+      table.logintable
+        tr
+          td(colspan=4)
+            h2.formtitle=msgs.login.title
+        tr.logintableImgRow
+          td(colspan=3)
+            img.formImg(src=skinUrl+'img/login-lock-icon.png')
+        tr
+          td.iconostd
+            label(for="username")
+              img.iconoslog(src=skinUrl+'img/iconousuario.png')
+          td.formlabel
+            label(for="username")=msgs.login.username
+          td.formtd
+            input(id="username", type="text", name="username", autofocus=true, placeholder=usernameLabel)
+          td.logintableRightImg(rowspan=3)
+            img.formImg#loginFormRightImg(src=skinUrl+'img/login-lock-icon.png')
+        tr
+          td.iconostd
+            label(for="password")
+              img.iconoslog(src=skinUrl+'img/iconopass.png') 
+          td.formlabel
+            label(for="password")=msgs.login.password
+          td.formtd    
+            input(id="password", type="password", name="password" placeholder=passwordLabel)
+        tr
+          td.iconostd.buttonmargin
+          td.formlabel.buttonmargin
+          td(colspan=4)
+            input.submit(type="submit", value=msgs.login.button)
+        each errorLine in (flash.error||[])
+          tr(style={color:'red'})
+            td(colspan=5)=errorLine
+    if autoLogin
+      script(src="auto-login.js")
