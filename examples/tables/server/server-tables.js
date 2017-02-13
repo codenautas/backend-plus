@@ -18,6 +18,7 @@ class AppExample extends backendPlus.AppBackend{
         this.tableStructures.element_images = require('./table-element_images.js');
         this.tableStructures.cursors = require('./table-cursors.js');
         this.tableStructures.bigint = require('./table-bigint.js');
+        this.tableStructures.users = require('./table-users.js');
     }
     addLoggedServices(){
         var be = this;
