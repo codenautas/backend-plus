@@ -439,22 +439,26 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
                 setTimeout(function(){
                     var wb = {Sheets:{}};
                     var ws = {};
+                    grid.def.fields.forEach(function(field,iColumn){
+                        ws[XLSX.utils.encode_cell({c:iColumn,r:0})]={t:'s',v:field.name, s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                    })
                     grid.depotsToDisplay.forEach(function(depot, iFila){
                         depot.def.fields.forEach(function(fieldDef, iColumn){
-                            if(iFila==0){
-                                ws[XLSX.utils.encode_cell({c:iColumn,r:0})]={t:'s',v:fieldDef.title};
-                                ws[XLSX.utils.encode_cell({c:iColumn,r:1})]={t:'s',v:depot.row[fieldDef.name]}
+                            var value=depot.row[fieldDef.name];
+                            if(value!=null){
+                                var cell={t:'s',v:value};
+                                if(!fieldDef.allow.update){
+                                    cell.s={font:{color:{ rgb: "88AA00" }}}
+                                }
+                                ws[XLSX.utils.encode_cell({c:iColumn,r:iFila+1})]=cell;
                             }
-                            ws[XLSX.utils.encode_cell({c:iColumn,r:iFila+1})]={t:'s',v:depot.row[fieldDef.name]}
-                            //depot.row[fieldDef.name];
                         })
                     });
-                    ws["!ref"]="A1:F99";
+                    ws["!ref"]="A1:"+XLSX.utils.encode_cell({c:grid.def.fields.length,r:grid.depotsToDisplay.length});
                     wb.SheetNames=["hoja1"];
                     wb.Sheets["hoja1"]=ws;
                     var wbFile = XLSX.write(wb, {bookType:'xlsx', bookSST:false, type: 'binary'});
                     var blob = new Blob([s2ab(wbFile)],{type:"application/octet-stream"});
-                    // var blob = new Blob([wbFile],{type:"application/octet-stream"});
                     mainDiv.setAttribute("current-state", "ready");
                     var url = URL.createObjectURL(blob); 
                     downloadElement.href=url;
