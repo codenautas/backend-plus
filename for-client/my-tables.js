@@ -346,6 +346,19 @@ myOwn.SpecialColumnGrid.prototype.th = function th(){
 
 myOwn.SpecialColumnGrid.prototype.thDetail = myOwn.SpecialColumnGrid.prototype.th;
 
+function s2ab(s) {
+	if(typeof ArrayBuffer !== 'undefined') {
+		var buf = new ArrayBuffer(s.length);
+		var view = new Uint8Array(buf);
+		for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+		return buf;
+	} else {
+		var buf = new Array(s.length);
+		for (var i=0; i!=s.length; ++i) buf[i] = s.charCodeAt(i) & 0xFF;
+		return buf;
+	}
+}
+
 myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     var grid = this;
     var my = grid.my;
@@ -411,6 +424,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
                 dialogWindow.appendChild(mainDiv);
                 var txtToDownload;
                 setTimeout(function(){
+                    return ;
                     var txtToDownload=grid.depotsToDisplay.map(function(depot){
                         return depot.def.fields.map(function(fieldDef){
                             return depot.row[fieldDef.name];
@@ -421,6 +435,27 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
                     var url = URL.createObjectURL(blob); 
                     downloadElement.href=url;
                     downloadElement.setAttribute("download", grid.def.name+".txt");
+                },1000);
+                setTimeout(function(){
+                    var wb = {Sheets:{}};
+                    var ws = {};
+                    grid.depotsToDisplay.forEach(function(depot, iFila){
+                        depot.def.fields.forEach(function(fieldDef, iColumn){
+                            depot.row[fieldDef.name];
+                        })
+                    });
+                    ws[XLSX.utils.encode_cell({c:2,r:3})]={t:'n', v:7};
+                    ws[XLSX.utils.encode_cell({c:2,r:4})]={t:'n', v:8888};
+                    ws["!ref"]="A1:F99";
+                    wb.SheetNames=["hoja1"];
+                    wb.Sheets["hoja1"]=ws;
+                    var wbFile = XLSX.write(wb, {bookType:'xlsx', bookSST:false, type: 'binary'});
+                    var blob = new Blob([s2ab(wbFile)],{type:"application/octet-stream"});
+                    // var blob = new Blob([wbFile],{type:"application/octet-stream"});
+                    mainDiv.setAttribute("current-state", "ready");
+                    var url = URL.createObjectURL(blob); 
+                    downloadElement.href=url;
+                    downloadElement.setAttribute("download", grid.def.name+".xlsx");
                 },1000);
             });
         });

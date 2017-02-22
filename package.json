@@ -26,10 +26,11 @@
     "fs-promise": "~1.0.0", 
     "js-yaml": "~3.7.0",
     "numeral": "~2.0.4",
+    "pikaday":"~1.5.1",
     "pug": "~2.0.0-beta6",
     "read-yaml-promise": "~1.0.2",
     "stylus": "~0.54.5",
-    "pikaday":"~1.5.1",
+    "xlsx": "~0.8.5",
     
     "ajax-best-promise": "~0.2.1",
     "backend-skins": "~0.0.5",
