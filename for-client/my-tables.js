@@ -441,11 +441,14 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
                     var ws = {};
                     grid.depotsToDisplay.forEach(function(depot, iFila){
                         depot.def.fields.forEach(function(fieldDef, iColumn){
-                            depot.row[fieldDef.name];
+                            if(iFila==0){
+                                ws[XLSX.utils.encode_cell({c:iColumn,r:0})]={t:'s',v:fieldDef.title};
+                                ws[XLSX.utils.encode_cell({c:iColumn,r:1})]={t:'s',v:depot.row[fieldDef.name]}
+                            }
+                            ws[XLSX.utils.encode_cell({c:iColumn,r:iFila+1})]={t:'s',v:depot.row[fieldDef.name]}
+                            //depot.row[fieldDef.name];
                         })
                     });
-                    ws[XLSX.utils.encode_cell({c:2,r:3})]={t:'n', v:7};
-                    ws[XLSX.utils.encode_cell({c:2,r:4})]={t:'n', v:8888};
                     ws["!ref"]="A1:F99";
                     wb.SheetNames=["hoja1"];
                     wb.Sheets["hoja1"]=ws;
