@@ -486,6 +486,11 @@ myOwn.path={
     img:'img/'
 }
 
+myOwn.getUniqueDomId = function getUniqueDomId(){
+    myOwn.getUniqueDomId.serial=(myOwn.getUniqueDomId.serial||0)+1;
+    return 'uniQ$___$id'+myOwn.getUniqueDomId.serial;
+}
+
 return myOwn;
 
 });

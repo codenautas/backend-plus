@@ -21,6 +21,9 @@ myOwn.messages=changing(myOwn.messages, {
     loading: "loading",
     Filter : "Filter",
     Delete : "Delete",
+    download: "download",
+    format: "format",
+    preparingForExport: "preparing for export",
     anotherUserChangedTheRow: "Another user changed the row",
     oldValue: "old value",
     actualValueInDB: "actual value in database"
@@ -30,6 +33,9 @@ myOwn.es=changing(myOwn.es, {
     loading: "cargando",
     Filter : "Filtrar",
     Delete : "Eliminar",
+    download: "descargar",
+    format: "formato",
+    preparingForExport: "preparando para exportar",
     anotherUserChangedTheRow: "Otro usuario modificó el registro",
     oldValue: "valor anterior",
     actualValueInDB: "valor actual en la base de datos"
@@ -382,6 +388,41 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
             grid.prepareGrid();
             grid.displayGrid();
             grid.dom.table.setAttribute("my-orientation",grid.vertical?'vertical':'horizontal');
+        });
+    }
+    if(grid.def.allow.export){
+        buttonOrientation=html.button({class:'table-button'}, [html.img({src:my.path.img+'export.png'})]).create();
+        buttonOrientation.addEventListener('click',function(){
+            dialogPromise(function(dialogWindow, closeWindow){
+                var id1=my.getUniqueDomId();
+                var id2=my.getUniqueDomId();
+                var downloadElement=html.a(my.messages.download).create();
+                var mainDiv=html.div({class:'dialog-export',"current-state":"preparing"}, [
+                    html.div({class:'dialog-preparing'}, my.messages.preparingForExport),
+                    html.div([
+                        html.span(my.messages.format),
+                        html.input({type:'radio', id:id1, name:'format', checked:true }), html.label({"for": id1}, '.txt'),
+                        html.input({type:'radio', id:id2, name:'format', checked:false}), html.label({"for": id2}, '.xlsx'),
+                    ]),
+                    html.img({class:['img-preparing', 'state-preparing'], src:'img/preparing.png'}),
+                    html.div({class:'state-ready'}, [downloadElement]),
+                    html.div('.')
+                ]).create();
+                dialogWindow.appendChild(mainDiv);
+                var txtToDownload;
+                setTimeout(function(){
+                    var txtToDownload=grid.depotsToDisplay.map(function(depot){
+                        return depot.def.fields.map(function(fieldDef){
+                            return depot.row[fieldDef.name];
+                        }).join(';')
+                    }).join('\r\n')+'\r\n';
+                    mainDiv.setAttribute("current-state", "ready");
+                    var blob = new Blob([txtToDownload], {type: 'text/plain'})
+                    var url = URL.createObjectURL(blob); 
+                    downloadElement.href=url;
+                    downloadElement.setAttribute("download", grid.def.name+".txt");
+                },1000);
+            });
         });
     }
     grid.columns=[new my.ActionColumnGrid({grid:grid, actions:[buttonInsert,/*buttonSaveMode,*/buttonCreateFilter,buttonDestroyFilter,buttonOrientation]})].concat(
@@ -853,6 +894,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             }
         }
         var linesToDisplay=depotsToDisplay.length<=myOwn.firstDisplayOverLimit?depotsToDisplay.length:my.firstDisplayCount;
+        grid.depotsToDisplay=depotsToDisplay;
         grid.displayRows(0, linesToDisplay);
     }
     grid.displayBody();

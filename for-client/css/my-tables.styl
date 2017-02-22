@@ -170,3 +170,37 @@ td.autoFilter button{
   th
     text-align left
     max-width 700px
+
+
+
+@-webkit-keyframes rotate {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+  to { 
+    -webkit-transform: rotate(360deg);
+  }
+}
+    
+rotate-infinite()
+  -webkit-animation-name rotate 
+  -webkit-animation-duration 2s
+  -webkit-animation-iteration-count infinite
+  -webkit-animation-timing-function linear
+  
+.dialog-export
+  .img-preparing
+    height 64px
+    width  64px
+    margin-bottom 10px
+    rotate-infinite()
+  .state-preparing
+    display inherit
+  .state-ready
+    display none
+.dialog-export[current-state="ready"]
+  .state-preparing
+    display none
+  .state-ready
+    display inherit
+  
