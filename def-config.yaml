@@ -3,6 +3,6 @@ server:
 db:
   host: localhost
   database: tutifruti_db
-  port: 5435
+  port: 5432
   user: tuti_node
   password: ponerlo_en_el_config_local
