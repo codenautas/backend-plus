@@ -18,9 +18,10 @@ describe("table-def-adapt", function(){
             "actionNamesList": [],
             "allow": {
               "delete": false,
+              "export": true ,
               "filter": true ,
               "insert": false,
-              "orientation": true,
+              "orientation": false,
               "select": true ,
               "update": false,
               "vertical-edit": true
