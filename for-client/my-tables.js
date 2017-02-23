@@ -414,8 +414,8 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
                     html.div({class:'dialog-preparing'}, my.messages.preparingForExport),
                     html.div([
                         html.span(my.messages.format),
-                        html.input({type:'radio', id:id1, name:'format', checked:true }), html.label({"for": id1}, '.txt'),
-                        html.input({type:'radio', id:id2, name:'format', checked:false}), html.label({"for": id2}, '.xlsx'),
+                       // html.input({type:'radio', id:id1, name:'format', checked:true }), html.label({"for": id1}, '.txt'),
+                        html.input({type:'radio', id:id2, name:'format', checked:true}), html.label({"for": id2}, '.xlsx'),
                     ]),
                     html.img({class:['img-preparing', 'state-preparing'], src:'img/preparing.png'}),
                     html.div({class:'state-ready'}, [downloadElement]),
