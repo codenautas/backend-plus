@@ -445,6 +445,18 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
                 setTimeout(function(){
                     var wb = {Sheets:{}};
                     var ws = {};
+                    var exportFileInformationWs={};
+                    var i=0;
+                    //console.log("grid.def",grid.def.allow);
+                    exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:i++})]={t:'s',v:'table name',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                    exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:i++})]={t:'s',v:grid.def.name};
+                    exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:i++})]={t:'s',v:'permisos',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                    for(var action in grid.def.allow){
+                        exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:i++})]={t:'s',v:action};
+                    }
+                    /*grid.def.allow.forEach(function(action,iAction){
+                        exportFileInformationWs[XLSX.utils.encode_cell({c:iAction,r:2})]={t:'s',v:action};
+                    })*/
                     grid.def.fields.forEach(function(field,iColumn){
                         ws[XLSX.utils.encode_cell({c:iColumn,r:0})]={t:'s',v:field.name, s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
                     })
@@ -461,8 +473,10 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
                         })
                     });
                     ws["!ref"]="A1:"+XLSX.utils.encode_cell({c:grid.def.fields.length,r:grid.depotsToDisplay.length});
-                    wb.SheetNames=["hoja1"];
+                    wb.SheetNames=["hoja1","hoja2"];
                     wb.Sheets["hoja1"]=ws;
+                    exportFileInformationWs["!ref"]="A1:F100"
+                    wb.Sheets["hoja2"]=exportFileInformationWs;
                     var wbFile = XLSX.write(wb, {bookType:'xlsx', bookSST:false, type: 'binary'});
                     var blob = new Blob([s2ab(wbFile)],{type:"application/octet-stream"});
                     mainDiv.setAttribute("current-state", "ready");
