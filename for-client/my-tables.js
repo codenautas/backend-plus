@@ -23,10 +23,12 @@ myOwn.messages=changing(myOwn.messages, {
     Delete : "Delete",
     download: "download",
     format: "format",
+    import: "import",
     preparingForExport: "preparing for export",
     anotherUserChangedTheRow: "Another user changed the row",
     oldValue: "old value",
-    actualValueInDB: "actual value in database"
+    actualValueInDB: "actual value in database",
+    importDataFromFile: "import data from external file"
 });
 
 myOwn.es=changing(myOwn.es, {
@@ -35,10 +37,12 @@ myOwn.es=changing(myOwn.es, {
     Delete : "Eliminar",
     download: "descargar",
     format: "formato",
+    import: "importar",
     preparingForExport: "preparando para exportar",
     anotherUserChangedTheRow: "Otro usuario modificó el registro",
     oldValue: "valor anterior",
-    actualValueInDB: "valor actual en la base de datos"
+    actualValueInDB: "valor actual en la base de datos",
+    importDataFromFile: "importar datos de un archivo externo"
 });
 
 var escapeRegExp = bestGlobals.escapeRegExp;
@@ -366,6 +370,8 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     var buttonCreateFilter;
     var buttonDestroyFilter;
     var buttonOrientation;
+    var buttonExport;
+    var buttonImport;
     var getSaveModeImgSrc=function(){ return my.path.img+(grid.modes.saveByField?'tables-update-by-field.png':'tables-update-by-row.png');};
     var buttonSaveModeImg=html.img({src:getSaveModeImgSrc()}).create();
     var buttonSaveMode;
@@ -404,8 +410,8 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         });
     }
     if(grid.def.allow.export){
-        buttonOrientation=html.button({class:'table-button'}, [html.img({src:my.path.img+'export.png'})]).create();
-        buttonOrientation.addEventListener('click',function(){
+        buttonExport=html.button({class:'table-button'}, [html.img({src:my.path.img+'export.png'})]).create();
+        buttonExport.addEventListener('click',function(){
             dialogPromise(function(dialogWindow, closeWindow){
                 var id1=my.getUniqueDomId();
                 var id2=my.getUniqueDomId();
@@ -467,7 +473,27 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
             });
         });
     }
-    grid.columns=[new my.ActionColumnGrid({grid:grid, actions:[buttonInsert,/*buttonSaveMode,*/buttonCreateFilter,buttonDestroyFilter,buttonOrientation]})].concat(
+    if(grid.def.allow.import){
+        buttonImport=html.button({class:'table-button'}, [html.img({src:my.path.img+'import.png'})]).create();
+        buttonImport.addEventListener('click',function(){
+            var buttonFile=html.input({type:'file',style:'min-width:400px'}).create();
+            var buttonConfirmImport=html.input({type:'button', value:my.messages.import}).create();
+            simpleFormPromise({elementsList:[
+                my.messages.importDataFromFile,
+                buttonFile,
+                html.br().create(),
+                buttonConfirmImport,
+            ]}).then(function(){
+                alertPromise('importado');
+            });
+        });
+    }
+    grid.columns=[new my.ActionColumnGrid({grid:grid, actions:[
+        buttonInsert,/*buttonSaveMode,*/buttonCreateFilter,buttonDestroyFilter,
+        buttonOrientation,
+        buttonExport,
+        buttonImport,
+    ]})].concat(
         grid.def.detailTables.map(function(detailTableDef){ return new my.DetailColumnGrid({grid:grid, detailTableDef:detailTableDef}); })
     ).concat(
         grid.def.fields.map(function(fieldDef){ return new my.DataColumnGrid({grid:grid, fieldDef:fieldDef}); })
