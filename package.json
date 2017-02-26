@@ -33,7 +33,7 @@
     "stylus": "~0.54.5",
     "xlsx-style": "~0.8.13",
     
-    "ajax-best-promise": "~0.2.2",
+    "ajax-best-promise": "~0.3.0",
     "backend-skins": "~0.0.5",
     "best-globals": "~0.7.1",
     "castellano": "~0.0.3",

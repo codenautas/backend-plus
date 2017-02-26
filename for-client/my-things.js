@@ -270,8 +270,11 @@ myOwn.ajaxPromise = function(procedureDef,data,opts){
             value = my.encoders[paramDef.encoding].stringify(value);
             params[paramDef.name]=value;
         });
+        if(data && data.files){
+            params.files=data.files;
+        }
         return AjaxBestPromise[procedureDef.method]({
-            postForm:procedureDef.postForm,
+            multipart:procedureDef.files,
             url:procedureDef.action,
             data:params
         }).then(function(result){

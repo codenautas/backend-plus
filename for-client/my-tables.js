@@ -500,7 +500,6 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
             var buttonFile=html.input({type:'file',style:'min-width:400px'}).create();
             var buttonConfirmImport=html.input({type:'button', value:my.messages.import}).create();
             buttonConfirmImport.addEventListener('click', function(){
-                var formData = new FormData();
                 var files = buttonFile.files;
                 my.ajax.table.upload({
                     table:grid.def.name, 
