@@ -363,6 +363,12 @@ function s2ab(s) {
 	}
 }
 
+function Workbook() {
+	if(!(this instanceof Workbook)) return new Workbook();
+	this.SheetNames = [];
+	this.Sheets = {};
+}
+
 myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     var grid = this;
     var my = grid.my;
@@ -443,7 +449,8 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
                     downloadElement.setAttribute("download", grid.def.name+".txt");
                 },1000);
                 setTimeout(function(){
-                    var wb = {Sheets:{}};
+                    var wb = new Workbook();
+                    // var wb = {Sheets:{}};
                     var ws = {};
                     var exportFileInformationWs={};
                     var i=0;
@@ -492,13 +499,21 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         buttonImport.addEventListener('click',function(){
             var buttonFile=html.input({type:'file',style:'min-width:400px'}).create();
             var buttonConfirmImport=html.input({type:'button', value:my.messages.import}).create();
+            buttonConfirmImport.addEventListener('click', function(){
+                var formData = new FormData();
+                var files = buttonFile.files;
+                my.ajax.table.upload({
+                    table:grid.def.name, 
+                    files:files
+                }).then(this.dialogPromiseDone,this.dialogPromiseDone);
+            });
             simpleFormPromise({elementsList:[
                 my.messages.importDataFromFile,
                 buttonFile,
                 html.br().create(),
                 buttonConfirmImport,
-            ]}).then(function(){
-                alertPromise('importado');
+            ]}).then(function(message){
+                alertPromise(message);
             });
         });
     }

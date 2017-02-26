@@ -241,7 +241,7 @@ myOwn.encoders = {
     plain: { 
         parse: function(x){return x;}, 
         stringify: function(x){
-            if(typeof x === "object"){
+            if(typeof x === "object" && !(x instanceof FileList)){
                 throw new Error("Invalid plain type "+(x==null?value:typeof x)+" detected");
             }
             return x;
@@ -271,6 +271,7 @@ myOwn.ajaxPromise = function(procedureDef,data,opts){
             params[paramDef.name]=value;
         });
         return AjaxBestPromise[procedureDef.method]({
+            postForm:procedureDef.postForm,
             url:procedureDef.action,
             data:params
         }).then(function(result){
