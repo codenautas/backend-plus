@@ -23,12 +23,18 @@ myOwn.messages=changing(myOwn.messages, {
     Delete : "Delete",
     download: "download",
     format: "format",
+    export: "export",
     import: "import",
+    table: "table",
     preparingForExport: "preparing for export",
     anotherUserChangedTheRow: "Another user changed the row",
     oldValue: "old value",
     actualValueInDB: "actual value in database",
-    importDataFromFile: "import data from external file"
+    importDataFromFile: "import data from external file",
+    deleteAllRecords: "delete all records",
+    confirmDeleteAll: "Do you want to delete these records?",
+    xOverTWillDelete: "({$x} over a total of {$t} records will be deleted)",
+    allTWillDelete: "(ALL {$t} records will be deleted)"
 });
 
 myOwn.es=changing(myOwn.es, {
@@ -37,12 +43,18 @@ myOwn.es=changing(myOwn.es, {
     Delete : "Eliminar",
     download: "descargar",
     format: "formato",
+    export: "exportar",
     import: "importar",
+    table: "tabla",
     preparingForExport: "preparando para exportar",
     anotherUserChangedTheRow: "Otro usuario modificó el registro",
     oldValue: "valor anterior",
     actualValueInDB: "valor actual en la base de datos",
-    importDataFromFile: "importar datos de un archivo externo"
+    importDataFromFile: "importar datos de un archivo externo",
+    deleteAllRecords: "borrar todos los registros",
+    confirmDeleteAll: "¿Desea borrar estos registros?",
+    xOverTWillDelete: "(se borrarán {$x} registros sobre un total de {$t})",
+    allTWillDelete: "(se borrarán todos los registros: {$t} registros)"
 });
 
 var escapeRegExp = bestGlobals.escapeRegExp;
@@ -369,56 +381,13 @@ function Workbook() {
 	this.Sheets = {};
 }
 
-myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
-    var grid = this;
-    var my = grid.my;
-    var buttonInsert;
-    var buttonCreateFilter;
-    var buttonDestroyFilter;
-    var buttonOrientation;
-    var buttonExport;
-    var buttonImport;
-    var getSaveModeImgSrc=function(){ return my.path.img+(grid.modes.saveByField?'tables-update-by-field.png':'tables-update-by-row.png');};
-    var buttonSaveModeImg=html.img({src:getSaveModeImgSrc()}).create();
-    var buttonSaveMode;
-    if(grid.def.allow.update){
-        buttonSaveMode=html.button({class:'table-button'}, [buttonSaveModeImg]).create();
-        buttonSaveMode.addEventListener('click',function(){
-            grid.modes.saveByField = !grid.modes.saveByField;
-            buttonSaveModeImg.src=getSaveModeImgSrc();
-        });
-    }
-    if(grid.def.allow.insert){
-        buttonInsert=html.button({class:'table-button'}, [html.img({src:my.path.img+'insert.png'})]).create();
-        buttonInsert.addEventListener('click', function(){
-            grid.createRowInsertElements();
-        });
-    }
-    if(grid.def.allow.filter){
-        buttonCreateFilter=html.button({class:'table-button', 'when-filter':'no'}, [html.img({src:my.path.img+'filter.png'})]).create();
-        buttonCreateFilter.addEventListener('click', function(){
-            grid.createRowFilter(0);
-        });
-        buttonDestroyFilter=html.button({class:'table-button', 'when-filter':'yes'}, [html.img({src:my.path.img+'destroy-filter.png'})]).create();
-        buttonDestroyFilter.addEventListener('click', function(){
-            grid.destroyRowFilter(0);
-            grid.view.filter=false;
-            grid.displayBody();
-        });
-    }
-    if(grid.def.allow.orientation){
-        buttonOrientation=html.button({class:'table-button'}, [html.img({src:my.path.img+'orientation-toggle.png'})]).create();
-        buttonOrientation.addEventListener('click',function(){
-            grid.vertical = !grid.vertical;
-            grid.prepareGrid();
-            grid.displayGrid();
-            grid.dom.table.setAttribute("my-orientation",grid.vertical?'vertical':'horizontal');
-        });
-    }
+myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
+    button.src=my.path.img+'menu-dots.png';
+    var grid=this;
+    var menuOptions=[];
     if(grid.def.allow.export){
-        buttonExport=html.button({class:'table-button'}, [html.img({src:my.path.img+'export.png'})]).create();
-        buttonExport.addEventListener('click',function(){
-            dialogPromise(function(dialogWindow, closeWindow){
+        menuOptions.push({img:my.path.img+'export.png', value:true, label:my.messages.export, doneFun:function(){
+            return dialogPromise(function(dialogWindow, closeWindow){
                 var id1=my.getUniqueDomId();
                 var id2=my.getUniqueDomId();
                 var downloadElement=html.a(my.messages.download).create();
@@ -461,9 +430,9 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
                     for(var action in grid.def.allow){
                         exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:i++})]={t:'s',v:action};
                     }
-                    /*grid.def.allow.forEach(function(action,iAction){
-                        exportFileInformationWs[XLSX.utils.encode_cell({c:iAction,r:2})]={t:'s',v:action};
-                    })*/
+                    // grid.def.allow.forEach(function(action,iAction){
+                    //     exportFileInformationWs[XLSX.utils.encode_cell({c:iAction,r:2})]={t:'s',v:action};
+                    // })
                     grid.def.fields.forEach(function(field,iColumn){
                         ws[XLSX.utils.encode_cell({c:iColumn,r:0})]={t:'s',v:field.name, s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
                     })
@@ -492,11 +461,10 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
                     downloadElement.setAttribute("download", grid.def.name+".xlsx");
                 },1000);
             });
-        });
+        }});
     }
     if(grid.def.allow.import){
-        buttonImport=html.button({class:'table-button'}, [html.img({src:my.path.img+'import.png'})]).create();
-        buttonImport.addEventListener('click',function(){
+        menuOptions.push({img:my.path.img+'import.png', value:true, label:my.messages.import, doneFun:function(){
             var buttonFile=html.input({type:'file',style:'min-width:400px'}).create();
             var buttonConfirmImport=html.input({type:'button', value:my.messages.import}).create();
             buttonConfirmImport.addEventListener('click', function(){
@@ -515,13 +483,89 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
                 grid.prepareAndDisplayGrid();
                 return alertPromise(message);
             });
+        }});
+    }
+    if(grid.def.allow.delete){
+        menuOptions.push({img:my.path.img+'delete-all-rows.png', value:true, label:my.messages.deleteAllRecords, doneFun:function(){
+            return confirmPromise(my.messages.confirmDeleteAll+(
+                grid.depotsToDisplay.length<grid.depots.length?my.messages.xOverTWillDelete:my.messages.allTWillDelete
+            ).replace('{$x}',grid.depotsToDisplay.length).replace('{$t}',grid.depots.length)
+            ).then(function(){
+            //    return alertPromise('por borrar');
+            //}).then(function(){
+                return my.ajax.table['delete-many-records']({
+                    table:grid.def.name,
+                    rowsToDelete:grid.depotsToDisplay.map(function(depot){
+                        return depot.row;
+                    }),
+                    expectedRemainCount:grid.depots.length-grid.depotsToDisplay.length
+                });
+            }).then(function(message){
+                grid.prepareAndDisplayGrid();
+                return alertPromise(message);
+            });
+        }});
+    }
+    button.onclick=function(){
+        miniMenuPromise(menuOptions,{
+            underElement:button,
+            withCloseButton:false,
+            imgStyle:{width:'32px'}
+        });
+    };
+};
+
+myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
+    var grid = this;
+    var my = grid.my;
+    var buttonInsert;
+    var buttonCreateFilter;
+    var buttonDestroyFilter;
+    var buttonOrientation;
+    var buttonMenu;
+    var getSaveModeImgSrc=function(){ return my.path.img+(grid.modes.saveByField?'tables-update-by-field.png':'tables-update-by-row.png');};
+    var buttonSaveModeImg=html.img({src:getSaveModeImgSrc()}).create();
+    var buttonSaveMode;
+    if(grid.def.allow.update){
+        buttonSaveMode=html.button({class:'table-button'}, [buttonSaveModeImg]).create();
+        buttonSaveMode.addEventListener('click',function(){
+            grid.modes.saveByField = !grid.modes.saveByField;
+            buttonSaveModeImg.src=getSaveModeImgSrc();
         });
     }
+    if(grid.def.allow.insert){
+        buttonInsert=html.button({class:'table-button'}, [html.img({src:my.path.img+'insert.png'})]).create();
+        buttonInsert.addEventListener('click', function(){
+            grid.createRowInsertElements();
+        });
+    }
+    if(grid.def.allow.filter){
+        buttonCreateFilter=html.button({class:'table-button', 'when-filter':'no'}, [html.img({src:my.path.img+'filter.png'})]).create();
+        buttonCreateFilter.addEventListener('click', function(){
+            grid.createRowFilter(0);
+        });
+        buttonDestroyFilter=html.button({class:'table-button', 'when-filter':'yes'}, [html.img({src:my.path.img+'destroy-filter.png'})]).create();
+        buttonDestroyFilter.addEventListener('click', function(){
+            grid.destroyRowFilter(0);
+            grid.view.filter=false;
+            grid.displayBody();
+        });
+    }
+    if(grid.def.allow.orientation){
+        buttonOrientation=html.button({class:'table-button'}, [html.img({src:my.path.img+'orientation-toggle.png'})]).create();
+        buttonOrientation.addEventListener('click',function(){
+            grid.vertical = !grid.vertical;
+            grid.prepareGrid();
+            grid.displayGrid();
+            grid.dom.table.setAttribute("my-orientation",grid.vertical?'vertical':'horizontal');
+        });
+    }
+    buttonMenu=html.button({class:'table-button'}, [html.img({src:my.path.img+'menu-dots.png'})]).create();
+    grid.prepareMenu(buttonMenu);
     grid.columns=[new my.ActionColumnGrid({grid:grid, actions:[
         buttonInsert,/*buttonSaveMode,*/buttonCreateFilter,buttonDestroyFilter,
         buttonOrientation,
-        buttonExport,
-        buttonImport,
+        buttonMenu,
     ]})].concat(
         grid.def.detailTables.map(function(detailTableDef){ return new my.DetailColumnGrid({grid:grid, detailTableDef:detailTableDef}); })
     ).concat(
