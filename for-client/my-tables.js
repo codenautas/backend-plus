@@ -510,7 +510,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
         miniMenuPromise(menuOptions,{
             underElement:button,
             withCloseButton:false,
-            imgStyle:{width:'32px'}
+            imgStyle:{width:'22px', padding:'2px'}
         });
     };
 };
