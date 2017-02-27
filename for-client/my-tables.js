@@ -512,6 +512,9 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
                 html.br().create(),
                 buttonConfirmImport,
             ]}).then(function(message){
+                //if(typeof message == 'object'){
+                //    message = JSON.stringify(message);
+                //}
                 alertPromise(message);
             });
         });
