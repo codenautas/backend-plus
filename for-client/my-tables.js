@@ -827,58 +827,60 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             var directInput=grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
             var td = html.td({"my-colname":fieldDef.name, "typed-controls-direct-input":directInput}).create();
             TypedControls.adaptElement(td, fieldDef);
-            td.addEventListener('click', function(){
-                var actualControl = this;
-                var rect = my.getRect(actualControl);
-                var buttonContainer = document;
-                var buttonLupa = buttonContainer.buttonLupa;
-                if(buttonLupa){
-                    document.body.removeChild(buttonLupa);
-                    if(buttonContainer.buttonLupaTimmer){
-                        clearTimeout(buttonContainer.buttonLupaTimmer);
+            if(fieldDef.allow.update){
+                td.addEventListener('click', function(){
+                    var actualControl = this;
+                    var rect = my.getRect(actualControl);
+                    var buttonContainer = document;
+                    var buttonLupa = buttonContainer.buttonLupa;
+                    if(buttonLupa){
+                        document.body.removeChild(buttonLupa);
+                        if(buttonContainer.buttonLupaTimmer){
+                            clearTimeout(buttonContainer.buttonLupaTimmer);
+                        }
                     }
-                }
-                buttonLupa=html.img({class:'img-lupa', src:my.path.img+'lupa.png'}).create();
-                buttonLupa.forElement=actualControl;
-                buttonContainer.buttonLupa=buttonLupa;
-                document.body.appendChild(buttonLupa);
-                buttonLupa.style.position='absolute';
-                buttonLupa.style.left=rect.left+rect.width-6+'px';
-                buttonLupa.style.top=rect.top+rect.height-8+'px';
-                buttonLupa.addEventListener('click', function(){
-                    var actualValue=actualControl.getTypedValue();
-                    var optDialog={underElement:actualControl};
-                    if(fieldDef.typeName=='date'){
-                        dialogPromise(function(dialogWindow, closeWindow){
-                            var button=html.button('Ok').create();
-                            var divPicker=html.div({id:'datepicker'}).create();
-                            var picker = new Pikaday({
-                                defaultDate: actualValue,
-                                onSelect: function(date) {
+                    buttonLupa=html.img({class:'img-lupa', src:my.path.img+'lupa.png'}).create();
+                    buttonLupa.forElement=actualControl;
+                    buttonContainer.buttonLupa=buttonLupa;
+                    document.body.appendChild(buttonLupa);
+                    buttonLupa.style.position='absolute';
+                    buttonLupa.style.left=rect.left+rect.width-6+'px';
+                    buttonLupa.style.top=rect.top+rect.height-8+'px';
+                    buttonLupa.addEventListener('click', function(){
+                        var actualValue=actualControl.getTypedValue();
+                        var optDialog={underElement:actualControl};
+                        if(fieldDef.typeName=='date'){
+                            dialogPromise(function(dialogWindow, closeWindow){
+                                var button=html.button('Ok').create();
+                                var divPicker=html.div({id:'datepicker'}).create();
+                                var picker = new Pikaday({
+                                    defaultDate: actualValue,
+                                    onSelect: function(date) {
+                                        closeWindow(new Date(picker.toString()));
+                                    }
+                                });
+                                divPicker.appendChild(picker.el);
+                                button.addEventListener('click',function(){
                                     closeWindow(new Date(picker.toString()));
-                                }
+                                });
+                                dialogWindow.appendChild(html.div([
+                                     html.div(fieldDef.label),
+                                     html.div([divPicker]),
+                                     html.div([button])
+                                ]).create());
+                            }, optDialog).then(function(value){
+                                actualControl.setTypedValue(value);
+                                actualControl.dispatchEvent(new CustomEvent('update'));
+                             });
+                        }else{
+                            promptPromise(fieldDef.label, actualValue,optDialog ).then(function(value){
+                                actualControl.setTypedValue(value);
                             });
-                            divPicker.appendChild(picker.el);
-                            button.addEventListener('click',function(){
-                                closeWindow(new Date(picker.toString()));
-                            });
-                            dialogWindow.appendChild(html.div([
-                                 html.div(fieldDef.label),
-                                 html.div([divPicker]),
-                                 html.div([button])
-                            ]).create());
-                        }, optDialog).then(function(value){
-                            actualControl.setTypedValue(value);
-                            actualControl.dispatchEvent(new CustomEvent('update'));
-                         });
-                    }else{
-                        promptPromise(fieldDef.label, actualValue,optDialog ).then(function(value){
-                            actualControl.setTypedValue(value);
-                        });
-                    }
+                        }
+                    });
+                    buttonContainer.buttonLupaTimmer=setTimeout(my.quitarLupa,3000);
                 });
-                buttonContainer.buttonLupaTimmer=setTimeout(my.quitarLupa,3000);
-            });
+            }
             depot.rowControls[fieldDef.name] = td;
             if(depot.row[fieldDef.name]!=null){
                 td.setTypedValue(depot.row[fieldDef.name]);
