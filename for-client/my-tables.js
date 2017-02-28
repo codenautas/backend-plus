@@ -391,6 +391,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                 var id1=my.getUniqueDomId();
                 var id2=my.getUniqueDomId();
                 var downloadElement=html.a(my.messages.download).create();
+                var downloadElementText=html.a(my.messages.download+" txt").create();
                 var mainDiv=html.div({class:'dialog-export',"current-state":"preparing"}, [
                     html.div({class:'dialog-preparing'}, my.messages.preparingForExport),
                     html.div([
@@ -400,23 +401,27 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     ]),
                     html.img({class:['img-preparing', 'state-preparing'], src:'img/preparing.png'}),
                     html.div({class:'state-ready'}, [downloadElement]),
+                    html.div({class:'state-ready-txt'}, [downloadElementText]),
                     html.div('.')
                 ]).create();
                 dialogWindow.appendChild(mainDiv);
                 var txtToDownload;
                 setTimeout(function(){
-                    return ;
-                    var txtToDownload=grid.depotsToDisplay.map(function(depot){
-                        return depot.def.fields.map(function(fieldDef){
-                            return depot.row[fieldDef.name];
-                        }).join(';')
-                    }).join('\r\n')+'\r\n';
-                    mainDiv.setAttribute("current-state", "ready");
+                    var txtToDownload=grid.def.fields.map(function(fieldDef){
+                            return fieldDef.name;
+                        }).join('|')+'\r\n'+
+                        grid.depotsToDisplay.map(function(depot){
+                            return grid.def.fields.map(function(fieldDef){
+                                var value=depot.row[fieldDef.name]
+                                return value==null?'':depot.row[fieldDef.name].toString().trim();
+                            }).join('|')
+                        }).join('\r\n')+'\r\n';
+                    mainDiv.setAttribute("current-state-txt", "ready");
                     var blob = new Blob([txtToDownload], {type: 'text/plain'})
                     var url = URL.createObjectURL(blob); 
-                    downloadElement.href=url;
-                    downloadElement.setAttribute("download", grid.def.name+".txt");
-                },1000);
+                    downloadElementText.href=url;
+                    downloadElementText.setAttribute("download", grid.def.name+".tab");
+                },10);
                 setTimeout(function(){
                     var wb = new Workbook();
                     // var wb = {Sheets:{}};
@@ -459,7 +464,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     var url = URL.createObjectURL(blob); 
                     downloadElement.href=url;
                     downloadElement.setAttribute("download", grid.def.name+".xlsx");
-                },1000);
+                },10);
             });
         }});
     }
