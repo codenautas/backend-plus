@@ -19,6 +19,7 @@ describe("table-def-adapt", function(){
             "allow": {
               "delete": false,
               "export": true ,
+              "import": true ,
               "filter": true ,
               "insert": false,
               "orientation": false,
@@ -63,6 +64,7 @@ describe("table-def-adapt", function(){
             "sql": {
               "from": '"the-table-name"',
               "isTable": true,
+              "postCreateSqls": "",
               "select": [
                 '"id"'
               ]
