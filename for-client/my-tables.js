@@ -18,43 +18,65 @@ function sameValue(a,b){
 sameValue(3,4);
 
 myOwn.messages=changing(myOwn.messages, {
-    loading: "loading",
-    Filter : "Filter",
     Delete : "Delete",
-    download: "download",
-    format: "format",
-    export: "export",
-    import: "import",
-    table: "table",
-    preparingForExport: "preparing for export",
-    anotherUserChangedTheRow: "Another user changed the row",
-    oldValue: "old value",
+    Filter : "Filter",
     actualValueInDB: "actual value in database",
-    importDataFromFile: "import data from external file",
-    deleteAllRecords: "delete all records",
+    allTWillDelete: "(ALL {$t} records will be deleted)",
+    anotherUserChangedTheRow: "Another user changed the row",
     confirmDeleteAll: "Do you want to delete these records?",
+    deleteAllRecords: "delete all records",
+    deleteRecord: "delete record",
+    details: "details",
+    download: "download",
+    export: "export",
+    filter : "filter",
+    filterOff: "filter off",
+    format: "format",
+    import: "import",
+    importDataFromFile: "import data from external file",
+    insertBelow: "insert record below this",
+    insertRecordAtTop: "insert record at top",
+    lessDetails: "hide details",
+    loading: "loading",
+    oldValue: "old value",
+    optionsForThisTable: "options for this table",
+    orientationToggle: "toggle orientation (vertical vs horizontal)",
+    preparingForExport: "preparing for export",
+    table: "table",
+    verticalEdit: "vertical edit",
     xOverTWillDelete: "({$x} over a total of {$t} records will be deleted)",
-    allTWillDelete: "(ALL {$t} records will be deleted)"
+    zoom: "zoom",
 });
 
 myOwn.es=changing(myOwn.es, {
-    loading: "cargando",
-    Filter : "Filtrar",
     Delete : "Eliminar",
-    download: "descargar",
-    format: "formato",
-    export: "exportar",
-    import: "importar",
-    table: "tabla",
-    preparingForExport: "preparando para exportar",
-    anotherUserChangedTheRow: "Otro usuario modificó el registro",
-    oldValue: "valor anterior",
+    Filter : "Filtrar",
     actualValueInDB: "valor actual en la base de datos",
-    importDataFromFile: "importar datos de un archivo externo",
-    deleteAllRecords: "borrar todos los registros",
+    allTWillDelete: "(se borrarán todos los registros: {$t} registros)",
+    anotherUserChangedTheRow: "Otro usuario modificó el registro",
     confirmDeleteAll: "¿Desea borrar estos registros?",
+    deleteAllRecords: "borrar todos los registros",
+    deleteRecord: "borrar este registro",
+    details: "detalles",
+    download: "descargar",
+    export: "exportar",
+    filter : "filtrar",
+    filterOff: "desactiva el filtro (ver todos los registros)",
+    format: "formato",
+    import: "importar",
+    importDataFromFile: "importar datos de un archivo externo",
+    insertBelow: "agregar un registro debajo de éste",
+    insertRecordAtTop: "insertar un registro nuevo en la tabla",
+    lessDetails: "dejar de mostrar los detalles asocialdos al registro",
+    loading: "cargando",
+    oldValue: "valor anterior",
+    optionsForThisTable: "opciones para esta tabla",
+    orientationToggle: "cambiar la orientación de la tabla (por fila o por columna)",
+    preparingForExport: "preparando para exportar",
+    table: "tabla",
+    verticalEdit: "edición en forma de ficha",
     xOverTWillDelete: "(se borrarán {$x} registros sobre un total de {$t})",
-    allTWillDelete: "(se borrarán todos los registros: {$t} registros)"
+    zoom: "zoom",
 });
 
 var escapeRegExp = bestGlobals.escapeRegExp;
@@ -383,6 +405,7 @@ function Workbook() {
 
 myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
     button.src=my.path.img+'menu-dots.png';
+    button.title=my.messages.optionsForThisTable;
     var grid=this;
     var menuOptions=[];
     if(grid.def.allow.export){
@@ -399,7 +422,11 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                        // html.input({type:'radio', id:id1, name:'format', checked:true }), html.label({"for": id1}, '.txt'),
                         html.input({type:'radio', id:id2, name:'format', checked:true}), html.label({"for": id2}, '.xlsx'),
                     ]),
-                    html.img({class:['img-preparing', 'state-preparing'], src:'img/preparing.png'}),
+                    html.img({
+                        class:['img-preparing', 'state-preparing'], 
+                        src:'img/preparing.png', 
+                        alt:my.messages.preparingForExport, 
+                        title:my.messages.preparingForExport, }),
                     html.div({class:'state-ready'}, [downloadElement]),
                     html.div({class:'state-ready-txt'}, [downloadElementText]),
                     html.div('.')
@@ -481,7 +508,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
             });
             simpleFormPromise({elementsList:[
                 my.messages.importDataFromFile,
-                buttonFile,
+                buttonFile, 
                 html.br().create(),
                 buttonConfirmImport,
             ]}).then(function(message){
@@ -539,17 +566,35 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         });
     }
     if(grid.def.allow.insert){
-        buttonInsert=html.button({class:'table-button'}, [html.img({src:my.path.img+'insert.png'})]).create();
+        buttonInsert=html.button({class:'table-button'}, [
+            html.img({
+                src:my.path.img+'insert.png',
+                alt:'INS',
+                title:my.messages.insertRecordAtTop
+            })
+        ]).create();
         buttonInsert.addEventListener('click', function(){
             grid.createRowInsertElements();
         });
     }
     if(grid.def.allow.filter){
-        buttonCreateFilter=html.button({class:'table-button', 'when-filter':'no'}, [html.img({src:my.path.img+'filter.png'})]).create();
+        buttonCreateFilter=html.button({class:'table-button', 'when-filter':'no'}, [
+            html.img({
+                src:my.path.img+'filter.png',
+                alt:'FILTER',
+                title:my.messages.filter
+            })
+        ]).create();
         buttonCreateFilter.addEventListener('click', function(){
             grid.createRowFilter(0);
         });
-        buttonDestroyFilter=html.button({class:'table-button', 'when-filter':'yes'}, [html.img({src:my.path.img+'destroy-filter.png'})]).create();
+        buttonDestroyFilter=html.button({class:'table-button', 'when-filter':'yes'}, [
+            html.img({
+                src:my.path.img+'destroy-filter.png',
+                alt:'FILTER OFF',
+                title:my.messages.filterOff
+            })
+        ]).create();
         buttonDestroyFilter.addEventListener('click', function(){
             grid.destroyRowFilter(0);
             grid.view.filter=false;
@@ -557,7 +602,13 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         });
     }
     if(grid.def.allow.orientation){
-        buttonOrientation=html.button({class:'table-button'}, [html.img({src:my.path.img+'orientation-toggle.png'})]).create();
+        buttonOrientation=html.button({class:'table-button'}, [
+            html.img({
+                src:my.path.img+'orientation-toggle.png',
+                alt:'CARD',
+                title:my.messages.orientationToggle,
+            })
+        ]).create();
         buttonOrientation.addEventListener('click',function(){
             grid.vertical = !grid.vertical;
             grid.prepareGrid();
@@ -565,7 +616,11 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
             grid.dom.table.setAttribute("my-orientation",grid.vertical?'vertical':'horizontal');
         });
     }
-    buttonMenu=html.button({class:'table-button'}, [html.img({src:my.path.img+'menu-dots.png'})]).create();
+    buttonMenu=html.button({class:'table-button'}, [
+        html.img({
+            src:my.path.img+'menu-dots.png',
+        })
+    ]).create();
     grid.prepareMenu(buttonMenu);
     grid.columns=[new my.ActionColumnGrid({grid:grid, actions:[
         buttonInsert,/*buttonSaveMode,*/buttonCreateFilter,buttonDestroyFilter,
@@ -776,7 +831,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             var actionDef = my.tableAction[actionName];
             if(grid.def.allow[actionName]){
                 var buttonAction=html.button({class:'table-button'}, [
-                    html.img({src:actionDef.img})
+                    html.img({src:actionDef.img, alt:actionDef.alt, title:my.messages[actionDef.titleMsg]})
                 ]).create();
                 thActions.appendChild(buttonAction);
                 buttonAction.addEventListener('click', function(){
@@ -786,7 +841,11 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         });
         grid.def.detailTables.forEach(function(detailTableDef, i_dt){
             var detailControl = depot.detailControls[detailTableDef.table] || { show:false };
-            detailControl.img = html.img({src:my.path.img+'detail-unknown.png'}).create();
+            detailControl.img = html.img({
+                src:my.path.img+'detail-unknown.png',
+                alt:'DETAIL',
+                title:my.messages.details
+            }).create();
             var button = html.button({class:'table-button'}, [detailControl.img]).create();
             var td = html.td({class:['grid-th','grid-th-details'], "my-relname":detailTableDef.table}, button).create();
             if(grid.vertical){ 
@@ -798,6 +857,8 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 var spansForSmooth = [i_dt+2, 999];
                 if(!detailControl.show){
                     detailControl.img.src=my.path.img+'detail-contract.png';
+                    detailControl.img.alt="[-]";
+                    detailControl.img.title=my.messages.lessDetails;
                     var newTr = grid.my.insertRow({under:tr,smooth:{height:70, spans:spansForSmooth}});
                     detailControl.tr = newTr;
                     var tdMargin = newTr.insertCell(-1);
@@ -821,6 +882,8 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     depot.detailRows.push(newTr);
                 }else{
                     detailControl.img.src=my.path.img+'detail-expand.png';
+                    detailControl.img.alt="[+]";
+                    detailControl.img.title=my.messages.details;
                     grid.my.fade(detailControl.tr, {smooth:{spans:spansForSmooth, content:detailControl.table}});
                     detailControl.show = false;
                     depot.detailRows = depot.detailRows.filter(function(tr){ return tr!==detailControl.tr;});
@@ -844,7 +907,12 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                             clearTimeout(buttonContainer.buttonLupaTimmer);
                         }
                     }
-                    buttonLupa=html.img({class:'img-lupa', src:my.path.img+'lupa.png'}).create();
+                    buttonLupa=html.img({
+                        class:'img-lupa', 
+                        src:my.path.img+'lupa.png',
+                        alt:"zoom",
+                        title:my.messages.zoom
+                    }).create();
                     buttonLupa.forElement=actualControl;
                     buttonContainer.buttonLupa=buttonLupa;
                     document.body.appendChild(buttonLupa);
@@ -930,8 +998,10 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 if(detailControl.show){
                     tbody.appendChild(detailTr);
                     detailControl.img.src=my.path.img+'detail-contract.png';
+                    detailControl.img.title=my.messages.lessDetails;
                 }else{
                     detailControl.img.src=my.path.img+'detail-expand.png';
+                    detailControl.img.title=my.messages.details;
                 }
             });
         }
@@ -1067,12 +1137,16 @@ myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot){
 myOwn.tableAction={
     "insert":{
         img: myOwn.path.img+'insert.png',
+        alt: "INS",
+        titleMsg: 'insertBelow',
         actionRow: function(depot){
             return depot.manager.createRowInsertElements(depot);
         }
     },
     "delete":{
         img: myOwn.path.img+'delete.png',
+        alt: "DEL",
+        titleMsg: 'deleteRecord',
         actionRow: function(depot){
             return depot.my.showQuestion(depot.my.messages.Delete+' '+JSON.stringify(depot.primaryKeyValues)+' ?').then(function(result){
                 if(result){
@@ -1085,6 +1159,8 @@ myOwn.tableAction={
     },
     "vertical-edit":{
         img: myOwn.path.img+'vertical-edit.png',
+        alt: "CARD",
+        titleMsg: 'verticalEdit',
         actionRow: function(depot){
             var grid = depot.manager;
             if(grid.vertical){
