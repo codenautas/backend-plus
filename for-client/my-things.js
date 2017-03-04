@@ -241,7 +241,7 @@ myOwn.encoders = {
     plain: { 
         parse: function(x){return x;}, 
         stringify: function(x){
-            if(typeof x === "object" && !(x instanceof FileList)){
+            if(typeof x === "object" /* && !(x instanceof FileList)*/){
                 throw new Error("Invalid plain type "+(x==null?value:typeof x)+" detected");
             }
             return x;
