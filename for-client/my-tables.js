@@ -503,6 +503,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                 var files = buttonFile.files;
                 my.ajax.table.upload({
                     table:grid.def.name, 
+                    prefilledFields:grid.connector.fixedFields,
                     files:files
                 }).then(this.dialogPromiseDone,this.dialogPromiseDone);
             });
@@ -630,7 +631,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     ).concat(
         grid.def.fields.map(function(fieldDef){ return new my.DataColumnGrid({grid:grid, fieldDef:fieldDef}); })
     ).concat(
-        [new my.SpecialColumnGrid({class:"empty-rigth-column"})]
+        [new my.SpecialColumnGrid({class:"empty-right-column"})]
     );
     if(grid.modes.withColumnDetails==null){
         grid.modes.withColumnDetails=grid.def.fields.some(function(fieldDef){ return fieldDef.label!=fieldDef.title; });
