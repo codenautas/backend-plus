@@ -522,19 +522,19 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
             return confirmPromise(my.messages.confirmDeleteAll+(
                 grid.depotsToDisplay.length<grid.depots.length?my.messages.xOverTWillDelete:my.messages.allTWillDelete
             ).replace('{$x}',grid.depotsToDisplay.length).replace('{$t}',grid.depots.length)
-            ).then(function(){
-            //    return alertPromise('por borrar');
-            //}).then(function(){
-                return my.ajax.table['delete-many-records']({
-                    table:grid.def.name,
-                    rowsToDelete:grid.depotsToDisplay.map(function(depot){
-                        return depot.row;
-                    }),
-                    expectedRemainCount:grid.depots.length-grid.depotsToDisplay.length
-                });
-            }).then(function(message){
-                grid.prepareAndDisplayGrid();
-                return alertPromise(message);
+            ).then(function(answer){
+                if(answer){
+                    return my.ajax.table['delete-many-records']({
+                        table:grid.def.name,
+                        rowsToDelete:grid.depotsToDisplay.map(function(depot){
+                            return depot.row;
+                        }),
+                        expectedRemainCount:grid.depots.length-grid.depotsToDisplay.length
+                    }).then(function(message){
+                        grid.prepareAndDisplayGrid();
+                        return alertPromise(message);
+                    });
+                }
             });
         }});
     }
@@ -542,7 +542,6 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
         miniMenuPromise(menuOptions,{
             underElement:button,
             withCloseButton:false,
-            imgStyle:{width:'22px', padding:'2px'}
         });
     };
 };
