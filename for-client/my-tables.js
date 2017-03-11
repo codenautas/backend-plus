@@ -65,7 +65,7 @@ myOwn.es=changing(myOwn.es, {
     filterOff: "desactiva el filtro (ver todos los registros)",
     format: "formato",
     import: "importar",
-    importDataFromFile: "importar datos de un archivo externo"",
+    importDataFromFile: "importar datos de un archivo externo",
     insertBelow: "agregar un registro debajo de éste",
     insertRecordAtTop: "insertar un registro nuevo en la tabla",
     lessDetails: "dejar de mostrar los detalles asocialdos al registro",
