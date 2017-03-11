@@ -334,8 +334,8 @@ myOwn.testKeepAlive = function testKeepAlive(){
     })
 };
 
-myOwn.showQuestion = function showQuestion(message){
-    return confirmPromise(message);
+myOwn.showQuestion = function showQuestion(message, opts){
+    return confirmPromise(message, opts);
 };
 
 myOwn.easeInOut = function easeInOut(currentTime, start, change, duration) {

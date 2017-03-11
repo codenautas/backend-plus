@@ -43,6 +43,7 @@ myOwn.messages=changing(myOwn.messages, {
     orientationToggle: "toggle orientation (vertical vs horizontal)",
     preparingForExport: "preparing for export",
     table: "table",
+    uploadFile: "upload file $1",
     verticalEdit: "vertical edit",
     xOverTWillDelete: "({$x} over a total of {$t} records will be deleted)",
     zoom: "zoom",
@@ -64,7 +65,7 @@ myOwn.es=changing(myOwn.es, {
     filterOff: "desactiva el filtro (ver todos los registros)",
     format: "formato",
     import: "importar",
-    importDataFromFile: "importar datos de un archivo externo",
+    importDataFromFile: "importar datos de un archivo externo"",
     insertBelow: "agregar un registro debajo de éste",
     insertRecordAtTop: "insertar un registro nuevo en la tabla",
     lessDetails: "dejar de mostrar los detalles asocialdos al registro",
@@ -74,6 +75,7 @@ myOwn.es=changing(myOwn.es, {
     orientationToggle: "cambiar la orientación de la tabla (por fila o por columna)",
     preparingForExport: "preparando para exportar",
     table: "tabla",
+    uploadFile: "subir el archivo $1",
     verticalEdit: "edición en forma de ficha",
     xOverTWillDelete: "(se borrarán {$x} registros sobre un total de {$t})",
     zoom: "zoom",
@@ -523,19 +525,17 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
             return confirmPromise(my.messages.confirmDeleteAll+(
                 grid.depotsToDisplay.length<grid.depots.length?my.messages.xOverTWillDelete:my.messages.allTWillDelete
             ).replace('{$x}',grid.depotsToDisplay.length).replace('{$t}',grid.depots.length)
-            ).then(function(answer){
-                if(answer){
-                    return my.ajax.table['delete-many-records']({
-                        table:grid.def.name,
-                        rowsToDelete:grid.depotsToDisplay.map(function(depot){
-                            return depot.row;
-                        }),
-                        expectedRemainCount:grid.depots.length-grid.depotsToDisplay.length
-                    }).then(function(message){
-                        grid.prepareAndDisplayGrid();
-                        return alertPromise(message);
-                    });
-                }
+            ).then(function(){
+                return my.ajax.table['delete-many-records']({
+                    table:grid.def.name,
+                    rowsToDelete:grid.depotsToDisplay.map(function(depot){
+                        return depot.row;
+                    }),
+                    expectedRemainCount:grid.depots.length-grid.depotsToDisplay.length
+                }).then(function(message){
+                    grid.prepareAndDisplayGrid();
+                    return alertPromise(message);
+                });
             });
         }});
     }
@@ -1148,12 +1148,13 @@ myOwn.tableAction={
         alt: "DEL",
         titleMsg: 'deleteRecord',
         actionRow: function(depot){
-            return depot.my.showQuestion(depot.my.messages.Delete+' '+JSON.stringify(depot.primaryKeyValues)+' ?').then(function(result){
-                if(result){
-                    return depot.connector.deleteRecord(depot).then(function(){
-                        depot.manager.displayAsDeleted(depot);
-                    });
-                }
+            return depot.my.showQuestion(
+                depot.my.messages.Delete+' '+JSON.stringify(depot.primaryKeyValues)+' ?', 
+                {askForNoRepeat:depot.my.messages.Delete+', '+depot.def.name}
+            ).then(function(result){
+                return depot.connector.deleteRecord(depot).then(function(){
+                    depot.manager.displayAsDeleted(depot);
+                });
             });
         }
     },
