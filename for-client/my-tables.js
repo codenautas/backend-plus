@@ -21,6 +21,8 @@ myOwn.messages=changing(myOwn.messages, {
     Delete : "Delete",
     Filter : "Filter",
     actualValueInDB: "actual value in database",
+    allGWillDelete: "({$t} records will be deleted)",
+    allRecordsDeleted: "all records where deleted",
     allTWillDelete: "(ALL {$t} records will be deleted)",
     anotherUserChangedTheRow: "Another user changed the row",
     confirmDeleteAll: "Do you want to delete these records?",
@@ -42,6 +44,7 @@ myOwn.messages=changing(myOwn.messages, {
     optionsForThisTable: "options for this table",
     orientationToggle: "toggle orientation (vertical vs horizontal)",
     preparingForExport: "preparing for export",
+    recordsReimaining: "{$r} records remains in the table",
     table: "table",
     uploadFile: "upload file $1",
     verticalEdit: "vertical edit",
@@ -53,6 +56,8 @@ myOwn.es=changing(myOwn.es, {
     Delete : "Eliminar",
     Filter : "Filtrar",
     actualValueInDB: "valor actual en la base de datos",
+    allGWillDelete: "(se borrarán {$t} registros)",
+    allRecordsDeleted: "todos los registros fueron borrados",
     allTWillDelete: "(se borrarán todos los registros: {$t} registros)",
     anotherUserChangedTheRow: "Otro usuario modificó el registro",
     confirmDeleteAll: "¿Desea borrar estos registros?",
@@ -74,6 +79,7 @@ myOwn.es=changing(myOwn.es, {
     optionsForThisTable: "opciones para esta tabla",
     orientationToggle: "cambiar la orientación de la tabla (por fila o por columna)",
     preparingForExport: "preparando para exportar",
+    recordsReimaining: "quedan {$r} registros en la tabla",
     table: "tabla",
     uploadFile: "subir el archivo $1",
     verticalEdit: "edición en forma de ficha",
@@ -523,7 +529,9 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
     if(grid.def.allow.delete){
         menuOptions.push({img:my.path.img+'delete-all-rows.png', value:true, label:my.messages.deleteAllRecords, doneFun:function(){
             return confirmPromise(my.messages.confirmDeleteAll+(
-                grid.depotsToDisplay.length<grid.depots.length?my.messages.xOverTWillDelete:my.messages.allTWillDelete
+                grid.depotsToDisplay.length<grid.depots.length?my.messages.xOverTWillDelete:(
+                    grid.connector.fixedFields.length?my.messages.allGWillDelete:my.messages.allTWillDelete
+                )
             ).replace('{$x}',grid.depotsToDisplay.length).replace('{$t}',grid.depots.length)
             ).then(function(){
                 return my.ajax.table['delete-many-records']({
@@ -534,7 +542,9 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     expectedRemainCount:grid.depots.length-grid.depotsToDisplay.length
                 }).then(function(message){
                     grid.prepareAndDisplayGrid();
-                    return alertPromise(message);
+                    return alertPromise((
+                        message.record_count?my.messages.recordsReimaining:my.messages.allRecordsDeleted
+                    ).replace('{$r}',message.remaining_record_count));
                 });
             });
         }});
