@@ -2,8 +2,6 @@
 
 module.exports = function(context){
     var admin = context.user.rol==='admin';
-    console.log('xxxxxxx users');
-    console.log(context.user);
     return context.be.tableDefAdapt({
         name:'users',
         title:'usuarios',
