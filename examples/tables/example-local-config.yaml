@@ -5,6 +5,7 @@ log:
 login:
   plus:
     secret: false
+    allowHttpLogin: true
 devel:
   forceShowAsEditable: true    
 client-setup:

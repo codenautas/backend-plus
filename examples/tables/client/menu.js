@@ -7,6 +7,8 @@ var my = myOwn;
 
 my.tableAction.showImg={
     img: my.path.img+'picture.png',
+    alt: 'img',
+    titleMsg: 'showImage',
     actionRow: function(depot){
         var div=depot.manager.dom.main;
         return Promise.resolve().then(function(){
@@ -52,3 +54,5 @@ window.addEventListener('load', function(){
     my.autoSetup().then(prepareTableButtons);
 });
 
+my.messages.showImage='show image';
+my.messages.es.showImage='mostrar imagen';
