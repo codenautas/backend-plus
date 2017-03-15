@@ -507,12 +507,27 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
         menuOptions.push({img:my.path.img+'import.png', value:true, label:my.messages.import, doneFun:function(){
             var buttonFile=html.input({type:'file',style:'min-width:400px'}).create();
             var buttonConfirmImport=html.input({type:'button', value:my.messages.import}).create();
+            var progressIndicator=html.div({class:'indicator'},' ').create();
+            var progressBar=html.div({class:'progress-bar', style:'width:400px; height:8px;'},[progressIndicator]).create()
+            var uploadingProgress=function(progress){
+                if(progress.lengthComputable){
+                    progressIndicator.style.width=progress.loaded*100/progress.total+'%';
+                    progressIndicator.title=Math.round(progress.loaded*100/progress.total)+'%';
+                }else{
+                    progressIndicator.style.backgroundColor='#D4D';
+                    progressIndicator.title='N/D %';
+                }
+            }
             buttonConfirmImport.addEventListener('click', function(){
                 var files = buttonFile.files;
-                my.ajax.table.upload({
-                    table:grid.def.name, 
-                    prefilledFields:grid.connector.fixedFields,
-                    files:files
+                buttonConfirmImport.value='cargando...';
+                buttonConfirmImport.disabled=true;
+                bestGlobals.sleep(100).then(function(){
+                    return my.ajax.table.upload({
+                        table:grid.def.name, 
+                        prefilledFields:grid.connector.fixedFields,
+                        files:files
+                    },{uploading:uploadingProgress});
                 }).then(this.dialogPromiseDone,this.dialogPromiseDone);
             });
             simpleFormPromise({elementsList:[
@@ -520,6 +535,8 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                 buttonFile, 
                 html.br().create(),
                 buttonConfirmImport,
+                html.br().create(),
+                progressBar,
             ]}).then(function(message){
                 grid.prepareAndDisplayGrid();
                 return alertPromise(message);
