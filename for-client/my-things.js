@@ -276,7 +276,8 @@ myOwn.ajaxPromise = function(procedureDef,data,opts){
         return AjaxBestPromise[procedureDef.method]({
             multipart:procedureDef.files,
             url:procedureDef.action,
-            data:params
+            data:params,
+            uploading:opts.uploading
         }).then(function(result){
             if(result && result[0]=="<" && result.match(/login/m)){
                 my.informDetectedStatus('notLogged');
