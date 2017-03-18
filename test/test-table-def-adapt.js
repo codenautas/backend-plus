@@ -33,6 +33,7 @@ describe("table-def-adapt", function(){
                 "allow": {
                   "delete": false,
                   "filter": true ,
+                  "import": false,
                   "insert": false,
                   "select": true ,
                   "update": false
@@ -47,6 +48,7 @@ describe("table-def-adapt", function(){
                 "allow": {
                   "delete": false,
                   "filter": true ,
+                  "import": false,
                   "insert": false,
                   "select": true ,
                   "update": false,
@@ -83,6 +85,7 @@ describe("table-def-adapt", function(){
         expect(result.field.id.allow).to.eql({
             select:true,
             update:false,
+            "import": false,
             insert:false,
             delete:false,
             filter:true
@@ -97,6 +100,7 @@ describe("table-def-adapt", function(){
         expect(result.field.id.allow).to.eql({
             select:true,
             update:true,
+            "import": false,
             insert:false,
             delete:false,
             filter:true

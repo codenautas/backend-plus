@@ -464,12 +464,12 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     var exportFileInformationWs={};
                     var i=0;
                     //console.log("grid.def",grid.def.allow);
-                    exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:i++})]={t:'s',v:'table name',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
-                    exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:i++})]={t:'s',v:grid.def.name};
-                    exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:i++})]={t:'s',v:'permisos',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
-                    for(var action in grid.def.allow){
-                        exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:i++})]={t:'s',v:action};
-                    }
+                    exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:i++})]={t:'s',v:'table',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                    exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:i  })]={t:'s',v:grid.def.name};
+                    exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:i++})]={t:'s',v:'date',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                    exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:i  })]={t:'s',v:new Date().toISOString()};
+                    exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:i++})]={t:'s',v:'user',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                    exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:i  })]={t:'s',v:};
                     // grid.def.allow.forEach(function(action,iAction){
                     //     exportFileInformationWs[XLSX.utils.encode_cell({c:iAction,r:2})]={t:'s',v:action};
                     // })
@@ -489,10 +489,12 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                         })
                     });
                     ws["!ref"]="A1:"+XLSX.utils.encode_cell({c:grid.def.fields.length,r:grid.depotsToDisplay.length});
-                    wb.SheetNames=["hoja1","hoja2"];
-                    wb.Sheets["hoja1"]=ws;
+                    var sheet1name=grid.def.name;
+                    var sheet2name=grid.def.name!=="metadata"?"metadata":"meta-data";
+                    wb.SheetNames=[sheet1name,sheet2name];
+                    wb.Sheets[sheet1name]=ws;
                     exportFileInformationWs["!ref"]="A1:F100"
-                    wb.Sheets["hoja2"]=exportFileInformationWs;
+                    wb.Sheets[sheet2name]=exportFileInformationWs;
                     var wbFile = XLSX.write(wb, {bookType:'xlsx', bookSST:false, type: 'binary'});
                     var blob = new Blob([s2ab(wbFile)],{type:"application/octet-stream"});
                     mainDiv.setAttribute("current-state", "ready");
