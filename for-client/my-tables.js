@@ -469,7 +469,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:i++})]={t:'s',v:'date',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
                     exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:i  })]={t:'s',v:new Date().toISOString()};
                     exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:i++})]={t:'s',v:'user',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
-                    exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:i  })]={t:'s',v:};
+                    exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:i  })]={t:'s',v:my.config.username};
                     // grid.def.allow.forEach(function(action,iAction){
                     //     exportFileInformationWs[XLSX.utils.encode_cell({c:iAction,r:2})]={t:'s',v:action};
                     // })

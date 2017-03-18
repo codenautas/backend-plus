@@ -81,6 +81,10 @@ myOwn.autoSetup = function autoSetup(){
                     lastName=name;
                 });
                 target[lastName]=my.ajaxPromise.bind(my,procedureDef);
+                var activeUserElement = document.getElementById('active-user');
+                if(activeUserElement){
+                    activeUserElement.textContent=my.config.username||'-';
+                }
             });
         });
     };
