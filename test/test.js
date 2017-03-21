@@ -280,6 +280,18 @@ describe('backend-plus', function(){
             //        .expect('private: data',done);
             //    });
             //});
+            describe("jsonb", function(){
+                it("read jsonb in a where", function(){
+                    var idj={uno:'dos', tres:'cuatro'}
+                    return be.getDbClient().then(function(client){
+                        return client.query("select data, idj, idn from conjson where idj = $1",[idj]).execute();
+                    }).then(function(result){
+                        expect(result.rows).to.eql([
+                            {data:'1,2,3,4', idj:idj, idn:1}
+                        ])
+                    });
+                });
+            });
         });
     });
     //describe("warnings", function(){

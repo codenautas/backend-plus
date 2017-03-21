@@ -35,4 +35,14 @@
         value: 5,
     },
     expectedError: /algo/,
+},{
+    action: 'table/save-record',
+    parameters: {
+        table: 'conjson',
+        primaryKeyValues: [1, {uno:'dos', tres:'cuatro'}],
+        newRow: {data: '1,2,3,4'},
+        oldRow: {data: '1 2 3 4'},
+        status: 'retrieved'
+    },
+    expected: {idn:1, idj:{uno:'dos', tres:'cuatro'}, data: '1,2,3,4'},
 }]

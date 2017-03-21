@@ -12,6 +12,7 @@ class AppExample extends backendPlus.AppBackend{
         this.tableStructures = {};
         this.tableStructures.simple = require('./table-simple.js');
         this.tableStructures.employees = require('./table-employees.js');
+        this.tableStructures.conjson = require('./table-conjson.js');
         this.optsForConfigList=opts;
     }
     configList(){
