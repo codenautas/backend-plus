@@ -45,6 +45,7 @@ myOwn.messages=changing(myOwn.messages, {
     orientationToggle: "toggle orientation (vertical vs horizontal)",
     preparingForExport: "preparing for export",
     recordsReimaining: "{$r} records remains in the table",
+    refresh: "refresh - retrive data from database",
     table: "table",
     uploadFile: "upload file $1",
     verticalEdit: "vertical edit",
@@ -80,6 +81,7 @@ myOwn.es=changing(myOwn.es, {
     orientationToggle: "cambiar la orientación de la tabla (por fila o por columna)",
     preparingForExport: "preparando para exportar",
     recordsReimaining: "quedan {$r} registros en la tabla",
+    refresh: "refrescar la grilla desde la base de datos",
     table: "tabla",
     uploadFile: "subir el archivo $1",
     verticalEdit: "edición en forma de ficha",
@@ -255,6 +257,10 @@ myOwn.TableGrid.prototype.prepareDepots = function prepareDepots(rows){
     grid.view.sortColumns=grid.view.sortColumns||grid.def.sortColumns||[];
 }
 
+myOwn.TableGrid.prototype.refresh = function refresh(){
+    return this.prepareAndDisplayGrid();
+}
+
 myOwn.TableGrid.prototype.prepareAndDisplayGrid = function prepareAndDisplayGrid(){
     var grid = this;
     grid.displayPreLoadMessage();
@@ -416,6 +422,9 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
     button.title=my.messages.optionsForThisTable;
     var grid=this;
     var menuOptions=[];
+    menuOptions.push({img:my.path.img+'refresh.png', value:true, label:my.messages.refresh, doneFun:function(){
+        return grid.refresh();
+    }});
     if(grid.def.allow.export){
         menuOptions.push({img:my.path.img+'export.png', value:true, label:my.messages.export, doneFun:function(){
             return dialogPromise(function(dialogWindow, closeWindow){
@@ -540,8 +549,10 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                 html.br().create(),
                 progressBar,
             ]}).then(function(message){
-                grid.prepareAndDisplayGrid();
-                return alertPromise(message);
+                return Promise.all([
+                    grid.refresh(),
+                    alertPromise(message)
+                ]);
             });
         }});
     }
@@ -560,10 +571,12 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     }),
                     expectedRemainCount:grid.depots.length-grid.depotsToDisplay.length
                 }).then(function(message){
-                    grid.prepareAndDisplayGrid();
-                    return alertPromise((
-                        message.record_count?my.messages.recordsReimaining:my.messages.allRecordsDeleted
-                    ).replace('{$r}',message.remaining_record_count));
+                    return Promise.all([
+                        grid.refresh(),
+                        alertPromise((
+                            message.record_count?my.messages.recordsReimaining:my.messages.allRecordsDeleted
+                        ).replace('{$r}',message.remaining_record_count))
+                    ]);
                 });
             });
         }});
