@@ -46,6 +46,7 @@ myOwn.messages=changing(myOwn.messages, {
     preparingForExport: "preparing for export",
     recordsReimaining: "{$r} records remains in the table",
     refresh: "refresh - retrive data from database",
+    showInheritedKeys: "show inherited keys",
     table: "table",
     uploadFile: "upload file $1",
     verticalEdit: "vertical edit",
@@ -82,6 +83,7 @@ myOwn.es=changing(myOwn.es, {
     preparingForExport: "preparando para exportar",
     recordsReimaining: "quedan {$r} registros en la tabla",
     refresh: "refrescar la grilla desde la base de datos",
+    showInheritedKeys: "mostrar las columnas relacionadas",
     table: "tabla",
     uploadFile: "subir el archivo $1",
     verticalEdit: "edición en forma de ficha",
@@ -325,7 +327,11 @@ myOwn.DataColumnGrid.prototype = Object.create(myOwn.ColumnGrid.prototype);
 myOwn.DataColumnGrid.prototype.th = function th(){
     var fieldDef = this.fieldDef;
     var grid = this.grid;
-    var th=html.th({class: "th-name", "my-colname":fieldDef.name},fieldDef.title).create();
+    var attr={class: "th-name", "my-colname":fieldDef.name};
+    if(grid.connector.fixedField[fieldDef.name]){
+        attr["inherited-pk-column"]="yes";
+    }
+    var th=html.th(attr,fieldDef.title).create();
     if(fieldDef.width){
         th.style.width=fieldDef.width+'px';
     }
@@ -354,7 +360,11 @@ myOwn.DataColumnGrid.prototype.thFilter = function thFilter(depot, iColumn){
         depot.row[fieldDef.name]=this.getTypedValue();
     });
     TypedControls.adaptElement(elementFilter,fieldDef);
-    var th=html.td({"class":"autoFilter"},[symbolFilter,elementFilter]).create();
+    var attr={"class":"autoFilter"};
+    if(grid.connector.fixedField[fieldDef.name]){
+        attr["inherited-pk-column"]="yes";
+    }
+    var th=html.td(attr,[symbolFilter,elementFilter]).create();
     elementFilter.width=grid.sizesForFilters[iColumn]-myOwn.comparatorWidth-5;
     elementFilter.style.width=elementFilter.width.toString()+'px';
     symbolFilter.addEventListener('click',function(){
@@ -374,6 +384,15 @@ myOwn.DataColumnGrid.prototype.thFilter = function thFilter(depot, iColumn){
         });
     });
     return th;
+}
+
+myOwn.DataColumnGrid.prototype.thDetail = function thLabel(){
+    var grid=this.grid;
+    var attr={class:'th-detail'};
+    if(grid.connector.fixedField[this.fieldDef.name]){
+        attr["inherited-pk-column"]="yes";
+    }
+    return html.th(attr, (this.fieldDef||{}).label);
 }
 
 myOwn.DetailColumnGrid = function DetailColumnGrid(opts){
@@ -423,6 +442,11 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
     var grid=this;
     var menuOptions=[];
     menuOptions.push({img:my.path.img+'refresh.png', value:true, label:my.messages.refresh, doneFun:function(){
+        return grid.refresh();
+    }});
+    menuOptions.push({img:my.path.img+'show-inherited-keys.png', value:true, label:my.messages.showInheritedKeys, doneFun:function(){
+        grid.view.showInheritedKeys = !grid.view.showInheritedKeys;
+        grid.dom.table.parentNode.setAttribute('show-inherited-keys', grid.view.showInheritedKeys?'yes':'no');
         return grid.refresh();
     }});
     if(grid.def.allow.export){
@@ -935,7 +959,11 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         });
         grid.def.fields.forEach(function(fieldDef){
             var directInput=grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
-            var td = html.td({"my-colname":fieldDef.name, "typed-controls-direct-input":directInput}).create();
+            var attr={"my-colname":fieldDef.name, "typed-controls-direct-input":directInput};
+            if(grid.connector.fixedField[fieldDef.name]){
+                attr["inherited-pk-column"]="yes";
+            }
+            var td = html.td(attr).create();
             TypedControls.adaptElement(td, fieldDef);
             if(fieldDef.allow.update){
                 td.addEventListener('click', function(){
