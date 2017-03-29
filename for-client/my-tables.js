@@ -662,13 +662,23 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
         return dialogPromise(function(dialogWindow, closeWindow){
             var optionDiv=html.div({class:"show-or-hide"},[
                 html.div({class:'show-or-hide'},[
-                    html.img({src:'hide.png'}),
-                    html.select([
+                    html.img({src:my.path.img+'hide.png'}),
+                    html.select({multiple:true},[
                         html.option({value:'value 1'},'value 1'),
-                        html.option({value:'value 2'},'value 2')
+                        html.option({value:'value 2'},'value 2'),
+                        html.option({value:'value 3'},'value 3'),
+                        html.option({value:'value 4'},'value 4')
                     ])
                 ]),
-                html.div({class:'show-or-hide'},[html.img({src:'mostrar.png'}),'show'])
+                html.div({class:'show-or-hide'},[
+                    html.img({src:my.path.img+'show.png'}),
+                    html.select({multiple:true},[
+                        html.option({value:'value 1'},'value 1'),
+                        html.option({value:'value 2'},'value 2'),
+                        html.option({value:'value 3'},'value 3'),
+                        html.option({value:'value 4'},'value 4')
+                    ])
+                ])
             ])
             dialogWindow.appendChild(optionDiv.create());
         })
