@@ -237,7 +237,8 @@ myOwn.TableGrid = function(context, mainElement){
         withColumnDetails: null, // null = autodetect
     };
     grid.view = {
-        hiddenColumns:[]
+        hiddenColumns:[],
+        showedColmns: []
     };
 };
 
@@ -392,6 +393,7 @@ myOwn.DataColumnGrid.prototype.th = function th(){
     th.addEventListener('click',function(mouseEvent){
         if(mouseEvent.altKey){
             hideColumn(fieldDef.name);
+            grid.view.hiddenColumns.push(fieldDef.name);
         }else{
             var currentOrder=grid.view.sortColumns.length && grid.view.sortColumns[0].column==fieldDef.name?grid.view.sortColumns[0].order:null;
             grid.view.sortColumns=grid.view.sortColumns.filter(function(sortColumn){
@@ -660,27 +662,45 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
     }});
     menuOptions.push({img:my.path.img+'mostrarOcutar.png', value:true, label: my.messages.hideOrShow, doneFun:function(){
         return dialogPromise(function(dialogWindow, closeWindow){
+            //grid.view.showedColmns=
+            //grid.def.fields.map(function(gridField){
+            //    grid.view.hiddenColumns.forEach(function(hiddenField){
+            //        if(hiddenField.name==gridField){
+            //            
+            //        }
+            //    })
+            //})
+            var button=html.button({class:'hide-or-show'},'ok').create();
             var optionDiv=html.div({class:"show-or-hide"},[
                 html.div({class:'show-or-hide'},[
                     html.img({src:my.path.img+'hide.png'}),
-                    html.select({multiple:true},[
-                        html.option({value:'value 1'},'value 1'),
-                        html.option({value:'value 2'},'value 2'),
-                        html.option({value:'value 3'},'value 3'),
-                        html.option({value:'value 4'},'value 4')
-                    ])
+                    html.select({id:'hide-columns',class:'hide-or-menu',multiple:true},
+                        grid.def.fields.map(function(field){
+                            return html.option({value: field.name},field.title)
+                        })
+                    )
                 ]),
                 html.div({class:'show-or-hide'},[
                     html.img({src:my.path.img+'show.png'}),
-                    html.select({multiple:true},[
-                        html.option({value:'value 1'},'value 1'),
-                        html.option({value:'value 2'},'value 2'),
-                        html.option({value:'value 3'},'value 3'),
-                        html.option({value:'value 4'},'value 4')
-                    ])
-                ])
+                    html.select({id:'show-columns',class:'hide-or-menu',multiple:true},
+                        grid.view.hiddenColumns.map(function(field){
+                        //grid.def.fields.map(function(field){
+                            return html.option({value: field},field)
+                        })
+                    )
+                ]),
+                button
             ])
             dialogWindow.appendChild(optionDiv.create());
+            button.addEventListener('click',function(){
+                var hide=document.getElementById('hide-columns');
+                for(var i=0;i<hide.length;i++){
+                    if(hide[i].selected)
+                        console.log(hide[i].value);
+                }
+                console.log("grid.view.hiddenColumns",grid.view.hiddenColumns)
+                closeWindow('ok')
+            })
         })
     }});
     if(grid.def.allow.export){
