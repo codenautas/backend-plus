@@ -223,17 +223,18 @@ myOwn.TableConnector.prototype.deleteEnter = function enterRecord(depot){
 };
 
 myOwn.TableGrid = function(context, mainElement){
+    var grid = this;
     for(var attr in context){
-        this[attr] = context[attr];
+        grid[attr] = context[attr];
     }
-    this.dom={
+    grid.dom={
         main: mainElement
     };
-    this.modes = {
+    grid.modes = {
         saveByField: true,
         withColumnDetails: null, // null = autodetect
     };
-    this.view = {};
+    grid.view = {};
 };
 
 myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
