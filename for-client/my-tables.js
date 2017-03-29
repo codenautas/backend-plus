@@ -492,17 +492,15 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                 },10);
                 setTimeout(function(){
                     var wb = new Workbook();
-                    // var wb = {Sheets:{}};
                     var ws = {};
                     var exportFileInformationWs={};
                     var i=0;
-                    //console.log("grid.def",grid.def.allow);
-                    exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:i++})]={t:'s',v:'table',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
-                    exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:i  })]={t:'s',v:grid.def.name};
-                    exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:i++})]={t:'s',v:'date',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
-                    exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:i  })]={t:'s',v:new Date().toISOString()};
-                    exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:i++})]={t:'s',v:'user',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
-                    exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:i  })]={t:'s',v:my.config.username};
+                    exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'table',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                    exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:  i})]={t:'s',v:grid.def.name};
+                    exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'date',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                    exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:  i})]={t:'s',v:new Date().toISOString()};
+                    exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'user',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                    exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:  i})]={t:'s',v:my.config.username};
                     // grid.def.allow.forEach(function(action,iAction){
                     //     exportFileInformationWs[XLSX.utils.encode_cell({c:iAction,r:2})]={t:'s',v:action};
                     // })
@@ -514,8 +512,10 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                             var value=depot.row[fieldDef.name];
                             if(value!=null){
                                 var cell={t:'s',v:value};
-                                if(!fieldDef.allow.update){
-                                    cell.s={font:{color:{ rgb: "88AA00" }}}
+                                if(fieldDef.isPk){
+                                    cell.s={font:{bold:true}};
+                                }else if(!fieldDef.allow.update){
+                                    cell.s={font:{color:{ rgb: "88AA00" }}};
                                 }
                                 ws[XLSX.utils.encode_cell({c:iColumn,r:iFila+1})]=cell;
                             }
