@@ -306,6 +306,10 @@ myOwn.ColumnGrid.prototype.thFilter = function thFilter(){
     return html.th();
 };
 
+myOwn.ColumnGrid.prototype.td = function td(){
+    return html.td().create();
+};
+
 myOwn.ActionColumnGrid = function ActionColumnGrid(opts){
     myOwn.ColumnGrid.call(this,opts);
 };
@@ -324,6 +328,25 @@ myOwn.ActionColumnGrid.prototype.thFilter = function thFilter(depot){
         grid.displayBody();
     });
     return html.th([buttonFilter]);
+};
+
+myOwn.ActionColumnGrid.prototype.td = function td(depot){
+    var grid = this.grid;
+    var thActions=html.th({class:['grid-th','grid-th-actions']}).create();
+    var actionNamesList = ['insert','delete','vertical-edit'].concat(grid.def.actionNamesList);
+    actionNamesList.forEach(function(actionName){
+        var actionDef = my.tableAction[actionName];
+        if(grid.def.allow[actionName]){
+            var buttonAction=html.button({class:'table-button'}, [
+                html.img({src:actionDef.img, alt:actionDef.alt, title:my.messages[actionDef.titleMsg]})
+            ]).create();
+            thActions.appendChild(buttonAction);
+            buttonAction.addEventListener('click', function(){
+                actionDef.actionRow(depot);
+            });
+        }
+    });
+    return thActions;
 };
 
 myOwn.DataColumnGrid = function DataColumnGrid(opts){
@@ -403,6 +426,97 @@ myOwn.DataColumnGrid.prototype.thDetail = function thLabel(){
     return html.th(attr, (this.fieldDef||{}).label);
 };
 
+myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
+    var grid = this.grid;
+    var fieldDef = this.fieldDef;
+    var forInsert = false; // TODO: Verificar que esto está en desuso
+    var directInput=grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
+    var attr={"my-colname":fieldDef.name, "typed-controls-direct-input":directInput};
+    if(grid.connector.fixedField[fieldDef.name]){
+        attr["inherited-pk-column"]="yes";
+    }
+    var td = html.td(attr).create();
+    TypedControls.adaptElement(td, fieldDef);
+    if(fieldDef.allow.update){
+        td.addEventListener('click', function(){
+            var actualControl = this;
+            var rect = my.getRect(actualControl);
+            var buttonContainer = document;
+            var buttonLupa = buttonContainer.buttonLupa;
+            if(buttonLupa){
+                document.body.removeChild(buttonLupa);
+                if(buttonContainer.buttonLupaTimmer){
+                    clearTimeout(buttonContainer.buttonLupaTimmer);
+                }
+            }
+            buttonLupa=html.img({
+                class:'img-lupa', 
+                src:my.path.img+'lupa.png',
+                alt:"zoom",
+                title:my.messages.zoom
+            }).create();
+            buttonLupa.forElement=actualControl;
+            buttonContainer.buttonLupa=buttonLupa;
+            document.body.appendChild(buttonLupa);
+            buttonLupa.style.position='absolute';
+            buttonLupa.style.left=rect.left+rect.width-6+'px';
+            buttonLupa.style.top=rect.top+rect.height-8+'px';
+            buttonLupa.addEventListener('click', function(){
+                var actualValue=actualControl.getTypedValue();
+                var optDialog={underElement:actualControl};
+                if(fieldDef.typeName=='date'){
+                    dialogPromise(function(dialogWindow, closeWindow){
+                        var button=html.button('Ok').create();
+                        var divPicker=html.div({id:'datepicker'}).create();
+                        var picker = new Pikaday({
+                            defaultDate: actualValue,
+                            onSelect: function(date) {
+                                closeWindow(new Date(picker.toString()));
+                            }
+                        });
+                        divPicker.appendChild(picker.el);
+                        button.addEventListener('click',function(){
+                            closeWindow(new Date(picker.toString()));
+                        });
+                        dialogWindow.appendChild(html.div([
+                             html.div(fieldDef.label),
+                             html.div([divPicker]),
+                             html.div([button])
+                        ]).create());
+                    }, optDialog).then(function(value){
+                        actualControl.setTypedValue(value);
+                        actualControl.dispatchEvent(new CustomEvent('update'));
+                     });
+                }else{
+                    promptPromise(fieldDef.label, actualValue,optDialog ).then(function(value){
+                        actualControl.setTypedValue(value);
+                        actualControl.dispatchEvent(new CustomEvent('update'));
+                    });
+                }
+            });
+            buttonContainer.buttonLupaTimmer=setTimeout(my.quitarLupa,3000);
+        });
+    }
+    depot.rowControls[fieldDef.name] = td;
+    if(depot.row[fieldDef.name]!=null){
+        td.setTypedValue(depot.row[fieldDef.name]);
+    }
+    if(!fieldDef.clientSide){
+        td.addEventListener('update',function(){
+            var value = this.getTypedValue();
+            if(!sameValue(value,depot.row[fieldDef.name])){
+                this.setAttribute('io-status', 'pending');
+                depot.rowPendingForUpdate[fieldDef.name] = value;
+                depot.row[fieldDef.name] = value;
+                if(grid.modes.saveByField){
+                    saveRow(depot,{visiblyLogErrors:false});
+                }
+            }
+        });
+    }
+    return td;
+};
+
 myOwn.DetailColumnGrid = function DetailColumnGrid(opts){
     myOwn.ColumnGrid.call(this,opts);
 };
@@ -412,6 +526,58 @@ myOwn.DetailColumnGrid.prototype = Object.create(myOwn.ColumnGrid.prototype);
 myOwn.DetailColumnGrid.prototype.th = function th(){
     var th=html.th({"my-defname":this.detailTableDef.table, title:this.detailTableDef.label},this.detailTableDef.abr);
     return th;
+};
+
+myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
+    var grid = this.grid;
+    var detailTableDef = this.detailTableDef;
+    var detailControl = depot.detailControls[detailTableDef.table] || { show:false };
+    detailControl.img = html.img({
+        src:my.path.img+'detail-unknown.png',
+        alt:'DETAIL',
+        title:my.messages.details
+    }).create();
+    var button = html.button({class:'table-button'}, [detailControl.img]).create();
+    var td = html.td({class:['grid-th','grid-th-details'], "my-relname":detailTableDef.table}, button).create();
+    depot.detailControls[detailTableDef.table] = detailControl;
+    button.addEventListener('click',function(){
+        var spansForSmooth = [iColumn+1, 999];
+        if(!detailControl.show){
+            detailControl.img.src=my.path.img+'detail-contract.png';
+            detailControl.img.alt="[-]";
+            detailControl.img.title=my.messages.lessDetails;
+            var newTr = grid.my.insertRow({under:tr,smooth:{height:70, spans:spansForSmooth}});
+            detailControl.tr = newTr;
+            var tdMargin = newTr.insertCell(-1);
+            tdMargin.colSpan = td.cellIndex+1;
+            var tdGrid = newTr.insertCell(-1);
+            tdGrid.colSpan = tr.cells.length-td.cellIndex;
+            tdGrid.style.maxWidth='inherit';
+            var fixedFields = detailTableDef.fields.map(function(pair){
+                return {fieldName: pair.target, value:depot.row[pair.source]};
+            });
+            if(!detailControl.table){
+                grid.my.tableGrid(detailTableDef.table, tdGrid, {fixedFields: fixedFields}).waitForReady(function(g){
+                    detailControl.table=g.dom.table;
+                });
+            }else{
+                tdGrid.appendChild(detailControl.table);
+            }
+            detailControl.show = true;
+            newTr.detailTableName=detailTableDef.table;
+            newTr.isDetail=true;
+            depot.detailRows.push(newTr);
+        }else{
+            detailControl.img.src=my.path.img+'detail-expand.png';
+            detailControl.img.alt="[+]";
+            detailControl.img.title=my.messages.details;
+            grid.my.fade(detailControl.tr, {smooth:{spans:spansForSmooth, content:detailControl.table}});
+            detailControl.show = false;
+            depot.detailRows = depot.detailRows.filter(function(tr){ return tr!==detailControl.tr;});
+            detailControl.tr = null;
+        }
+    });
+    return td;
 };
 
 myOwn.SpecialColumnGrid = function SpecialColumnGrid(opts){
@@ -910,159 +1076,11 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             }:false});
         }
         depot.tr = tr;
-        var thActions=html.th({class:['grid-th','grid-th-actions']}).create();
-        tr.appendChild(thActions);
-        var actionNamesList = ['insert','delete','vertical-edit'].concat(grid.def.actionNamesList);
-        actionNamesList.forEach(function(actionName){
-            var actionDef = my.tableAction[actionName];
-            if(grid.def.allow[actionName]){
-                var buttonAction=html.button({class:'table-button'}, [
-                    html.img({src:actionDef.img, alt:actionDef.alt, title:my.messages[actionDef.titleMsg]})
-                ]).create();
-                thActions.appendChild(buttonAction);
-                buttonAction.addEventListener('click', function(){
-                    actionDef.actionRow(depot);
-                });
-            }
-        });
-        grid.def.detailTables.forEach(function(detailTableDef, i_dt){
-            var detailControl = depot.detailControls[detailTableDef.table] || { show:false };
-            detailControl.img = html.img({
-                src:my.path.img+'detail-unknown.png',
-                alt:'DETAIL',
-                title:my.messages.details
-            }).create();
-            var button = html.button({class:'table-button'}, [detailControl.img]).create();
-            var td = html.td({class:['grid-th','grid-th-details'], "my-relname":detailTableDef.table}, button).create();
+        grid.columns.forEach(function(column, iColumn){
+            tr.appendChild(column.td(depot, iColumn, tr, saveRow));
             if(grid.vertical){ 
                 tr = tr.nextSibling;
             }
-            tr.appendChild(td);
-            depot.detailControls[detailTableDef.table] = detailControl;
-            button.addEventListener('click',function(){
-                var spansForSmooth = [i_dt+2, 999];
-                if(!detailControl.show){
-                    detailControl.img.src=my.path.img+'detail-contract.png';
-                    detailControl.img.alt="[-]";
-                    detailControl.img.title=my.messages.lessDetails;
-                    var newTr = grid.my.insertRow({under:tr,smooth:{height:70, spans:spansForSmooth}});
-                    detailControl.tr = newTr;
-                    var tdMargin = newTr.insertCell(-1);
-                    tdMargin.colSpan = td.cellIndex+1;
-                    var tdGrid = newTr.insertCell(-1);
-                    tdGrid.colSpan = tr.cells.length-td.cellIndex;
-                    tdGrid.style.maxWidth='inherit';
-                    var fixedFields = detailTableDef.fields.map(function(pair){
-                        return {fieldName: pair.target, value:depot.row[pair.source]};
-                    });
-                    if(!detailControl.table){
-                        grid.my.tableGrid(detailTableDef.table, tdGrid, {fixedFields: fixedFields}).waitForReady(function(g){
-                            detailControl.table=g.dom.table;
-                        });
-                    }else{
-                        tdGrid.appendChild(detailControl.table);
-                    }
-                    detailControl.show = true;
-                    newTr.detailTableName=detailTableDef.table;
-                    newTr.isDetail=true;
-                    depot.detailRows.push(newTr);
-                }else{
-                    detailControl.img.src=my.path.img+'detail-expand.png';
-                    detailControl.img.alt="[+]";
-                    detailControl.img.title=my.messages.details;
-                    grid.my.fade(detailControl.tr, {smooth:{spans:spansForSmooth, content:detailControl.table}});
-                    detailControl.show = false;
-                    depot.detailRows = depot.detailRows.filter(function(tr){ return tr!==detailControl.tr;});
-                    detailControl.tr = null;
-                }
-            });
-        });
-        grid.def.fields.forEach(function(fieldDef){
-            var directInput=grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
-            var attr={"my-colname":fieldDef.name, "typed-controls-direct-input":directInput};
-            if(grid.connector.fixedField[fieldDef.name]){
-                attr["inherited-pk-column"]="yes";
-            }
-            var td = html.td(attr).create();
-            TypedControls.adaptElement(td, fieldDef);
-            if(fieldDef.allow.update){
-                td.addEventListener('click', function(){
-                    var actualControl = this;
-                    var rect = my.getRect(actualControl);
-                    var buttonContainer = document;
-                    var buttonLupa = buttonContainer.buttonLupa;
-                    if(buttonLupa){
-                        document.body.removeChild(buttonLupa);
-                        if(buttonContainer.buttonLupaTimmer){
-                            clearTimeout(buttonContainer.buttonLupaTimmer);
-                        }
-                    }
-                    buttonLupa=html.img({
-                        class:'img-lupa', 
-                        src:my.path.img+'lupa.png',
-                        alt:"zoom",
-                        title:my.messages.zoom
-                    }).create();
-                    buttonLupa.forElement=actualControl;
-                    buttonContainer.buttonLupa=buttonLupa;
-                    document.body.appendChild(buttonLupa);
-                    buttonLupa.style.position='absolute';
-                    buttonLupa.style.left=rect.left+rect.width-6+'px';
-                    buttonLupa.style.top=rect.top+rect.height-8+'px';
-                    buttonLupa.addEventListener('click', function(){
-                        var actualValue=actualControl.getTypedValue();
-                        var optDialog={underElement:actualControl};
-                        if(fieldDef.typeName=='date'){
-                            dialogPromise(function(dialogWindow, closeWindow){
-                                var button=html.button('Ok').create();
-                                var divPicker=html.div({id:'datepicker'}).create();
-                                var picker = new Pikaday({
-                                    defaultDate: actualValue,
-                                    onSelect: function(date) {
-                                        closeWindow(new Date(picker.toString()));
-                                    }
-                                });
-                                divPicker.appendChild(picker.el);
-                                button.addEventListener('click',function(){
-                                    closeWindow(new Date(picker.toString()));
-                                });
-                                dialogWindow.appendChild(html.div([
-                                     html.div(fieldDef.label),
-                                     html.div([divPicker]),
-                                     html.div([button])
-                                ]).create());
-                            }, optDialog).then(function(value){
-                                actualControl.setTypedValue(value);
-                                actualControl.dispatchEvent(new CustomEvent('update'));
-                             });
-                        }else{
-                            promptPromise(fieldDef.label, actualValue,optDialog ).then(function(value){
-                                actualControl.setTypedValue(value);
-                            });
-                        }
-                    });
-                    buttonContainer.buttonLupaTimmer=setTimeout(my.quitarLupa,3000);
-                });
-            }
-            depot.rowControls[fieldDef.name] = td;
-            if(depot.row[fieldDef.name]!=null){
-                td.setTypedValue(depot.row[fieldDef.name]);
-            }
-            if(!fieldDef.clientSide){
-                td.addEventListener('update',function(){
-                    var value = this.getTypedValue();
-                    if(!sameValue(value,depot.row[fieldDef.name])){
-                        this.setAttribute('io-status', 'pending');
-                        depot.rowPendingForUpdate[fieldDef.name] = value;
-                        depot.row[fieldDef.name] = value;
-                        if(grid.modes.saveByField){
-                            saveRow(depot,{visiblyLogErrors:false});
-                        }
-                    }
-                });
-            }
-            if(grid.vertical){ tr = tr.nextSibling; }
-            tr.appendChild(td);
         });
         tr.addEventListener('focusout', function(event){
             if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
