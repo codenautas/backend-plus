@@ -41,6 +41,7 @@ myOwn.messages=changing(myOwn.messages, {
     filter : "filter",
     filterOff: "filter off",
     format: "format",
+    hideOrShow: "hide Or show colums",
     import: "import",
     importDataFromFile: "import data from external file",
     insertBelow: "insert record below this",
@@ -78,6 +79,7 @@ myOwn.es=changing(myOwn.es, {
     filter : "filtrar",
     filterOff: "desactiva el filtro (ver todos los registros)",
     format: "formato",
+    hideOrShow: "Ocultar o mostrar columnas",
     import: "importar",
     importDataFromFile: "importar datos de un archivo externo",
     insertBelow: "agregar un registro debajo de éste",
@@ -234,7 +236,9 @@ myOwn.TableGrid = function(context, mainElement){
         saveByField: true,
         withColumnDetails: null, // null = autodetect
     };
-    grid.view = {};
+    grid.view = {
+        hiddenColumns:[]
+    };
 };
 
 myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
@@ -653,6 +657,21 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
         grid.view.showInheritedKeys = !grid.view.showInheritedKeys;
         grid.dom.table.parentNode.setAttribute('show-inherited-keys', grid.view.showInheritedKeys?'yes':'no');
         return Promise.resolve(true);
+    }});
+    menuOptions.push({img:my.path.img+'mostrarOcutar.png', value:true, label: my.messages.hideOrShow, doneFun:function(){
+        return dialogPromise(function(dialogWindow, closeWindow){
+            var optionDiv=html.div({class:"show-or-hide"},[
+                html.div({class:'show-or-hide'},[
+                    html.img({src:'hide.png'}),
+                    html.select([
+                        html.option({value:'value 1'},'value 1'),
+                        html.option({value:'value 2'},'value 2')
+                    ])
+                ]),
+                html.div({class:'show-or-hide'},[html.img({src:'mostrar.png'}),'show'])
+            ])
+            dialogWindow.appendChild(optionDiv.create());
+        })
     }});
     if(grid.def.allow.export){
         menuOptions.push({img:my.path.img+'export.png', value:true, label:my.messages.export, doneFun:function(){
