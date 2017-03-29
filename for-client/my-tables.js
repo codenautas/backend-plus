@@ -447,7 +447,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
     menuOptions.push({img:my.path.img+'show-inherited-keys.png', value:true, label:my.messages.showInheritedKeys, doneFun:function(){
         grid.view.showInheritedKeys = !grid.view.showInheritedKeys;
         grid.dom.table.parentNode.setAttribute('show-inherited-keys', grid.view.showInheritedKeys?'yes':'no');
-        return grid.refresh();
+        return Promise.resolve(true);
     }});
     if(grid.def.allow.export){
         menuOptions.push({img:my.path.img+'export.png', value:true, label:my.messages.export, doneFun:function(){
