@@ -1,6 +1,13 @@
 "use strict";
 
+/*global myOwn, my, XLSX, Pikaday  */
+/*global miniMenuPromise, dialogPromise, alertPromise, confirmPromise, promptPromise, simpleFormPromise */
+/*global Blob, document, CustomEvent, URL  */
+
+var bestGlobals = require('best-globals');
+var html = require('js-to-html').html;
 var JSON4all = require('json4all');
+var TypedControls = require('typed-controls');
 
 var changing = bestGlobals.changing;
 
@@ -9,10 +16,10 @@ var pikaday = require('pikaday');
 var MAX_SAFE_INTEGER = 9007199254740991;
 
 function sameValue(a,b){
-    return a==b 
-      || a instanceof Date && b instanceof Date && a.getTime() == b.getTime() 
-      || typeof a === 'number' && (a>MAX_SAFE_INTEGER || a< -MAX_SAFE_INTEGER) && Math.abs(a/b)<1.00000000000001 && Math.abs(a/b)>0.99999999999999
-      || a && !!a.sameValue && a.sameValue(b);
+    return a==b ||
+      a instanceof Date && b instanceof Date && a.getTime() == b.getTime() ||
+      typeof a === 'number' && (a>MAX_SAFE_INTEGER || a< -MAX_SAFE_INTEGER) && Math.abs(a/b)<1.00000000000001 && Math.abs(a/b)>0.99999999999999 ||
+      a && !!a.sameValue && a.sameValue(b);
 }
 
 sameValue(3,4);
@@ -103,11 +110,11 @@ myOwn.comparator={
     '~':function(valueToCheck,condition){return condition==null || RegExp(escapeRegExp(condition.toString()),'i').test(valueToCheck);},
     '/R/i':function(valueToCheck,condition){return condition==null || RegExp(condition,'i').test(valueToCheck);},
     '\u2205':function(valueToCheck,condition){return valueToCheck == null;},//\u2205 = conjunto vacío
-    '>':function(valueToCheck,condition){return (valueToCheck>condition)},
-    '>=':function(valueToCheck,condition){return (valueToCheck>=condition)},
-    '<':function(valueToCheck,condition){return (valueToCheck<condition)},
-    '<=':function(valueToCheck,condition){return (valueToCheck<=condition)},
-    'not-an-operator':function(valueToCheck,condition){ return 'Operator does not exist'},
+    '>':function(valueToCheck,condition){return (valueToCheck>condition); },
+    '>=':function(valueToCheck,condition){return (valueToCheck>=condition); },
+    '<':function(valueToCheck,condition){return (valueToCheck<condition); },
+    '<=':function(valueToCheck,condition){return (valueToCheck<=condition); },
+    'not-an-operator':function(valueToCheck,condition){ return 'Operator does not exist'; },
     'traductor':{
         '=':'igual',
         '~':'parecido',
@@ -162,7 +169,7 @@ myOwn.TableConnector.prototype.deleteRecord = function deleteRecord(depot){
 
 myOwn.cloneRow = function cloneRow(row){
     return JSON4all.parse(JSON4all.stringify(row));
-}
+};
 
 myOwn.TableConnector.prototype.saveRecord = function saveRecord(depot, opts){
     var sendedForUpdate = depot.my.cloneRow(depot.rowPendingForUpdate);
@@ -203,13 +210,12 @@ myOwn.TableGrid = function(context, mainElement){
     }
     this.dom={
         main: mainElement
-    }
+    };
     this.modes = {
         saveByField: true,
         withColumnDetails: null, // null = autodetect
     };
-    this.view = {
-    }
+    this.view = {};
 };
 
 myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
@@ -226,7 +232,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
         return preparing.then(function(){
             return grid;
         }).then(fun||function(){});
-    }
+    };
     return grid;
 };
 
@@ -249,19 +255,19 @@ myOwn.TableGrid.prototype.createDepotFromRow = function createDepotFromRow(row, 
         status: status||'preparing',
         detailControls:{},
         detailRows:[]
-    }
+    };
     return depot;
-}
+};
 
 myOwn.TableGrid.prototype.prepareDepots = function prepareDepots(rows){
     var grid = this;
     grid.depots = rows.map(grid.createDepotFromRow.bind(grid));
     grid.view.sortColumns=grid.view.sortColumns||grid.def.sortColumns||[];
-}
+};
 
 myOwn.TableGrid.prototype.refresh = function refresh(){
     return this.prepareAndDisplayGrid();
-}
+};
 
 myOwn.TableGrid.prototype.prepareAndDisplayGrid = function prepareAndDisplayGrid(){
     var grid = this;
@@ -279,35 +285,36 @@ myOwn.TableGrid.prototype.prepareAndDisplayGrid = function prepareAndDisplayGrid
         });
     }).catch(function(err){
         grid.my.log(err);
-    })
+    });
 };
 
 myOwn.ColumnGrid = function ColumnGrid(opts){
     for(var optName in opts){
         this[optName] = opts[optName];
     }
-}
+};
 
 myOwn.ColumnGrid.prototype.th = function th(){
     return html.th();
-}
+};
 
 myOwn.ColumnGrid.prototype.thDetail = function thLabel(){
     return html.th({class:'th-detail'}, (this.fieldDef||{}).label);
-}
+};
 
 myOwn.ColumnGrid.prototype.thFilter = function thFilter(){
     return html.th();
-}
+};
 
 myOwn.ActionColumnGrid = function ActionColumnGrid(opts){
     myOwn.ColumnGrid.call(this,opts);
-}
+};
+
 myOwn.ActionColumnGrid.prototype = Object.create(myOwn.ColumnGrid.prototype);
 
 myOwn.ActionColumnGrid.prototype.th = function th(){
     return html.th(this.actions);
-}
+};
 
 myOwn.ActionColumnGrid.prototype.thFilter = function thFilter(depot){
     var buttonFilter=html.button({id:'button-filter'},myOwn.messages.Filter+"!").create();
@@ -317,11 +324,12 @@ myOwn.ActionColumnGrid.prototype.thFilter = function thFilter(depot){
         grid.displayBody();
     });
     return html.th([buttonFilter]);
-}
+};
 
 myOwn.DataColumnGrid = function DataColumnGrid(opts){
     myOwn.ColumnGrid.call(this,opts);
-}
+};
+
 myOwn.DataColumnGrid.prototype = Object.create(myOwn.ColumnGrid.prototype);
 
 myOwn.DataColumnGrid.prototype.th = function th(){
@@ -339,12 +347,12 @@ myOwn.DataColumnGrid.prototype.th = function th(){
         var currentOrder=grid.view.sortColumns.length && grid.view.sortColumns[0].column==fieldDef.name?grid.view.sortColumns[0].order:null;
         grid.view.sortColumns=grid.view.sortColumns.filter(function(sortColumn){
             return sortColumn.column != fieldDef.name;
-        })
-        grid.view.sortColumns.unshift({column:fieldDef.name, order:currentOrder?-currentOrder:1})
-        grid.displayBody()
+        });
+        grid.view.sortColumns.unshift({column:fieldDef.name, order:currentOrder?-currentOrder:1});
+        grid.displayBody();
     });
     return th;
-}
+};
 
 myOwn.DataColumnGrid.prototype.thFilter = function thFilter(depot, iColumn){
     var grid = this.grid;
@@ -384,7 +392,7 @@ myOwn.DataColumnGrid.prototype.thFilter = function thFilter(depot, iColumn){
         });
     });
     return th;
-}
+};
 
 myOwn.DataColumnGrid.prototype.thDetail = function thLabel(){
     var grid=this.grid;
@@ -393,11 +401,11 @@ myOwn.DataColumnGrid.prototype.thDetail = function thLabel(){
         attr["inherited-pk-column"]="yes";
     }
     return html.th(attr, (this.fieldDef||{}).label);
-}
+};
 
 myOwn.DetailColumnGrid = function DetailColumnGrid(opts){
     myOwn.ColumnGrid.call(this,opts);
-}
+};
 
 myOwn.DetailColumnGrid.prototype = Object.create(myOwn.ColumnGrid.prototype);
 
@@ -408,32 +416,40 @@ myOwn.DetailColumnGrid.prototype.th = function th(){
 
 myOwn.SpecialColumnGrid = function SpecialColumnGrid(opts){
     myOwn.ColumnGrid.call(this,opts);
-}
+};
+
 myOwn.SpecialColumnGrid.prototype = Object.create(myOwn.ColumnGrid.prototype);
 
 myOwn.SpecialColumnGrid.prototype.th = function th(){
     return html.th({class:this.class});
-}
+};
 
 myOwn.SpecialColumnGrid.prototype.thDetail = myOwn.SpecialColumnGrid.prototype.th;
 
 function s2ab(s) {
-	if(typeof ArrayBuffer !== 'undefined') {
-		var buf = new ArrayBuffer(s.length);
-		var view = new Uint8Array(buf);
-		for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
-		return buf;
-	} else {
-		var buf = new Array(s.length);
-		for (var i=0; i!=s.length; ++i) buf[i] = s.charCodeAt(i) & 0xFF;
-		return buf;
-	}
+    var buf;
+    var i;
+    if(typeof ArrayBuffer !== 'undefined') {
+        buf = new ArrayBuffer(s.length);
+        var view = new Uint8Array(buf);
+        for (i=0; i!=s.length; ++i){
+            view[i] = s.charCodeAt(i) & 0xFF;
+        }
+    } else {
+        buf = new Array(s.length);
+        for (i=0; i!=s.length; ++i){
+            buf[i] = s.charCodeAt(i) & 0xFF;
+        }
+    }
+    return buf;
 }
 
 function Workbook() {
-	if(!(this instanceof Workbook)) return new Workbook();
-	this.SheetNames = [];
-	this.Sheets = {};
+    if(!(this instanceof Workbook)){
+        return new Workbook();
+    }
+    this.SheetNames = [];
+    this.Sheets = {};
 }
 
 myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
@@ -480,12 +496,12 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                         }).join('|')+'\r\n'+
                         grid.depotsToDisplay.map(function(depot){
                             return grid.def.fields.map(function(fieldDef){
-                                var value=depot.row[fieldDef.name]
+                                var value=depot.row[fieldDef.name];
                                 return value==null?'':depot.row[fieldDef.name].toString().trim();
-                            }).join('|')
+                            }).join('|');
                         }).join('\r\n')+'\r\n';
                     mainDiv.setAttribute("current-state-txt", "ready");
-                    var blob = new Blob([txtToDownload], {type: 'text/plain'})
+                    var blob = new Blob([txtToDownload], {type: 'text/plain'});
                     var url = URL.createObjectURL(blob); 
                     downloadElementText.href=url;
                     downloadElementText.setAttribute("download", grid.def.name+".tab");
@@ -506,7 +522,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     // })
                     grid.def.fields.forEach(function(field,iColumn){
                         ws[XLSX.utils.encode_cell({c:iColumn,r:0})]={t:'s',v:field.name, s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
-                    })
+                    });
                     grid.depotsToDisplay.forEach(function(depot, iFila){
                         depot.def.fields.forEach(function(fieldDef, iColumn){
                             var value=depot.row[fieldDef.name];
@@ -519,14 +535,14 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                                 }
                                 ws[XLSX.utils.encode_cell({c:iColumn,r:iFila+1})]=cell;
                             }
-                        })
+                        });
                     });
                     ws["!ref"]="A1:"+XLSX.utils.encode_cell({c:grid.def.fields.length,r:grid.depotsToDisplay.length});
                     var sheet1name=grid.def.name;
                     var sheet2name=grid.def.name!=="metadata"?"metadata":"meta-data";
                     wb.SheetNames=[sheet1name,sheet2name];
                     wb.Sheets[sheet1name]=ws;
-                    exportFileInformationWs["!ref"]="A1:F100"
+                    exportFileInformationWs["!ref"]="A1:F100";
                     wb.Sheets[sheet2name]=exportFileInformationWs;
                     var wbFile = XLSX.write(wb, {bookType:'xlsx', bookSST:false, type: 'binary'});
                     var blob = new Blob([s2ab(wbFile)],{type:"application/octet-stream"});
@@ -543,7 +559,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
             var buttonFile=html.input({type:'file',style:'min-width:400px'}).create();
             var buttonConfirmImport=html.input({type:'button', value:my.messages.import}).create();
             var progressIndicator=html.div({class:'indicator'},' ').create();
-            var progressBar=html.div({class:'progress-bar', style:'width:400px; height:8px;'},[progressIndicator]).create()
+            var progressBar=html.div({class:'progress-bar', style:'width:400px; height:8px;'},[progressIndicator]).create();
             var uploadingProgress=function(progress){
                 if(progress.lengthComputable){
                     progressIndicator.style.width=progress.loaded*100/progress.total+'%';
@@ -552,7 +568,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     progressIndicator.style.backgroundColor='#D4D';
                     progressIndicator.title='N/D %';
                 }
-            }
+            };
             buttonConfirmImport.addEventListener('click', function(){
                 var files = buttonFile.files;
                 buttonConfirmImport.value='cargando...';
@@ -801,7 +817,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 td.setTypedValue(depot.row[fieldDef.name]);
             }
         });
-    }
+    };
     var saveRow = function(depot, opts){
         if(!('saving' in depot)){
             depot.saving = Promise.resolve();
@@ -819,7 +835,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     td.title='';
                 }
             });
-        }
+        };
         changeIoStatus('updating',depot.rowPendingForUpdate);
         depot.saving = depot.saving.then(function(){
             if(!Object.keys(depot.rowPendingForUpdate).length){
@@ -843,9 +859,11 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                             // ok, lo que viene coincide con lo pendiente
                             delete depot.rowPendingForUpdate[fieldName];
                             changeIoStatus('temporal-ok', fieldName);
+                            /*jshint loopfunc: true */
                             setTimeout(function(fieldName){
                                 changeIoStatus('ok', fieldName);
                             },3000,fieldName);
+                            /*jshint loopfunc: false */
                         }else if(sameValue(retrievedRow[fieldName], source[fieldName])){
                             // ok, si bien lo que viene no coincide con lo pendiente que sigue pendiente, 
                             // sí coincide con lo que estaba antes de mandar a grabar, 
@@ -865,9 +883,11 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                             changeIoStatus('background-change', fieldName);
                             depot.row[fieldName] = retrievedRow[fieldName];
                             depot.rowControls[fieldName].setTypedValue(retrievedRow[fieldName]);
+                            /*jshint loopfunc: true */
                             setTimeout(function(fieldName){
                                 changeIoStatus('ok', fieldName);
                             },3000,fieldName);
+                            /*jshint loopfunc: false */
                         }
                     }
                 }
@@ -877,7 +897,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 changeIoStatus('error',depot.rowPendingForUpdate,err.message);
             });
         });
-    }
+    };
     grid.createRowElements = function createRowElements(iRow, depot){
         var grid = this;
         var forInsert = iRow>=0;
@@ -1060,7 +1080,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     console.log(result);
                 });
             }
-        })
+        });
         if(iRow===-1){
             depot.detailRows.forEach(function(detailTr){
                 var detailControl = depot.detailControls[detailTr.detailTableName];
@@ -1076,13 +1096,13 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             });
         }
         return depot;
-    }
+    };
     grid.destroyRowFilter = function destroyRowFilter(){
         var tr=grid.hasFilterRow;
         grid.dom.table.setAttribute('has-filter',0);
         grid.dom.table.tHead.removeChild(tr);
         delete grid.hasFilterRow;
-    }
+    };
     grid.dom.table.setAttribute('has-filter',0);
     grid.createRowFilter = function createRowFilter(){
         var grid = this;
@@ -1111,28 +1131,26 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         grid.dom.table.setAttribute('has-filter',1);
         grid.dom.table.tHead.appendChild(tr);
         return true;
-        // tr.appendChild(html.td().create());
-        grid.def.fields.forEach(function(fieldDef){
-        });
-    }
+    };
     grid.displayBody=function displayBody(){
         var grid = this;
+        var depotsToDisplay;
         var filterData = grid.view.filter;
         if(filterData){
-            var depotsToDisplay = grid.depots.filter(function(depot,i){
+            depotsToDisplay = grid.depots.filter(function(depot,i){
                 var partialOk=true;
                 for(var column in depot.row){
                     if(filterData.rowSymbols[column] && my.comparator[filterData.rowSymbols[column]]){
-                        var isSatisfied=my.comparator[filterData.rowSymbols[column]](depot.row[column],filterData.row[column])
+                        var isSatisfied=my.comparator[filterData.rowSymbols[column]](depot.row[column],filterData.row[column]);
                         if(!isSatisfied){
                             partialOk=false;
                         }
                     }
                 }
                 return partialOk;
-            })
+            });
         }else{
-            var depotsToDisplay = grid.depots;
+            depotsToDisplay = grid.depots;
         }
         if(grid.view.sortColumns.length>0){
             depotsToDisplay.sort(function(depot1, depot2){ 
@@ -1154,12 +1172,14 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     tbody.innerHTML='';
                 }
             }
+            /*jshint loopfunc: true */
             for(var iRow=fromRowNumber; iRow<toRowNumber; iRow++){
                 (function(depot){
                     var tr=grid.createRowElements(-1, depot);
                     grid.updateRowData(depot);
                 })(depotsToDisplay[iRow]);
             }
+            /*jshint loopfunc: false */
             grid.dom.footInfo.displayFrom.textContent=depotsToDisplay.length?1:0;
             grid.dom.footInfo.displayTo.textContent=iRow;
             grid.dom.footInfo.rowCount.innerHTML='';
@@ -1171,7 +1191,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     buttonRest.addEventListener('click',function(){
                         grid.displayRows(iRow, toNextRowNumber, true);
                     });
-                }
+                };
                 my.displayCountBreaks.forEach(function(size, iSize){
                     var cut=(iRow+size) - (iRow+size) % size;
                     if(cut*5<=depotsToDisplay.length*3 && (iSize==my.displayCountBreaks.length-1 || cut*5<=my.displayCountBreaks[iSize+1]*3)){
@@ -1180,11 +1200,11 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 });
                 addButtonRest(depotsToDisplay.length);
             }
-        }
+        };
         var linesToDisplay=depotsToDisplay.length<=myOwn.firstDisplayOverLimit?depotsToDisplay.length:my.firstDisplayCount;
         grid.depotsToDisplay=depotsToDisplay;
         grid.displayRows(0, linesToDisplay);
-    }
+    };
     grid.displayBody();
 };
 
@@ -1251,7 +1271,7 @@ myOwn.tableAction={
             grid.dom.table.setAttribute("my-orientation",grid.vertical?'vertical':'horizontal');
         }
     }
-}
+};
 
 myOwn.clientSides={
     newPass:{
@@ -1275,9 +1295,10 @@ myOwn.clientSides={
                         },3000);
                     },function(err){
                         td.setAttribute('io-status','error');
+                        td.title=err.message;
                     });
                 }
             }, true);
         }
     }
-}
+};
