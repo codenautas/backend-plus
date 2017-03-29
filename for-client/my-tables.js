@@ -98,6 +98,24 @@ myOwn.es=changing(myOwn.es, {
     zoom: "zoom",
 });
 
+function hideColumn(columnName){
+    var id='bp-hidden-columns';
+    var autoStyle = document.getElementById(id);
+    if(!autoStyle){
+        autoStyle = document.createElement('style');
+        autoStyle.type = 'text/css';
+        autoStyle.innerHTML = '.cssClass { color: #F00; }';
+        autoStyle.id=id;
+        document.getElementsByTagName('head')[0].appendChild(autoStyle);
+    }
+    var lines = autoStyle.innerHTML.split('\n');
+    var selector = "[my-colname="+columnName+"]";
+    var newLines = lines.filter(function(line){ return line.substr(0,selector.length) !== selector; });
+    newLines.push(selector+' { display:none }');
+    // newLines.push(selector+' { background-color: #FEA }');
+    autoStyle.innerHTML = newLines.join('\n');
+}
+
 var escapeRegExp = bestGlobals.escapeRegExp;
 
 myOwn.firstDisplayCount = 20;
@@ -366,13 +384,17 @@ myOwn.DataColumnGrid.prototype.th = function th(){
     if(fieldDef.width){
         th.style.width=fieldDef.width+'px';
     }
-    th.addEventListener('click',function(){
-        var currentOrder=grid.view.sortColumns.length && grid.view.sortColumns[0].column==fieldDef.name?grid.view.sortColumns[0].order:null;
-        grid.view.sortColumns=grid.view.sortColumns.filter(function(sortColumn){
-            return sortColumn.column != fieldDef.name;
-        });
-        grid.view.sortColumns.unshift({column:fieldDef.name, order:currentOrder?-currentOrder:1});
-        grid.displayBody();
+    th.addEventListener('click',function(mouseEvent){
+        if(mouseEvent.altKey){
+            hideColumn(fieldDef.name);
+        }else{
+            var currentOrder=grid.view.sortColumns.length && grid.view.sortColumns[0].column==fieldDef.name?grid.view.sortColumns[0].order:null;
+            grid.view.sortColumns=grid.view.sortColumns.filter(function(sortColumn){
+                return sortColumn.column != fieldDef.name;
+            });
+            grid.view.sortColumns.unshift({column:fieldDef.name, order:currentOrder?-currentOrder:1});
+            grid.displayBody();
+        }
     });
     return th;
 };
@@ -419,7 +441,7 @@ myOwn.DataColumnGrid.prototype.thFilter = function thFilter(depot, iColumn){
 
 myOwn.DataColumnGrid.prototype.thDetail = function thLabel(){
     var grid=this.grid;
-    var attr={class:'th-detail'};
+    var attr={class:'th-detail', 'my-colname':this.fieldDef.name};
     if(grid.connector.fixedField[this.fieldDef.name]){
         attr["inherited-pk-column"]="yes";
     }
