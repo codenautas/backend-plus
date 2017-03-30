@@ -670,35 +670,51 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
     menuOptions.push({img:my.path.img+'show-hide-columns.png', value:true, label: my.messages.hideOrShow, doneFun:function(){
         return dialogPromise(function(dialogWindow, closeWindow){
             var button=html.button({class:'hide-or-show'},'ok').create();
-            var optionDiv=html.div({class:"show-or-hide"},[
-                html.div({class:'show-or-hide'},[
-                    html.img({src:my.path.img+'hide.png'}),
-                    html.select({id:'hide-columns',class:'hide-or-menu',multiple:true},
-                        grid.view.showedColmns.map(function(field){
-                            return html.option({value: field},field)
-                        })
-                    )
+            var selecColumnsToHideElement=html.select({id:'hide-columns',class:'hide-or-menu',multiple:true},
+                grid.view.showedColmns.map(function(field){
+                    return html.option({value: field},field)
+                })
+            ).create();
+            var selectColumnsToShowElement=html.select({id:'show-columns',class:'hide-or-menu',multiple:true},
+                grid.view.hiddenColumns.map(function(field){
+                    return html.option({value: field},field)
+                })
+            ).create();
+            var hideOrShowTable=html.table({class:"show-or-hide"},[html.tr([
+                html.td([
+                    selecColumnsToHideElement
                 ]),
-                html.div({class:'show-or-hide'},[
-                    html.img({src:my.path.img+'show.png'}),
-                    html.select({id:'show-columns',class:'hide-or-menu',multiple:true},
-                        grid.view.hiddenColumns.map(function(field){
-                            return html.option({value: field},field)
-                        })
-                    )
+                html.td([
+                    html.div([html.img({src:my.path.img+'show.png'})]),
+                    html.div([html.img({src:my.path.img+'hide.png'})])
                 ]),
-                button
-            ])
-            dialogWindow.appendChild(optionDiv.create());
-            button.addEventListener('click',function(){
-                var hide=document.getElementById('hide-columns');
-                for(var i=0;i<hide.length;i++){
-                    if(hide[i].selected)
-                        console.log(hide[i].value);
-                }
-                console.log("grid.view.hiddenColumns",grid.view.hiddenColumns)
-                closeWindow('ok')
-            })
+                html.td([selectColumnsToShowElement])
+                //html.span({class:'show-or-hide'},[selecColumnsToHideElement]),
+                //html.span([
+                //    html.img({src:my.path.img+'show.png'}),
+                //    html.img({src:my.path.img+'hide.png'})
+                //]),
+                //html.span({class:'show-or-hide'},[selectColumnsToShowElement]),
+                //html.div([button])
+            ])])
+            
+            dialogWindow.appendChild(hideOrShowTable.create());
+            //var hide=document.getElementById('hide-columns');
+            //hide.addEventListener('change',function(){
+            //    hide.forEach(function(t){
+            //        console.log("test",t.value)
+            //    })
+            //    
+            //})
+            //button.addEventListener('click',function(){
+            //    var hide=document.getElementById('hide-columns');
+            //    for(var i=0;i<hide.length;i++){
+            //        if(hide[i].selected)
+            //            console.log(hide[i].value);
+            //    }
+            //    console.log("grid.view.hiddenColumns",grid.view.hiddenColumns)
+            //    closeWindow('ok')
+            //})
         })
     }});
     if(grid.def.allow.export){
