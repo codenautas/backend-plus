@@ -703,14 +703,19 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                 for(var i=0;i<selectColumnsToHideElement.length;i++){
                     var option=selectColumnsToHideElement[i];
                     if(option.selected){
-                        grid.view.hiddenColumns.push(option.value);
-                        grid.view.showedColmns.splice(grid.view.showedColmns.indexOf(option.value),1);
+                        selectColumnsToHideElement.remove(option.value);
+                        selectColumnsToShowElement.options[selectColumnsToShowElement.length]=new Option(option.value,option.value);
                     }
                 }
-                selectColumnsToHideElement=createSelectElement(grid.view.showedColmns,'hide-columns');
-                selectColumnsToShowElement=createSelectElement(grid.view.hiddenColumns,'show-columns');
-                console.log("grid.view.showedColmns",grid.view.showedColmns)
-                console.log("grid.view.hiddenColumns",grid.view.hiddenColumns)
+            })
+            selectColumnsToShowElement.addEventListener('change',function(){
+                for(var i=0;i<selectColumnsToShowElement.length;i++){
+                    var option=selectColumnsToShowElement[i];
+                    if(option.selected){
+                        selectColumnsToShowElement.remove(option.value);
+                        selectColumnsToHideElement.options[selectColumnsToHideElement.length]=new Option(option.value,option.value);
+                    }
+                }
             })
         })
     }});
