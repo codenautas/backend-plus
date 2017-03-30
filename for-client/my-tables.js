@@ -32,6 +32,8 @@ myOwn.messages=changing(myOwn.messages, {
     allRecordsDeleted: "all records where deleted",
     allTWillDelete: "(ALL {$t} records will be deleted)",
     anotherUserChangedTheRow: "Another user changed the row",
+    columnsToHide:'Select columns to hide',
+    columnsToShow:'Select columns to show',
     confirmDeleteAll: "Do you want to delete these records?",
     deleteAllRecords: "delete all records",
     deleteRecord: "delete record",
@@ -70,6 +72,8 @@ myOwn.es=changing(myOwn.es, {
     allRecordsDeleted: "todos los registros fueron borrados",
     allTWillDelete: "(se borrarán todos los registros: {$t} registros)",
     anotherUserChangedTheRow: "Otro usuario modificó el registro",
+    columnsToHide:'Seleccione columnas a ocultar',
+    columnsToShow:'Selecciones columnas a mostrar',
     confirmDeleteAll: "¿Desea borrar estos registros?",
     deleteAllRecords: "borrar todos los registros",
     deleteRecord: "borrar este registro",
@@ -680,15 +684,23 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     return html.option({value: field},field)
                 })
             ).create();
+            var createSelectElement=function createSelectElement(columns,hideOrShowId){
+                var selectElement=html.select({id:hideOrShowId,class:'hide-or-menu',multiple:true},
+                    columns.map(function(column){
+                        return html.option({value: column},column)
+                    })
+                ).create()
+                return selectElement
+            }
             var hideOrShowTable=html.table({class:"show-or-hide"},[
                 html.tr([
-                    html.td('Select columns to hide'),
+                    html.td({class:'show-or-hide-title'},my.messages.columnsToHide),
                     html.td(),
-                    html.td('Select columns to show')
+                    html.td({class:'show-or-hide-title'},my.messages.columnsToShow)
                 ]),
                 html.tr([
                     html.td([
-                        selecColumnsToHideElement
+                        createSelectElement(grid.view.showedColmns,'hide-columns')
                     ]),
                     html.td([
                         html.div([html.img({class:'show-or-hide-img',src:my.path.img+'show.png'})]),
@@ -698,22 +710,16 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
             ])])
             
             dialogWindow.appendChild(hideOrShowTable.create());
-            //var hide=document.getElementById('hide-columns');
-            //hide.addEventListener('change',function(){
-            //    hide.forEach(function(t){
-            //        console.log("test",t.value)
-            //    })
-            //    
-            //})
-            //button.addEventListener('click',function(){
-            //    var hide=document.getElementById('hide-columns');
-            //    for(var i=0;i<hide.length;i++){
-            //        if(hide[i].selected)
-            //            console.log(hide[i].value);
-            //    }
-            //    console.log("grid.view.hiddenColumns",grid.view.hiddenColumns)
-            //    closeWindow('ok')
-            //})
+            selecColumnsToHideElement.addEventListener('change',function(){
+                for(var i=0;i<selecColumnsToHideElement.length;i++){
+                    var option=selecColumnsToHideElement[i];
+                    if(option.selected){
+                        grid.view.hiddenColumns.push(option.value);
+                        grid.view.showedColmns.splice(grid.view.showedColmns.indexOf(option.value),1);
+                    }
+                }
+                createSelectElement(grid.view.showedColmns,'hide-columns')
+            })
         })
     }});
     if(grid.def.allow.export){
