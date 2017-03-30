@@ -680,22 +680,21 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     return html.option({value: field},field)
                 })
             ).create();
-            var hideOrShowTable=html.table({class:"show-or-hide"},[html.tr([
-                html.td([
-                    selecColumnsToHideElement
+            var hideOrShowTable=html.table({class:"show-or-hide"},[
+                html.tr([
+                    html.td('Select columns to hide'),
+                    html.td(),
+                    html.td('Select columns to show')
                 ]),
-                html.td([
-                    html.div([html.img({src:my.path.img+'show.png'})]),
-                    html.div([html.img({src:my.path.img+'hide.png'})])
-                ]),
-                html.td([selectColumnsToShowElement])
-                //html.span({class:'show-or-hide'},[selecColumnsToHideElement]),
-                //html.span([
-                //    html.img({src:my.path.img+'show.png'}),
-                //    html.img({src:my.path.img+'hide.png'})
-                //]),
-                //html.span({class:'show-or-hide'},[selectColumnsToShowElement]),
-                //html.div([button])
+                html.tr([
+                    html.td([
+                        selecColumnsToHideElement
+                    ]),
+                    html.td([
+                        html.div([html.img({class:'show-or-hide-img',src:my.path.img+'show.png'})]),
+                        html.div([html.img({class:'show-or-hide-img',src:my.path.img+'hide.png'})])
+                    ]),
+                    html.td([selectColumnsToShowElement])
             ])])
             
             dialogWindow.appendChild(hideOrShowTable.create());
