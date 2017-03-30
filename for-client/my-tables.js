@@ -394,6 +394,8 @@ myOwn.DataColumnGrid.prototype.th = function th(){
         if(mouseEvent.altKey){
             hideColumn(fieldDef.name);
             grid.view.hiddenColumns.push(fieldDef.name);
+            var index=grid.view.showedColmns.indexOf(fieldDef.name);
+            grid.view.showedColmns.splice(index,1);
         }else{
             var currentOrder=grid.view.sortColumns.length && grid.view.sortColumns[0].column==fieldDef.name?grid.view.sortColumns[0].order:null;
             grid.view.sortColumns=grid.view.sortColumns.filter(function(sortColumn){
@@ -652,6 +654,11 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
     button.title=my.messages.optionsForThisTable;
     var grid=this;
     var menuOptions=[];
+    grid.def.fields.forEach(function(gridField){
+        if(!grid.view.hiddenColumns.includes(gridField)){
+            grid.view.showedColmns.push(gridField.name);
+        }
+    })
     menuOptions.push({img:my.path.img+'refresh.png', value:true, label:my.messages.refresh, doneFun:function(){
         return grid.refresh();
     }});
@@ -662,21 +669,13 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
     }});
     menuOptions.push({img:my.path.img+'show-hide-columns.png', value:true, label: my.messages.hideOrShow, doneFun:function(){
         return dialogPromise(function(dialogWindow, closeWindow){
-            //grid.view.showedColmns=
-            //grid.def.fields.map(function(gridField){
-            //    grid.view.hiddenColumns.forEach(function(hiddenField){
-            //        if(hiddenField.name==gridField){
-            //            
-            //        }
-            //    })
-            //})
             var button=html.button({class:'hide-or-show'},'ok').create();
             var optionDiv=html.div({class:"show-or-hide"},[
                 html.div({class:'show-or-hide'},[
                     html.img({src:my.path.img+'hide.png'}),
                     html.select({id:'hide-columns',class:'hide-or-menu',multiple:true},
-                        grid.def.fields.map(function(field){
-                            return html.option({value: field.name},field.title)
+                        grid.view.showedColmns.map(function(field){
+                            return html.option({value: field},field)
                         })
                     )
                 ]),
@@ -684,7 +683,6 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     html.img({src:my.path.img+'show.png'}),
                     html.select({id:'show-columns',class:'hide-or-menu',multiple:true},
                         grid.view.hiddenColumns.map(function(field){
-                        //grid.def.fields.map(function(field){
                             return html.option({value: field},field)
                         })
                     )
