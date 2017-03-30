@@ -696,27 +696,26 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                         html.div([html.img({class:'show-or-hide-img',src:my.path.img+'show.png'})]),
                         html.div([html.img({class:'show-or-hide-img',src:my.path.img+'hide.png'})])
                     ]),
-                    html.td([selectColumnsToShowElement])
-            ])]);
+                    html.td([selectColumnsToShowElement]),
+                ]),
+                html.tr([html.td({colspan:3},[button])])
+            ]);
             dialogWindow.appendChild(hideOrShowTable.create());
-            selectColumnsToHideElement.addEventListener('change',function(){
-                for(var i=0;i<selectColumnsToHideElement.length;i++){
-                    var option=selectColumnsToHideElement[i];
-                    if(option.selected){
-                        selectColumnsToHideElement.remove(option.value);
-                        selectColumnsToShowElement.options[selectColumnsToShowElement.length]=new Option(option.value,option.value);
+            var changeOptionsFromSelect= function changeOptionsFromSelect(columnsToHideElement,columnsToShowElement){
+                columnsToHideElement.addEventListener('change',function(){
+                    for(var i=0;i<columnsToHideElement.length;i++){
+                        var option=columnsToHideElement[i];
+                        if(option.selected){
+                            console.log("selectColumnsToHideElement antes ",selectColumnsToHideElement)
+                            columnsToHideElement.remove(option.value);
+                            console.log("selectColumnsToHideElement después ",selectColumnsToHideElement)
+                            columnsToShowElement.options[columnsToShowElement.length]=new Option(option.value,option.value);
+                        }
                     }
-                }
-            })
-            selectColumnsToShowElement.addEventListener('change',function(){
-                for(var i=0;i<selectColumnsToShowElement.length;i++){
-                    var option=selectColumnsToShowElement[i];
-                    if(option.selected){
-                        selectColumnsToShowElement.remove(option.value);
-                        selectColumnsToHideElement.options[selectColumnsToHideElement.length]=new Option(option.value,option.value);
-                    }
-                }
-            })
+                })
+            }
+            changeOptionsFromSelect(selectColumnsToHideElement,selectColumnsToShowElement);
+            changeOptionsFromSelect(selectColumnsToShowElement,selectColumnsToHideElement);
         })
     }});
     if(grid.def.allow.export){
