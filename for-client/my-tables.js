@@ -674,24 +674,16 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
     menuOptions.push({img:my.path.img+'show-hide-columns.png', value:true, label: my.messages.hideOrShow, doneFun:function(){
         return dialogPromise(function(dialogWindow, closeWindow){
             var button=html.button({class:'hide-or-show'},'ok').create();
-            var selecColumnsToHideElement=html.select({id:'hide-columns',class:'hide-or-menu',multiple:true},
-                grid.view.showedColmns.map(function(field){
-                    return html.option({value: field},field)
-                })
-            ).create();
-            var selectColumnsToShowElement=html.select({id:'show-columns',class:'hide-or-menu',multiple:true},
-                grid.view.hiddenColumns.map(function(field){
-                    return html.option({value: field},field)
-                })
-            ).create();
             var createSelectElement=function createSelectElement(columns,hideOrShowId){
                 var selectElement=html.select({id:hideOrShowId,class:'hide-or-menu',multiple:true},
                     columns.map(function(column){
                         return html.option({value: column},column)
                     })
                 ).create()
-                return selectElement
-            }
+                return selectElement;
+            };
+            var selectColumnsToHideElement=createSelectElement(grid.view.showedColmns,'hide-columns');
+            var selectColumnsToShowElement=createSelectElement(grid.view.hiddenColumns,'show-columns');
             var hideOrShowTable=html.table({class:"show-or-hide"},[
                 html.tr([
                     html.td({class:'show-or-hide-title'},my.messages.columnsToHide),
@@ -699,27 +691,31 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     html.td({class:'show-or-hide-title'},my.messages.columnsToShow)
                 ]),
                 html.tr([
-                    html.td([
-                        createSelectElement(grid.view.showedColmns,'hide-columns')
-                    ]),
+                    html.td([selectColumnsToHideElement]),
                     html.td([
                         html.div([html.img({class:'show-or-hide-img',src:my.path.img+'show.png'})]),
                         html.div([html.img({class:'show-or-hide-img',src:my.path.img+'hide.png'})])
                     ]),
-                    html.td([selectColumnsToShowElement])
-            ])])
-            
+                    html.td([selectColumnsToShowElement]),
+                ]),
+                html.tr([html.td({colspan:3},[button])])
+            ]);
             dialogWindow.appendChild(hideOrShowTable.create());
-            selecColumnsToHideElement.addEventListener('change',function(){
-                for(var i=0;i<selecColumnsToHideElement.length;i++){
-                    var option=selecColumnsToHideElement[i];
-                    if(option.selected){
-                        grid.view.hiddenColumns.push(option.value);
-                        grid.view.showedColmns.splice(grid.view.showedColmns.indexOf(option.value),1);
+            var changeOptionsFromSelect= function changeOptionsFromSelect(columnsToHideElement,columnsToShowElement){
+                columnsToHideElement.addEventListener('change',function(){
+                    for(var i=0;i<columnsToHideElement.length;i++){
+                        var option=columnsToHideElement[i];
+                        if(option.selected){
+                            console.log("selectColumnsToHideElement antes ",selectColumnsToHideElement)
+                            columnsToHideElement.remove(option.value);
+                            console.log("selectColumnsToHideElement después ",selectColumnsToHideElement)
+                            columnsToShowElement.options[columnsToShowElement.length]=new Option(option.value,option.value);
+                        }
                     }
-                }
-                createSelectElement(grid.view.showedColmns,'hide-columns')
-            })
+                })
+            }
+            changeOptionsFromSelect(selectColumnsToHideElement,selectColumnsToShowElement);
+            changeOptionsFromSelect(selectColumnsToShowElement,selectColumnsToHideElement);
         })
     }});
     if(grid.def.allow.export){
