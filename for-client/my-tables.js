@@ -674,23 +674,13 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
     menuOptions.push({img:my.path.img+'show-hide-columns.png', value:true, label: my.messages.hideOrShow, doneFun:function(){
         return dialogPromise(function(dialogWindow, closeWindow){
             var button=html.button({class:'hide-or-show'},'ok').create();
-            //var selecColumnsToHideElement=html.select({id:'hide-columns',class:'hide-or-menu',multiple:true},
-            //    grid.view.showedColmns.map(function(field){
-            //        return html.option({value: field},field)
-            //    })
-            //).create();
-            //var selectColumnsToShowElement=html.select({id:'show-columns',class:'hide-or-menu',multiple:true},
-            //    grid.view.hiddenColumns.map(function(field){
-            //        return html.option({value: field},field)
-            //    })
-            //).create();
             var createSelectElement=function createSelectElement(columns,hideOrShowId){
                 var selectElement=html.select({id:hideOrShowId,class:'hide-or-menu',multiple:true},
                     columns.map(function(column){
                         return html.option({value: column},column)
                     })
                 ).create()
-                return selectElement
+                return selectElement;
             };
             var selectColumnsToHideElement=createSelectElement(grid.view.showedColmns,'hide-columns');
             var selectColumnsToShowElement=createSelectElement(grid.view.hiddenColumns,'show-columns');
@@ -707,8 +697,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                         html.div([html.img({class:'show-or-hide-img',src:my.path.img+'hide.png'})])
                     ]),
                     html.td([selectColumnsToShowElement])
-            ])])
-            
+            ])]);
             dialogWindow.appendChild(hideOrShowTable.create());
             selectColumnsToHideElement.addEventListener('change',function(){
                 for(var i=0;i<selectColumnsToHideElement.length;i++){
@@ -718,8 +707,10 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                         grid.view.showedColmns.splice(grid.view.showedColmns.indexOf(option.value),1);
                     }
                 }
-                selectColumnsToHideElement=createSelectElement(grid.view.showedColmns,'hide-columns')
-                selectColumnsToShowElement=createSelectElement(grid.view.hiddenColumns,'show-columns')
+                selectColumnsToHideElement=createSelectElement(grid.view.showedColmns,'hide-columns');
+                selectColumnsToShowElement=createSelectElement(grid.view.hiddenColumns,'show-columns');
+                console.log("grid.view.showedColmns",grid.view.showedColmns)
+                console.log("grid.view.hiddenColumns",grid.view.hiddenColumns)
             })
         })
     }});
