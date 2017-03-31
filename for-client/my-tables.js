@@ -122,6 +122,17 @@ function hideColumn(columnName){
     autoStyle.innerHTML = newLines.join('\n');
 }
 
+function showColmn(columnName){
+	var id='bp-hidden-columns';
+	var autoStyle = document.getElementById(id);
+	if(autoStyle){
+		var lines = autoStyle.innerHTML.split('\n');
+		var selector = "[my-colname="+columnName+"]";
+		var newLines=lines.filter(function(line){return line !=="[my-colname="+columnName+"]"+' { display:none }'})
+		autoStyle.innerHTML = newLines.join('\n');
+	}
+}
+
 var escapeRegExp = bestGlobals.escapeRegExp;
 
 myOwn.firstDisplayCount = 20;
@@ -659,7 +670,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
     var grid=this;
     var menuOptions=[];
     grid.def.fields.forEach(function(gridField){
-        if(!grid.view.hiddenColumns.includes(gridField)){
+        if(grid.view.hiddenColumns.indexOf(gridField.name)==-1){
             grid.view.showedColmns.push(gridField.name);
         }
     })
@@ -701,21 +712,36 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                 html.tr([html.td({colspan:3},[button])])
             ]);
             dialogWindow.appendChild(hideOrShowTable.create());
-            var changeOptionsFromSelect= function changeOptionsFromSelect(columnsToHideElement,columnsToShowElement){
-                columnsToHideElement.addEventListener('change',function(){
-                    for(var i=0;i<columnsToHideElement.length;i++){
-                        var option=columnsToHideElement[i];
-                        if(option.selected){
-                            console.log("selectColumnsToHideElement antes ",selectColumnsToHideElement)
-                            columnsToHideElement.remove(option.value);
-                            console.log("selectColumnsToHideElement después ",selectColumnsToHideElement)
-                            columnsToShowElement.options[columnsToShowElement.length]=new Option(option.value,option.value);
-                        }
-                    }
-                })
-            }
-            changeOptionsFromSelect(selectColumnsToHideElement,selectColumnsToShowElement);
-            changeOptionsFromSelect(selectColumnsToShowElement,selectColumnsToHideElement);
+			var changeOption=function changeOption(toHideElement,toShowElement){
+				Array.prototype.forEach.call(toHideElement.selectedOptions, function(option, i) {
+					toHideElement.removeChild(option);
+					toShowElement.appendChild(option)
+				});
+			}
+            selectColumnsToHideElement.addEventListener('change',function(){
+				changeOption(selectColumnsToHideElement,selectColumnsToShowElement);
+			});
+            selectColumnsToShowElement.addEventListener('change',function(){
+				changeOption(selectColumnsToShowElement,selectColumnsToHideElement)
+			});
+			var showAndHide=function showAndHide(selectColumnElement,showOrHide){
+				Array.prototype.forEach.call(selectColumnElement.children,function(child){
+					if(showOrHide=='hide'){
+						hideColumn(child.value)
+						grid.view.hiddenColumns.push(child.value);
+					}else{
+						showColmn(child.value);
+						grid.view.showedColmns.push(child.value);
+					}
+				})
+			};
+			button.addEventListener('click',function(){
+				grid.view.hiddenColumns=[];
+				grid.view.showedColmns=[];
+				showAndHide(selectColumnsToHideElement,'hide');
+				showAndHide(selectColumnsToShowElement,'show');	
+				closeWindow();
+			})
         })
     }});
     if(grid.def.allow.export){
