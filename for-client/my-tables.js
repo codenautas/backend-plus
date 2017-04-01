@@ -192,12 +192,13 @@ myOwn.TableConnector.prototype.getData = function getData(){
     });
 };
 
-myOwn.TableConnector.prototype.deleteRecord = function deleteRecord(depot){
+myOwn.TableConnector.prototype.deleteRecord = function deleteRecord(depot, opts){
     return (depot.primaryKeyValues===false?
         Promise.resolve():
         depot.my.ajax.table['delete-record']({
             table:depot.def.name, 
-            primaryKeyValues:depot.primaryKeyValues
+            primaryKeyValues:depot.primaryKeyValues,
+            launcher:opts.launcher
         })
     );
 };
@@ -381,7 +382,7 @@ myOwn.ActionColumnGrid.prototype.td = function td(depot){
             ]).create();
             thActions.appendChild(buttonAction);
             buttonAction.addEventListener('click', function(){
-                actionDef.actionRow(depot);
+                actionDef.actionRow(depot, {launcher:buttonAction});
             });
         }
     });
@@ -512,7 +513,7 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
                 var optDialog={underElement:actualControl};
                 if(fieldDef.typeName=='date'){
                     dialogPromise(function(dialogWindow, closeWindow){
-                        var button=html.button('Ok').create();
+                        var button=html.button(DialogPromise.messages.Ok).create();
                         var divPicker=html.div({id:'datepicker'}).create();
                         var picker = new Pikaday({
                             defaultDate: actualValue,
@@ -991,8 +992,8 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         grid.def.detailTables.map(function(detailTableDef){ return new my.DetailColumnGrid({grid:grid, detailTableDef:detailTableDef}); })
     ).concat(
         grid.def.fields.map(function(fieldDef){ return new my.DataColumnGrid({grid:grid, fieldDef:fieldDef}); })
-    ).concat(
-        [new my.SpecialColumnGrid({class:"empty-right-column"})]
+    // ).concat(
+    //     [new my.SpecialColumnGrid({class:"empty-right-column"})]
     );
     if(grid.modes.withColumnDetails==null){
         grid.modes.withColumnDetails=grid.def.fields.some(function(fieldDef){ return fieldDef.label!=fieldDef.title; });
@@ -1375,14 +1376,14 @@ myOwn.tableAction={
         img: myOwn.path.img+'delete.png',
         alt: "DEL",
         titleMsg: 'deleteRecord',
-        actionRow: function(depot){
+        actionRow: function(depot, opts){
             return depot.my.showQuestion(
                 depot.my.messages.Delete+' '+JSON.stringify(depot.primaryKeyValues)+' ?', 
                 {askForNoRepeat:depot.my.messages.Delete+', '+depot.def.name}
             ).then(function(result){
-                return depot.connector.deleteRecord(depot).then(function(){
+                return depot.connector.deleteRecord(depot, opts).then(function(){
                     depot.manager.displayAsDeleted(depot);
-                });
+                }).catch(depot.my.alertError);
             });
         }
     },

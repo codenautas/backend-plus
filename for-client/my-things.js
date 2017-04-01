@@ -131,6 +131,10 @@ myOwn.log = function log(severity, message){
         setTimeout(function(){
             my.fade(divMessage);
         },3000);
+    }else{
+        setTimeout(function(){
+            my.fade(divMessage);
+        },30000);
     }
 };
 
@@ -261,12 +265,50 @@ myOwn.encoders = {
     },
 };
 
+myOwn.launcherOk=function(launcher){
+    return function(result){
+        launcher.title=launcher.originalTitle;
+        launcher.removeAttribute('my-working');
+        return result;
+    }
+}
+
+myOwn.launcherCatch=function(launcher){
+    return function(err){
+        launcher.title=err.message;
+        launcher.setAttribute('my-working','error');
+        throw err;
+    }
+}
+
+myOwn.alertError = function(err){
+    return dialogPromise(function(dialogWindow, closeWindow){
+        var button=html.button(DialogPromise.messages.Ok).create();
+        button.addEventListener('click',function(){
+            closeWindow();
+        });
+        dialogWindow.appendChild(html.div([
+            html.div({class:'dialog-error-img'}, [html.img({src:my.path.img+'warning128.png'})]),
+            html.pre(err.message),
+            html.div([button])
+        ]).create());
+    });
+}
+
 myOwn.ajaxPromise = function(procedureDef,data,opts){
     opts = opts || {};
     if(!('visiblyLogErrors' in opts)){
         opts.visiblyLogErrors=true;
     }
     var my = this;
+    if(opts.launcher){
+        if(!opts.launcher.originalTitle){
+            opts.launcher.originalTitle=opts.launcher.title;
+        }else{
+            opts.launcher.title=opts.launcher.originalTitle;
+        }
+        opts.launcher.setAttribute('my-working','working');
+    }
     return Promise.resolve().then(function(){
         var params={};
         procedureDef.parameters.forEach(function(paramDef){
@@ -290,6 +332,10 @@ myOwn.ajaxPromise = function(procedureDef,data,opts){
             my.informDetectedStatus('logged', true);
             return my.encoders[procedureDef.encoding].parse(result);
         }).catch(function(err){
+            if(opts.launcher){
+                opts.launcher.setAttribute('my-working','error');
+                opts.launcher.title='err';
+            }
             if(!err.isNotLoggedError) {
                 if(!window.navigator.onLine) {
                     my.informDetectedStatus('noNetwork');
