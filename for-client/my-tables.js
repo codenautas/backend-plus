@@ -1090,9 +1090,16 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             var editable=grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
             td.disable(!editable);
             if(fieldDef.clientSide){
-                grid.my.clientSides[fieldDef.clientSide].action(depot, fieldDef.name);
-            }
-            if(editable){
+                if(!td.clientSidePrepared){
+                    grid.my.clientSides[fieldDef.clientSide].prepare(depot, fieldDef.name);
+                    td.clientSidePrepared=true;
+                }
+                if(grid.my.clientSides[fieldDef.clientSide].update===true){
+                    td.setTypedValue(depot.row[fieldDef.name]);
+                }else if(grid.my.clientSides[fieldDef.clientSide].update){
+                    grid.my.clientSides[fieldDef.clientSide].update(depot, fieldDef.name);
+                }
+            }else{
                 td.setTypedValue(depot.row[fieldDef.name]);
             }
         });
@@ -1406,7 +1413,7 @@ myOwn.tableAction={
 
 myOwn.clientSides={
     newPass:{
-        action: function(depot, fieldName){
+        prepare: function(depot, fieldName){
             var td=depot.rowControls[fieldName];
             td.disable(false);
             TypedControls.adaptElement(td, 'text');

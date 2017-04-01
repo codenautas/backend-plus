@@ -28,7 +28,8 @@ my.tableAction.showImg={
 };
 
 my.clientSides.colorSample={
-    action: function(depot, fieldName){
+    update: true,
+    prepare: function(depot, fieldName){
         depot.row[fieldName]=depot.row.color;
         depot.rowControls[fieldName].style.backgroundColor='#'+depot.row[fieldName];
     }
