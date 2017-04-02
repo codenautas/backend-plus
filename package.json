@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for typed controls",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -35,7 +35,7 @@
     "xlsx-style": "~0.8.13",
     
     "ajax-best-promise": "~0.3.3",
-    "backend-skins": "~0.0.5",
+    "backend-skins": "~0.0.6",
     "best-globals": "~0.8.0",
     "castellano": "~0.0.3",
     "dialog-promise": "~0.5.1",
