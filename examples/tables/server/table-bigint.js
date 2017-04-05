@@ -11,6 +11,7 @@ module.exports = function(context){
             {name:'nombre'          , typeName:'text'                     },
             {name:'col_bigint'      , typeName:'bigint'                   },
             {name:'col_number'      , typeName:'number'                   },
+            {name:'hora'            , typeName:'interval'                 },
         ],
         primaryKey:['id']
     });
