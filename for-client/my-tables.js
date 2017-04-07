@@ -32,8 +32,8 @@ myOwn.messages=changing(myOwn.messages, {
     allRecordsDeleted: "all records where deleted",
     allTWillDelete: "(ALL {$t} records will be deleted)",
     anotherUserChangedTheRow: "Another user changed the row",
-    columnsToHide:'Select columns to hide',
-    columnsToShow:'Select columns to show',
+    exhibitedColumns:'Exhibited Columns',
+    hiddenColumns:'Hidden columns',
     confirmDeleteAll: "Do you want to delete these records?",
     deleteAllRecords: "delete all records",
     deleteRecord: "delete record",
@@ -72,8 +72,8 @@ myOwn.es=changing(myOwn.es, {
     allRecordsDeleted: "todos los registros fueron borrados",
     allTWillDelete: "(se borrarán todos los registros: {$t} registros)",
     anotherUserChangedTheRow: "Otro usuario modificó el registro",
-    columnsToHide:'Seleccione columnas a ocultar',
-    columnsToShow:'Selecciones columnas a mostrar',
+    exhibitedColumns:'Columnas que se muestran',
+    hiddenColumns:'Columnas ocultas',
     confirmDeleteAll: "¿Desea borrar estos registros?",
     deleteAllRecords: "borrar todos los registros",
     deleteRecord: "borrar este registro",
@@ -698,9 +698,9 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
             var selectColumnsToShowElement=createSelectElement(grid.view.hiddenColumns,'show-columns');
             var hideOrShowTable=html.table({class:"show-or-hide"},[
                 html.tr([
-                    html.td({class:'show-or-hide-title'},my.messages.columnsToHide),
+                    html.td({class:'show-or-hide-title'},my.messages.exhibitedColumns),
                     html.td(),
-                    html.td({class:'show-or-hide-title'},my.messages.columnsToShow)
+                    html.td({class:'show-or-hide-title'},my.messages.hiddenColumns)
                 ]),
                 html.tr([
                     html.td([selectColumnsToHideElement]),
@@ -713,36 +713,36 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                 html.tr([html.td({colspan:3},[button])])
             ]);
             dialogWindow.appendChild(hideOrShowTable.create());
-			var changeOption=function changeOption(toHideElement,toShowElement){
-				Array.prototype.forEach.call(toHideElement.selectedOptions, function(option, i) {
-					toHideElement.removeChild(option);
-					toShowElement.appendChild(option)
-				});
-			}
+            var changeOption=function changeOption(toHideElement,toShowElement){
+                Array.prototype.forEach.call(toHideElement.selectedOptions, function(option, i) {
+                    toHideElement.removeChild(option);
+                    toShowElement.appendChild(option)
+                });
+            }
             selectColumnsToHideElement.addEventListener('change',function(){
-				changeOption(selectColumnsToHideElement,selectColumnsToShowElement);
-			});
+                changeOption(selectColumnsToHideElement,selectColumnsToShowElement);
+            });
             selectColumnsToShowElement.addEventListener('change',function(){
-				changeOption(selectColumnsToShowElement,selectColumnsToHideElement)
-			});
-			var showAndHide=function showAndHide(selectColumnElement,showOrHide){
-				Array.prototype.forEach.call(selectColumnElement.children,function(child){
-					if(showOrHide=='hide'){
-						hideColumn(child.value)
-						grid.view.hiddenColumns.push(child.value);
-					}else{
-						showColmn(child.value);
-						grid.view.showedColmns.push(child.value);
-					}
-				})
-			};
-			button.addEventListener('click',function(){
-				grid.view.hiddenColumns=[];
-				grid.view.showedColmns=[];
-				showAndHide(selectColumnsToHideElement,'hide');
-				showAndHide(selectColumnsToShowElement,'show');	
-				closeWindow();
-			})
+                changeOption(selectColumnsToShowElement,selectColumnsToHideElement)
+            });
+            var showAndHide=function showAndHide(selectColumnElement,showOrHide){
+                Array.prototype.forEach.call(selectColumnElement.children,function(child){
+                    if(showOrHide=='hide'){
+                        hideColumn(child.value)
+                        grid.view.hiddenColumns.push(child.value);
+                    }else{
+                        showColmn(child.value);
+                        grid.view.showedColmns.push(child.value);
+                    }
+                })
+            };
+            button.addEventListener('click',function(){
+                grid.view.hiddenColumns=[];
+                grid.view.showedColmns=[];
+                showAndHide(selectColumnsToHideElement,'show');
+                showAndHide(selectColumnsToShowElement,'hide');	
+                closeWindow();
+            })
         })
     }});
     if(grid.def.allow.export){
