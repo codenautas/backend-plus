@@ -64,6 +64,7 @@ describe("table-def-adapt", function(){
             },
             "name": "the-table-name",
             "sql": {
+              "fields": {},
               "from": '"the-table-name"',
               "isTable": true,
               "postCreateSqls": "",

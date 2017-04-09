@@ -122,6 +122,21 @@ function hideColumn(columnName){
     autoStyle.innerHTML = newLines.join('\n');
 }
 
+function hideColumnsViaCss(gridName, columnNameList){
+    var id='bp-hidden-columns-'+gridName;
+    var autoStyle = document.getElementById(id);
+    if(!autoStyle){
+        var autoStyle=document.createElement('style');
+        // document.body.appendChild(autoStyle);
+        autoStyle.type = 'text/css';
+        autoStyle.id=id;
+        document.getElementsByTagName('head')[0].appendChild(autoStyle);
+    }
+    autoStyle.innerHTML = columnNameList.map(function(columnName){
+        return "[my-table='"+gridName+"'] [my-colname='"+columnName+"'] {display:none}";
+    }).join('\n');
+}
+
 function showColmn(columnName){
 	var id='bp-hidden-columns';
 	var autoStyle = document.getElementById(id);
@@ -252,10 +267,7 @@ myOwn.TableGrid = function(context, mainElement){
         saveByField: true,
         withColumnDetails: null, // null = autodetect
     };
-    grid.view = {
-        hiddenColumns:[],
-        showedColmns: []
-    };
+    grid.view = {};
 };
 
 myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
@@ -408,10 +420,8 @@ myOwn.DataColumnGrid.prototype.th = function th(){
     }
     th.addEventListener('click',function(mouseEvent){
         if(mouseEvent.altKey){
-            hideColumn(fieldDef.name);
             grid.view.hiddenColumns.push(fieldDef.name);
-            var index=grid.view.showedColmns.indexOf(fieldDef.name);
-            grid.view.showedColmns.splice(index,1);
+            hideColumnsViaCss(grid.def.name, grid.view.hiddenColumns);
         }else{
             var currentOrder=grid.view.sortColumns.length && grid.view.sortColumns[0].column==fieldDef.name?grid.view.sortColumns[0].order:null;
             grid.view.sortColumns=grid.view.sortColumns.filter(function(sortColumn){
@@ -670,11 +680,6 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
     button.title=my.messages.optionsForThisTable;
     var grid=this;
     var menuOptions=[];
-    grid.def.fields.forEach(function(gridField){
-        if(grid.view.hiddenColumns.indexOf(gridField.name)==-1){
-            grid.view.showedColmns.push(gridField.name);
-        }
-    })
     menuOptions.push({img:my.path.img+'refresh.png', value:true, label:my.messages.refresh, doneFun:function(){
         return grid.refresh();
     }});
@@ -684,18 +689,27 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
         return Promise.resolve(true);
     }});
     menuOptions.push({img:my.path.img+'show-hide-columns.png', value:true, label: my.messages.hideOrShow, doneFun:function(){
-        return dialogPromise(function(dialogWindow, closeWindow){
+        dialogPromise(function(dialogWindow, closeWindow){
             var button=html.button({class:'hide-or-show'},'ok').create();
-            var createSelectElement=function createSelectElement(columns,hideOrShowId){
-                var selectElement=html.select({id:hideOrShowId,class:'hide-or-menu',multiple:true},
+            var createSelectElement=function createSelectElement(columns,hideOrShowId,disabledItems){
+                var selectElement=html.select(
+                    {id:hideOrShowId, class:'hide-or-menu', multiple:true, size:Math.max(Math.min(grid.def.fields.lenght,10),4)},
                     columns.map(function(column){
-                        return html.option({value: column},column)
+                        return html.option({value: column, disabled:disabledItems.indexOf(column)!==-1},column)
                     })
                 ).create()
                 return selectElement;
             };
-            var selectColumnsToHideElement=createSelectElement(grid.view.showedColmns,'hide-columns');
-            var selectColumnsToShowElement=createSelectElement(grid.view.hiddenColumns,'show-columns');
+            var selectColumnsToHideElement=createSelectElement(
+                grid.def.fields.map(function(def){return def.name;}),
+                'hide-columns',
+                grid.view.hiddenColumns
+            );
+            var selectColumnsToShowElement=createSelectElement(
+                grid.view.hiddenColumns,
+                'show-columns',
+                []
+            );
             var hideOrShowTable=html.table({class:"show-or-hide"},[
                 html.tr([
                     html.td({class:'show-or-hide-title'},my.messages.exhibitedColumns),
@@ -713,17 +727,23 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                 html.tr([html.td({colspan:3},[button])])
             ]);
             dialogWindow.appendChild(hideOrShowTable.create());
-            var changeOption=function changeOption(toHideElement,toShowElement){
-                Array.prototype.forEach.call(toHideElement.selectedOptions, function(option, i) {
-                    toHideElement.removeChild(option);
-                    toShowElement.appendChild(option)
-                });
-            }
             selectColumnsToHideElement.addEventListener('change',function(){
-                changeOption(selectColumnsToHideElement,selectColumnsToShowElement);
+                Array.prototype.forEach.call(selectColumnsToHideElement.selectedOptions, function(option) {
+                    option.disabled=true;
+                    selectColumnsToShowElement.add(html.option({value:option.value}, option.value).create());
+                    grid.view.hiddenColumns.push(option.value);
+                });
+                hideColumnsViaCss(grid.def.name, grid.view.hiddenColumns);
             });
             selectColumnsToShowElement.addEventListener('change',function(){
-                changeOption(selectColumnsToShowElement,selectColumnsToHideElement)
+                var listOptionsToShow=Array.prototype.slice.call(selectColumnsToShowElement.selectedOptions); 
+                listOptionsToShow.forEach(function(option) {
+                    grid.view.hiddenColumns.splice(grid.view.hiddenColumns.indexOf(option.value),1);
+                    selectColumnsToShowElement.removeChild(option);
+                    var elementToEnable=selectColumnsToHideElement.querySelector("[value="+option.value+"]");
+                    elementToEnable.disabled=false;
+                });
+                hideColumnsViaCss(grid.def.name, grid.view.hiddenColumns);
             });
             var showAndHide=function showAndHide(selectColumnElement,showOrHide){
                 Array.prototype.forEach.call(selectColumnElement.children,function(child){
@@ -732,18 +752,14 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                         grid.view.hiddenColumns.push(child.value);
                     }else{
                         showColmn(child.value);
-                        grid.view.showedColmns.push(child.value);
                     }
                 })
             };
             button.addEventListener('click',function(){
-                grid.view.hiddenColumns=[];
-                grid.view.showedColmns=[];
-                showAndHide(selectColumnsToHideElement,'show');
-                showAndHide(selectColumnsToShowElement,'hide');	
                 closeWindow();
             })
         })
+        return true;
     }});
     if(grid.def.allow.export){
         menuOptions.push({img:my.path.img+'export.png', value:true, label:my.messages.export, doneFun:function(){
@@ -912,6 +928,8 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
 myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     var grid = this;
     var my = grid.my;
+    grid.view.hiddenColumns=grid.view.hiddenColumns||grid.def.hiddenColumns||[];
+    hideColumnsViaCss(grid.def.name, grid.view.hiddenColumns);
     var buttonInsert;
     var buttonCreateFilter;
     var buttonDestroyFilter;
