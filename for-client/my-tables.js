@@ -158,6 +158,7 @@ myOwn.comparatorWidth = 16;
 myOwn.comparator={
     '=':function(valueToCheck,condition){return valueToCheck == condition;},
     '~':function(valueToCheck,condition){return condition==null || RegExp(escapeRegExp(condition.toString()),'i').test(valueToCheck);},
+    '/~':function(valueToCheck,condition){return condition==null || !RegExp(escapeRegExp(condition.toString()),'i').test(valueToCheck);},
     '/R/i':function(valueToCheck,condition){return condition==null || RegExp(condition,'i').test(valueToCheck);},
     '\u2205':function(valueToCheck,condition){return valueToCheck == null;},//\u2205 = conjunto vacío
     '>':function(valueToCheck,condition){return (valueToCheck>condition); },
@@ -168,6 +169,7 @@ myOwn.comparator={
     'traductor':{
         '=':'igual',
         '~':'parecido',
+        '/~':'not-like',
         '/R/i':'expresion-regular',
         '\u2205':'vacio',
         '>':'mayor',
@@ -448,7 +450,7 @@ myOwn.DataColumnGrid.prototype.thFilter = function thFilter(depot, iColumn){
         depot.row[fieldDef.name]=this.getTypedValue();
     });
     TypedControls.adaptElement(elementFilter,fieldDef);
-    var attr={"class":"autoFilter"};
+    var attr={class:"autoFilter", "my-colname":fieldDef.name};
     if(grid.connector.fixedField[fieldDef.name]){
         attr["inherited-pk-column"]="yes";
     }
@@ -459,6 +461,7 @@ myOwn.DataColumnGrid.prototype.thFilter = function thFilter(depot, iColumn){
         miniMenuPromise([
             {value:'=',     img:my.path.img+'igual.png'},
             {value:'~',     img:my.path.img+'parecido.png'},
+            {value:'/~',    img:my.path.img+'not-like.png'},
             {value:'\u2205',img:my.path.img+'vacio.png'},
             {value:'>',     img:my.path.img+'mayor.png'},
             {value:'>=',    img:my.path.img+'mayor-igual.png'},
