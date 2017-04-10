@@ -61,7 +61,7 @@ myOwn.autoSetup = function autoSetup(){
             action:'client-setup',
             method:'get',
             encoding:'JSON',
-            parameters:[],
+            parameters:[]
         }).then(function(setup){
             my.config = setup;
             my.config.procedures.forEach(function(procedureDef){
