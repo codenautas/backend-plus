@@ -104,30 +104,11 @@ myOwn.es=changing(myOwn.es, {
     zoom: "zoom",
 });
 
-function hideColumn(columnName){
-    var id='bp-hidden-columns';
-    var autoStyle = document.getElementById(id);
-    if(!autoStyle){
-        autoStyle = document.createElement('style');
-        autoStyle.type = 'text/css';
-        autoStyle.innerHTML = '.cssClass { color: #F00; }';
-        autoStyle.id=id;
-        document.getElementsByTagName('head')[0].appendChild(autoStyle);
-    }
-    var lines = autoStyle.innerHTML.split('\n');
-    var selector = "[my-colname="+columnName+"]";
-    var newLines = lines.filter(function(line){ return line.substr(0,selector.length) !== selector; });
-    newLines.push(selector+' { display:none }');
-    // newLines.push(selector+' { background-color: #FEA }');
-    autoStyle.innerHTML = newLines.join('\n');
-}
-
 function hideColumnsViaCss(gridName, columnNameList){
     var id='bp-hidden-columns-'+gridName;
     var autoStyle = document.getElementById(id);
     if(!autoStyle){
         var autoStyle=document.createElement('style');
-        // document.body.appendChild(autoStyle);
         autoStyle.type = 'text/css';
         autoStyle.id=id;
         document.getElementsByTagName('head')[0].appendChild(autoStyle);
@@ -135,17 +116,6 @@ function hideColumnsViaCss(gridName, columnNameList){
     autoStyle.innerHTML = columnNameList.map(function(columnName){
         return "[my-table='"+gridName+"'] [my-colname='"+columnName+"'] {display:none}";
     }).join('\n');
-}
-
-function showColmn(columnName){
-	var id='bp-hidden-columns';
-	var autoStyle = document.getElementById(id);
-	if(autoStyle){
-		var lines = autoStyle.innerHTML.split('\n');
-		var selector = "[my-colname="+columnName+"]";
-		var newLines=lines.filter(function(line){return line !=="[my-colname="+columnName+"]"+' { display:none }'})
-		autoStyle.innerHTML = newLines.join('\n');
-	}
 }
 
 var escapeRegExp = bestGlobals.escapeRegExp;
@@ -158,7 +128,7 @@ myOwn.comparatorWidth = 16;
 myOwn.comparator={
     '=':function(valueToCheck,condition){return valueToCheck == condition;},
     '~':function(valueToCheck,condition){return condition==null || RegExp(escapeRegExp(condition.toString()),'i').test(valueToCheck);},
-    '/~':function(valueToCheck,condition){return condition==null || !RegExp(escapeRegExp(condition.toString()),'i').test(valueToCheck);},
+    '!~':function(valueToCheck,condition){return condition==null || !RegExp(escapeRegExp(condition.toString()),'i').test(valueToCheck);},
     '/R/i':function(valueToCheck,condition){return condition==null || RegExp(condition,'i').test(valueToCheck);},
     '\u2205':function(valueToCheck,condition){return valueToCheck == null;},//\u2205 = conjunto vacío
     '>':function(valueToCheck,condition){return (valueToCheck>condition); },
@@ -169,7 +139,7 @@ myOwn.comparator={
     'traductor':{
         '=':'igual',
         '~':'parecido',
-        '/~':'not-like',
+        '!~':'not-like',
         '/R/i':'expresion-regular',
         '\u2205':'vacio',
         '>':'mayor',
@@ -440,16 +410,19 @@ myOwn.DataColumnGrid.prototype.thFilter = function thFilter(depot, iColumn){
     var grid = this.grid;
     var fieldDef = this.fieldDef;
     var fieldName=fieldDef.name;
-    depot.rowSymbols[fieldDef.name]='~';
-    var filterImage=my.path.img+my.comparator.traductor['~']+'.png';
+    depot.rowSymbols[fieldDef.name]=depot.rowSymbols[fieldDef.name]||'~';
+    var filterImage=my.path.img+my.comparator.traductor[depot.rowSymbols[fieldDef.name]]+'.png';
     var imgFilter=html.img({src:filterImage}); 
     var symbolFilter=html.button({"class":'table-button', tabindex:-1},imgFilter).create();
     var elementFilter=html.span({"class":"filter-span", "typed-controls-direct-input":true}).create();
     depot.rowControls[fieldName]=elementFilter;
+    TypedControls.adaptElement(elementFilter,fieldDef);
+    if(fieldName in depot.row){
+        elementFilter.setTypedValue(depot.row[fieldName]);
+    }
     elementFilter.addEventListener('update',function(){
         depot.row[fieldDef.name]=this.getTypedValue();
     });
-    TypedControls.adaptElement(elementFilter,fieldDef);
     var attr={class:"autoFilter", "my-colname":fieldDef.name};
     if(grid.connector.fixedField[fieldDef.name]){
         attr["inherited-pk-column"]="yes";
@@ -461,7 +434,7 @@ myOwn.DataColumnGrid.prototype.thFilter = function thFilter(depot, iColumn){
         miniMenuPromise([
             {value:'=',     img:my.path.img+'igual.png'},
             {value:'~',     img:my.path.img+'parecido.png'},
-            {value:'/~',    img:my.path.img+'not-like.png'},
+            {value:'!~',    img:my.path.img+'not-like.png'},
             {value:'\u2205',img:my.path.img+'vacio.png'},
             {value:'>',     img:my.path.img+'mayor.png'},
             {value:'>=',    img:my.path.img+'mayor-igual.png'},
@@ -1284,13 +1257,17 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             isFilterPending:false,
             tr: tr
         };
+        grid.def.filterColumns.forEach(function(filterColumn){
+            depot.row[filterColumn.column]=filterColumn.value;
+            depot.rowSymbols[filterColumn.column]=filterColumn.operator;
+        });
         var tr=html.tr({'class':'filter-line'}, grid.columns.map(function(column, iColumn){
             return column.thFilter(depot, iColumn);
         })).create();
         grid.hasFilterRow=tr;
         grid.dom.table.setAttribute('has-filter',1);
         grid.dom.table.tHead.appendChild(tr);
-        return true;
+        return depot;
     };
     grid.displayBody=function displayBody(){
         var grid = this;
@@ -1366,6 +1343,10 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         grid.displayRows(0, linesToDisplay);
     };
     grid.displayBody();
+    if(grid.def.filterColumns.length){
+        grid.view.filter=grid.createRowFilter(0);
+        grid.displayBody();
+    }
 };
 
 myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot){

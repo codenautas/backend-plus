@@ -58,6 +58,7 @@ describe("table-def-adapt", function(){
                 "title": "id"
               }
             ],
+            "filterColumns": [],
             "foreignKeys":[],
             "layout":{
                 "vertical": false
