@@ -56,4 +56,4 @@ window.addEventListener('load', function(){
 });
 
 my.messages.showImage='show image';
-my.messages.es.showImage='mostrar imagen';
+// my.messages.es.showImage='mostrar imagen';

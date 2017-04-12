@@ -11,34 +11,7 @@ html(lang="en")
     link(rel="shortcut icon"   , href=skinUrl+"img/ptable.png", type:"image/png")
     link(rel="apple-touch-icon", href=skinUrl+"img/ptable.png")
   body
-    div#main_layout
-      div#barra_superior
-        img#main-logo(src=skinUrl+"img/ptable.png")
-        span tables
-        button#tables(id-table="ptable" ) ptable
-        button#tables(id-table="pgroups") pgroups
-        button#tables(id-table="isotopes") isotopes
-        button#tables(id-table="element_images") images
-        button#tables(id-table="bigint") No en base 1
-        button#tables(id-table="bigint") No en base dos
-        button#tables(id-table="bigint") No en base 4
-        button#tables(id-table="bigint") No en base ej 
-        button#tables(id-table="bigint") No en base 5
-        button#tables(id-table="bigint") No en base seis
-        button#tables(id-table="bigint") No en base Otra
-        button#tables(id-table="bigint") No en base nueva
-        button#tables(id-table="bigint") No en base No
-        button#tables(id-table="bigint") No en base Sí
-        button#tables(id-table="bigint") No en base probar
-        button#tables(id-table="bigint") No en base test
-        button#tables(id-table="bigint") No en base pruena
-        button#tables(id-table="bigint") No en base 
-        button#tables(id-table="bigint") No en base La
-        button#tables(id-table="bigint") No en base Tabla
-        button#tables(id-table="bigint") No en base Que no
-        button#tables(id-table="bigint") No en base Está
-      div#table_layout
-    pre#status
+    div#main-layout
     each script in modules.scripts
       script(src=script.src)
     if(lang=='es')

@@ -35,6 +35,22 @@ class AppExample extends backendPlus.AppBackend{
             );
         });
     }
+    getMenu(context){
+        return {menu:[
+            {name:'tablas', menuType:'menu', menuContent:[
+                {name:'ptable', label:'periodic table', menuType:'table'},
+                {name:'pgroup', label:'groups of elements', menuType:'table'},
+                {name:'isotopes', label:'groups of elements', menuType:'table'},
+            ]},
+            {name:'images', menuType:'table'},
+            {name:'test', menuType:'menu', menuContent:[
+                {name:'bigint', menuType:'table'},
+            ]},
+            {name:'config', menuType:'menu', menuContent:[
+                {name:'users', menuType:'table'},
+            ]},
+        ]}
+    }
 }
 
 new AppExample().start();

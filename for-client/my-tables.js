@@ -534,6 +534,7 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
     if(depot.row[fieldDef.name]!=null){
         td.setTypedValue(depot.row[fieldDef.name]);
     }
+    
     if(!fieldDef.clientSide){
         td.addEventListener('update',function(){
             var value = this.getTypedValue();
@@ -1200,7 +1201,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         tr.addEventListener('focusout', function(event){
             if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
                 depot.connector.deleteEnter(depot).then(function(result){
-                    console.log(result);
+                    console.log("result",result);
                 });
                 if(Object.keys(depot.rowPendingForUpdate).length){
                     saveRow(depot);
@@ -1210,7 +1211,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         tr.addEventListener('focusin',function(event){
             if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
                 return depot.connector.enterRecord(depot).then(function(result){
-                    console.log(result);
+                    console.log("result",result);
                 });
             }
         });
