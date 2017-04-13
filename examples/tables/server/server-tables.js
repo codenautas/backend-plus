@@ -39,10 +39,10 @@ class AppExample extends backendPlus.AppBackend{
         return {menu:[
             {name:'tablas', menuType:'menu', menuContent:[
                 {name:'ptable', label:'periodic table', menuType:'table'},
-                {name:'pgroup', label:'groups of elements', menuType:'table'},
+                {name:'pgroups', label:'groups of elements', menuType:'table'},
                 {name:'isotopes', label:'groups of elements', menuType:'table'},
             ]},
-            {name:'images', menuType:'table'},
+            {name:'images', menuType:'table', table:'element_images'},
             {name:'test', menuType:'menu', menuContent:[
                 {name:'bigint', menuType:'table'},
             ]},

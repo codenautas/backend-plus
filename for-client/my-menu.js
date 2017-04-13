@@ -60,7 +60,7 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
                 next = function(layout, menu, addrParams, parents){
                     setTimeout(function(){
                         var layout = document.getElementById('main_layout');
-                        my.tableGrid(menuItem.name,layout);
+                        my.tableGrid(menuItem.table||menuItem.name,layout);
                     },10);
                 }
             }

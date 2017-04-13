@@ -39,7 +39,7 @@ module.exports = function(context){
                 select * from ptable p,
                   lateral (select array_agg(mass_number::text order by "order") as isotopes from isotopes i where i.atomic_number = p.atomic_number) i,
                   lateral (select count(url)::integer as cant_images from element_images e where e.atomic_number = p.atomic_number) e
-            ) x`
+            )`
         }
     });
 }
