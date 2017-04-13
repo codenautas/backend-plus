@@ -39,5 +39,6 @@ client-setup:
   skin: confort-bis
   formTitle: example-tables
   menu: true
+  title: periodic table
 logo: 
   path: client/img
