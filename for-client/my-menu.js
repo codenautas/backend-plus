@@ -1,5 +1,18 @@
 "use strict";
 
+myOwn.displayProcessScreen = function(addrParams){
+    var procDef=my.config.procedures.find(function(proc){
+        return proc.action == addrParams.p;
+    });
+    main_layout.appendChild(html.table({class:"table-param-screen"},procDef.parameters.map(function(parameterDef){
+        var control = html.td().create();
+        control.style.minWidth='200px';
+        control.style.backgroundColor='white';
+        TypedControls.adaptElement(control,{typeName:'text'});
+        return html.tr([html.td(parameterDef.label||parameterDef.name), control]);
+    })).create());
+}
+
 myOwn.showPage = function showPage(pageDef){
     var parts=location.search.split('&');
     var addrParams={}
@@ -19,6 +32,10 @@ myOwn.showPage = function showPage(pageDef){
         addrParams.i=[];
     }
     my.displayMainMenu(addrParams);
+    switch(addrParams.w){
+        case 'p': my.displayProcessScreen(addrParams);
+        break;
+    }
 };
 
 myOwn.createForkeableButton = function createForkeableButton(menu){

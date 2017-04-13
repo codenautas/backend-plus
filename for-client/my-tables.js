@@ -1198,23 +1198,25 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 tr = tr.nextSibling;
             }
         });
-        tr.addEventListener('focusout', function(event){
-            if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
-                depot.connector.deleteEnter(depot).then(function(result){
-                    console.log("result",result);
-                });
-                if(Object.keys(depot.rowPendingForUpdate).length){
-                    saveRow(depot);
+        if(!grid.vertical){ 
+            tr.addEventListener('focusout', function(event){
+                if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
+                    depot.connector.deleteEnter(depot).then(function(result){
+                        console.log("result",result);
+                    });
+                    if(Object.keys(depot.rowPendingForUpdate).length){
+                        saveRow(depot);
+                    }
                 }
-            }
-        });
-        tr.addEventListener('focusin',function(event){
-            if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
-                return depot.connector.enterRecord(depot).then(function(result){
-                    console.log("result",result);
-                });
-            }
-        });
+            });
+            tr.addEventListener('focusin',function(event){
+                if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
+                    return depot.connector.enterRecord(depot).then(function(result){
+                        console.log("result",result);
+                    });
+                }
+            });
+        }
         if(iRow===-1){
             depot.detailRows.forEach(function(detailTr){
                 var detailControl = depot.detailControls[detailTr.detailTableName];
