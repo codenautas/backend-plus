@@ -1,6 +1,8 @@
 "use strict";
 
-myOwn.displayProcessScreen = function(addrParams){
+myOwn.wScreens={}
+
+myOwn.wScreens.proc = function(addrParams){
     var procDef=my.config.procedures.find(function(proc){
         return proc.action == addrParams.p;
     });
@@ -32,9 +34,8 @@ myOwn.showPage = function showPage(pageDef){
         addrParams.i=[];
     }
     my.displayMainMenu(addrParams);
-    switch(addrParams.w){
-        case 'p': my.displayProcessScreen(addrParams);
-        break;
+    if(typeof my.wScreens[addrParams.w] === 'function'){
+        my.wScreens[addrParams.w].call(my, addrParams);
     }
 };
 
@@ -113,11 +114,6 @@ myOwn.displayMainMenu = function(addrParams){
 
 window.addEventListener('load', function(){
     window.my = myOwn;
-    document.body.style.backgroundColor='rgb('+[
-        Math.ceil(Math.random()*64+196),
-        Math.ceil(Math.random()*64+196),
-        Math.ceil(Math.random()*64+196),
-    ].join(',')+')';
     my.autoSetup().then(function(){
         my.showPage();
     });
