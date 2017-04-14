@@ -16,6 +16,7 @@ describe("table-def-adapt", function(){
         var expected = {
             "action": "all/defaults",
             "actionNamesList": [],
+            "alias": "the-table-name",
             "allow": {
               "delete": false,
               "export": true ,
