@@ -34,8 +34,9 @@ myOwn.showPage = function showPage(pageDef){
         addrParams.i=[];
     }
     my.displayMainMenu(addrParams);
-    if(typeof my.wScreens[addrParams.w] === 'function'){
-        my.wScreens[addrParams.w].call(my, addrParams);
+    var w=addrParams.w;
+    if(typeof my.wScreens[w] === 'function'){
+        my.wScreens[w].call(my, addrParams);
     }
 };
 
