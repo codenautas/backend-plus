@@ -2,9 +2,16 @@
 
 myOwn.wScreens={}
 
+myOwn.wScreens.table = function(addrParams){
+    setTimeout(function(){
+        var layout = document.getElementById('main_layout');
+        my.tableGrid(addrParams.table||addrParams.name,layout);
+    },10);
+}
+
 myOwn.wScreens.proc = function(addrParams){
     var procDef=my.config.procedures.find(function(proc){
-        return proc.action == addrParams.p;
+        return proc.action == addrParams.proc||addrParams.name;
     });
     main_layout.appendChild(html.table({class:"table-param-screen"},procDef.parameters.map(function(parameterDef){
         var control = html.td().create();
@@ -25,7 +32,7 @@ myOwn.showPage = function showPage(pageDef){
         var eq = pair.indexOf('=');
         if(eq !== -1){
             var varName=pair.substr(0, eq);
-            addrParams[varName] = pair.substr(eq+1);
+            addrParams[varName] = decodeURIComponent(pair.substr(eq+1));
         }
     });
     if(addrParams.i){
@@ -33,8 +40,12 @@ myOwn.showPage = function showPage(pageDef){
     }else{
         addrParams.i=[];
     }
-    my.displayMainMenu(addrParams);
+    var menu = my.displayMainMenu(addrParams);
     var w=addrParams.w;
+    if(!w && menu && menu.selectedItem){
+        addrParams = changing({name: menu.selectedItem.name}, addrParams);
+        w=menu.selectedItem.menuType;
+    }
     if(typeof my.wScreens[w] === 'function'){
         my.wScreens[w].call(my, addrParams);
     }
@@ -71,18 +82,6 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
         if(menuItem.name == addrParams.i[depth]){
             button.setAttribute('menu-selected', 'yes');
             selectedItem = menuItem;
-            if(menuItem.menuType==='menu'){
-                next = displayMenu; 
-                menu = menuItem.menuContent;
-            }
-            if(menuItem.menuType==='table'){
-                next = function(layout, menu, addrParams, parents){
-                    setTimeout(function(){
-                        var layout = document.getElementById('main_layout');
-                        my.tableGrid(menuItem.table||menuItem.name,layout);
-                    },10);
-                }
-            }
         }
         return button;
     }))
@@ -92,25 +91,29 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
             html.img({class: "right-menu", src: "img/three-dot-menu.png"}),
         ]));
     }
-    var menuLine=html.div({id: "main-top-bar"+(depth||'')}, elements).create();
+    var menuLine=html.div({id: "main-top-bar"+(depth||''), class: depth?"sub-menu-bar":"top-menu-bar"}, elements).create();
     layout.appendChild(menuLine);
-    if(next){
-        newMenuLine = next(layout, menu, addrParams, parents.concat(selectedItem.name));
+    var innerSelectedItem = selectedItem;
+    if(selectedItem && selectedItem.menuType === 'menu'){
+        var subMenu = my.displayMenu(layout, selectedItem.menuContent, addrParams, parents.concat(selectedItem.name));
+        var realign = function(){
+            subMenu.menuLine.style.paddingLeft = selectedItem.button.offsetLeft + 'px';
+        };
+        innerSelectedItem = subMenu.selectedItem;
     }
-    if(selectedItem && newMenuLine){
-        setTimeout(function(){
-            newMenuLine.style.paddingLeft = selectedItem.button.offsetLeft + 'px';
-        },1);
-    }
-    return menuLine;
+    return {menuLine: menuLine, selectedItem: innerSelectedItem, realigns:(subMenu?subMenu.realigns:[]).concat(realign)};
 };
 
 myOwn.displayMainMenu = function(addrParams){
     var be = this;
     var totalLayout=document.getElementById('total-layout');
     totalLayout.innerHTML='';
-    be.displayMenu(totalLayout,my.config.menu,addrParams,[]);
+    var menu = be.displayMenu(totalLayout,my.config.menu,addrParams,[]);
     totalLayout.appendChild(html.div({id:'main_layout'}).create());
+    setTimeout(function(){
+        menu.realigns.reverse().forEach(function(realign){ if(realign){ realign(); }});
+    },10);
+    return menu;
 };
 
 window.addEventListener('load', function(){
