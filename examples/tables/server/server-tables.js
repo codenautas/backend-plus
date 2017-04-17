@@ -28,16 +28,16 @@ class AppExample extends backendPlus.AppBackend{
     }
     getMenu(context){
         return {menu:[
-            {name:'periodic table', menuType:'menu', menuContent:[
-                {name:'ptable', label:'elements', menuType:'table'},
-                {name:'pgroups', label:'groups', menuType:'table'},
-                {name:'isotopes', label:'isotopes', menuType:'table'},
+            {menuType:'menu', name:'periodic table', menuContent:[
+                {menuType:'table', name:'ptable'  , label:'elements'},
+                {menuType:'table', name:'pgroups' , label:'groups'  },
+                {menuType:'table', name:'isotopes', label:'isotopes'},
             ]},
-            {name:'images', menuType:'table', table:'element_images'},
-            {name:'test', menuType:'menu', menuContent:[
-                {name:'bigint', menuType:'table'},
+            {menuType:'table', name:'images', table:'element_images'},
+            {menuType:'menu', name:'test', menuContent:[
+                {menuType:'table', name:'bigint'},
             ]},
-            {name:'config', menuType:'menu', menuContent:[
+            {menuType:'menu', name:'config', menuContent:[
                 {name:'users', menuType:'table'},
             ]},
         ]}
