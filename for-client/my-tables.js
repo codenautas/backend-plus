@@ -1017,6 +1017,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         grid.dom.footInfo[info.name] = html.span(info.value).create();
         grid.dom.footInfo.appendChild(grid.dom.footInfo[info.name]);
     });
+    grid.dom.footInfo.displayTo.textContent = my.messages.loading;
     if(grid.vertical){
         grid.dom.table = html.table({"class":"my-grid", "my-table": grid.def.name},[
             html.caption(grid.def.title),

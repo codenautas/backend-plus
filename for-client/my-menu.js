@@ -2,6 +2,18 @@
 
 myOwn.wScreens={}
 
+myOwn.messages=changing(myOwn.messages, {
+    chpass:'change password',
+    exit:'exit',
+    user:'user',
+});
+
+myOwn.es=changing(myOwn.es, {
+    chpass:'cambiar clave',
+    exit:'salir',
+    user:'usuario',
+});
+
 myOwn.wScreens.table = function(addrParams){
     setTimeout(function(){
         var layout = document.getElementById('main_layout');
@@ -43,11 +55,15 @@ myOwn.showPage = function showPage(pageDef){
     var menu = my.displayMainMenu(addrParams);
     var w=addrParams.w;
     if(!w && menu && menu.selectedItem){
-        addrParams = changing({name: menu.selectedItem.name}, addrParams);
+        addrParams = changing(addrParams, menu.selectedItem);
         w=menu.selectedItem.menuType;
     }
     if(typeof my.wScreens[w] === 'function'){
         my.wScreens[w].call(my, addrParams);
+    }
+    var rightMenu = document.getElementById('right-menu');
+    rightMenu.onclick=function(){
+        my.rightMenu();
     }
 };
 
@@ -87,8 +103,8 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
     }))
     if(depth===0){
         elements.push(html.span({id: "right-menu"}, [
-            html.span({id: "active-user"}, "user"),
-            html.img({class: "right-menu", src: "img/three-dot-menu.png"}),
+            html.span({id: "active-user"}, my.config.username||"user"),
+            html.img({class: "right-menu", src: "img/three-dot-menu.png",id: "right-menu-icon"}),
         ]));
     }
     var menuLine=html.div({id: "main-top-bar"+(depth||''), class: depth?"sub-menu-bar":"top-menu-bar"}, elements).create();
@@ -115,6 +131,21 @@ myOwn.displayMainMenu = function(addrParams){
     },10);
     return menu;
 };
+
+myOwn.rightMenu = function rightMenu(){
+    miniMenuPromise([
+        {label:my.messages.user, startGroud:'true'},
+        {img:my.path.img+'chpass.png', label:my.messages.chpass, value:{que:'href', valor:'chpass'}},
+        {img:my.path.img+'exit.png'  , label:my.messages.exit  , value:{que:'href', valor:'logout'}}
+    ],{
+        underElement:document.getElementById('right-menu-icon'),
+        withCloseButton:false,
+    }).then(function(rta){
+        if(rta.que==='href'){
+            window.location.href = rta.valor;
+        }
+    });
+}
 
 window.addEventListener('load', function(){
     window.my = myOwn;

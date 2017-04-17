@@ -65,6 +65,7 @@ describe("table-def-adapt", function(){
                 "vertical": false
             },
             "name": "the-table-name",
+            "nameFields": [],
             "sql": {
               "fields": {},
               "from": '"the-table-name"',

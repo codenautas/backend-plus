@@ -18,6 +18,9 @@ module.exports = function(context){
         primaryKey:['atomic_number','mass_number'],
         constraints:[
             {constraintType:'unique', fields:['atomic_number','order']}
+        ],
+        foreignKeys:[
+            {references:'ptable', fields:['atomic_number']}
         ]
-    });
+    },context);
 }

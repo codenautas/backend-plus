@@ -9,17 +9,8 @@ var changing = require('best-globals').changing;
 class AppExample extends backendPlus.AppBackend{
     constructor(){
         super();
-        this.rootPath=Path.resolve(__dirname,'..');
-        console.log('rootPath',this.rootPath);
-        this.tableStructures = {};
-        this.tableStructures.ptable = require('./table-ptable.js');
-        this.tableStructures.pgroups = require('./table-groups.js');
-        this.tableStructures.isotopes = require('./table-isotopes.js');
-        this.tableStructures.element_images = require('./table-element_images.js');
-        this.tableStructures.cursors = require('./table-cursors.js');
-        this.tableStructures.bigint = require('./table-bigint.js');
-        this.tableStructures.users = require('./table-users.js');
     }
+    get rootPath(){ return Path.resolve(__dirname,'..'); }
     addLoggedServices(){
         var be = this;
         super.addLoggedServices();
@@ -37,10 +28,10 @@ class AppExample extends backendPlus.AppBackend{
     }
     getMenu(context){
         return {menu:[
-            {name:'tablas', menuType:'menu', menuContent:[
-                {name:'ptable', label:'periodic table', menuType:'table'},
-                {name:'pgroups', label:'groups of elements', menuType:'table'},
-                {name:'isotopes', label:'groups of elements', menuType:'table'},
+            {name:'periodic table', menuType:'menu', menuContent:[
+                {name:'ptable', label:'elements', menuType:'table'},
+                {name:'pgroups', label:'groups', menuType:'table'},
+                {name:'isotopes', label:'isotopes', menuType:'table'},
             ]},
             {name:'images', menuType:'table', table:'element_images'},
             {name:'test', menuType:'menu', menuContent:[
@@ -50,6 +41,17 @@ class AppExample extends backendPlus.AppBackend{
                 {name:'users', menuType:'table'},
             ]},
         ]}
+    }
+    getTables(){
+        return super.getTables().concat([
+            'users',
+            'ptable',
+            {name:'pgroups', fileName:'groups'},
+            'isotopes',
+            'element_images',
+            'cursors',
+            'bigint',
+        ]);
     }
 }
 
