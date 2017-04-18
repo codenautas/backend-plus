@@ -8,6 +8,7 @@ var bestGlobals = require('best-globals');
 var html = require('js-to-html').html;
 var JSON4all = require('json4all');
 var TypedControls = require('typed-controls');
+var typeStore=require('type-store');
 
 var changing = bestGlobals.changing;
 
@@ -810,8 +811,14 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     grid.depotsToDisplay.forEach(function(depot, iFila){
                         depot.def.fields.forEach(function(fieldDef, iColumn){
                             var value=depot.row[fieldDef.name];
+                            var valueType='s';
+                            var type=fieldDef.typeName;
                             if(value!=null){
-                                var cell={t:'s',v:value};
+                                if(typeStore.type[type] && typeStore.type[type].toExcelValue){
+                                    value=typeStore.type[type].toExcelValue(value)
+                                    valueType =typeStore.type[type].toExcelType(value)
+                                }
+                                var cell={t:valueType,v:value};
                                 if(fieldDef.isPk){
                                     cell.s={font:{bold:true}};
                                 }else if(!fieldDef.allow.update){
