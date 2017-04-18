@@ -184,9 +184,15 @@ myOwn.TableConnector.prototype.getData = function getData(){
         fixedFields:connector.fixedFields
     }).then(function(rows){
         return connector.whenStructureReady.then(function(){
+            connector.getElementToDisplayCount().textContent=rows.length+' '+my.messages.displaying+'...';
+            return bestGlobals.sleep(10);
+        }).then(function(){
             connector.my.adaptData(connector.def, rows);
             return rows;
         });
+    }).catch(function(err){
+        connector.getElementToDisplayCount().appendChild(html.span({style:'color:red', title: err.message},' error').create());
+        throw err;
     });
 };
 
@@ -256,7 +262,11 @@ myOwn.TableGrid = function(context, mainElement){
 myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
     var grid = new my.TableGrid({my: this}, mainElement);
     opts = opts || {};
-    grid.connector = new my.TableConnector({my:this, tableName: tableName});
+    grid.connector = new my.TableConnector({
+        my:this, 
+        tableName: tableName, 
+        getElementToDisplayCount:function(){ return grid.dom.footInfo.displayTo; }
+    });
     grid.connector.fixedFields = opts.fixedFields || [];
     grid.connector.fixedField = {};
     grid.connector.fixedFields.forEach(function(pair){
@@ -390,14 +400,23 @@ myOwn.DataColumnGrid = function DataColumnGrid(opts){
 
 myOwn.DataColumnGrid.prototype = Object.create(myOwn.ColumnGrid.prototype);
 
-myOwn.DataColumnGrid.prototype.th = function th(){
+myOwn.DataColumnGrid.prototype.cellAttributes = function cellAttributes(specificAttributes){
     var fieldDef = this.fieldDef;
-    var grid = this.grid;
-    var attr={class: "th-name", "my-colname":fieldDef.name};
+    var grid=this.grid;
+    var attr=changing({"my-colname":fieldDef.name},specificAttributes);
     if(grid.connector.fixedField[fieldDef.name]){
         attr["inherited-pk-column"]="yes";
     }
-    var th=html.th(attr,fieldDef.title).create();
+    if(fieldDef.referencesField && grid.connector.fixedField[fieldDef.referencesField]){
+        attr["inherited-pk-column"]="yes";
+    }
+    return attr;
+}
+    
+myOwn.DataColumnGrid.prototype.th = function th(){
+    var fieldDef = this.fieldDef;
+    var grid = this.grid;
+    var th=html.th(this.cellAttributes({class: "th-name"}),fieldDef.title).create();
     if(fieldDef.width){
         th.style.width=fieldDef.width+'px';
     }
@@ -434,11 +453,7 @@ myOwn.DataColumnGrid.prototype.thFilter = function thFilter(depot, iColumn){
     elementFilter.addEventListener('update',function(){
         depot.row[fieldDef.name]=this.getTypedValue();
     });
-    var attr={class:"autoFilter", "my-colname":fieldDef.name};
-    if(grid.connector.fixedField[fieldDef.name]){
-        attr["inherited-pk-column"]="yes";
-    }
-    var th=html.td(attr,[symbolFilter,elementFilter]).create();
+    var th=html.td(this.cellAttributes({class:"autoFilter"}),[symbolFilter,elementFilter]).create();
     elementFilter.width=grid.sizesForFilters[iColumn]-myOwn.comparatorWidth-5;
     elementFilter.style.width=elementFilter.width.toString()+'px';
     symbolFilter.addEventListener('click',function(){
@@ -463,11 +478,7 @@ myOwn.DataColumnGrid.prototype.thFilter = function thFilter(depot, iColumn){
 
 myOwn.DataColumnGrid.prototype.thDetail = function thLabel(){
     var grid=this.grid;
-    var attr={class:'th-detail', 'my-colname':this.fieldDef.name};
-    if(grid.connector.fixedField[this.fieldDef.name]){
-        attr["inherited-pk-column"]="yes";
-    }
-    return html.th(attr, (this.fieldDef||{}).label);
+    return html.th(this.cellAttributes({class:"th-detail"}), (this.fieldDef||{}).label);
 };
 
 myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
@@ -475,11 +486,7 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
     var fieldDef = this.fieldDef;
     var forInsert = false; // TODO: Verificar que esto está en desuso
     var directInput=grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
-    var attr={"my-colname":fieldDef.name, "typed-controls-direct-input":directInput};
-    if(grid.connector.fixedField[fieldDef.name]){
-        attr["inherited-pk-column"]="yes";
-    }
-    var td = html.td(attr).create();
+    var td = html.td(this.cellAttributes({"typed-controls-direct-input":directInput})).create();
     TypedControls.adaptElement(td, fieldDef);
     if(fieldDef.allow.update){
         td.addEventListener('click', function(){
@@ -545,7 +552,6 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
     if(depot.row[fieldDef.name]!=null){
         td.setTypedValue(depot.row[fieldDef.name]);
     }
-    
     if(!fieldDef.clientSide){
         td.addEventListener('update',function(){
             var value = this.getTypedValue();
