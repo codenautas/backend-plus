@@ -35,6 +35,8 @@ myOwn.wScreens.proc = function(addrParams){
 }
 
 myOwn.showPage = function showPage(pageDef){
+    my.prepareFloating3dots();
+    my.prepareRulerToggle();
     var parts=location.search.split('&');
     var addrParams={}
     parts.forEach(function(pair){

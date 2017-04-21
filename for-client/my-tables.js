@@ -116,20 +116,6 @@ myOwn.es=changing(myOwn.es, {
     zoom: "zoom",
 });
 
-function hideColumnsViaCss(gridName, columnNameList){
-    var id='bp-hidden-columns-'+gridName;
-    var autoStyle = document.getElementById(id);
-    if(!autoStyle){
-        var autoStyle=document.createElement('style');
-        autoStyle.type = 'text/css';
-        autoStyle.id=id;
-        document.getElementsByTagName('head')[0].appendChild(autoStyle);
-    }
-    autoStyle.innerHTML = columnNameList.map(function(columnName){
-        return "[my-table='"+gridName+"'] [my-colname='"+columnName+"'] {display:none}";
-    }).join('\n');
-}
-
 var escapeRegExp = bestGlobals.escapeRegExp;
 
 myOwn.firstDisplayCount = 20;
@@ -282,6 +268,14 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
     return grid;
 };
 
+myOwn.TableGrid.prototype.hideColumnsViaCss = function hideColumnsViaCss(){
+    var grid = this;
+    var autoStyle = my.inlineCss('bp-hidden-columns-'+grid.def.name);
+    autoStyle.innerHTML = grid.view.hiddenColumns.map(function(columnName){
+        return "[my-table='"+grid.def.name+"'] [my-colname='"+columnName+"'] {display:none}";
+    }).join('\n');
+}
+
 myOwn.TableGrid.prototype.displayPreLoadMessage = function displayPreLoadMessage(){
     this.dom.main.textContent = my.messages.loading+'...';
 };
@@ -424,7 +418,7 @@ myOwn.DataColumnGrid.prototype.th = function th(){
     th.addEventListener('click',function(mouseEvent){
         if(mouseEvent.altKey){
             grid.view.hiddenColumns.push(fieldDef.name);
-            hideColumnsViaCss(grid.def.name, grid.view.hiddenColumns);
+            grid.hideColumnsViaCss();
         }else{
             var currentOrder=grid.view.sortColumns.length && grid.view.sortColumns[0].column==fieldDef.name?grid.view.sortColumns[0].order:null;
             grid.view.sortColumns=grid.view.sortColumns.filter(function(sortColumn){
@@ -732,7 +726,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     selectColumnsToShowElement.add(html.option({value:option.value}, option.value).create());
                     grid.view.hiddenColumns.push(option.value);
                 });
-                hideColumnsViaCss(grid.def.name, grid.view.hiddenColumns);
+                grid.hideColumnsViaCss();
             });
             selectColumnsToShowElement.addEventListener('change',function(){
                 var listOptionsToShow=Array.prototype.slice.call(selectColumnsToShowElement.selectedOptions); 
@@ -742,7 +736,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     var elementToEnable=selectColumnsToHideElement.querySelector("[value="+option.value+"]");
                     elementToEnable.disabled=false;
                 });
-                hideColumnsViaCss(grid.def.name, grid.view.hiddenColumns);
+                grid.hideColumnsViaCss();
             });
             var showAndHide=function showAndHide(selectColumnElement,showOrHide){
                 Array.prototype.forEach.call(selectColumnElement.children,function(child){
@@ -934,7 +928,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     var grid = this;
     var my = grid.my;
     grid.view.hiddenColumns=grid.view.hiddenColumns||grid.def.hiddenColumns||[];
-    hideColumnsViaCss(grid.def.name, grid.view.hiddenColumns);
+    grid.hideColumnsViaCss();
     var buttonInsert;
     var buttonCreateFilter;
     var buttonDestroyFilter;

@@ -546,6 +546,78 @@ myOwn.getUniqueDomId = function getUniqueDomId(){
     return 'uniQ$___$id'+myOwn.getUniqueDomId.serial;
 }
 
+myOwn.prepareFloating3dots = function prepareFloating3dots(){
+    if(!my.imgFloating3dots){
+        var img = html.img({src:my.path.img+'floating-3dots.png', class:'floating-img'}).create();
+        my.imgFloating3dots=img;
+        var rePosition = function(){
+            img.style.visibility=document.body.scrollTop || document.body.scrollLeft?'visible':'hidden';
+            img.style.top = window.innerHeight - 40 + 'px';
+            img.style.left = window.innerWidth - 40 + 'px';
+        }
+        img.style.position='fixed';
+        document.body.appendChild(img);
+        setTimeout(rePosition,100);
+        window.addEventListener('scroll', rePosition);
+        window.addEventListener('resize', rePosition);
+    }
+}
+
+myOwn.inlineCss = function inlineCss(id){
+    var autoStyle = document.getElementById(id);
+    if(!autoStyle){
+        var autoStyle=document.createElement('style');
+        autoStyle.type = 'text/css';
+        autoStyle.id=id;
+        document.getElementsByTagName('head')[0].appendChild(autoStyle);
+    }
+    return autoStyle;
+}
+
+myOwn.prepareRulerToggle = function prepareRulerToggle(){
+    if(!my.imgRulerToggle){
+        var img = html.img({src:my.path.img+'floating-ruler-toggle.png', class:'floating-img'}).create();
+        my.imgRulerToggle=img;
+        var rePosition = function(){
+            img.style.visibility=document.body.scrollTop || document.body.scrollLeft?'visible':'hidden';
+            img.style.top = '-10px';
+            img.style.left = '-10px';
+        }
+        img.style.position='fixed';
+        document.body.appendChild(img);
+        setTimeout(rePosition,100);
+        window.addEventListener('scroll', rePosition);
+        window.addEventListener('resize', rePosition);
+        var autoPosition=function(){
+            var tables = document.querySelectorAll(".my-grid");
+            if(tables){
+                Array.prototype.forEach.call(tables,function(table){
+                    var myTableName = table.getAttribute("my-table");
+                    var autoStyle = my.inlineCss("css-my-table-"+myTableName);
+                    var rect = my.getRect(table.tHead.rows[0]);
+                    var cssClausules=[];
+                    if(rect.top<document.body.scrollTop){
+                        cssClausules.push(
+                            "[my-table="+myTableName+"] > thead > tr > th { position:relative; background-color:rgba(255,255,200,0.8); border: 2px solid #997; background-clip: padding-box; "+
+                            " top:"+(document.body.scrollTop-rect.top)+'px; '+
+                            "}"
+                        );
+                    }
+                    autoStyle.innerHTML=cssClausules.join('\n');
+                    
+                });
+            }
+        }
+        img.onclick=function(){
+            setTimeout(function(){
+                autoPosition();
+                window.addEventListener('scroll', autoPosition);
+                window.addEventListener('resize', autoPosition);
+            },100);
+        }
+    }
+}
+
 return myOwn;
 
 });
