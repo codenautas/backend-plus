@@ -69,6 +69,7 @@ describe("table-def-adapt", function(){
             "sql": {
               "fields": {},
               "from": '"the-table-name"',
+              "fromWoAs": '"the-table-name"',
               "isTable": true,
               "postCreateSqls": "",
               "select": [

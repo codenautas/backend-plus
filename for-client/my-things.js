@@ -551,7 +551,7 @@ myOwn.prepareFloating3dots = function prepareFloating3dots(){
         var img = html.img({src:my.path.img+'floating-3dots.png', class:'floating-img'}).create();
         my.imgFloating3dots=img;
         var rePosition = function(){
-            img.style.visibility=document.body.scrollTop || document.body.scrollLeft?'visible':'hidden';
+            img.style.visibility=window.scrollY || window.scrollX?'visible':'hidden';
             img.style.top = window.innerHeight - 40 + 'px';
             img.style.left = window.innerWidth - 40 + 'px';
         }
@@ -579,7 +579,7 @@ myOwn.prepareRulerToggle = function prepareRulerToggle(){
         var img = html.img({src:my.path.img+'floating-ruler-toggle.png', class:'floating-img'}).create();
         my.imgRulerToggle=img;
         var rePosition = function(){
-            img.style.visibility=document.body.scrollTop || document.body.scrollLeft?'visible':'hidden';
+            img.style.visibility=window.scrollY || window.scrollX?'visible':'hidden';
             img.style.top = '-10px';
             img.style.left = '-10px';
         }
@@ -596,7 +596,7 @@ myOwn.prepareRulerToggle = function prepareRulerToggle(){
                     var autoStyleTop = my.inlineCss("css-my-table-"+myTableName+"-top");
                     var rect = my.getRect(table.tHead.rows[0]);
                     var cssClausules=[];
-                    autoStyleTop.actualDif=my.autoRuler && document.body.scrollTop-rect.top;
+                    autoStyleTop.actualDif=my.autoRuler && window.scrollY-rect.top;
                     if(!('previousDif' in autoStyleTop) || autoStyleTop.actualDif!=autoStyleTop.previousDif){
                         if(autoStyleTop.actualDif>0){
                             cssClausules.push(
@@ -617,7 +617,7 @@ myOwn.prepareRulerToggle = function prepareRulerToggle(){
                     if(firstCell){
                         var rect = my.getRect(firstCell);
                         var cssClausules=[];
-                        autoStyleLeft.actualDif=my.autoRuler && document.body.scrollLeft-rect.left;
+                        autoStyleLeft.actualDif=my.autoRuler && window.scrollX-rect.left;
                         if(!('previousDif' in autoStyleLeft) || autoStyleLeft.actualDif!=autoStyleLeft.previousDif){
                             if(autoStyleLeft.actualDif>0){
                                 cssClausules.push(
