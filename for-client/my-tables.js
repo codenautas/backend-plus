@@ -402,8 +402,17 @@ myOwn.DataColumnGrid.prototype.cellAttributes = function cellAttributes(specific
     if(grid.connector.fixedField[fieldDef.name]){
         attr["inherited-pk-column"]="yes";
     }
-    if(fieldDef.referencesField && grid.connector.fixedField[fieldDef.referencesField]){
-        attr["inherited-pk-column"]="yes";
+    if(fieldDef.referencesField){
+        if(grid.connector.fixedField[fieldDef.referencesField]){
+            attr["inherited-pk-column"]="yes";
+        }
+        if(grid.def.field[fieldDef.referencesField].isPk){
+            attr["my-fixed2left-column"]=true;
+        }
+    }
+    if(fieldDef.isPk){
+        attr["my-pk-column"]=fieldDef.isPk;
+        attr["my-fixed2left-column"]=true;
     }
     return attr;
 }

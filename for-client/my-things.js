@@ -600,13 +600,36 @@ myOwn.prepareRulerToggle = function prepareRulerToggle(){
                     if(!('previousDif' in autoStyleTop) || autoStyleTop.actualDif!=autoStyleTop.previousDif){
                         if(autoStyleTop.actualDif>0){
                             cssClausules.push(
-                                "[my-table=\""+myTableName.replace(/"/g,'\\"')+"\"] > thead > tr > th { position:relative; background-color:rgba(255,255,200,0.8); border: 2px solid #997; background-clip: padding-box; "+
+                                "[my-table=\""+myTableName.replace(/"/g,'\\"')+"\"] > thead > tr > th { position:relative; background-color:rgba(155,155,255,0.8); background-clip: padding-box; "+
                                 " top:"+(autoStyleTop.actualDif)+'px; '+
                                 "}"
                             );
                         }
                         autoStyleTop.previousDif = autoStyleTop.actualDif;
                         autoStyleTop.innerHTML=cssClausules.join('\n');
+                    }
+                    var autoStyleLeft = my.inlineCss("css-my-table-"+myTableName+"-left");
+                    var cssSelectorH = "[my-table=\""+myTableName.replace(/"/g,'\\"')+"\"] > thead > tr > [my-fixed2left-column]";
+                    var cssSelectorB = "[my-table=\""+myTableName.replace(/"/g,'\\"')+"\"] > tbody > tr > [my-fixed2left-column]";
+                    var firstCell=Array.prototype.slice.call(table.querySelectorAll(cssSelectorH),0,100).find(function(cell){
+                        return cell.scrollWidth>4;
+                    });
+                    if(firstCell){
+                        var rect = my.getRect(firstCell);
+                        var cssClausules=[];
+                        autoStyleLeft.actualDif=my.autoRuler && document.body.scrollLeft-rect.left;
+                        if(!('previousDif' in autoStyleLeft) || autoStyleLeft.actualDif!=autoStyleLeft.previousDif){
+                            if(autoStyleLeft.actualDif>0){
+                                cssClausules.push(
+                                    cssSelectorB+
+                                    " { position:relative; background-color:rgba(155,155,255,0.8); background-clip: padding-box; "+
+                                    " left:"+(autoStyleLeft.actualDif)+'px; '+
+                                    "}"
+                                );
+                            }
+                            autoStyleLeft.previousDif = autoStyleLeft.actualDif;
+                            autoStyleLeft.innerHTML=cssClausules.join('\n');
+                        }
                     }
                 });
             }
