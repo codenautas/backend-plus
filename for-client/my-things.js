@@ -593,28 +593,33 @@ myOwn.prepareRulerToggle = function prepareRulerToggle(){
             if(tables){
                 Array.prototype.forEach.call(tables,function(table){
                     var myTableName = table.getAttribute("my-table");
-                    var autoStyle = my.inlineCss("css-my-table-"+myTableName);
+                    var autoStyleTop = my.inlineCss("css-my-table-"+myTableName+"-top");
                     var rect = my.getRect(table.tHead.rows[0]);
                     var cssClausules=[];
-                    if(rect.top<document.body.scrollTop){
-                        cssClausules.push(
-                            "[my-table="+myTableName+"] > thead > tr > th { position:relative; background-color:rgba(255,255,200,0.8); border: 2px solid #997; background-clip: padding-box; "+
-                            " top:"+(document.body.scrollTop-rect.top)+'px; '+
-                            "}"
-                        );
+                    autoStyleTop.actualDif=my.autoRuler && document.body.scrollTop-rect.top;
+                    if(!('previousDif' in autoStyleTop) || autoStyleTop.actualDif!=autoStyleTop.previousDif){
+                        if(autoStyleTop.actualDif>0){
+                            cssClausules.push(
+                                "[my-table="+myTableName+"] > thead > tr > th { position:relative; background-color:rgba(255,255,200,0.8); border: 2px solid #997; background-clip: padding-box; "+
+                                " top:"+(autoStyleTop.actualDif)+'px; '+
+                                "}"
+                            );
+                        }
+                        autoStyleTop.previousDif = autoStyleTop.actualDif;
+                        autoStyleTop.innerHTML=cssClausules.join('\n');
                     }
-                    autoStyle.innerHTML=cssClausules.join('\n');
-                    
                 });
             }
         }
         img.onclick=function(){
+            my.autoRuler=!my.autoRuler;
+            my.imgRulerToggle.src=my.path.img+'floating-ruler-toggle-'+(my.autoRuler?'on':'off')+'.png'
             setTimeout(function(){
                 autoPosition();
-                window.addEventListener('scroll', autoPosition);
-                window.addEventListener('resize', autoPosition);
             },100);
         }
+        window.addEventListener('scroll', autoPosition);
+        window.addEventListener('resize', autoPosition);
     }
 }
 
