@@ -272,7 +272,7 @@ myOwn.TableGrid.prototype.hideColumnsViaCss = function hideColumnsViaCss(){
     var grid = this;
     var autoStyle = my.inlineCss('bp-hidden-columns-'+grid.def.name);
     autoStyle.innerHTML = grid.view.hiddenColumns.map(function(columnName){
-        return "[my-table='"+grid.def.name+"'] [my-colname='"+columnName+"'] {display:none}";
+        return "[my-table|='"+grid.def.name+"'] [my-colname='"+columnName+"'] {display:none}";
     }).join('\n');
 }
 
@@ -1029,8 +1029,9 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         grid.dom.footInfo.appendChild(grid.dom.footInfo[info.name]);
     });
     grid.dom.footInfo.displayTo.textContent = my.messages.loading;
+    grid.actualName = grid.def.name + (grid.connector.fixedFields.length ? '-' + JSON4all.stringify(grid.connector.fixedFields.map(function(pair){ return pair.value; })) : '')
     if(grid.vertical){
-        grid.dom.table = html.table({"class":"my-grid", "my-table": grid.def.name},[
+        grid.dom.table = html.table({"class":"my-grid", "my-table": grid.actualName},[
             html.caption(grid.def.title),
             html.tbody(
                 grid.columns.map(function(column){ 
@@ -1045,7 +1046,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
             ])
         ]).create();
     }else{
-        grid.dom.table = html.table({"class":"my-grid", "my-table": grid.def.name},[
+        grid.dom.table = html.table({"class":"my-grid", "my-table": grid.actualName},[
             html.caption(grid.def.title),
             html.thead([
                 html.tr(grid.columns.map(function(column){ return column.th(); })),

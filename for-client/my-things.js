@@ -600,7 +600,7 @@ myOwn.prepareRulerToggle = function prepareRulerToggle(){
                     if(!('previousDif' in autoStyleTop) || autoStyleTop.actualDif!=autoStyleTop.previousDif){
                         if(autoStyleTop.actualDif>0){
                             cssClausules.push(
-                                "[my-table="+myTableName+"] > thead > tr > th { position:relative; background-color:rgba(255,255,200,0.8); border: 2px solid #997; background-clip: padding-box; "+
+                                "[my-table=\""+myTableName.replace(/"/g,'\\"')+"\"] > thead > tr > th { position:relative; background-color:rgba(255,255,200,0.8); border: 2px solid #997; background-clip: padding-box; "+
                                 " top:"+(autoStyleTop.actualDif)+'px; '+
                                 "}"
                             );
