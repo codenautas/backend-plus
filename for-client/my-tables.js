@@ -591,6 +591,11 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
     var grid = this.grid;
     var detailTableDef = this.detailTableDef;
     var detailControl = depot.detailControls[detailTableDef.table] || { show:false };
+    if(detailTableDef.condition){
+        if(!my.conditions[detailTableDef.condition](depot)){
+            return html.td({class:['grid-th','grid-th-details'], "my-relname":detailTableDef.table}).create();
+        }
+    }
     detailControl.img = html.img({
         src:my.path.img+'detail-unknown.png',
         alt:'DETAIL',
@@ -1449,6 +1454,8 @@ myOwn.tableAction={
         }
     }
 };
+
+myOwn.conditions={};
 
 myOwn.clientSides={
     newPass:{
