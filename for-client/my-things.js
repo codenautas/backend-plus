@@ -547,6 +547,7 @@ myOwn.getUniqueDomId = function getUniqueDomId(){
 }
 
 myOwn.prepareFloating3dots = function prepareFloating3dots(){
+    return ;
     if(!my.imgFloating3dots){
         var img = html.img({src:my.path.img+'floating-3dots.png', class:'floating-img'}).create();
         my.imgFloating3dots=img;
