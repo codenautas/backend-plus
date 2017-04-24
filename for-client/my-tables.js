@@ -246,6 +246,11 @@ myOwn.TableGrid = function(context, mainElement){
     grid.view = {};
 };
 
+function upadteNumberOfRows(depot,grid){
+    console.log("grid.depotsToDisplay.length",grid.depotsToDisplay.length)
+    depot.manager.dom.footInfo.displayTo.textContent=grid.depotsToDisplay.length;
+}
+
 myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
     var grid = new my.TableGrid({my: this}, mainElement);
     opts = opts || {};
@@ -1162,6 +1167,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 return Promise.resolve();
             }
             return grid.connector.saveRecord(depot, opts).then(function(result){
+                upadteNumberOfRows(depot,grid);
                 var retrievedRow = result.updatedRow;
                 for(var fieldName in retrievedRow){
                     if(!grid.def.field[fieldName].clientSide){
