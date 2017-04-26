@@ -814,12 +814,13 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     downloadElementText.href=url;
                     downloadElementText.setAttribute("download", grid.def.name+".tab");
                 },10);
-                var populateTableXLS = function populateTableXLS(ws, depot, fieldDefs, topRow, leftColumn){
+                var populateTableXLS = function populateTableXLS(ws, depots, fieldDefs, topRow, leftColumn){
                     topRow=topRow||0;
+                    leftColumn=leftColumn||0;
                     fieldDefs.forEach(function(field,iColumn){
                         ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:topRow})]={t:'s',v:field.name, s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
                     });
-                    grid.depotsToDisplay.forEach(function(depot, iRow){
+                    depots.forEach(function(depot, iRow){
                         fieldDefs.forEach(function(fieldDef, iColumn){
                             var value=depot.row[fieldDef.name];
                             var valueType='s';
@@ -868,7 +869,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                             populateTableXLS(exportFileInformationWs, fieldPropertiesDepot,fieldPropertiesDefs,i+1,1);
                         }
                     }
-                    populateTableXLS(ws, depot, depot.def.fields);
+                    populateTableXLS(ws, grid.depotsToDisplay, grid.def.fields);
                     var sheet1name=grid.def.name;
                     var sheet2name=grid.def.name!=="metadata"?"metadata":"meta-data";
                     wb.SheetNames=[sheet1name,sheet2name];
