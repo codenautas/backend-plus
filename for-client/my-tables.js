@@ -814,6 +814,33 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     downloadElementText.href=url;
                     downloadElementText.setAttribute("download", grid.def.name+".tab");
                 },10);
+                var populateTableXLS = function populateTableXLS(ws, depot, fieldDefs, topRow, leftColumn){
+                    topRow=topRow||0;
+                    fieldDefs.forEach(function(field,iColumn){
+                        ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:topRow})]={t:'s',v:field.name, s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                    });
+                    grid.depotsToDisplay.forEach(function(depot, iRow){
+                        fieldDefs.forEach(function(fieldDef, iColumn){
+                            var value=depot.row[fieldDef.name];
+                            var valueType='s';
+                            var type=fieldDef.typeName;
+                            if(value!=null){
+                                if(typeStore.type[type] && typeStore.type[type].toExcelValue){
+                                    value=typeStore.type[type].toExcelValue(value)
+                                    valueType =typeStore.type[type].toExcelType(value)
+                                }
+                                var cell={t:valueType,v:value};
+                                if(fieldDef.isPk){
+                                    cell.s={font:{bold:true}};
+                                }else if(!fieldDef.allow || !fieldDef.allow.update){
+                                    cell.s={font:{color:{ rgb: "88AA00" }}};
+                                }
+                                ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:iRow+1+topRow})]=cell;
+                            }
+                        });
+                    });
+                    ws["!ref"]="A1:"+XLSX.utils.encode_cell({c:fieldDefs.length+leftColumn,r:grid.depotsToDisplay.length+topRow});
+                }
                 setTimeout(function(){
                     var wb = new Workbook();
                     var ws = {};
@@ -828,30 +855,20 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     // grid.def.allow.forEach(function(action,iAction){
                     //     exportFileInformationWs[XLSX.utils.encode_cell({c:iAction,r:2})]={t:'s',v:action};
                     // })
-                    grid.def.fields.forEach(function(field,iColumn){
-                        ws[XLSX.utils.encode_cell({c:iColumn,r:0})]={t:'s',v:field.name, s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
-                    });
-                    grid.depotsToDisplay.forEach(function(depot, iFila){
-                        depot.def.fields.forEach(function(fieldDef, iColumn){
-                            var value=depot.row[fieldDef.name];
-                            var valueType='s';
-                            var type=fieldDef.typeName;
-                            if(value!=null){
-                                if(typeStore.type[type] && typeStore.type[type].toExcelValue){
-                                    value=typeStore.type[type].toExcelValue(value)
-                                    valueType =typeStore.type[type].toExcelType(value)
-                                }
-                                var cell={t:valueType,v:value};
-                                if(fieldDef.isPk){
-                                    cell.s={font:{bold:true}};
-                                }else if(!fieldDef.allow.update){
-                                    cell.s={font:{color:{ rgb: "88AA00" }}};
-                                }
-                                ws[XLSX.utils.encode_cell({c:iColumn,r:iFila+1})]=cell;
-                            }
-                        });
-                    });
-                    ws["!ref"]="A1:"+XLSX.utils.encode_cell({c:grid.def.fields.length,r:grid.depotsToDisplay.length});
+                    if(grid.def.exportMetadata){
+                        if(grid.def.exportMetadata.fieldProperties){
+                            var fieldPropertiesDefs=grid.def.exportMetadata.fieldProperties.map(function(propName, i){
+                                return {name:propName, typeName:'text', isPk:!i};
+                            });
+                            var fieldPropertiesDepot=grid.def.fields.filter(function(fieldDef){
+                                return !('exportMetadata' in fieldDef || fieldDef.exportMetadata);
+                            }).map(function(fieldDef){
+                                return {row:fieldDef};
+                            });
+                            populateTableXLS(exportFileInformationWs, fieldPropertiesDepot,fieldPropertiesDefs,i+1,1);
+                        }
+                    }
+                    populateTableXLS(ws, depot, depot.def.fields);
                     var sheet1name=grid.def.name;
                     var sheet2name=grid.def.name!=="metadata"?"metadata":"meta-data";
                     wb.SheetNames=[sheet1name,sheet2name];
