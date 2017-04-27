@@ -11,6 +11,7 @@ var TypedControls = require('typed-controls');
 var typeStore=require('type-store');
 
 var changing = bestGlobals.changing;
+var coalesce = bestGlobals.coalesce;
 
 var PostgresInterval = require('postgres-interval');
 
@@ -209,6 +210,7 @@ myOwn.TableConnector.prototype.saveRecord = function saveRecord(depot, opts){
         oldRow: depot.retrievedRow,
         status: depot.status
     },opts).then(function(result){
+        console.log("RESULT",result)
         var updatedRow=result.row;
         depot.my.adaptData(depot.def,[updatedRow]);
         return {sendedForUpdate:sendedForUpdate, updatedRow:updatedRow};
@@ -817,27 +819,14 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     downloadElementText.href=url;
                     downloadElementText.setAttribute("download", grid.def.name+".tab");
                 },10);
-                setTimeout(function(){
-                    var wb = new Workbook();
-                    var ws = {};
-                    var exportFileInformationWs={};
-                    var i=0;
-                    exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'table',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
-                    exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:  i})]={t:'s',v:grid.def.name};
-                    exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'date',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
-                    exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:  i})]={t:'s',v:new Date().toISOString()};
-                    exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'user',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
-                    exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:  i})]={t:'s',v:my.config.username};
-                    exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:myOwn.messages.numberExportedRows,s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
-                    exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:  i})]={t:'s',v:grid.depotsToDisplay.length};
-                    // grid.def.allow.forEach(function(action,iAction){
-                    //     exportFileInformationWs[XLSX.utils.encode_cell({c:iAction,r:2})]={t:'s',v:action};
-                    // })
-                    grid.def.fields.forEach(function(field,iColumn){
-                        ws[XLSX.utils.encode_cell({c:iColumn,r:0})]={t:'s',v:field.name, s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                var populateTableXLS = function populateTableXLS(ws, depots, fieldDefs, topRow, leftColumn){
+                    topRow=topRow||0;
+                    leftColumn=leftColumn||0;
+                    fieldDefs.forEach(function(field,iColumn){
+                        ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:topRow})]={t:'s',v:field.name, s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
                     });
-                    grid.depotsToDisplay.forEach(function(depot, iFila){
-                        depot.def.fields.forEach(function(fieldDef, iColumn){
+                    depots.forEach(function(depot, iRow){
+                        fieldDefs.forEach(function(fieldDef, iColumn){
                             var value=depot.row[fieldDef.name];
                             var valueType='s';
                             var type=fieldDef.typeName;
@@ -849,14 +838,45 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                                 var cell={t:valueType,v:value};
                                 if(fieldDef.isPk){
                                     cell.s={font:{bold:true}};
-                                }else if(!fieldDef.allow.update){
+                                }else if(!fieldDef.allow || !fieldDef.allow.update){
                                     cell.s={font:{color:{ rgb: "88AA00" }}};
                                 }
-                                ws[XLSX.utils.encode_cell({c:iColumn,r:iFila+1})]=cell;
+                                ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:iRow+1+topRow})]=cell;
                             }
                         });
                     });
-                    ws["!ref"]="A1:"+XLSX.utils.encode_cell({c:grid.def.fields.length,r:grid.depotsToDisplay.length});
+                    ws["!ref"]="A1:"+XLSX.utils.encode_cell({c:fieldDefs.length+leftColumn,r:grid.depotsToDisplay.length+topRow});
+                }
+                setTimeout(function(){
+                    var wb = new Workbook();
+                    var ws = {};
+                    var exportFileInformationWs={};
+                    var i=0;
+                    exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'table',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                    exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:  i})]={t:'s',v:grid.def.name};
+                    exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'date',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                    exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:  i})]={t:'s',v:new Date().toISOString()};
+                    exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'user',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                    exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:  i})]={t:'s',v:my.config.username};
+                    // grid.def.allow.forEach(function(action,iAction){
+                    //     exportFileInformationWs[XLSX.utils.encode_cell({c:iAction,r:2})]={t:'s',v:action};
+                    // })
+                    if(grid.def.exportMetadata){
+                        if(grid.def.exportMetadata.fieldProperties){
+                            var fieldPropertiesDefs=grid.def.exportMetadata.fieldProperties.map(function(propName, i){
+                                return {name:propName, typeName:'text', isPk:!i};
+                            });
+                            var fieldPropertiesDepot=grid.def.fields.filter(function(fieldDef){
+                                console.log('xxxxxxxxxxxx',fieldDef.name, fieldDef.exportMetadata,grid.def.exportMetadata.exportAnyField,true,coalesce(fieldDef.exportMetadata,grid.def.exportMetadata.exportAnyField,true));
+                                return coalesce(fieldDef.exportMetadata,grid.def.exportMetadata.exportAnyField,true);
+                            }).map(function(fieldDef){
+                                console.log('xxxxxxxxxxxx',fieldDef.name, 'xxxxxxxxxxxxxxxxxxx');
+                                return {row:fieldDef};
+                            });
+                            populateTableXLS(exportFileInformationWs, fieldPropertiesDepot,fieldPropertiesDefs,i+1,1);
+                        }
+                    }
+                    populateTableXLS(ws, grid.depotsToDisplay, grid.def.fields);
                     var sheet1name=grid.def.name;
                     var sheet2name=grid.def.name!=="metadata"?"metadata":"meta-data";
                     wb.SheetNames=[sheet1name,sheet2name];
