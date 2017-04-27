@@ -11,6 +11,7 @@ var TypedControls = require('typed-controls');
 var typeStore=require('type-store');
 
 var changing = bestGlobals.changing;
+var coalesce = bestGlobals.coalesce;
 
 var PostgresInterval = require('postgres-interval');
 
@@ -862,8 +863,10 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                                 return {name:propName, typeName:'text', isPk:!i};
                             });
                             var fieldPropertiesDepot=grid.def.fields.filter(function(fieldDef){
-                                return !('exportMetadata' in fieldDef || fieldDef.exportMetadata);
+                                console.log('xxxxxxxxxxxx',fieldDef.name, fieldDef.exportMetadata,grid.def.exportMetadata.exportAnyField,true,coalesce(fieldDef.exportMetadata,grid.def.exportMetadata.exportAnyField,true));
+                                return coalesce(fieldDef.exportMetadata,grid.def.exportMetadata.exportAnyField,true);
                             }).map(function(fieldDef){
+                                console.log('xxxxxxxxxxxx',fieldDef.name, 'xxxxxxxxxxxxxxxxxxx');
                                 return {row:fieldDef};
                             });
                             populateTableXLS(exportFileInformationWs, fieldPropertiesDepot,fieldPropertiesDefs,i+1,1);
