@@ -210,7 +210,6 @@ myOwn.TableConnector.prototype.saveRecord = function saveRecord(depot, opts){
         oldRow: depot.retrievedRow,
         status: depot.status
     },opts).then(function(result){
-        console.log("RESULT",result)
         var updatedRow=result.row;
         depot.my.adaptData(depot.def,[updatedRow]);
         return {sendedForUpdate:sendedForUpdate, updatedRow:updatedRow};
