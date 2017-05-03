@@ -782,14 +782,14 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
             return dialogPromise(function(dialogWindow, closeWindow){
                 var id1=my.getUniqueDomId();
                 var id2=my.getUniqueDomId();
-                var downloadElement=html.a(my.messages.download).create();
-                var downloadElementText=html.a(my.messages.download+" txt").create();
+                var downloadElement=html.a({class:'export-a'},my.messages.download).create();
+                var downloadElementText=html.a({class:'export-a'},my.messages.download+" txt").create();
                 var mainDiv=html.div({class:'dialog-export',"current-state":"preparing"}, [
                     html.div({class:'dialog-preparing'}, my.messages.preparingForExport),
                     html.div([
                         html.span(my.messages.format),
                        // html.input({type:'radio', id:id1, name:'format', checked:true }), html.label({"for": id1}, '.txt'),
-                        html.input({type:'radio', id:id2, name:'format', checked:true}), html.label({"for": id2}, '.xlsx'),
+                        html.input({class:'export-radio',type:'radio', id:id2, name:'format', checked:true}), html.label({"for": id2}, '.xlsx'),
                     ]),
                     html.img({
                         class:['img-preparing', 'state-preparing'], 
@@ -894,8 +894,8 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
     }
     if(grid.def.allow.import){
         menuOptions.push({img:my.path.img+'import.png', value:true, label:my.messages.import, doneFun:function(){
-            var buttonFile=html.input({type:'file',style:'min-width:400px'}).create();
-            var buttonConfirmImport=html.input({type:'button', value:my.messages.import}).create();
+            var buttonFile=html.input({class:'import-button',type:'file',style:'min-width:400px'}).create();
+            var buttonConfirmImport=html.input({class:'import-button',type:'button', value:my.messages.import}).create();
             var progressIndicator=html.div({class:'indicator'},' ').create();
             var progressBar=html.div({class:'progress-bar', style:'width:400px; height:8px;'},[progressIndicator]).create();
             var uploadingProgress=function(progress){
