@@ -91,8 +91,10 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
     var newMenuLine;
     var elements=[];
     var depth = parents.length;
+    var skin=be.config.config.skin;
+    var skinUrl=(skin?skin+'/':'');
     if(depth===0){
-        elements.push(html.img({id: "main-logo", src: "img/logo.png"}));
+        elements.push(html.img({id: "main-logo", src: skinUrl+"img/logo.png"}));
     }
     elements = elements.concat(menu.map(function(menuItem){
         menuItem.parents = parents;
@@ -106,7 +108,7 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
     if(depth===0){
         elements.push(html.span({id: "right-menu"}, [
             html.span({id: "active-user"}, my.config.username||"user"),
-            html.img({class: "right-menu", src: "img/three-dot-menu.png",id: "right-menu-icon"}),
+            html.img({class: "right-menu", src: skinUrl+"img/three-dot-menu.png",id: "right-menu-icon"}),
         ]));
     }
     var menuLine=html.div({id: "main-top-bar"+(depth||''), class: depth?"sub-menu-bar":"top-menu-bar"}, elements).create();
