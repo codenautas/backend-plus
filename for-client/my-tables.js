@@ -60,6 +60,7 @@ myOwn.messages=changing(myOwn.messages, {
     import: "import",
     importDataFromFile: "import data from external file",
     insertBelow: "insert record below this",
+    inserted: "Rows inserted: ",
     insertRecordAtTop: "insert record at top",
     lessDetails: "hide details",
     loading: "loading",
@@ -72,6 +73,7 @@ myOwn.messages=changing(myOwn.messages, {
     refresh: "refresh - retrive data from database",
     showInheritedKeys: "show inherited keys",
     table: "table",
+    updated: "Rows updated: ",
     uploadFile: "upload file $1",
     verticalEdit: "vertical edit",
     xOverTWillDelete: "({$x} over a total of {$t} records will be deleted)",
@@ -101,6 +103,7 @@ myOwn.es=changing(myOwn.es, {
     import: "importar",
     importDataFromFile: "importar datos de un archivo externo",
     insertBelow: "agregar un registro debajo de éste",
+    inserted: "Filas agregadas: ",
     insertRecordAtTop: "insertar un registro nuevo en la tabla",
     lessDetails: "dejar de mostrar los detalles asocialdos al registro",
     loading: "cargando",
@@ -113,6 +116,7 @@ myOwn.es=changing(myOwn.es, {
     refresh: "refrescar la grilla desde la base de datos",
     showInheritedKeys: "mostrar las columnas relacionadas",
     table: "tabla",
+    updated: "Filas actualizadas: ",
     uploadFile: "subir el archivo $1",
     verticalEdit: "edición en forma de ficha",
     xOverTWillDelete: "(se borrarán {$x} registros sobre un total de {$t})",
@@ -917,7 +921,11 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                         prefilledFields:grid.connector.fixedFields,
                         files:files
                     },{uploading:uploadingProgress});
-                }).then(this.dialogPromiseDone,this.dialogPromiseDone);
+                }).then(function(result){
+                    var insertOrUpdateObject=JSON.parse("{"+result.slice(result.indexOf("uploaded")-1,result.length-1)+"}");
+                    return myOwn.messages.inserted+insertOrUpdateObject.uploaded.inserted+' -- '+myOwn.messages.updated+insertOrUpdateObject.uploaded.updated;
+                }).then(this.dialogPromiseDone);
+                //}).then(this.dialogPromiseDone/*,this.dialogPromiseDone*/);
             });
             simpleFormPromise({elementsList:[
                 my.messages.importDataFromFile,
