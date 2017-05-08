@@ -1,16 +1,20 @@
 "use strict";
 
+require('lazy-some').bindToPrototypeIn(Array);
+
 myOwn.wScreens={}
 
 myOwn.messages=changing(myOwn.messages, {
     chpass:'change password',
     exit:'exit',
+    proced:'proced',
     user:'user',
 });
 
 myOwn.es=changing(myOwn.es, {
     chpass:'cambiar clave',
     exit:'salir',
+    proced:'proceder',
     user:'usuario',
 });
 
@@ -23,15 +27,42 @@ myOwn.wScreens.table = function(addrParams){
 
 myOwn.wScreens.proc = function(addrParams){
     var procDef=my.config.procedures.find(function(proc){
-        return proc.action == addrParams.proc||addrParams.name;
+        return proc.action == (addrParams.proc||addrParams.name);
     });
+    console.log('procDef');
+    console.log(addrParams);
+    console.log(procDef);
+    var params={};
+    var button = html.button(my.messages.proced).create();
+    var divResult = html.div().create();
+    divResult.style.minHeight='40px';
     main_layout.appendChild(html.table({class:"table-param-screen"},procDef.parameters.map(function(parameterDef){
         var control = html.td().create();
         control.style.minWidth='200px';
         control.style.backgroundColor='white';
         TypedControls.adaptElement(control,{typeName:'text'});
+        control.addEventListener('update', function(){
+            params[parameterDef.name] = control.getTypedValue();
+        });
         return html.tr([html.td(parameterDef.label||parameterDef.name), control]);
-    })).create());
+    }).concat(
+        html.tr([html.td(), html.td([button])])
+    )).create());
+    main_layout.appendChild(divResult);
+    button.onclick=function(){
+        var my_ajax_actionFun = procDef.action.split('/').reduce(function(o, part){ return o[part]; },my.ajax);
+        console.log('x',my_ajax_actionFun);
+        button.disabled=true;
+        my_ajax_actionFun(params).then(function(result){
+            divResult.textContent = result;
+            divResult.style.backgroundColor = 'green';
+        },function(err){
+            divResult.textContent = err.message;
+            divResult.style.backgroundColor = 'orange';
+        }).then(function(){
+            button.disabled=false;
+        });
+    }
 }
 
 myOwn.showPage = function showPage(pageDef){
@@ -136,20 +167,28 @@ myOwn.displayMainMenu = function(addrParams){
     return menu;
 };
 
-myOwn.rightMenu = function rightMenu(){
-    miniMenuPromise([
+myOwn.rigthMenuDoneFunLocation = function rigthMenuDoneFunLocation(newLocation){
+    return function(){
+        window.location.href = newLocation;
+        return null;
+    };
+};
+
+myOwn.rightMenuOpts = function rightMenuOpts(){
+    return [
         {label:my.messages.user, startGroud:'true'},
-        {img:my.path.img+'chpass.png', label:my.messages.chpass, value:{que:'href', valor:'chpass'}},
-        {img:my.path.img+'exit.png'  , label:my.messages.exit  , value:{que:'href', valor:'logout'}}
-    ],{
+        {img:my.path.img+'chpass.png', label:my.messages.chpass, doneFun:my.rigthMenuDoneFunLocation('chpass')},
+    ]
+};
+
+myOwn.rightMenu = function rightMenu(){
+    return miniMenuPromise(my.rightMenuOpts().concat(
+        {img:my.path.img+'exit.png'  , label:my.messages.exit  , doneFun:my.rigthMenuDoneFunLocation('logout')}
+    ),{
         underElement:document.getElementById('right-menu-icon'),
         withCloseButton:false,
-    }).then(function(rta){
-        if(rta.que==='href'){
-            window.location.href = rta.valor;
-        }
     });
-}
+};
 
 window.addEventListener('load', function(){
     window.my = myOwn;

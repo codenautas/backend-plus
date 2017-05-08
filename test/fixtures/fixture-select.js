@@ -14,7 +14,10 @@
         oldRow: {id_type: 'card'},
         status: 'retrieved'
     },
-    expected: {id_type: 'passport',id: 123456,first_name: 'Bob' ,last_name: 'Smith',birth_date: null ,salary: null },
+    expected: {
+        command: 'UPDATE', 
+        row: {id_type: 'passport',id: 123456,first_name: 'Bob' ,last_name: 'Smith',birth_date: null ,salary: null },
+    }
 },{
     skip: !true,
     name: 'update dates',
@@ -26,7 +29,10 @@
         oldRow: {birth_date: null},
         status: 'retrieved'
     },
-    expected: {id_type: 'passport',id: 123456,first_name: 'Bob' ,last_name: 'Smith',birth_date: new Date(1990,1-1,8),salary: null },
+    expected: {
+        command: 'UPDATE', 
+        row: {id_type: 'passport',id: 123456,first_name: 'Bob' ,last_name: 'Smith',birth_date: new Date(1990,1-1,8),salary: null },
+    }
 },{
     skip: '#25',
     // name: 'double update',
@@ -44,5 +50,8 @@
         oldRow: {data: '1 2 3 4'},
         status: 'retrieved'
     },
-    expected: {idn:1, idj:{uno:'dos', tres:'cuatro'}, data: '1,2,3,4'},
+    expected: {
+        command: 'UPDATE', 
+        row: {idn:1, idj:{uno:'dos', tres:'cuatro'}, data: '1,2,3,4'},
+    }
 }]
