@@ -40,7 +40,11 @@ myOwn.wScreens.proc = function(addrParams){
         var control = html.td().create();
         control.style.minWidth='200px';
         control.style.backgroundColor='white';
-        TypedControls.adaptElement(control,{typeName:'text'});
+        TypedControls.adaptElement(control,parameterDef);
+        if('defaultValue' in parameterDef){
+            params[parameterDef.name] = parameterDef.defaultValue;
+            control.setTypedValue(parameterDef.defaultValue);
+        }
         control.addEventListener('update', function(){
             params[parameterDef.name] = control.getTypedValue();
         });
@@ -51,11 +55,11 @@ myOwn.wScreens.proc = function(addrParams){
     main_layout.appendChild(divResult);
     button.onclick=function(){
         var my_ajax_actionFun = procDef.action.split('/').reduce(function(o, part){ return o[part]; },my.ajax);
-        console.log('x',my_ajax_actionFun);
+        console.log('x',params);
         button.disabled=true;
         my_ajax_actionFun(params).then(function(result){
             divResult.textContent = result;
-            divResult.style.backgroundColor = 'green';
+            divResult.style.backgroundColor = '#5F5';
         },function(err){
             divResult.textContent = err.message;
             divResult.style.backgroundColor = 'orange';

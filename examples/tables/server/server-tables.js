@@ -32,6 +32,7 @@ class AppExample extends backendPlus.AppBackend{
                 {menuType:'table', name:'ptable'  , label:'elements'},
                 {menuType:'table', name:'pgroups' , label:'groups'  },
                 {menuType:'table', name:'isotopes', label:'isotopes'},
+                {menuType:'proc' , name:'count/without-isotopes', label:'count'}
             ]},
             {menuType:'table', name:'images', table:'element_images'},
             {menuType:'menu', name:'test', menuContent:[
