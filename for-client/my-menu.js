@@ -37,7 +37,7 @@ myOwn.wScreens.proc = function(addrParams){
     var divResult = html.div().create();
     divResult.style.minHeight='40px';
     main_layout.appendChild(html.table({class:"table-param-screen"},procDef.parameters.map(function(parameterDef){
-        var control = html.td().create();
+        var control = html.td({"typed-controls-direct-input":true}).create();
         control.style.minWidth='200px';
         control.style.backgroundColor='white';
         TypedControls.adaptElement(control,parameterDef);
@@ -48,7 +48,7 @@ myOwn.wScreens.proc = function(addrParams){
         control.addEventListener('update', function(){
             params[parameterDef.name] = control.getTypedValue();
         });
-        return html.tr([html.td(parameterDef.label||parameterDef.name), control]);
+        return html.tr([ html.td(parameterDef.label||parameterDef.name),control]);
     }).concat(
         html.tr([html.td(), html.td([button])])
     )).create());
