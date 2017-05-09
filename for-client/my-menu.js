@@ -119,6 +119,21 @@ myOwn.createForkeableButton = function createForkeableButton(menu){
     return button;
 };
 
+function encodeMinimalURIComponent(text){
+    return text
+        .replace(/=/g, '%3D')
+        .replace(/\?/g, '%3F')
+        .replace(/&/g, '%26')
+        .replace(/%/g, '%25');
+}
+
+myOwn.replaceAddrParams = function replaceAddrParams(params){
+    var paramPart = likeAr(params).map(function(value, name){
+        return name+'='+encodeMinimalURIComponent(value);
+    }).join('&');
+    history.replaceState(null, null, 'menu?'+paramPart);
+}
+
 myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
     var be = this;
     var next = false;
