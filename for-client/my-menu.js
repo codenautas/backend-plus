@@ -40,7 +40,7 @@ myOwn.wScreens.proc = function(addrParams){
         var control = html.td({"typed-controls-direct-input":true}).create();
         control.style.minWidth='200px';
         control.style.backgroundColor='white';
-        TypedControls.adaptElement(control,parameterDef);
+        TypedControls.adaptElement(control,changing({typeName:'text'}, parameterDef));
         if('defaultValue' in parameterDef){
             params[parameterDef.name] = parameterDef.defaultValue;
             control.setTypedValue(parameterDef.defaultValue);
