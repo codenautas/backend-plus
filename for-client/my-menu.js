@@ -167,7 +167,7 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
     elements = elements.concat(menu.map(function(menuItem){
         menuItem.parents = parents;
         var button = my.createForkeableButton(menuItem);
-        if(menuItem.name == addrParams.i[depth]){
+        if(menuItem.name == addrParams.i[depth] || !addrParams.i[depth] && menuItem.selectedByDefault){
             button.setAttribute('menu-selected', 'yes');
             selectedItem = menuItem;
         }
