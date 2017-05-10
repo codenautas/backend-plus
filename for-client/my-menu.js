@@ -128,7 +128,7 @@ myOwn.createForkeableButton = function createForkeableButton(menu, label){
     menu.button = button;
     button.onclick=function(event){
         if(!event.ctrlKey){
-            history.pushState(null, null, href);
+            history.pushState(null, null, this.href);
             my.showPage();
             event.preventDefault();
         }
