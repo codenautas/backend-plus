@@ -69,10 +69,8 @@ myOwn.wScreens.proc = function(addrParams){
     }
 }
 
-myOwn.showPage = function showPage(pageDef){
-    my.prepareFloating3dots();
-    my.prepareRulerToggle();
-    var parts=location.search.split('&');
+myOwn.UriSearchToObject = function UriSearchToObject(locationSearch){
+    var parts=locationSearch.split('&');
     var addrParams={}
     parts.forEach(function(pair){
         if(pair[0]==='?'){
@@ -84,6 +82,13 @@ myOwn.showPage = function showPage(pageDef){
             addrParams[varName] = decodeURIComponent(pair.substr(eq+1));
         }
     });
+    return addrParams;
+}
+
+myOwn.showPage = function showPage(pageDef){
+    my.prepareFloating3dots();
+    my.prepareRulerToggle();
+    var addrParams=my.UriSearchToObject(location.search);
     if(addrParams.i){
         addrParams.i=addrParams.i.split(',');
     }else{
@@ -104,10 +109,18 @@ myOwn.showPage = function showPage(pageDef){
     }
 };
 
-myOwn.createForkeableButton = function createForkeableButton(menu){
+myOwn.createForkeableButton = function createForkeableButton(menu, label){
     var be = this;
-    var href = 'menu?i=' + menu.parents.concat(menu.name).join(',');
-    var button=html.a({"class": "menu-item", "menu-type":menu.menuType, "menu-name":menu.name, href: href}, menu.label || menu.name).create();
+    var href;
+    if(!menu.w && menu.menuType){
+        href = 'menu?i=' + menu.parents.concat(menu.name).join(',');
+        if(menu.section){
+            href += '&section='+menu.section;
+        }
+    }else{
+        href = 'menu?' + my.paramsToUriPart(menu);
+    }
+    var button=html.a({"class": "menu-item", "menu-type":menu.menuType||menu.w, "menu-name":menu.name||'noname', href: href}, label || menu.label || menu.name).create();
     menu.button = button;
     button.onclick=function(event){
         if(!event.ctrlKey){
@@ -127,11 +140,16 @@ function encodeMinimalURIComponent(text){
         .replace(/%/g, '%25');
 }
 
-myOwn.replaceAddrParams = function replaceAddrParams(params){
-    var paramPart = likeAr(params).map(function(value, name){
-        return name+'='+encodeMinimalURIComponent(value);
+myOwn.paramsToUriPart = function paramsToUriPart(params){
+    return likeAr(params).map(function(value, name){
+        if(value!=null){
+            return name+'='+encodeMinimalURIComponent(value);
+        }
     }).join('&');
-    history.replaceState(null, null, 'menu?'+paramPart);
+}
+
+myOwn.replaceAddrParams = function replaceAddrParams(params){
+    history.replaceState(null, null, 'menu?'+my.paramsToUriPart(param));
 }
 
 myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
@@ -195,7 +213,7 @@ myOwn.rigthMenuDoneFunLocation = function rigthMenuDoneFunLocation(newLocation){
 
 myOwn.rightMenuOpts = function rightMenuOpts(){
     return [
-        {label:my.messages.user, startGroud:'true'},
+        // {label:my.messages.user, startGroud:'true'},
         {img:my.path.img+'chpass.png', label:my.messages.chpass, doneFun:my.rigthMenuDoneFunLocation('chpass')},
     ]
 };

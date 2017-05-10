@@ -14,11 +14,13 @@ img.right-menu
   
 #main-top-bar
   padding 4px
+  padding-top 0px
   border-bottom 1px solid #AAA
 
 #main-top-bar *
   vertical-align top
   margin-left 8px
+  margin-top 4px
 
 .sub-menu-bar
   padding 4px
@@ -29,24 +31,32 @@ img.right-menu
   vertical-align top
   margin-left 8px
 
-.menu-item
+#main-top-bar a.menu-item
+  margin-top -1px
+
+a.menu-item
+  display inline-block
   font-family arial
   color black
   text-decoration none
   border 1px solid
-  height 24px
   padding 4px
   background-color #ddd
   border-top 1px solid #eee
   border-left 1px solid #eee
   border-bottom 1px solid #ccc
   border-right 1px solid #ccc
-  margin-top 4px
-  
+  margin-top 0px
+
+.top-menu-bar
+  padding-top 0  
+
+.sub-menu-bar
+  padding-top 0  
+
 .menu-item[menu-selected=yes]
   background-color #eee
-  
-  
+
 .table-param-screen td
   border 4px solid transparent
 
