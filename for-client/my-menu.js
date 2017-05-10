@@ -111,16 +111,20 @@ myOwn.showPage = function showPage(pageDef){
 
 myOwn.createForkeableButton = function createForkeableButton(menu, label){
     var be = this;
-    var href;
-    if(!menu.w && menu.menuType){
-        href = 'menu?i=' + menu.parents.concat(menu.name).join(',');
-        if(menu.section){
-            href += '&section='+menu.section;
+    var button=html.a({"class": "menu-item", "menu-type":menu.menuType||menu.w, "menu-name":menu.name||'noname'}, label || menu.label || menu.name).create();
+    button.setForkeableHref = function setForkeableHref(menu){
+        var href;
+        if(!menu.w && menu.menuType){
+            href = 'menu?i=' + menu.parents.concat(menu.name).join(',');
+            if(menu.section){
+                href += '&section='+menu.section;
+            }
+        }else{
+            href = 'menu?' + my.paramsToUriPart(menu);
         }
-    }else{
-        href = 'menu?' + my.paramsToUriPart(menu);
+        button.href = href;
     }
-    var button=html.a({"class": "menu-item", "menu-type":menu.menuType||menu.w, "menu-name":menu.name||'noname', href: href}, label || menu.label || menu.name).create();
+    button.setForkeableHref(menu);
     menu.button = button;
     button.onclick=function(event){
         if(!event.ctrlKey){
@@ -149,7 +153,7 @@ myOwn.paramsToUriPart = function paramsToUriPart(params){
 }
 
 myOwn.replaceAddrParams = function replaceAddrParams(params){
-    history.replaceState(null, null, 'menu?'+my.paramsToUriPart(param));
+    history.replaceState(null, null, 'menu?'+my.paramsToUriPart(params));
 }
 
 myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
