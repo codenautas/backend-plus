@@ -20,7 +20,7 @@ describe("table-def-adapt", function(){
             "allow": {
               "delete": false,
               "export": true ,
-              "import": true ,
+              "import": false ,
               "filter": true ,
               "insert": false,
               "orientation": false,
