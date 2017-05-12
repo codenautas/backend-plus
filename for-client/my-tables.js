@@ -920,10 +920,8 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                         files:files
                     },{uploading:uploadingProgress});
                 }).then(function(result){
-                    var insertOrUpdateObject=JSON.parse("{"+result.slice(result.indexOf("uploaded")-1,result.length-1)+"}");
-                    return myOwn.messages.inserted+insertOrUpdateObject.uploaded.inserted+' -- '+myOwn.messages.updated+insertOrUpdateObject.uploaded.updated;
-                }).then(this.dialogPromiseDone);
-                //}).then(this.dialogPromiseDone/*,this.dialogPromiseDone*/);
+                    return alertPromise(JSON.stringify(result));
+                },my.alertError).then(this.dialogPromiseDone,this.dialogPromiseDone);
             });
             simpleFormPromise({elementsList:[
                 my.messages.importDataFromFile,
