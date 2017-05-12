@@ -60,12 +60,15 @@ myOwn.messages=changing(myOwn.messages, {
     import: "import",
     importDataFromFile: "import data from external file",
     insertBelow: "insert record below this",
-    inserted: "Rows inserted: ",
     insertRecordAtTop: "insert record at top",
     lessDetails: "hide details",
     loading: "loading",
     numberExportedRows:"Rows exported",
     oldValue: "old value",
+    oneRowInserted: "one row inserted.",
+    xRowsInserted: "{$x} rows inserted.",
+    oneRowUpdated: "one row updated.",
+    xRowsUpdated: "{$x} rows updated.",
     optionsForThisTable: "options for this table",
     orientationToggle: "toggle orientation (vertical vs horizontal)",
     preparingForExport: "preparing for export",
@@ -73,7 +76,6 @@ myOwn.messages=changing(myOwn.messages, {
     refresh: "refresh - retrive data from database",
     showInheritedKeys: "show inherited keys",
     table: "table",
-    updated: "Rows updated: ",
     uploadFile: "upload file $1",
     verticalEdit: "vertical edit",
     xOverTWillDelete: "({$x} over a total of {$t} records will be deleted)",
@@ -103,12 +105,15 @@ myOwn.es=changing(myOwn.es, {
     import: "importar",
     importDataFromFile: "importar datos de un archivo externo",
     insertBelow: "agregar un registro debajo de éste",
-    inserted: "Filas agregadas: ",
     insertRecordAtTop: "insertar un registro nuevo en la tabla",
     lessDetails: "dejar de mostrar los detalles asocialdos al registro",
     loading: "cargando",
     numberExportedRows:"Filas exportadas",
     oldValue: "valor anterior",
+    oneRowInserted: "un registro insertado.",
+    xRowsInserted: "{$x} registros insertados.",
+    oneRowUpdated: "un registro modificados.",
+    xRowsUpdated: "{$x} registros modificados.",
     optionsForThisTable: "opciones para esta tabla",
     orientationToggle: "cambiar la orientación de la tabla (por fila o por columna)",
     preparingForExport: "preparando para exportar",
@@ -116,7 +121,6 @@ myOwn.es=changing(myOwn.es, {
     refresh: "refrescar la grilla desde la base de datos",
     showInheritedKeys: "mostrar las columnas relacionadas",
     table: "tabla",
-    updated: "Filas actualizadas: ",
     uploadFile: "subir el archivo $1",
     verticalEdit: "edición en forma de ficha",
     xOverTWillDelete: "(se borrarán {$x} registros sobre un total de {$t})",
@@ -920,8 +924,19 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                         files:files
                     },{uploading:uploadingProgress});
                 }).then(function(result){
-                    return alertPromise(JSON.stringify(result));
-                },my.alertError).then(this.dialogPromiseDone,this.dialogPromiseDone);
+                    var message='';
+                    if(result.uploaded.inserted==1){
+                        message+=my.messages.oneRowInserted;
+                    }else if(result.uploaded.inserted>1){
+                        message+=my.messages.xRowsInserted.replace('{$x}',result.uploaded.inserted);;
+                    }
+                    if(result.uploaded.updated==1){
+                        message+=my.messages.oneRowUpdated;
+                    }else if(result.uploaded.updated>1){
+                        message+=my.messages.xRowsUpdated.replace('{$x}',result.uploaded.updated);;
+                    }
+                    return message;
+                }).then(this.dialogPromiseDone,this.dialogPromiseDone);
             });
             simpleFormPromise({elementsList:[
                 my.messages.importDataFromFile,
@@ -934,6 +949,11 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                 return Promise.all([
                     grid.refresh(),
                     alertPromise(message)
+                ]);
+            },function(err){
+                return Promise.all([
+                    grid.refresh(),
+                    my.alertError(err)
                 ]);
             });
         }});
