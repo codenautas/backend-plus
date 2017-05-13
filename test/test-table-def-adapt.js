@@ -66,6 +66,7 @@ describe("table-def-adapt", function(){
             },
             "name": "the-table-name",
             "nameFields": [],
+            "softForeignKeys": [],
             "sql": {
               "fields": {},
               "from": '"the-table-name"',
