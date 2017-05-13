@@ -231,6 +231,10 @@ myOwn.rightMenu = function rightMenu(){
     });
 };
 
+window.addEventListener('popstate', function(){
+    my.showPage();
+});
+
 window.addEventListener('load', function(){
     window.my = myOwn;
     my.autoSetup().then(function(){
