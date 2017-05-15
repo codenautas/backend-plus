@@ -64,9 +64,15 @@ myOwn.autoSetup = function autoSetup(){
             parameters:[]
         }).then(function(setup){
             my.config = setup;
+            my.config.procedure=my.config.procedure||{};
             my.config.procedures.forEach(function(procedureDef){
+                my.config.procedure[procedureDef.action]=procedureDef;
                 var target;
                 var lastName = null;
+                procedureDef.parameter=procedureDef.parameter||{};
+                procedureDef.parameters.forEach(function(parameterDef){
+                    procedureDef.parameter[parameterDef.name]=parameterDef;
+                });
                 var partsNames=procedureDef.action.split('/').filter(id).forEach(function(name){
                     if(lastName){
                         if(!target[lastName]){
@@ -312,7 +318,7 @@ myOwn.ajaxPromise = function(procedureDef,data,opts){
     return Promise.resolve().then(function(){
         var params={};
         procedureDef.parameters.forEach(function(paramDef){
-            var value=coalesce(data[paramDef.name],paramDef.def,coalesce.throwErrorIfUndefined("lack of parameter "+paramDef.name));
+            var value=coalesce(data[paramDef.name],'defaultValue' in paramDef?paramDef.defaultValue:coalesce.throwErrorIfUndefined("lack of parameter "+paramDef.name));
             value = my.encoders[paramDef.encoding].stringify(value);
             params[paramDef.name]=value;
         });
