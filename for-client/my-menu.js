@@ -68,6 +68,10 @@ myOwn.wScreens.proc = function(addrParams){
         });
     }
 }
+myOwn.wScreens.path = function(addrParams){
+    window.location.href='.'+addrParams.path;
+}
+
 
 myOwn.UriSearchToObject = function UriSearchToObject(locationSearch){
     var parts=locationSearch.split('&');
