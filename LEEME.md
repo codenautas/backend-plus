@@ -114,7 +114,6 @@ module.exports = function(context){
 }
 ```
 
-
 ### Definición de menúes
 
 menuType | uso
@@ -152,6 +151,47 @@ Ejemplo integrador:
         ]}
     }
 
+```
+
+### Definición de procedimientos
+
+#### procDef:
+
+propiedad   | tipo | predeterminado | uso
+------------|------|----------------|-----------------------------------------------------
+action      | T    |                | Nombre con que va a ser invocado el procedimiento
+parameters  | AOP  | `[]`           | Array de Objetos parametro
+coreFunction| F    |                | Función que implementa el procedimiento
+
+#### paramDef:
+
+propiedad     | tipo           | predeterminado | uso
+--------------|----------------|----------------|-------------------
+name          | T              |                | nombre del parametro que se le envía al procedimiento
+defaultValue  | según typeName |                | valor por defecto del parametro
+typeName      | T              |                | tipo de dato
+label         | T              | name           | etiqueta del parámetro
+
+Ejemplo integrador:
+```js
+    {
+        action:'count/without-isotopes',
+        parameters:[
+            {name:'first_atomic_number', defaultValue:10, typeName:'integer'},
+            {name:'last_atomic_number' , defaultValue:99, typeName:'integer'},
+        ],
+        coreFunction:function(context, parameters){
+            return context.client.query(
+                `SELECT count(*) as number_of_elements 
+                   FROM ptable p left join isotopes i on p.atomic_number=i.atomic_number 
+                   WHERE i.atomic_number IS NULL
+                     AND p.atomic_number between coalesce($1,0) and coalesce($2,999)`,
+                [parameters.first_atomic_number, parameters.last_atomic_number]
+            ).fetchUniqueRow().then(function(result){
+                return result.row.number_of_elements;
+            });
+        }
+    },
 ```
 
 
