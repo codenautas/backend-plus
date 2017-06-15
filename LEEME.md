@@ -38,6 +38,21 @@ Es un framework para desarrollar aplicaciones web basadas en base de datos Postg
       2. mecanismo de login
       3. menúes
       4. posibilidad de definir skins
+      
+<!--lang:en--]
+
+
+It's a framework for developing web applications based on PostgreSQL database. It's main features are:
+
+   1. It is based on centralized metadata that defines:
+      1. The data structure (tables and views structure)
+      2. The procedures structure (param definition, permissions, encoding)
+      3. The menus structure
+   2. It provides:
+      1. Editable grids (orderable and filterable), with support for edit data using XLSX format files
+      2. Login mechanism
+      3. Menus
+      4. Skins definition
 
 <!--lang:*-->
 
