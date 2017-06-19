@@ -237,7 +237,7 @@ Integrating example:
     }
 
 ```
-
+<!--lang:es-->
 ### Definición de procedimientos
 
 #### procDef:
@@ -257,7 +257,33 @@ defaultValue  | según typeName |                | valor por defecto del paráme
 typeName      | T              |                | tipo de dato
 label         | T              | name           | etiqueta del parámetro
 
+<!--lang:en--]
+### Procedures definition
+
+#### procDef:
+
+property    | type | default value  | use
+------------|------|----------------|-----------------------------------------------------
+action      | T    |                | Name that will be invoked the procedure
+parameters  | POA  | `[]`           | Param Objects Array
+coreFunction| F    |                | Function that implements the procedure
+
+#### paramDef:
+
+property      | type           | default value  | use
+--------------|----------------|----------------|-------------------
+name          | T              |                | name of the parameter that is sent to the procedure
+defaultValue  | según typeName |                | parameter default value
+typeName      | T              |                | to define the data type
+label         | T              | name           | if you don't want to use default value to display on screen
+
+<!--lang:es-->
 Ejemplo integrador:
+
+<!--lang:en--]
+Integrating example:
+
+<!--lang:*-->
 ```js
     {
         action:'count/without-isotopes',
