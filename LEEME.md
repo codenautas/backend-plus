@@ -101,7 +101,55 @@ name      | T    |                | nombre en la base de datos y id de campo
 typeName  | T    |                | tipo
 title     | T    | `name`         | título para la grilla cuando no se quiere el name
 
+<!--lang:en--]
+
+### Tables definition
+
+Are defined tables, database views (which correspond to a database VIEW), or query views (which are simply a query that knows the application but didn't generate a VIEW).
+In the future there will be available tables which not have data that originated by the database, for example a list of fields would have to be able to be seen in a table.
+
+#### tableDef:
+
+property    | type | default value  | use
+------------|------|----------------|----------------------------------------------------------------------------------------------
+name        | T    |                | table name in database. this name is the table id inside the system
+title       | T    | `name`         | grid title
+editable    | L    | `false`        | permissions
+allow       | PO   | `editable`     | individual permissions object
+primaryKey  | A    | `[]`           | PK name field list
+foreignKeys | A    | `[]`           | FK definition list
+constraints | A    | `[]`           | constraints list (except PK and FK)
+
+list examples   | element format
+----------------|--------------------------------------
+ foreignKeys    | {references:'ptable', fields:['atomic_number']}
+ constraints    | {constraintType:'unique', fields:['atomic_number','order']}
+
+permissions | table | field | use
+------------|-------|-------|-------
+insert      | x     | x     |
+update      | x     | x     |
+delete      | x     |       |
+select      | x     | x     |
+select      | x     | x     |
+
+#### fieldDef:
+
+property | type | default value | use
+---------|------|---------------|-------------------
+name     | T    |               | name in database and field id
+typeName | T    |               | data type
+title    | T    | `name`        | title in the grid if you don't want to use name property default value
+
+
+<!--lang:es-->
 Ejemplo integrador:
+
+<!--lang:en--]
+Integrating example:
+
+<!--lang:*-->
+
 ```js
 module.exports = function(context){
     return context.be.tableDefAdapt({
@@ -128,7 +176,7 @@ module.exports = function(context){
     },context);
 }
 ```
-
+<!--lang:es-->
 ### Definición de menúes
 
 menuType | uso
@@ -175,15 +223,15 @@ Ejemplo integrador:
 propiedad   | tipo | predeterminado | uso
 ------------|------|----------------|-----------------------------------------------------
 action      | T    |                | Nombre con que va a ser invocado el procedimiento
-parameters  | AOP  | `[]`           | Array de Objetos parametro
+parameters  | AOP  | `[]`           | Array de Objetos parámetro
 coreFunction| F    |                | Función que implementa el procedimiento
 
 #### paramDef:
 
 propiedad     | tipo           | predeterminado | uso
 --------------|----------------|----------------|-------------------
-name          | T              |                | nombre del parametro que se le envía al procedimiento
-defaultValue  | según typeName |                | valor por defecto del parametro
+name          | T              |                | nombre del parámetro que se le envía al procedimiento
+defaultValue  | según typeName |                | valor por defecto del parámetro
 typeName      | T              |                | tipo de dato
 label         | T              | name           | etiqueta del parámetro
 
