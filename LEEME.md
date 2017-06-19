@@ -106,7 +106,7 @@ title     | T    | `name`         | título para la grilla cuando no se quiere e
 ### Tables definition
 
 Are defined tables, database views (which correspond to a database VIEW), or query views (which are simply a query that knows the application but didn't generate a VIEW).
-In the future there will be available tables which not have data that originated by the database, for example a list of fields would have to be able to be seen in a table.
+In the future there will be available to create tables which not have data originated by the database, for example a list of fields would have to be able to be seen in a table.
 
 #### tableDef:
 
