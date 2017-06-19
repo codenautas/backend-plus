@@ -193,8 +193,30 @@ menuContent | A    |                | menu     | contenido del menú
 table       | T    | `name`         | table    | nombre de la tabla 
 label       | T    | `name`         |          | lo que se ve en el menú
 
+<!--lang:en--]
+### Menus definition
+
+menuType | use
+---------|----------
+menu     | menu or submenu
+table    | grid or table
+proc     | procedures
+    
+property    | type | default value  | menuType | use
+------------|------|----------------|----------|---------
+menuType    | T    |                |          | menu Type
+name        | T    |                |          | option name (id)
+menuContent | A    |                | menu     | menu content
+table       | T    | `name`         | table    | table name
+label       | T    | `name`         |          | if you don't want to use default value to display in menu
+
+<!--lang:es-->
 Ejemplo integrador:
 
+<!--lang:en--]
+Integrating example:
+
+<!--lang:*-->
 ```js
     getMenu(context){
         return {menu:[
