@@ -1,4 +1,13 @@
 <!--multilang v0 es:LEEME.md en:README.md -->
+<!--multilang buttons-->
+
+idioma: ![castellano](https://raw.githubusercontent.com/codenautas/multilang/master/img/lang-es.png)
+también disponible en:
+[![inglés](https://raw.githubusercontent.com/codenautas/multilang/master/img/lang-en.png)](README.md)
+
+<!--lang:es-->
+<!--lang:en--]
+[!--lang:*-->
 # backend-plus
 
 <!--lang:es-->
@@ -19,11 +28,7 @@ Backend for typed-controls
 [![dependencies](https://img.shields.io/david/codenautas/backend-plus.svg)](https://david-dm.org/codenautas/backend-plus)
 [![qa-control](http://codenautas.com/github/codenautas/backend-plus.svg)](http://codenautas.com/github/codenautas/backend-plus)
 
-<!--multilang buttons-->
 
-idioma: ![castellano](https://raw.githubusercontent.com/codenautas/multilang/master/img/lang-es.png)
-también disponible en:
-[![inglés](https://raw.githubusercontent.com/codenautas/multilang/master/img/lang-en.png)](README.md)
 
 <!--lang:es-->
 
@@ -54,7 +59,7 @@ It's a framework for developing web applications based on PostgreSQL database. I
       3. Menus
       4. Skins definition
 
-<!--lang:*-->
+[!--lang:*-->
 
 ## API
 
@@ -148,7 +153,7 @@ Ejemplo integrador:
 <!--lang:en--]
 Integrating example:
 
-<!--lang:*-->
+[!--lang:*-->
 
 ```js
 module.exports = function(context){
@@ -216,7 +221,7 @@ Ejemplo integrador:
 <!--lang:en--]
 Integrating example:
 
-<!--lang:*-->
+[!--lang:*-->
 ```js
     getMenu(context){
         return {menu:[
@@ -283,7 +288,7 @@ Ejemplo integrador:
 <!--lang:en--]
 Integrating example:
 
-<!--lang:*-->
+[!--lang:*-->
 ```js
     {
         action:'count/without-isotopes',
@@ -305,26 +310,16 @@ Integrating example:
     },
 ```
 
-
-<!--lang:en--]
-
-## Install
-
 <!--lang:es-->
-
 ## Instalación
 
 <!--lang:en--]
-
 ## Install
 
 [!--lang:*-->
-
 ```sh
 $ npm install backend-plus
 ```
-
-<!--lang:*-->
 
 ## License
 
