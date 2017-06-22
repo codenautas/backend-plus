@@ -1,7 +1,4 @@
 
-language: ![English](https://raw.githubusercontent.com/codenautas/multilang/master/img/lang-en.png)
-also available in:
-[![Spanish](https://raw.githubusercontent.com/codenautas/multilang/master/img/lang-es.png)](LEEME.md)
 
 # backend-plus
 
@@ -18,6 +15,9 @@ Backend for typed-controls
 [![qa-control](http://codenautas.com/github/codenautas/backend-plus.svg)](http://codenautas.com/github/codenautas/backend-plus)
 
 
+language: ![English](https://raw.githubusercontent.com/codenautas/multilang/master/img/lang-en.png)
+also available in:
+[![Spanish](https://raw.githubusercontent.com/codenautas/multilang/master/img/lang-es.png)](LEEME.md)
 
 
 

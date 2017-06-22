@@ -1,9 +1,5 @@
 <!--multilang v0 es:LEEME.md en:README.md -->
-<!--multilang buttons-->
 
-idioma: ![castellano](https://raw.githubusercontent.com/codenautas/multilang/master/img/lang-es.png)
-también disponible en:
-[![inglés](https://raw.githubusercontent.com/codenautas/multilang/master/img/lang-en.png)](README.md)
 
 <!--lang:es-->
 <!--lang:en--]
@@ -28,7 +24,11 @@ Backend for typed-controls
 [![dependencies](https://img.shields.io/david/codenautas/backend-plus.svg)](https://david-dm.org/codenautas/backend-plus)
 [![qa-control](http://codenautas.com/github/codenautas/backend-plus.svg)](http://codenautas.com/github/codenautas/backend-plus)
 
+<!--multilang buttons-->
 
+idioma: ![castellano](https://raw.githubusercontent.com/codenautas/multilang/master/img/lang-es.png)
+también disponible en:
+[![inglés](https://raw.githubusercontent.com/codenautas/multilang/master/img/lang-en.png)](README.md)
 
 <!--lang:es-->
 
