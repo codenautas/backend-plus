@@ -515,6 +515,9 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
             var actualControl = this;
             var rect = my.getRect(actualControl);
             var buttonContainer = document;
+            if(this.lupa){
+                return;
+            }
             var buttonLupa = buttonContainer.buttonLupa;
             if(buttonLupa){
                 document.body.removeChild(buttonLupa);

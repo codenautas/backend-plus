@@ -46,8 +46,8 @@ class AppExample extends backendPlus.AppBackend{
     getTables(){
         return super.getTables().concat([
             'users',
-            'ptable',
             {name:'pgroups', fileName:'groups'},
+            'ptable',
             'isotopes',
             'element_images',
             'cursors',

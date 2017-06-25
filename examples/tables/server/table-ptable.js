@@ -29,6 +29,9 @@ module.exports = function(context){
             {table: 'isotopes'      , fields:[{source:'atomic_number', target:'atomic_number'}], abr:'iso', label:'isotopes'},
             {table: 'element_images', fields:[{source:'atomic_number', target:'atomic_number'}], abr:'img', label:'images'}
         ],
+        foreignKeys:[
+            {references: 'pgroups' , fields:['group'], abr:'g'},
+        ],
         constraints:[
             {constraintType:'unique', fields:['symbol']}
         ],
@@ -41,5 +44,5 @@ module.exports = function(context){
                   lateral (select count(url)::integer as cant_images from element_images e where e.atomic_number = p.atomic_number) e
             )`
         }
-    });
+    }, context);
 }
