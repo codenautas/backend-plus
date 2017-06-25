@@ -110,7 +110,9 @@ myOwn.autoSetupFunctions = [
             my.log('error', error.message);
         });
         window.addEventListener("unhandledrejection", function(event) {
-            my.log('error', event.reason);
+            if(!event.reason.DialogPromise){
+                my.log('error', event.reason.message);
+            }
         });
         return readProcedureDefinitions();
     }

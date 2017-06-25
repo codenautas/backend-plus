@@ -1559,6 +1559,7 @@ myOwn.autoSetupFunctions.push(function autoSetupMyTables(){
             var typeInfo = typedControl.controledTypeInfo;
             var dataReady;
             var reference;
+            var canceled;
             if(!my.references[typeInfo.references]){
                 var connector=new my.TableConnector({
                     my:my, 
@@ -1582,29 +1583,38 @@ myOwn.autoSetupFunctions.push(function autoSetupMyTables(){
             var timeoutWaiting=setTimeout(function(){
                 timeoutWaiting=null;
                 dialogPromise(function(dialogWindow, closeWindow){
+                    var cancelButton=html.button({class:'my-cancel'}, my.messages.Cancel).create();
+                    cancelButton.onclick=function(){
+                        closeWindow('cancel');
+                        closeWindow=null;
+                    };
                     dialogWindow.appendChild(html.div([
                         html.div(my.messages.loading+'...'),
-                        html.img({src:my.path.img+'hamster.gif'})
+                        html.img({src:my.path.img+'hamster.gif'}),
+                        html.div([cancelButton])
                     ]).create());
                     dataReady.then(function(){
-                        closeWindow('ready');
+                        if(closeWindow){
+                            closeWindow('ready');
+                        }
                     });
                 },{
                     underElement:typedControl,
                     reject:false,
-                    withCloseButton:true
+                    withCloseButton:false
                 }).then(function(value){
-                    if(value!='ready'){
-                        alertPromise('cancelando!!!!!!');
-                    }
+                    canceled = value=='cancel';
                 });
-            },500);
+            },250);
             dataReady.then(function(){
                 if(timeoutWaiting){
                     clearTimeout(timeoutWaiting);
                 }
             });
             return dataReady.then(function(rows){
+                if(canceled){
+                    return Promise.reject();
+                }
                 var opts=rows.map(function(row){
                     return {
                         value:row[reference.tableDef.primaryKey[0]],

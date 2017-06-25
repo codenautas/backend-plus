@@ -38,7 +38,7 @@
     "backend-skins": "~0.1.0",
     "best-globals": "~0.8.1",
     "castellano": "~0.0.3",
-    "dialog-promise": "~0.6.2",
+    "dialog-promise": "~0.6.3",
     "extension-serve-static": "~0.1.6",
     "js-to-html": "~0.9.2",
     "json4all": "~0.3.3",
