@@ -20,8 +20,9 @@ ProceduresExamples = [
     {
         action:'count/without-isotopes',
         parameters:[
-            {name:'first_atomic_number', defaultValue:10, typeName:'integer'},
-            {name:'last_atomic_number' , defaultValue:99, typeName:'integer'},
+            {name:'first_atomic_number', defaultValue:10, typeName:'integer', references:'ptable'},
+            {name:'last_atomic_number' , defaultValue:99, typeName:'integer', references:'ptable'},
+            {name:'group'         , defaultValue:'Actinide', typeName:'text', references:'pgroups'},
         ],
         coreFunction:function(context, parameters){
             return context.client.query(

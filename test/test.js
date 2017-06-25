@@ -16,7 +16,7 @@ var assert = require('self-explain').assert;
 
 var myOwn = require('../for-client/my-things.js');
 
-describe('backend-plus', function(){
+describe('backend-plus', function describeBackendPlus(){
     [
         {base:''           ,root:true },
         {base:'/base'      ,root:false},

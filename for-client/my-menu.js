@@ -186,6 +186,7 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
             html.span({id: "active-user"}, my.config.username||"user"),
             html.img({class: "right-menu", src: skinUrl+"img/three-dot-menu.png",id: "right-menu-icon"}),
         ]));
+        elements.push(html.span({id: "mini-console"}));
     }
     var menuLine=html.div({id: "main-top-bar"+(depth||''), class: depth?"sub-menu-bar":"top-menu-bar"}, elements).create();
     layout.appendChild(menuLine);

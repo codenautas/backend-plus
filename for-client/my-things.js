@@ -27,6 +27,7 @@ var myOwn = {};
 /*jshint +W004 */
 
 myOwn.messages = {
+    Cancel   : "Cancel",
     notLogged: "Not logged in",
     noServer : "The server is inaccessible",
     noNetwork: "Not connected to the network",
@@ -34,6 +35,7 @@ myOwn.messages = {
 };
 
 myOwn.es = {
+    Cancel   : "Cancelar",
     notLogged: "Sin sesión activa",
     noServer : "No se puede acceder al servidor",
     noNetwork: "No se detecta conexión de red",
@@ -54,57 +56,73 @@ function id(x){return x;}
 
 myOwn.statusDivName = 'reconnection_div';
 
-myOwn.autoSetup = function autoSetup(){
-    var my = this;
-    var readProcedureDefinitions = function readProcedureDefinitions(){
-        return my.ajaxPromise({
-            action:'client-setup',
-            method:'get',
-            encoding:'JSON',
-            parameters:[]
-        }).then(function(setup){
-            my.config = setup;
-            my.config.procedure=my.config.procedure||{};
-            my.config.procedures.forEach(function(procedureDef){
-                my.config.procedure[procedureDef.action]=procedureDef;
-                var target;
-                var lastName = null;
-                procedureDef.parameter=procedureDef.parameter||{};
-                procedureDef.parameters.forEach(function(parameterDef){
-                    procedureDef.parameter[parameterDef.name]=parameterDef;
-                });
-                var partsNames=procedureDef.action.split('/').filter(id).forEach(function(name){
-                    if(lastName){
-                        if(!target[lastName]){
-                            target[lastName]={"dont-use":lastName};
-                        }else if(target[lastName]["dont-use"]!==lastName){
-                            throw new Error("Bad nesting of procedures");
+myOwn.autoSetupFunctions = [
+    function autoSetupMyThings(){
+        var my = this;
+        var readProcedureDefinitions = function readProcedureDefinitions(){
+            return my.ajaxPromise({
+                action:'client-setup',
+                method:'get',
+                encoding:'JSON',
+                parameters:[]
+            }).then(function(setup){
+                my.config = setup;
+                my.config.procedure=my.config.procedure||{};
+                my.config.procedures.forEach(function(procedureDef){
+                    my.config.procedure[procedureDef.action]=procedureDef;
+                    var target;
+                    var lastName = null;
+                    procedureDef.parameter=procedureDef.parameter||{};
+                    procedureDef.parameters.forEach(function(parameterDef){
+                        procedureDef.parameter[parameterDef.name]=parameterDef;
+                    });
+                    var partsNames=procedureDef.action.split('/').filter(id).forEach(function(name){
+                        if(lastName){
+                            if(!target[lastName]){
+                                target[lastName]={"dont-use":lastName};
+                            }else if(target[lastName]["dont-use"]!==lastName){
+                                throw new Error("Bad nesting of procedures");
+                            }
+                            target=target[lastName];
+                        }else{
+                            target=my.ajax;
                         }
-                        target=target[lastName];
-                    }else{
-                        target=my.ajax;
+                        lastName=name;
+                    });
+                    target[lastName]=my.ajaxPromise.bind(my,procedureDef);
+                    var activeUserElement = document.getElementById('active-user');
+                    if(activeUserElement){
+                        activeUserElement.textContent=my.config.username||'-';
                     }
-                    lastName=name;
                 });
-                target[lastName]=my.ajaxPromise.bind(my,procedureDef);
-                var activeUserElement = document.getElementById('active-user');
-                if(activeUserElement){
-                    activeUserElement.textContent=my.config.username||'-';
-                }
             });
+        };
+        my.captureKeys();
+        document.addEventListener('click', function(event){
+            if(document.buttonLupa && !document.buttonLupa.forElement.contains(event.target)){
+                my.quitarLupa();
+            }
         });
-    };
-    my.captureKeys();
-    document.addEventListener('click', function(event){
-        if(document.buttonLupa && !document.buttonLupa.forElement.contains(event.target)){
-            my.quitarLupa();
-        }
+        setInterval(function(){
+            my.testKeepAlive();
+        },my.debuggingStatus?6*1000:60*1000);
+        window.addEventListener("error", function myErrorHandler(error, url, lineNumber) {
+            my.log('error', error.message);
+        });
+        window.addEventListener("unhandledrejection", function(event) {
+            my.log('error', event.reason);
+        });
+        return readProcedureDefinitions();
+    }
+];
+myOwn.autoSetup = function autoSetup(){
+    var my=this;
+    var promiseChain=Promise.resolve();
+    my.autoSetupFunctions.forEach(function(autoSetupFunction){
+        promiseChain=promiseChain.then(autoSetupFunction.bind(my));
     });
-    setInterval(function(){
-        my.testKeepAlive();
-    },my.debuggingStatus?6*1000:60*1000);
-    return readProcedureDefinitions();
-};
+    return promiseChain;
+}
     
 myOwn["log-severities"] = {
     error:{permanent:true },
@@ -128,11 +146,15 @@ myOwn.log = function log(severity, message){
         clientMessage = message;
     }
     consoleMessage = consoleMessage || clientMessage;
-    var status = document.getElementById('status');
+    var status = document.getElementById('mini-console');
     console.log(severity, consoleMessage);
     status = status||document.body;
     var divMessage = html.div({"class": ["status-"+severity]}, clientMessage).create();
-    status.appendChild(divMessage);
+    if(status.firstChild){
+        status.insertBefore(divMessage, status.firstChild);
+    }else{
+        status.appendChild(divMessage);
+    }
     if(!this["log-severities"][severity].permanent){
         setTimeout(function(){
             my.fade(divMessage);

@@ -158,10 +158,16 @@ myOwn.comparator={
     }
 };
 
-myOwn.TableConnector = function(context){
+myOwn.TableConnector = function(context, opts){
+    var connector = this;
     for(var attr in context){
-        this[attr] = context[attr];
+        connector[attr] = context[attr];
     }
+    connector.fixedFields = (opts||{}).fixedFields || [];
+    connector.fixedField = {};
+    connector.fixedFields.forEach(function(pair){
+        connector.fixedField[pair.fieldName] = pair.value;
+    });
 };
 
 myOwn.TableConnector.prototype.getStructure = function getStructure(){
@@ -270,12 +276,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
         my:this, 
         tableName: tableName, 
         getElementToDisplayCount:function(){ return grid.dom.footInfo.displayTo; }
-    });
-    grid.connector.fixedFields = opts.fixedFields || [];
-    grid.connector.fixedField = {};
-    grid.connector.fixedFields.forEach(function(pair){
-        grid.connector.fixedField[pair.fieldName] = pair.value;
-    });
+    }, opts);
     var preparing = grid.prepareAndDisplayGrid();
     grid.waitForReady = function waitForReady(fun){
         return preparing.then(function(){
@@ -1540,3 +1541,86 @@ myOwn.clientSides={
         }
     }
 };
+
+myOwn.references={};
+
+myOwn.autoSetupFunctions.push(function autoSetupMyTables(){
+    var my=this;
+    var dummyElement = html.div().create();
+    TypedControls.Expanders.unshift({
+        whenType: function(typedControl){ 
+            var typeInfo = typedControl.controledTypeInfo;
+            return typeInfo.references;
+        },
+        dialogInput:function(typedControl){
+            var typeInfo = typedControl.controledTypeInfo;
+            var dataReady;
+            var reference;
+            if(!my.references[typeInfo.references]){
+                var connector=new my.TableConnector({
+                    my:my, 
+                    tableName: typeInfo.references, 
+                    getElementToDisplayCount:function(){ return dummyElement; }
+                });
+                connector.getStructure();
+                dataReady=connector.getData().then(function(rows){
+                    reference.rows=rows;
+                    reference.tableDef=connector.def;
+                    return rows;
+                });
+                reference=my.references[typeInfo.references]={
+                    connector:connector,
+                    dataReady:dataReady
+                };
+            }else{
+                reference=my.references[typeInfo.references]
+                dataReady=reference.dataReady;
+            }
+            var timeoutWaiting=setTimeout(function(){
+                timeoutWaiting=null;
+                dialogPromise(function(dialogWindow, closeWindow){
+                    dialogWindow.appendChild(html.div([
+                        html.div(my.messages.loading+'...'),
+                        html.img({src:my.path.img+'hamster.gif'})
+                    ]).create());
+                    dataReady.then(function(){
+                        closeWindow('ready');
+                    });
+                },{
+                    underElement:typedControl,
+                    reject:false,
+                    withCloseButton:true
+                }).then(function(value){
+                    if(value!='ready'){
+                        alertPromise('cancelando!!!!!!');
+                    }
+                });
+            },500);
+            dataReady.then(function(){
+                if(timeoutWaiting){
+                    clearTimeout(timeoutWaiting);
+                }
+            });
+            return dataReady.then(function(rows){
+                var opts=rows.map(function(row){
+                    return {
+                        value:row[reference.tableDef.primaryKey[0]],
+                        labels:reference.tableDef.primaryKey.concat(reference.tableDef.nameFields).map(function(fieldName){
+                            return row[fieldName];
+                        })
+                    };
+                });
+                if(typeInfo.nullable){
+                    opts.push({value:null, labels:['',TypedControls.messages.Null]});
+                }
+                return miniMenuPromise(opts,{
+                    underElement:typedControl,
+                    withCloseButton:true,
+                }).then(function(value){
+                    typedControl.setTypedValue(value);
+                    typedControl.dispatchEvent(new CustomEvent('udpdate'));
+                });
+            });
+        }
+    });
+});
