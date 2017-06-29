@@ -95,6 +95,7 @@ myOwn.autoSetupFunctions = [
                         activeUserElement.textContent=my.config.username||'-';
                     }
                 });
+                DialogPromise.path.img=my.path.img;
             });
         };
         my.captureKeys();
