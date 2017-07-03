@@ -83,6 +83,7 @@ allow       | OP   | `editable`     | objeto de permisos individuales
 primaryKey  | A    | `[]`           | lista de nombres de campos que son PK
 foreignKeys | A    | `[]`           | lista las definiciones de las FK
 constraints | A    | `[]`           | lista de constraints (salvo las Pk, FK que van en otra lista)
+sql         | O    | *deducido*     | sintaxis SQL para casos especiales
 
 ejemplos lista  | formato elemento
 ----------------|--------------------------------------
@@ -97,6 +98,9 @@ delete   | x     |       |
 select   | x     | x     |
 select   | x     | x     |
 
+sql            | uso
+---------------|----------------
+postCreateSqls | texto con una o varias sentencias SQL que deben ejecutarse después de la creación. Sirve para agregar constraints que el motor no soporta. 
 
 #### fieldDef:
 
@@ -124,6 +128,7 @@ allow       | PO   | `editable`     | individual permissions object
 primaryKey  | A    | `[]`           | PK name field list
 foreignKeys | A    | `[]`           | FK definition list
 constraints | A    | `[]`           | constraints list (except PK and FK)
+sql         | O    | *deduced*      | SQL syntax for special cases
 
 list examples   | element format
 ----------------|--------------------------------------
@@ -137,6 +142,10 @@ update      | x     | x     |
 delete      | x     |       |
 select      | x     | x     |
 select      | x     | x     |
+
+sql            | usage
+---------------|----------------
+postCreateSqls | (see Spanish)
 
 #### fieldDef:
 

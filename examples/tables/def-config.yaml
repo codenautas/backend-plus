@@ -9,7 +9,9 @@ server:
     confort:
       local-path: node_modules/backend-skins/dist/
     confort-bis:
-      local-path: node_modules/backend-skins/dist/confort-bis
+      local-path: node_modules/backend-skins/dist/
+    confort-dark:
+      local-path: node_modules/backend-skins/dist/
 db:
   motor: postgresql
   host: localhost
@@ -36,7 +38,7 @@ login:
     x-loginPagePath: false
 client-setup:
   cursors: true
-  skin: confort-bis
+  skin: confort-dark
   formTitle: example-tables
   menu: true
   title: periodic table
