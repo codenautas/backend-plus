@@ -52,7 +52,7 @@
     "self-explain": "~0.10.12",
     "serve-content": "~0.3.7",
     "type-store": "~0.1.5",
-    "typed-controls": "~0.6.3"
+    "typed-controls": "~0.6.4"
   },
   "devDependencies": {
     "expect.js": "~0.3.1",

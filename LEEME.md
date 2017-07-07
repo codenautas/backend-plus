@@ -291,6 +291,19 @@ defaultValue  | según typeName |                | parameter default value
 typeName      | T              |                | to define the data type
 label         | T              | name           | if you don't want to use default value to display on screen
 
+<!--lang:*-->
+## def-config.yaml
+
+<!--lang:es-->
+entrada                      | uso
+-----------------------------|---------------
+devel.cache-content          | hace caché de imágenes y archivos en general (si no está en modo "devel" siempre hace caché, no se puede apagar el caché fuera del modo devel)
+
+<!--lang:en--]
+entry                        | usage
+-----------------------------|---------------
+devel.cache-content          | (see spanish)
+
 <!--lang:es-->
 Ejemplo integrador:
 

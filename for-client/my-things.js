@@ -96,6 +96,7 @@ myOwn.autoSetupFunctions = [
                     }
                 });
                 DialogPromise.path.img=my.path.img;
+                TypedControls.path.img=my.path.img;
             });
         };
         my.captureKeys();

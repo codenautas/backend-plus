@@ -38,6 +38,7 @@ module.exports = function(context){
         actionNamesList:['showImg'],
         allow:{showImg:true},
         sql:{
+            isTable:true,
             from:`(
                 select * from ptable p,
                   lateral (select array_agg(mass_number::text order by "order") as isotopes from isotopes i where i.atomic_number = p.atomic_number) i,
