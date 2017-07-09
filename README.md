@@ -53,6 +53,7 @@ allow       | PO   | `editable`     | individual permissions object
 primaryKey  | A    | `[]`           | PK name field list
 foreignKeys | A    | `[]`           | FK definition list
 constraints | A    | `[]`           | constraints list (except PK and FK)
+sql         | O    | *deduced*      | SQL syntax for special cases
 
 list examples   | element format
 ----------------|--------------------------------------
@@ -66,6 +67,10 @@ update      | x     | x     |
 delete      | x     |       |
 select      | x     | x     |
 select      | x     | x     |
+
+sql            | usage
+---------------|----------------
+postCreateSqls | (see Spanish)
 
 #### fieldDef:
 
@@ -162,7 +167,7 @@ defaultValue  | según typeName |                | parameter default value
 typeName      | T              |                | to define the data type
 label         | T              | name           | if you don't want to use default value to display on screen
 
-Integrating example:
+Process definition example:
 
 ```js
     {
@@ -183,6 +188,29 @@ Integrating example:
             });
         }
     },
+```
+
+## def-config.yaml
+
+entry                        | usage
+-----------------------------|---------------
+install                      | (see Spanish)
+  dump                       | (see Spanish)
+    db.user                  | (see Spanish)
+    scripts.post-adapt       | (see Spanish)
+devel                        | (see Spanish)
+  delay                      | (see Spanish)
+  cache-content              | (see Spanish)
+
+```yaml
+install:
+  dump:
+    db:
+      owner: user_owner
+    scripts:
+      post-adapt: [special_triggers.sql, other_contraints.sql]
+devel:
+  cache-content: true
 ```
 
 ## Install

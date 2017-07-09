@@ -291,24 +291,11 @@ defaultValue  | según typeName |                | parameter default value
 typeName      | T              |                | to define the data type
 label         | T              | name           | if you don't want to use default value to display on screen
 
-<!--lang:*-->
-## def-config.yaml
-
-<!--lang:es-->
-entrada                      | uso
------------------------------|---------------
-devel.cache-content          | hace caché de imágenes y archivos en general (si no está en modo "devel" siempre hace caché, no se puede apagar el caché fuera del modo devel)
+[!--lang:es-->
+Ejemplo de definición de proceso:
 
 <!--lang:en--]
-entry                        | usage
------------------------------|---------------
-devel.cache-content          | (see spanish)
-
-<!--lang:es-->
-Ejemplo integrador:
-
-<!--lang:en--]
-Integrating example:
+Process definition example:
 
 [!--lang:*-->
 ```js
@@ -330,6 +317,43 @@ Integrating example:
             });
         }
     },
+```
+
+<!--lang:*-->
+## def-config.yaml
+
+<!--lang:es-->
+entrada                      | uso
+-----------------------------|---------------
+install                      | opciones de instalación
+  dump                       | opciones del dump de instalación
+    db.user                  | usuario dueño de la base de datos
+    scripts.post-adapt       | lista de nombres de archivos para adaptar la estructura de la base de datos
+devel                        | conjunto de opciones para el ambiente de desarrollo y testing
+  delay                      | tiempo de espera promedio adicional (para simular un servidor lento)
+  cache-content              | hace caché de imágenes y archivos en general (si no está en modo "devel" siempre hace caché, no se puede apagar el caché fuera del modo devel)
+
+<!--lang:en--]
+entry                        | usage
+-----------------------------|---------------
+install                      | (see Spanish)
+  dump                       | (see Spanish)
+    db.user                  | (see Spanish)
+    scripts.post-adapt       | (see Spanish)
+devel                        | (see Spanish)
+  delay                      | (see Spanish)
+  cache-content              | (see Spanish)
+
+[!--lang:*-->
+```yaml
+install:
+  dump:
+    db:
+      owner: user_owner
+    scripts:
+      post-adapt: [special_triggers.sql, other_contraints.sql]      
+devel:
+  cache-content: true
 ```
 
 <!--lang:es-->
