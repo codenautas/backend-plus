@@ -76,7 +76,7 @@ En el futuro habrá tablas que no sean originadas en la base de datos, por ejemp
 
 propiedad   | tipo | predeterminado | uso
 ------------|------|----------------|----------------------------------------------------------------------------------------------
-name        | T    |                | nombre que va a tener la tabla en la base de datos y es el id de tabla dentro del sistema
+name        | T    |                | nombre que va a tener la tabla en el sistema
 title       | T    | `name`         | título en la grilla
 editable    | L    | `false`        | los permisos
 allow       | OP   | `editable`     | objeto de permisos individuales
@@ -84,8 +84,11 @@ primaryKey  | A    | `[]`           | lista de nombres de campos que son PK
 foreignKeys | A    | `[]`           | lista las definiciones de las FK
 constraints | A    | `[]`           | lista de constraints (salvo las Pk, FK que van en otra lista)
 sql         | O    | *deducido*     | sintaxis SQL para casos especiales
+  isTable   | L    | `true`         | si es una tabla y por lo tanto hay que hacer el dump para el create table y si se le deben deducir los campos name de sus FK
+  tableName | T    | `name`         | nombre de la tabla física (generalmente es el mismo name de definición de la tabla en el sistema)
 layout      | O    | {}             | opciones de despliegue
   vertical  | L    | `false`        | si el despliegue predeterminado es vertical
+forInsertOnlyMode | L | `false`     | si es una tabla de solo inserción
 
 ejemplos lista  | formato elemento
 ----------------|--------------------------------------
@@ -134,6 +137,7 @@ primaryKey  | A    | `[]`           | PK name field list
 foreignKeys | A    | `[]`           | FK definition list
 constraints | A    | `[]`           | constraints list (except PK and FK)
 sql         | O    | *deduced*      | SQL syntax for special cases
+  isTable   | L    | `true`         | (see Spanish)
 
 list examples   | element format
 ----------------|--------------------------------------

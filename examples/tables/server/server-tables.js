@@ -32,6 +32,8 @@ class AppExample extends backendPlus.AppBackend{
                 {menuType:'table', name:'ptable'  , label:'elements'},
                 {menuType:'table', name:'pgroups' , label:'groups'  },
                 {menuType:'table', name:'isotopes', label:'isotopes'},
+                {menuType:'table', name:'new_element', label:'new element'},
+                {menuType:'table', name:'new_isotopes', label:'new isotopes'},
                 {menuType:'proc' , name:'count/without-isotopes', label:'count'}
             ]},
             {menuType:'table', name:'images', table:'element_images'},
@@ -52,6 +54,8 @@ class AppExample extends backendPlus.AppBackend{
             'element_images',
             'cursors',
             'bigint',
+            'new_element',
+            'new_isotopes',
         ]);
     }
 }
