@@ -339,6 +339,9 @@ myOwn.TableGrid.prototype.prepareAndDisplayGrid = function prepareAndDisplayGrid
         return structureRequest.then(function(){
             grid.prepareDepots(rows);
             grid.displayGrid();
+            if(grid.def.forInsertOnlyMode){
+                grid.createRowInsertElements();
+            }
             return grid;
         });
     }).catch(function(err){
@@ -392,18 +395,20 @@ myOwn.ActionColumnGrid.prototype.td = function td(depot){
     var grid = this.grid;
     var thActions=html.th({class:['grid-th','grid-th-actions']}).create();
     var actionNamesList = ['insert','delete','vertical-edit'].concat(grid.def.actionNamesList);
-    actionNamesList.forEach(function(actionName){
-        var actionDef = my.tableAction[actionName];
-        if(grid.def.allow[actionName]){
-            var buttonAction=html.button({class:'table-button'}, [
-                html.img({src:actionDef.img, alt:actionDef.alt, title:my.messages[actionDef.titleMsg]})
-            ]).create();
-            thActions.appendChild(buttonAction);
-            buttonAction.addEventListener('click', function(){
-                actionDef.actionRow(depot, {launcher:buttonAction});
-            });
-        }
-    });
+    if(!grid.def.forInsertOnlyMode){
+        actionNamesList.forEach(function(actionName){
+            var actionDef = my.tableAction[actionName];
+            if(grid.def.allow[actionName]){
+                var buttonAction=html.button({class:'table-button'}, [
+                    html.img({src:actionDef.img, alt:actionDef.alt, title:my.messages[actionDef.titleMsg]})
+                ]).create();
+                thActions.appendChild(buttonAction);
+                buttonAction.addEventListener('click', function(){
+                    actionDef.actionRow(depot, {launcher:buttonAction});
+                });
+            }
+        });
+    }
     return thActions;
 };
 
@@ -1015,7 +1020,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
             buttonSaveModeImg.src=getSaveModeImgSrc();
         });
     }
-    if(grid.def.allow.insert){
+    if(grid.def.allow.insert && !grid.def.forInsertOnlyMode){
         buttonInsert=html.button({class:'table-button'}, [
             html.img({
                 src:my.path.img+'insert.png',
@@ -1027,7 +1032,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
             grid.createRowInsertElements();
         });
     }
-    if(grid.def.allow.filter){
+    if(grid.def.allow.filter && !grid.def.forInsertOnlyMode){
         buttonCreateFilter=html.button({class:'table-button', 'when-filter':'no'}, [
             html.img({
                 src:my.path.img+'filter.png',

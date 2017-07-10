@@ -84,19 +84,24 @@ primaryKey  | A    | `[]`           | lista de nombres de campos que son PK
 foreignKeys | A    | `[]`           | lista las definiciones de las FK
 constraints | A    | `[]`           | lista de constraints (salvo las Pk, FK que van en otra lista)
 sql         | O    | *deducido*     | sintaxis SQL para casos especiales
+layout      | O    | {}             | opciones de despliegue
+  vertical  | L    | `false`        | si el despliegue predeterminado es vertical
 
 ejemplos lista  | formato elemento
 ----------------|--------------------------------------
  foreignKeys    | {references:'ptable', fields:['atomic_number']}
  constraints    | {constraintType:'unique', fields:['atomic_number','order']}
 
-permisos | tabla | campo | uso
+permisos | tabla | campo | indica si se permite...
 ---------|-------|-------|-------
-insert   | x     | x     |
-update   | x     | x     |
-delete   | x     |       |
-select   | x     | x     |
-select   | x     | x     |
+insert   | x     | x     | agregar registros a la grilla
+update   | x     | x     | cambiar valores en la grilla
+delete   | x     |       | borrar registros
+select   | x     | x     | ver datos
+filter   | x     |       | filtrar la grilla
+import   | x     |       | importar datos desde archivos externos
+export   | x     |       | exportar datos a un archivo
+orientation | x  |       | cambiar la orientación de la grilla de vertical/horizontal
 
 sql            | uso
 ---------------|----------------
@@ -135,13 +140,16 @@ list examples   | element format
  foreignKeys    | {references:'ptable', fields:['atomic_number']}
  constraints    | {constraintType:'unique', fields:['atomic_number','order']}
 
-permissions | table | field | use
+permissions | table | field | allows:
 ------------|-------|-------|-------
-insert      | x     | x     |
-update      | x     | x     |
-delete      | x     |       |
-select      | x     | x     |
-select      | x     | x     |
+insert      | x     | x     | (see Spanish)
+update      | x     | x     | (see Spanish)
+delete      | x     |       | (see Spanish)
+select      | x     | x     | (see Spanish)
+filter      | x     |       | (see Spanish)
+import      | x     |       | (see Spanish)
+export      | x     |       | (see Spanish)
+orientation | x     |       | (see Spanish)
 
 sql            | usage
 ---------------|----------------
@@ -332,6 +340,15 @@ install                      | opciones de instalación
 devel                        | conjunto de opciones para el ambiente de desarrollo y testing
   delay                      | tiempo de espera promedio adicional (para simular un servidor lento)
   cache-content              | hace caché de imágenes y archivos en general (si no está en modo "devel" siempre hace caché, no se puede apagar el caché fuera del modo devel)
+  forceShowAsEditable        | fuerza mostrar las grillas como grillas editables para mostrar cómo el servidor impide la modificación
+login                        | opciones de login
+  plus                       | opciones a pasar al módulo login-plus
+    allowHttpLogin           | si permite loguerse desde conexiones HTTP
+    store                    | opciones de store de sesion
+      module-name            | nombre del módulo (ej: file)
+log                          | log por consola
+  req                        | muestra cada requerimiento
+  session                    | muestra info de las sesiones
 
 <!--lang:en--]
 entry                        | usage
@@ -343,6 +360,15 @@ install                      | (see Spanish)
 devel                        | (see Spanish)
   delay                      | (see Spanish)
   cache-content              | (see Spanish)
+  forceShowAsEditable        | (see Spanish)
+login                        | (see Spanish) 
+  plus                       | (see Spanish) 
+    allowHttpLogin           | (see Spanish) 
+    store                    | (see Spanish) 
+      module-name            | (see Spanish) 
+log                          | (see Spanish) 
+  req                        | (see Spanish) 
+  session                    | (see Spanish) 
 
 [!--lang:*-->
 ```yaml
@@ -352,6 +378,14 @@ install:
       owner: user_owner
     scripts:
       post-adapt: [special_triggers.sql, other_contraints.sql]      
+login:
+  plus:
+    allowHttpLogin: true
+    store:
+      module-name: file
+log:
+  req: true
+  session: true
 devel:
   cache-content: true
 ```

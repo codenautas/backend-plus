@@ -60,13 +60,16 @@ list examples   | element format
  foreignKeys    | {references:'ptable', fields:['atomic_number']}
  constraints    | {constraintType:'unique', fields:['atomic_number','order']}
 
-permissions | table | field | use
+permissions | table | field | allows:
 ------------|-------|-------|-------
-insert      | x     | x     |
-update      | x     | x     |
-delete      | x     |       |
-select      | x     | x     |
-select      | x     | x     |
+insert      | x     | x     | (see Spanish)
+update      | x     | x     | (see Spanish)
+delete      | x     |       | (see Spanish)
+select      | x     | x     | (see Spanish)
+filter      | x     |       | (see Spanish)
+import      | x     |       | (see Spanish)
+export      | x     |       | (see Spanish)
+orientation | x     |       | (see Spanish)
 
 sql            | usage
 ---------------|----------------
@@ -201,6 +204,15 @@ install                      | (see Spanish)
 devel                        | (see Spanish)
   delay                      | (see Spanish)
   cache-content              | (see Spanish)
+  forceShowAsEditable        | (see Spanish)
+login                        | (see Spanish)
+  plus                       | (see Spanish)
+    allowHttpLogin           | (see Spanish)
+    store                    | (see Spanish)
+      module-name            | (see Spanish)
+log                          | (see Spanish)
+  req                        | (see Spanish)
+  session                    | (see Spanish)
 
 ```yaml
 install:
@@ -209,6 +221,14 @@ install:
       owner: user_owner
     scripts:
       post-adapt: [special_triggers.sql, other_contraints.sql]
+login:
+  plus:
+    allowHttpLogin: true
+    store:
+      module-name: file
+log:
+  req: true
+  session: true
 devel:
   cache-content: true
 ```
