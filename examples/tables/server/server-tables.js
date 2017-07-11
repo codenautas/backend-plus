@@ -9,6 +9,9 @@ var changing = require('best-globals').changing;
 class AppExample extends backendPlus.AppBackend{
     constructor(){
         super();
+        this.internalData={
+            filterAtomicNumberForIsotopes:3
+        }
     }
     get rootPath(){ return Path.resolve(__dirname,'..'); }
     addLoggedServices(){
