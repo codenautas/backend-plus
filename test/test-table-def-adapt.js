@@ -75,7 +75,8 @@ describe("table-def-adapt", function(){
               "postCreateSqls": "",
               "select": [
                 '"id"'
-              ]
+              ],
+              tableName: "the-table-name"
             },
             "title": "the-table-name",
         }
