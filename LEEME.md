@@ -80,20 +80,22 @@ name        | T    |                | nombre que va a tener la tabla en el siste
 title       | T    | `name`         | título en la grilla
 editable    | L    | `false`        | los permisos
 allow       | OP   | `editable`     | objeto de permisos individuales
-primaryKey  | A    | `[]`           | lista de nombres de campos que son PK
-foreignKeys | A    | `[]`           | lista las definiciones de las FK
-constraints | A    | `[]`           | lista de constraints (salvo las Pk, FK que van en otra lista)
+primaryKey  | [T]  | `[]`           | lista de nombres de campos que son PK
+foreignKeys | [O]  | `[]`           | lista las definiciones de las FK
+constraints | [O]  | `[]`           | lista de constraints (salvo las Pk, FK que van en otra lista)
 sql         | O    | *deducido*     | sintaxis SQL para casos especiales
   isTable   | L    | `true`         | si es una tabla y por lo tanto hay que hacer el dump para el create table y si se le deben deducir los campos name de sus FK
   tableName | T    | `name`         | nombre de la tabla física (generalmente es el mismo name de definición de la tabla en el sistema)
 layout      | O    | {}             | opciones de despliegue
   vertical  | L    | `false`        | si el despliegue predeterminado es vertical
 forInsertOnlyMode | L | `false`     | si es una tabla de solo inserción
+filterColumns | [O]| `[]`           | lista de objetos de la forma {column, operator, value} para que sea el filtro predeterminado de la grilla
 
 ejemplos lista  | formato elemento
 ----------------|--------------------------------------
  foreignKeys    | {references:'ptable', fields:['atomic_number']}
  constraints    | {constraintType:'unique', fields:['atomic_number','order']}
+ filterColumns  | {column:'atomic_number', operator:'=', value:7}
 
 permisos | tabla | campo | indica si se permite...
 ---------|-------|-------|-------
@@ -133,16 +135,21 @@ name        | T    |                | table name in database. this name is the t
 title       | T    | `name`         | grid title
 editable    | L    | `false`        | permissions
 allow       | PO   | `editable`     | individual permissions object
-primaryKey  | A    | `[]`           | PK name field list
-foreignKeys | A    | `[]`           | FK definition list
-constraints | A    | `[]`           | constraints list (except PK and FK)
+primaryKey  | [T]  | `[]`           | PK name field list
+foreignKeys | [O]  | `[]`           | FK definition list
+constraints | [O]  | `[]`           | constraints list (except PK and FK)
 sql         | O    | *deduced*      | SQL syntax for special cases
   isTable   | L    | `true`         | (see Spanish)
+layout      | O    | {}             | (see Spanish)
+  vertical  | L    | `false`        | (see Spanish)
+forInsertOnlyMode | L | `false`     | (see Spanish)
+filterColumns | [O] | `[]`          | (see Spanish)
 
 list examples   | element format
 ----------------|--------------------------------------
  foreignKeys    | {references:'ptable', fields:['atomic_number']}
  constraints    | {constraintType:'unique', fields:['atomic_number','order']}
+ filterColumns  | {column:'atomic_number', operator:'=', value:7}
 
 permissions | table | field | allows:
 ------------|-------|-------|-------
