@@ -626,7 +626,7 @@ myOwn.prepareRulerToggle = function prepareRulerToggle(){
                 Array.prototype.forEach.call(tables,function(table){
                     var myTableName = table.getAttribute("my-table");
                     var autoStyleTop = my.inlineCss("css-my-table-"+myTableName+"-top");
-                    var rect = my.getRect(table.tHead.rows[0]);
+                    var rect = my.getRect(table.tHead?table.tHead.rows[0]:table);
                     var cssClausules=[];
                     autoStyleTop.actualDif=my.autoRuler && window.scrollY-rect.top;
                     if(!('previousDif' in autoStyleTop) || autoStyleTop.actualDif!=autoStyleTop.previousDif){

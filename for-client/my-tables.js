@@ -587,14 +587,33 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
         td.setTypedValue(depot.row[fieldDef.name]);
     }
     if(!fieldDef.clientSide){
+       // console.log("fieldDef",fieldDef.name,fieldDef)
         td.addEventListener('update',function(){
             var value = this.getTypedValue();
+            for(var control in depot.rowControls){
+                if(depot.rowControls[control].controledTypeInfo.inTable===false){
+                   // depot.rowControls[control].innerHTML='x';
+                    //console.log(depot.rowControls[control]);
+                }
+                
+            }
+            // likeAr(depot.rowControls).forEach(function(control){
+            //     console.log("control.td",control);
+            // })
             if(!sameValue(value,depot.row[fieldDef.name])){
                 this.setAttribute('io-status', 'pending');
                 depot.rowPendingForUpdate[fieldDef.name] = value;
                 depot.row[fieldDef.name] = value;
                 if(grid.modes.saveByField){
                     saveRow(depot,{visiblyLogErrors:false});
+                }
+               // console.log("fieldDef",fieldDef)
+                if(fieldDef.references){
+                    grid.def.fields.forEach(function(field){
+                        if(field.referencedAlias && field.referencedAlias==fieldDef.references){
+                            depot.rowControls[field.name].setTypedValue('x');
+                        }
+                    })
                 }
             }
         });
