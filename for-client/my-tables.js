@@ -907,8 +907,8 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
             });
         }});
     }
-    if(grid.def.allow.import){
-        menuOptions.push({img:my.path.img+'import.png', value:true, label:my.messages.import, doneFun:function(){
+    myOwn.dialogUpload = function dialogUpload(ajaxPath, ajaxParams, ajaxPrepareResultFun, showWithMiniMenu, messages){
+        var doneFun = function doneFun(){
             var buttonFile=html.input({class:'import-button',type:'file',style:'min-width:400px'}).create();
             var buttonConfirmImport=html.input({class:'import-button',type:'button', value:my.messages.import}).create();
             var progressIndicator=html.div({class:'indicator'},' ').create();
@@ -927,28 +927,13 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                 buttonConfirmImport.value='cargando...';
                 buttonConfirmImport.disabled=true;
                 bestGlobals.sleep(100).then(function(){
-                    return my.ajax.table.upload({
-                        table:grid.def.name, 
-                        prefilledFields:grid.connector.fixedFields,
+                    return my.ajax[ajaxPath[0]][ajaxPath[1]](changing(ajaxParams, {
                         files:files
-                    },{uploading:uploadingProgress});
-                }).then(function(result){
-                    var message='';
-                    if(result.uploaded.inserted==1){
-                        message+=my.messages.oneRowInserted;
-                    }else if(result.uploaded.inserted>1){
-                        message+=my.messages.xRowsInserted.replace('{$x}',result.uploaded.inserted);;
-                    }
-                    if(result.uploaded.updated==1){
-                        message+=my.messages.oneRowUpdated;
-                    }else if(result.uploaded.updated>1){
-                        message+=my.messages.xRowsUpdated.replace('{$x}',result.uploaded.updated);;
-                    }
-                    return message;
-                }).then(this.dialogPromiseDone,this.dialogPromiseDone);
+                    }),{uploading:uploadingProgress});
+                }).then(ajaxPrepareResultFun).then(this.dialogPromiseDone,this.dialogPromiseDone);
             });
             simpleFormPromise({elementsList:[
-                my.messages.importDataFromFile,
+                changing(my.messages, messages).importDataFromFile,
                 buttonFile, 
                 html.br().create(),
                 buttonConfirmImport,
@@ -965,7 +950,43 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     my.alertError(err)
                 ]);
             });
-        }});
+        }
+                        
+        if(showWithMiniMenu){
+            return {img:my.path.img+'import.png', value:true, label:my.messages.import, doneFun: doneFun};
+        }else{
+            doneFun();
+        }
+        
+    };
+    if(grid.def.allow.import){
+        var showWithMiniMenu = true;
+        var messages = {};
+        menuOptions.push(
+            myOwn.dialogUpload(
+                ['table','upload'], 
+                {
+                    table:grid.def.name, 
+                    prefilledFields:grid.connector.fixedFields,
+                },
+                function(result){
+                    var message='';
+                    if(result.uploaded.inserted==1){
+                        message+=my.messages.oneRowInserted;
+                    }else if(result.uploaded.inserted>1){
+                        message+=my.messages.xRowsInserted.replace('{$x}',result.uploaded.inserted);;
+                    }
+                    if(result.uploaded.updated==1){
+                        message+=my.messages.oneRowUpdated;
+                    }else if(result.uploaded.updated>1){
+                        message+=my.messages.xRowsUpdated.replace('{$x}',result.uploaded.updated);;
+                    }
+                    return message;
+                },
+                showWithMiniMenu,
+                messages
+            )
+        );
     }
     if(grid.def.allow.delete){
         menuOptions.push({img:my.path.img+'delete-all-rows.png', value:true, label:my.messages.deleteAllRecords, doneFun:function(){
