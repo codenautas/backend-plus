@@ -50,15 +50,21 @@ name        | T    |                | table name in database. this name is the t
 title       | T    | `name`         | grid title
 editable    | L    | `false`        | permissions
 allow       | PO   | `editable`     | individual permissions object
-primaryKey  | A    | `[]`           | PK name field list
-foreignKeys | A    | `[]`           | FK definition list
-constraints | A    | `[]`           | constraints list (except PK and FK)
+primaryKey  | [T]  | `[]`           | PK name field list
+foreignKeys | [O]  | `[]`           | FK definition list
+constraints | [O]  | `[]`           | constraints list (except PK and FK)
 sql         | O    | *deduced*      | SQL syntax for special cases
+  isTable   | L    | `true`         | (see Spanish)
+layout      | O    | {}             | (see Spanish)
+  vertical  | L    | `false`        | (see Spanish)
+forInsertOnlyMode | L | `false`     | (see Spanish)
+filterColumns | [O] | `[]`          | (see Spanish)
 
 list examples   | element format
 ----------------|--------------------------------------
  foreignKeys    | {references:'ptable', fields:['atomic_number']}
  constraints    | {constraintType:'unique', fields:['atomic_number','order']}
+ filterColumns  | {column:'atomic_number', operator:'=', value:7}
 
 permissions | table | field | allows:
 ------------|-------|-------|-------

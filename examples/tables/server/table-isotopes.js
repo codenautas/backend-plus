@@ -15,6 +15,9 @@ module.exports = function(context){
             {name:'order'               , typeName:'integer', width:100,                      orderForInsertOnly:'4'      },
             {name:'stable'              , typeName:'boolean', width:100,                                                  },
         ],
+        filterColumns:[
+            {column:'atomic_number', operator:'>', value:context.be.internalData.filterAtomicNumberForIsotopes}
+        ],
         primaryKey:['atomic_number','mass_number'],
         constraints:[
             {constraintType:'unique', fields:['atomic_number','order']}
