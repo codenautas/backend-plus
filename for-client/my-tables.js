@@ -587,19 +587,8 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
         td.setTypedValue(depot.row[fieldDef.name]);
     }
     if(!fieldDef.clientSide){
-       // console.log("fieldDef",fieldDef.name,fieldDef)
         td.addEventListener('update',function(){
             var value = this.getTypedValue();
-            for(var control in depot.rowControls){
-                if(depot.rowControls[control].controledTypeInfo.inTable===false){
-                   // depot.rowControls[control].innerHTML='x';
-                    //console.log(depot.rowControls[control]);
-                }
-                
-            }
-            // likeAr(depot.rowControls).forEach(function(control){
-            //     console.log("control.td",control);
-            // })
             if(!sameValue(value,depot.row[fieldDef.name])){
                 this.setAttribute('io-status', 'pending');
                 depot.rowPendingForUpdate[fieldDef.name] = value;
@@ -607,12 +596,18 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
                 if(grid.modes.saveByField){
                     saveRow(depot,{visiblyLogErrors:false});
                 }
-               // console.log("fieldDef",fieldDef)
                 if(fieldDef.references){
-                    grid.def.fields.forEach(function(field){
-                        if(field.referencedAlias && field.referencedAlias==fieldDef.references){
-                            depot.rowControls[field.name].setTypedValue('x');
-                        }
+                    var reference = my.getReference(fieldDef.references);
+                    reference.dataReady.then(function(rows){
+                        var referencedValue;
+                        grid.def.fields.forEach(function(field){
+                            if(field.referencedAlias && field.referencedAlias==fieldDef.references){
+                                referencedValue=rows.find(function(row){
+                                    return depot.row[fieldDef.name]==row[fieldDef.name];
+                                })||{};
+                                depot.rowControls[field.name].setTypedValue(referencedValue[field.referencedName]||null);
+                            }
+                        })
                     })
                 }
             }
@@ -1410,7 +1405,9 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         })).create();
         grid.hasFilterRow=tr;
         grid.dom.table.setAttribute('has-filter',1);
-        grid.dom.table.tHead.appendChild(tr);
+        if(grid.dom.table.tHead){ //TODO: el filtro para verticales debe organizarse sin tr
+            grid.dom.table.tHead.appendChild(tr);
+        }
         return depot;
     };
     grid.displayBody=function displayBody(){
@@ -1592,9 +1589,33 @@ myOwn.clientSides={
 
 myOwn.references={};
 
+myOwn.getReference = function initReference(referenceName, forceRefresh){
+    var reference={};
+    if(!my.references[referenceName]){
+        var dummyElement = html.div().create();
+        var connector=new my.TableConnector({
+            my:my, 
+            tableName: referenceName, 
+            getElementToDisplayCount:function(){ return dummyElement; }
+        });
+        connector.getStructure();
+        var dataReady=connector.getData().then(function(rows){
+            reference.rows=rows;
+            reference.tableDef=connector.def;
+            return rows;
+        });
+        reference=my.references[referenceName]={
+            connector:connector,
+            dataReady:dataReady
+        };
+    }else{
+        reference=my.references[referenceName]
+    }
+    return reference;
+}
+
 myOwn.autoSetupFunctions.push(function autoSetupMyTables(){
     var my=this;
-    var dummyElement = html.div().create();
     TypedControls.Expanders.unshift({
         whenType: function(typedControl){ 
             var typeInfo = typedControl.controledTypeInfo;
@@ -1602,29 +1623,9 @@ myOwn.autoSetupFunctions.push(function autoSetupMyTables(){
         },
         dialogInput:function(typedControl){
             var typeInfo = typedControl.controledTypeInfo;
-            var dataReady;
-            var reference;
             var canceled;
-            if(!my.references[typeInfo.references]){
-                var connector=new my.TableConnector({
-                    my:my, 
-                    tableName: typeInfo.references, 
-                    getElementToDisplayCount:function(){ return dummyElement; }
-                });
-                connector.getStructure();
-                dataReady=connector.getData().then(function(rows){
-                    reference.rows=rows;
-                    reference.tableDef=connector.def;
-                    return rows;
-                });
-                reference=my.references[typeInfo.references]={
-                    connector:connector,
-                    dataReady:dataReady
-                };
-            }else{
-                reference=my.references[typeInfo.references]
-                dataReady=reference.dataReady;
-            }
+            var reference = my.getReference(typeInfo.references);
+            var dataReady = reference.dataReady;
             var timeoutWaiting=setTimeout(function(){
                 timeoutWaiting=null;
                 dialogPromise(function(dialogWindow, closeWindow){
