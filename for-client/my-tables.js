@@ -605,11 +605,14 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
                                 referencedValue=rows.find(function(row){
                                     return depot.row[fieldDef.name]==row[fieldDef.name];
                                 })||{};
-                                depot.rowControls[field.name].setTypedValue(referencedValue[field.referencedName]||null);
+                                var lookupValue=coalesce(referencedValue[field.referencedName],null);
+                                depot.row[field.name]=lookupValue;
+                                depot.rowControls[field.name].setTypedValue(lookupValue);
                             }
                         })
                     })
                 }
+                grid.updateRowData(depot); // revisualiza aunque no haya grabado
             }
         });
     }
@@ -1231,7 +1234,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     grid.my.clientSides[fieldDef.clientSide].update(depot, fieldDef.name);
                 }
             }else{
-                td.setTypedValue(depot.row[fieldDef.name]);
+                td.setTypedValue(coalesce(depot.row[fieldDef.name],null));
             }
         });
     };
