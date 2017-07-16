@@ -609,7 +609,7 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
                         })
                     })
                 }
-                grid.updateRowData(depot); // revisualiza aunque no haya grabado
+                grid.updateRowData(depot,true); // revisualiza aunque no haya grabado
             }
         });
     }
@@ -1208,14 +1208,16 @@ myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElem
 myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
     var grid = this;
     var tbody = grid.dom.table.tBodies[0];
-    grid.updateRowData = function updateRowData(depot){
+    grid.updateRowData = function updateRowData(depot, skipUpdateStatus){
         var grid = this;
         var forInsert = false; // not define how to detect
         var tr = depot;
-        depot.status = 'loaded';
-        depot.primaryKeyValues = grid.def.primaryKey.map(function(fieldName){ 
-            return depot.row[fieldName]; 
-        });
+        if(!skipUpdateStatus){
+            depot.status = 'loaded';
+            depot.primaryKeyValues = grid.def.primaryKey.map(function(fieldName){ 
+                return depot.row[fieldName]; 
+            });
+        }
         grid.def.fields.forEach(function(fieldDef){
             var td = depot.rowControls[fieldDef.name];
             var editable=grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
@@ -1230,7 +1232,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 }else if(grid.my.clientSides[fieldDef.clientSide].update){
                     grid.my.clientSides[fieldDef.clientSide].update(depot, fieldDef.name);
                 }
-            }else{
+            }else if(!skipUpdateStatus){
                 td.setTypedValue(coalesce(depot.row[fieldDef.name],null));
             }
         });
