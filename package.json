@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for typed controls",
-  "version": "0.15.8",
+  "version": "0.15.9",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -20,7 +20,7 @@
     "es6-promise": "~4.1.1",
     "escape-string-regexp": "~1.0.5",
     "express": "~4.15.3",
-    "express-session": "~1.15.3",
+    "express-session": "~1.15.4",
     "express-useragent": "~1.0.7",
     "fs-extra": "~4.0.0", 
     "fs-promise": "~2.0.3", 
@@ -36,7 +36,7 @@
     
     "ajax-best-promise": "~0.3.3",
     "backend-skins": "~0.1.0",
-    "best-globals": "~0.9.6",
+    "best-globals": "~0.9.7",
     "castellano": "~0.1.0",
     "dialog-promise": "~0.8.0",
     "extension-serve-static": "~0.1.6",
@@ -51,7 +51,7 @@
     "require-bro": "~0.1.5",
     "self-explain": "~0.10.13",
     "serve-content": "~0.3.8",
-    "type-store": "~0.1.8",
+    "type-store": "~0.1.9",
     "typed-controls": "~0.6.8"
   },
   "devDependencies": {

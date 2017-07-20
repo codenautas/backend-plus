@@ -1173,7 +1173,6 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     grid.dom.main.appendChild(grid.dom.table);
 };
 
-
 myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElements(belowDepot){
     var grid = this;
     var position;
@@ -1203,8 +1202,11 @@ myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElem
     });
     //TODO: mejorar la posición dentro del splice o concluir que no sirve el splice
     grid.depots.splice(Math.min(grid.depots.length,Math.max(0,position)),0,depotForInsert);
-    return grid.createRowElements(position, depotForInsert);
+    var newRow = grid.createRowElements(position, depotForInsert);
+    grid.updateRowData(depotForInsert,true);
+    return newRow;
 };
+
 myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
     var grid = this;
     var tbody = grid.dom.table.tBodies[0];
