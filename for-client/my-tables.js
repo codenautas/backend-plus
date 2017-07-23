@@ -375,7 +375,7 @@ myOwn.ActionColumnGrid = function ActionColumnGrid(opts){
 myOwn.ActionColumnGrid.prototype = Object.create(myOwn.ColumnGrid.prototype);
 
 myOwn.ActionColumnGrid.prototype.th = function th(){
-    return html.th(this.actions);
+    return html.th({class:'th-action'}, this.actions);
 };
 
 myOwn.ActionColumnGrid.prototype.thFilter = function thFilter(depot){
