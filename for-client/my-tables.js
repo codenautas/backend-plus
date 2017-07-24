@@ -79,7 +79,7 @@ myOwn.messages=changing(myOwn.messages, {
     recordsReimaining: "{$r} records remains in the table",
     refresh: "refresh - retrive data from database",
     showInheritedKeys: "show inherited keys",
-    similartTo:'similar to',
+    similarTo:'similar to',
     table: "table",
     uploadFile: "upload file $1",
     verticalEdit: "vertical edit",
