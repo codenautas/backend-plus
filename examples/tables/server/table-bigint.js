@@ -13,6 +13,7 @@ module.exports = function(context){
             {name:'col_number'      , typeName:'number'                   },
             {name:'intervalos'      , typeName:'interval'                 },
             {name:'col_decimal'     , typeName:'decimal'                  },
+            {name:'col_ts'          , typeName:'timestamp'                },
         ],
         primaryKey:['id']
     });
