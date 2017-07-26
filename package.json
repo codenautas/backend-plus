@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for typed controls",
-  "version": "0.15.16",
+  "version": "0.15.17",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -36,7 +36,7 @@
     
     "ajax-best-promise": "~0.3.3",
     "backend-skins": "~0.1.0",
-    "best-globals": "~0.9.12",
+    "best-globals": "~0.9.13",
     "castellano": "~0.1.0",
     "dialog-promise": "~0.8.0",
     "extension-serve-static": "~0.1.6",
@@ -58,7 +58,7 @@
     "expect.js": "~0.3.1",
     "istanbul": "~0.4.5",
     "mocha": "~3.4.2",
-    "sinon": "~2.3.8",
+    "sinon": "~2.4.0",
     "supertest": "~3.0.0",
     
     "kill-9": "~0.4.2"
