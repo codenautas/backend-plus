@@ -9,7 +9,7 @@ module.exports = function(context){
         fields:[
             {name:'group'              , typeName:'text'   , nullable:false          },
             {name:'class'              , typeName:'text'                             },
-            {name:'color'              , typeName:'text'   , allow:{select:admin}    , isName:true},
+            {name:'color'              , typeName:'text'   , allow:{select:admin || context.forDump}    , isName:true},
             {name:'color_'             , typeName:'text'   , clientSide:'colorSample', allow:{update:false}},
         ],
         primaryKey:['group'],

@@ -21,8 +21,8 @@ module.exports = function(context){
             {name:'block'               , typeName:'text'                                    },
             {name:'state at STP'        , typeName:'text'                                    },
             {name:'ocurrence'           , typeName:'text'                                    },
-            {name:'isotopes'            , typeName:'ARRAY:text', editable:false              },
-            {name:'cant_images'         , typeName:'integer'   , editable:false              },
+            {name:'isotopes'            , typeName:'ARRAY:text', inTable: false , editable:false              },
+            {name:'cant_images'         , typeName:'integer'   , inTable: false, editable:false              },
         ],
         primaryKey:['atomic_number'],
         detailTables:[
