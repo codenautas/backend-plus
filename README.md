@@ -37,88 +37,8 @@ It's a framework for developing web applications based on PostgreSQL database. I
 ## API
 
 
-### Tables definition
+### [table definitions](doc/table-definitions.md)
 
-Are defined tables, database views (which correspond to a database VIEW), or query views (which are simply a query that knows the application but didn't generate a VIEW).
-In the future there will be available to create tables which not have data originated by the database, for example a list of fields would have to be able to be seen in a table.
-
-#### tableDef:
-
-property    | type | default value  | use
-------------|------|----------------|----------------------------------------------------------------------------------------------
-name        | T    |                | table name in database. this name is the table id inside the system
-title       | T    | `name`         | grid title
-editable    | L    | `false`        | permissions
-allow       | PO   | `editable`     | individual permissions object
-primaryKey  | [T]  | `[]`           | PK name field list
-foreignKeys | [O]  | `[]`           | FK definition list
-constraints | [O]  | `[]`           | constraints list (except PK and FK)
-sql         | O    | *deduced*      | SQL syntax for special cases
-  isTable   | L    | `true`         | (see Spanish)
-layout      | O    | {}             | (see Spanish)
-  vertical  | L    | `false`        | (see Spanish)
-forInsertOnlyMode | L | `false`     | (see Spanish)
-filterColumns | [O] | `[]`          | (see Spanish)
-
-list examples   | element format
-----------------|--------------------------------------
- foreignKeys    | {references:'ptable', fields:['atomic_number']}
- constraints    | {constraintType:'unique', fields:['atomic_number','order']}
- filterColumns  | {column:'atomic_number', operator:'=', value:7}
-
-permissions | table | field | allows:
-------------|-------|-------|-------
-insert      | x     | x     | (see Spanish)
-update      | x     | x     | (see Spanish)
-delete      | x     |       | (see Spanish)
-select      | x     | x     | (see Spanish)
-filter      | x     |       | (see Spanish)
-import      | x     |       | (see Spanish)
-export      | x     |       | (see Spanish)
-orientation | x     |       | (see Spanish)
-
-sql            | usage
----------------|----------------
-postCreateSqls | (see Spanish)
-
-#### fieldDef:
-
-property | type | default value | use
----------|------|---------------|-------------------
-name     | T    |               | name in database and field id
-typeName | T    |               | data type
-title    | T    | `name`        | title in the grid if you don't want to use name property default value
-
-
-Integrating example:
-
-
-```js
-module.exports = function(context){
-    return context.be.tableDefAdapt({
-        name:'isotopes',
-        title:'stable isotopes',
-        allow:{
-            insert:context.user.rol==='boss',
-            delete:context.user.rol==='boss',
-            update:context.user.rol==='boss',
-        },
-        fields:[
-            {name:'atomic_number', title:'A#', typeName:'integer', width:100, nullable:false,               },
-            {name:'mass_number'         , typeName:'integer', width:100,                               },
-            {name:'order'               , typeName:'integer', width:100,                               },
-            {name:'stable'              , typeName:'boolean', width:100,                               },
-        ],
-        primaryKey:['atomic_number','mass_number'],
-        constraints:[
-            {constraintType:'unique', fields:['atomic_number','order']}
-        ],
-        foreignKeys:[
-            {references:'ptable', fields:['atomic_number']}
-        ]
-    },context);
-}
-```
 ### Menus definition
 
 menuType | use
