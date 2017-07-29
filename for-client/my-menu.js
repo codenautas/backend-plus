@@ -98,16 +98,28 @@ myOwn.showPage = function showPage(pageDef){
     }else{
         addrParams.i=[];
     }
-    var menu = my.displayMainMenu(addrParams);
-    var w=addrParams.w;
-    if(!w && menu && menu.selectedItem){
-        addrParams = changing(addrParams, menu.selectedItem);
-        w=menu.selectedItem.menuType;
+    var totalLayout=document.getElementById('total-layout');
+    if(totalLayout.getAttribute('menu-type')!='hidden'){
+        var menu = my.displayMainMenu(addrParams);
+        var w=addrParams.w;
+        if(!w && menu && menu.selectedItem){
+            addrParams = changing(addrParams, menu.selectedItem);
+            w=menu.selectedItem.menuType;
+        }
+        if(typeof my.wScreens[w] === 'function'){
+            my.wScreens[w].call(my, addrParams);
+        }
+        var rightMenu = document.getElementById('right-menu');
+    }else{
+        var rightMenu = html.span({id: "right-menu"}, [
+            html.img({class: "right-menu", src: my.path.img+"three-dot-menu.png",id: "right-menu-icon"}),
+        ]).create();
+        rightMenu.style.position='fixed';
+        rightMenu.style.top='0px';
+        rightMenu.style.left=window.innerWidth-40+'px';//screen.width-32
+        rightMenu.style.zIndex=300;
+        totalLayout.appendChild(rightMenu);
     }
-    if(typeof my.wScreens[w] === 'function'){
-        my.wScreens[w].call(my, addrParams);
-    }
-    var rightMenu = document.getElementById('right-menu');
     rightMenu.onclick=function(){
         my.rightMenu();
     }
