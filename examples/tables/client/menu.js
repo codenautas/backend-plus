@@ -5,6 +5,30 @@ var html=jsToHtml.html;
 
 var my = myOwn;
 
+myOwn.wScreens["demo-screen"] = function(addrParams){
+    setTimeout(function(){
+        var layout = document.getElementById('main_layout');
+        window.TestE = d.documentElement;
+        window.TestG = d.getElementsByTagName('body')[0];
+        var bases='window,document,screen,TestE,TestG'.split(',');
+        var props='innerWidth,innerHeight,outerWidth,outerHeight,orientation,width,height,clientWidth,clientHeight,offsetWidth,offsetHeight,availWidth,availHeight'.split(',')
+        var table=html.table([
+            html.thead([
+                html.tr(bases.map(function(base){
+                    return th(base);
+                });
+            ]),
+            html.tbody(
+                props.map(function(prop){
+                    return html.tr(bases.map(function(base){
+                        return prop in window[base]?prop in window[base][prop]:'-'
+                    });
+                })
+            )
+        });
+    },10);
+}
+
 my.tableAction.showImg={
     img: my.path.img+'picture.png',
     alt: 'img',
