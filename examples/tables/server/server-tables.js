@@ -59,6 +59,7 @@ class AppExample extends backendPlus.AppBackend{
             'bigint',
             'new_element',
             'new_isotopes',
+            'other_fields',
         ]);
     }
 }
