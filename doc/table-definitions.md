@@ -28,21 +28,22 @@ In the future there will be available to create tables which not have data origi
 ## tableDef
 
 
-property    | type | default value  | use
-------------|------|----------------|----------------------------------------------------------------------------------------------
-name        | T    |                | table name in database. this name is the table id inside the system
-title       | T    | `name`         | grid title
-editable    | L    | `false`        | permissions
-allow       | PO   | `editable`     | individual permissions object
-primaryKey  | [T]  | `[]`           | PK name field list
-foreignKeys | [O]  | `[]`           | FK definition list
-constraints | [O]  | `[]`           | constraints list (except PK and FK)
-sql         | O    | *deduced*      | SQL syntax for special cases
-  isTable   | L    | `true`         | (see Spanish)
-layout      | O    | {}             | (see Spanish)
-  vertical  | L    | `false`        | (see Spanish)
-forInsertOnlyMode | L | `false`     | (see Spanish)
-filterColumns | [O] | `[]`          | (see Spanish)
+property          | type | default value         | use
+------------------|------|-----------------------|----------------------------------------------------------------------------------------------
+name              | T    |                       | table name in database. this name is the table id inside the system
+title             | T    | `name`                | grid title
+editable          | L    | `false`               | permissions
+allow             | PO   | `editable`            | individual permissions object
+primaryKey        | [T]  | `[]`                  | PK name field list
+foreignKeys       | [O]  | `[]`                  | FK definition list
+constraints       | [O]  | `[]`                  | constraints list (except PK and FK)
+sql               | O    | *deduced*             | SQL syntax for special cases
+isTable           | L    | `true`                | (see Spanish)
+layout            | O    | {}                    | (see Spanish)
+vertical          | L    | `false`               | (see Spanish)
+forInsertOnlyMode | L    | `false`               | (see Spanish)
+filterColumns     | [O]  | `[]`                  | (see Spanish)
+registerImports   | [O]  | (registerImportsDef)  | Object list. It is uset to configure how "others" fields are stored when any person imports a file (*it works* **__only if you set to true one field with "defaultForOtherFields"__** *(see fieldDef)*)
 
 list examples   | element format
 ----------------|--------------------------------------
@@ -70,17 +71,47 @@ postCreateSqls | (see Spanish)
 ## fieldDef
 
 
-property | type | default value | use
----------|------|---------------|-------------------
-name     | T    |               | name in database and field id
-typeName | T    |               | data type
-title    | T    | `name`        | title in the grid if you don't want to use name property default value
+property              | type | default value | use
+----------------------|------|---------------|-------------------
+name                  | T    |               | name in database and field id
+typeName              | T    |               | data type
+title                 | T    | `name`        | title in the grid if you don't want to use name property default value
+inTable               | L    | true          | determine if field belongs physically to the table and the dump.
+defaultForOtherFields | B    | false         | determines if field (must to be defined as "text") is used to save a JSON with other fields when any person imports a file
 
-Integrating example:
+
+## registerImportsDef
+
+
+property              | type | default value   | use
+----------------------|------|-----------------|-------------------
+inTable               | T    | null            | table name used to save "other" fields. It's necessary to define if you want to save information (the table must exist, see integrating example)
+fieldNames            | [O]  | (fieldNamesDef) | Object with table fields configuration.
+
+
+## fieldNamesDef
+
+
+Each property defines the field name of the table previously setted in "registerImports.inTable" that will be used to store information about "other" fields imported.
+
+property            | type | default value   | use y restrictions
+--------------------|------|-----------------|-------------------
+tableName           | T    | 'table_name'    | Origin table of field (can't be null and must to be defined as text and PK in "registerImports.inTable")
+fieldName           | T    | 'field'         | Fieldname (can't be null and must to be defined as text and PK in "registerImports.inTable")
+fieldIndex          | T    | 'field_index'   | Field position in file (can't be null and must to be defined as integer in "registerImports.inTable")
+originalFileName    | T    | null            | Filename to which belongs the field (can be null and must to be defined as text in "registerImports.inTable")
+serverPath          | T    | null            | File path to whitch belongs the field (can be null and must to be defined as text in "registerImports.inTable")
+lastUpload          | T    | null            | Timestamp of last import (can be null and must to be defined as timestamp in "registerImports.inTable")
+
+
+Null fields can be undefined in "registerImports.inTable". Not Null fields are required and must respect restrictions. If you don't define optatives properties (Which can be null), information not will be registered although you defines them in "registerImporst.inTable".
 
 
 ## Context
 
+
+
+Integrating example:
 
 
 ```js
@@ -93,11 +124,23 @@ module.exports = function(context){
             delete:context.user.rol==='boss',
             update:context.user.rol==='boss',
         },
+        registerImports:{
+            inTable:'other_fields', 
+            fieldNames:{
+                originalFileName:'original_filename',
+                serverPath:'server_filepath',
+                lastUpload:'last_upload',
+            }
+        },
         fields:[
-            {name:'atomic_number', title:'A#', typeName:'integer', width:100, nullable:false,          },
-            {name:'mass_number'         , typeName:'integer', width:100,                               },
-            {name:'order'               , typeName:'integer', width:100,                               },
-            {name:'stable'              , typeName:'boolean', width:100,                               },
+            {name:'atomic_number', title:'A#', typeName:'integer' , width:100, nullable:false,      orderForInsertOnly:'1' },
+            {name:'mass_number'              , typeName:'integer' , width:100,                      orderForInsertOnly:'2' },
+            {name:'order'                    , typeName:'integer' , width:100,                      orderForInsertOnly:'4' },
+            {name:'stable'                   , typeName:'boolean' , width:100,                                             },
+            {name:'others'                   , typeName:'text'    , width:700, defaultForOtherFields: true                },
+        ],
+        filterColumns:[
+            {column:'atomic_number', operator:'>', value:context.be.internalData.filterAtomicNumberForIsotopes}
         ],
         primaryKey:['atomic_number','mass_number'],
         constraints:[
@@ -107,5 +150,29 @@ module.exports = function(context){
             {references:'ptable', fields:['atomic_number']}
         ]
     },context);
+}
+
+//other fields table definition
+
+module.exports = function(context){
+    var admin = context.user.rol==='boss';
+    return context.be.tableDefAdapt({
+        name:'other_fields',
+        allow:{
+            insert:true,
+            update:true,
+        },
+        title:'information about other fields',
+        editable:admin,
+        fields:[
+            {name:'table_name'          , typeName:'text'       , nullable:false  },
+            {name:'field'               , typeName:'text'       , nullable:false  },
+            {name:'field_index'         , typeName:'integer'    , nullable:false  },
+            {name:'original_filename'   , typeName:'text'                         },
+            {name:'server_filepath'     , typeName:'text'                         },
+            {name:'last_upload'         , typeName:'timestamp'                    },
+        ],
+        primaryKey:['table_name', 'field'],
+    }, context);
 }
 ```

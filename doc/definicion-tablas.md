@@ -35,28 +35,29 @@ In the future there will be available to create tables which not have data origi
 
 <!--lang:es-->
 
-propiedad   | tipo | predeterminado | uso
-------------|------|----------------|----------------------------------------------------------------------------------------------
-name        | T    |                | nombre que va a tener la tabla en el sistema
-title       | T    | `name`         | título en la grilla
-editable    | L    | `false`        | los permisos
-allow       | OP   | `editable`     | objeto de permisos individuales
-primaryKey  | [T]  | `[]`           | lista de nombres de campos que son PK
-foreignKeys | [O]  | `[]`           | lista las definiciones de las FK
-constraints | [O]  | `[]`           | lista de constraints (salvo las Pk, FK que van en otra lista)
-sql         | O    | *deducido*     | sintaxis SQL para casos especiales
-  isTable   | L    | `true`         | si es una tabla y por lo tanto hay que hacer el dump para el create table y si se le deben deducir los campos name de sus FK
-  tableName | T    | `name`         | nombre de la tabla física (generalmente es el mismo name de definición de la tabla en el sistema)
-layout      | O    | {}             | opciones de despliegue
-  vertical  | L    | `false`        | si el despliegue predeterminado es vertical
-forInsertOnlyMode | L | `false`     | si es una tabla de solo inserción
-filterColumns | [O]| `[]`           | lista de objetos de la forma {column, operator, value} para que sea el filtro predeterminado de la grilla
+propiedad         | tipo | predeterminado        | uso
+------------------|------|-----------------------|----------------------------------------------------------------------------------------------
+name              | T    |                       | nombre que va a tener la tabla en el sistema
+title             | T    | `name`                | título en la grilla
+editable          | L    | `false`               | los permisos
+allow             | OP   | `editable`            | objeto de permisos individuales
+primaryKey        | [T]  | `[]`                  | lista de nombres de campos que son PK
+foreignKeys       | [O]  | `[]`                  | lista las definiciones de las FK
+constraints       | [O]  | `[]`                  | lista de constraints (salvo las Pk, FK que van en otra lista)
+sql               | O    | *deducido*            | sintaxis SQL para casos especiales
+isTable           | L    | `true`                | si es una tabla y por lo tanto hay que hacer el dump para el create table y si se le deben deducir los campos name de sus FK
+tableName         | T    | `name`                | nombre de la tabla física (generalmente es el mismo name de definición de la tabla en el sistema)
+layout            | O    | {}                    | opciones de despliegue
+vertical          | L    | `false`               | si el despliegue predeterminado es vertical
+forInsertOnlyMode | L    | `false`               | si es una tabla de solo inserción
+filterColumns     | [O]  | `[]`                  | lista de objetos de la forma {column, operator, value} para que sea el filtro predeterminado de la grilla
+registerImports   | [O]  | (registerImportsDef)  | lista de objetos. Configura opciones para guardar la definicion de los "otros" campos al importar un archivo (*para que funcione **debe existir un campo seteado como "defaultForOtherFields"** (ver fieldDef)*)
 
-ejemplos lista  | formato elemento
-----------------|--------------------------------------
- foreignKeys    | {references:'ptable', fields:['atomic_number']}
- constraints    | {constraintType:'unique', fields:['atomic_number','order']}
- filterColumns  | {column:'atomic_number', operator:'=', value:7}
+ejemplos lista   | formato elemento
+-----------------|--------------------------------------
+ foreignKeys     | {references:'ptable', fields:['atomic_number']}
+ constraints     | {constraintType:'unique', fields:['atomic_number','order']}
+ filterColumns   | {column:'atomic_number', operator:'=', value:7}
 
 permisos | tabla | campo | indica si se permite...
 ---------|-------|-------|-------
@@ -75,21 +76,22 @@ postCreateSqls | texto con una o varias sentencias SQL que deben ejecutarse desp
 
 <!--lang:en--]
 
-property    | type | default value  | use
-------------|------|----------------|----------------------------------------------------------------------------------------------
-name        | T    |                | table name in database. this name is the table id inside the system
-title       | T    | `name`         | grid title
-editable    | L    | `false`        | permissions
-allow       | PO   | `editable`     | individual permissions object
-primaryKey  | [T]  | `[]`           | PK name field list
-foreignKeys | [O]  | `[]`           | FK definition list
-constraints | [O]  | `[]`           | constraints list (except PK and FK)
-sql         | O    | *deduced*      | SQL syntax for special cases
-  isTable   | L    | `true`         | (see Spanish)
-layout      | O    | {}             | (see Spanish)
-  vertical  | L    | `false`        | (see Spanish)
-forInsertOnlyMode | L | `false`     | (see Spanish)
-filterColumns | [O] | `[]`          | (see Spanish)
+property          | type | default value         | use
+------------------|------|-----------------------|----------------------------------------------------------------------------------------------
+name              | T    |                       | table name in database. this name is the table id inside the system
+title             | T    | `name`                | grid title
+editable          | L    | `false`               | permissions
+allow             | PO   | `editable`            | individual permissions object
+primaryKey        | [T]  | `[]`                  | PK name field list
+foreignKeys       | [O]  | `[]`                  | FK definition list
+constraints       | [O]  | `[]`                  | constraints list (except PK and FK)
+sql               | O    | *deduced*             | SQL syntax for special cases
+isTable           | L    | `true`                | (see Spanish)
+layout            | O    | {}                    | (see Spanish)
+vertical          | L    | `false`               | (see Spanish)
+forInsertOnlyMode | L    | `false`               | (see Spanish)
+filterColumns     | [O]  | `[]`                  | (see Spanish)
+registerImports   | [O]  | (registerImportsDef)  | Object list. It is uset to configure how "others" fields are stored when any person imports a file (*it works* **__only if you set to true one field with "defaultForOtherFields"__** *(see fieldDef)*)
 
 list examples   | element format
 ----------------|--------------------------------------
@@ -119,26 +121,76 @@ postCreateSqls | (see Spanish)
 
 <!--lang:es-->
 
-propiedad | tipo | predeterminado | uso
-----------|------|----------------|-------------------
-name      | T    |                | nombre en la base de datos y id de campo
-typeName  | T    |                | tipo
-title     | T    | `name`         | título para la grilla cuando no se quiere el name
-inTable   | L    | true           | si pertenece físicamente a la tabla y por lo tanto entra en el dump.
+propiedad             | tipo | predeterminado | uso
+----------------------|------|----------------|-------------------
+name                  | T    |                | nombre en la base de datos y id de campo
+typeName              | T    |                | tipo
+title                 | T    | `name`         | título para la grilla cuando no se quiere el name
+inTable               | L    | true           | si pertenece físicamente a la tabla y por lo tanto entra en el dump.
+defaultForOtherFields | B    | false          | establece si el campo (que debe definirse como "text") se utiliza para guardar un JSON con los "otros" campos cuando se importa un archivo
 
 <!--lang:en--]
 
-property | type | default value | use
----------|------|---------------|-------------------
-name     | T    |               | name in database and field id
-typeName | T    |               | data type
-title    | T    | `name`        | title in the grid if you don't want to use name property default value
+property              | type | default value | use
+----------------------|------|---------------|-------------------
+name                  | T    |               | name in database and field id
+typeName              | T    |               | data type
+title                 | T    | `name`        | title in the grid if you don't want to use name property default value
+inTable               | L    | true          | determine if field belongs physically to the table and the dump.
+defaultForOtherFields | B    | false         | determines if field (must to be defined as "text") is used to save a JSON with other fields when any person imports a file
 
-[!--lang:es-->
-Ejemplo integrador:
+[!--lang:*-->
+
+## registerImportsDef
+
+<!--lang:es-->
+
+propiedad             | tipo | predeterminado  | uso
+----------------------|------|-----------------|-------------------
+inTable               | T    | null            | nombre de tabla para guardar definicion de "otros" campos. Debe definirse si se quiere guardar la informacion (la tabla debe existir, ver ejemplo integrador)
+fieldNames            | [O]  | (fieldNamesDef) | Objeto con configuracion de campos de la tabla definida
 
 <!--lang:en--]
-Integrating example:
+
+property              | type | default value   | use
+----------------------|------|-----------------|-------------------
+inTable               | T    | null            | table name used to save "other" fields. It's necessary to define if you want to save information (the table must exist, see integrating example)
+fieldNames            | [O]  | (fieldNamesDef) | Object with table fields configuration.
+
+[!--lang:*-->
+
+## fieldNamesDef
+
+<!--lang:es-->
+
+Cada propiedad define que nombre de campo de tabla seteada en "registerImports.inTable" se va a utilizar para guardar la información referida a "otros" campos importados
+
+propiedad           | tipo | predeterminado  | uso y restricciones
+--------------------|------|-----------------|-------------------
+tableName           | T    | 'table_name'    | tabla de origen del campo (no puede ser null y se debe definir como text y PK en "registerImports.inTable")
+fieldName           | T    | 'field'         | nombre del campo (no puede ser null y se debe definir como text y PK en "registerImports.inTable")
+fieldIndex          | T    | 'field_index'   | posición del campo en el archivo (no puede ser null y debe definirse como integer en "registerImports.inTable")
+originalFileName    | T    | null            | nombre del archivo al que pertenece el campo(puede ser null y debe definirse como text en "registerImports.inTable")
+serverPath          | T    | null            | path del archivo al que pertenece el campo(puede ser null y debe definirse como text en "registerImports.inTable")
+lastUpload          | T    | null            | fecha de ultima subida del archivo al que pertenece el campo(puede ser null y debe definirse como timestamp en "registerImports.inTable")
+
+Los campos que son null pueden no estar en la definicion de campos de la tabla definida en "registerImports.inTable", los demás son obligatorios y deben respetar las restricciones. Si no se setean los optativos (los que pueden ser null), la información no se registra por mas que existan en la tabla definida en "registerImporst.inTable".
+
+<!--lang:en--]
+
+Each property defines the field name of the table previously setted in "registerImports.inTable" that will be used to store information about "other" fields imported.
+
+property            | type | default value   | use y restrictions
+--------------------|------|-----------------|-------------------
+tableName           | T    | 'table_name'    | Origin table of field (can't be null and must to be defined as text and PK in "registerImports.inTable")
+fieldName           | T    | 'field'         | Fieldname (can't be null and must to be defined as text and PK in "registerImports.inTable")
+fieldIndex          | T    | 'field_index'   | Field position in file (can't be null and must to be defined as integer in "registerImports.inTable")
+originalFileName    | T    | null            | Filename to which belongs the field (can be null and must to be defined as text in "registerImports.inTable")
+serverPath          | T    | null            | File path to whitch belongs the field (can be null and must to be defined as text in "registerImports.inTable")
+lastUpload          | T    | null            | Timestamp of last import (can be null and must to be defined as timestamp in "registerImports.inTable")
+
+
+Null fields can be undefined in "registerImports.inTable". Not Null fields are required and must respect restrictions. If you don't define optatives properties (Which can be null), information not will be registered although you defines them in "registerImporst.inTable".
 
 [!--lang:*-->
 
@@ -157,6 +209,13 @@ user      | objeto con la información del usuario una vez que está logueado.
 
 <!--lang:en--]
 
+
+[!--lang:es-->
+Ejemplo integrador:
+
+<!--lang:en--]
+Integrating example:
+
 [!--lang:*-->
 
 ```js
@@ -169,11 +228,23 @@ module.exports = function(context){
             delete:context.user.rol==='boss',
             update:context.user.rol==='boss',
         },
+        registerImports:{
+            inTable:'other_fields', 
+            fieldNames:{
+                originalFileName:'original_filename',
+                serverPath:'server_filepath',
+                lastUpload:'last_upload',
+            }
+        },
         fields:[
-            {name:'atomic_number', title:'A#', typeName:'integer', width:100, nullable:false,          },
-            {name:'mass_number'         , typeName:'integer', width:100,                               },
-            {name:'order'               , typeName:'integer', width:100,                               },
-            {name:'stable'              , typeName:'boolean', width:100,                               },
+            {name:'atomic_number', title:'A#', typeName:'integer' , width:100, nullable:false,      orderForInsertOnly:'1' },
+            {name:'mass_number'              , typeName:'integer' , width:100,                      orderForInsertOnly:'2' },
+            {name:'order'                    , typeName:'integer' , width:100,                      orderForInsertOnly:'4' },
+            {name:'stable'                   , typeName:'boolean' , width:100,                                             },
+            {name:'others'                   , typeName:'text'    , width:700, defaultForOtherFields: true                },
+        ],
+        filterColumns:[
+            {column:'atomic_number', operator:'>', value:context.be.internalData.filterAtomicNumberForIsotopes}
         ],
         primaryKey:['atomic_number','mass_number'],
         constraints:[
@@ -183,5 +254,29 @@ module.exports = function(context){
             {references:'ptable', fields:['atomic_number']}
         ]
     },context);
+}
+
+//other fields table definition
+
+module.exports = function(context){
+    var admin = context.user.rol==='boss';
+    return context.be.tableDefAdapt({
+        name:'other_fields',
+        allow:{
+            insert:true,
+            update:true,
+        },
+        title:'information about other fields',
+        editable:admin,
+        fields:[
+            {name:'table_name'          , typeName:'text'       , nullable:false  },
+            {name:'field'               , typeName:'text'       , nullable:false  },
+            {name:'field_index'         , typeName:'integer'    , nullable:false  },
+            {name:'original_filename'   , typeName:'text'                         },
+            {name:'server_filepath'     , typeName:'text'                         },
+            {name:'last_upload'         , typeName:'timestamp'                    },
+        ],
+        primaryKey:['table_name', 'field'],
+    }, context);
 }
 ```
