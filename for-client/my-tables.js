@@ -851,12 +851,29 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                 var txtToDownload;
                 setTimeout(function(){
                     var txtToDownload=grid.def.fields.map(function(fieldDef){
-                            return fieldDef.name;
+                            if(fieldDef.defaultForOtherFields){
+                                var textArray=[];
+                                grid.def.otherFields.forEach(function(otherField){
+                                    textArray.push(otherField[grid.def.registerImports.fieldNames.fieldName]);
+                                });
+                                return textArray.join('|');
+                            }else{
+                                return fieldDef.name;
+                            }
                         }).join('|')+'\r\n'+
                         grid.depotsToDisplay.map(function(depot){
                             return grid.def.fields.map(function(fieldDef){
                                 var value=depot.row[fieldDef.name];
-                                return value==null?'':depot.row[fieldDef.name].toString().trim();
+                                if(fieldDef.defaultForOtherFields){
+                                    var otherFields = JSON.parse(value);
+                                    var textArray = [];
+                                    otherFields.forEach(function(otherField){
+                                        textArray.push(otherField.value);
+                                    });
+                                    return textArray.join('|');
+                                }else{
+                                    return value==null?'':depot.row[fieldDef.name].toString().trim();
+                                }
                             }).join('|');
                         }).join('\r\n')+'\r\n';
                     mainDiv.setAttribute("current-state-txt", "ready");
@@ -869,11 +886,17 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     topRow=topRow||0;
                     leftColumn=leftColumn||0;
                     fieldDefs.forEach(function(field,iColumn){
-                        ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:topRow})]={t:'s',v:field.name, s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                        if(field.defaultForOtherFields){
+                            grid.def.otherFields.forEach(function(otherField){
+                                ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:topRow})]={t:'s',v:otherField[grid.def.registerImports.fieldNames.fieldName], s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                                iColumn++;
+                            });
+                        }else{
+                            ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:topRow})]={t:'s',v:field.name, s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                        }
                     });
                     depots.forEach(function(depot, iRow){
-                        fieldDefs.forEach(function(fieldDef, iColumn){
-                            var value=depot.row[fieldDef.name];
+                        var addCell = function addCell(value, fieldDef, iColumn){
                             var valueType='s';
                             var type=fieldDef.typeName;
                             if(value!=null){
@@ -888,6 +911,18 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                                     cell.s={font:{color:{ rgb: "88AA00" }}};
                                 }
                                 ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:iRow+1+topRow})]=cell;
+                            }
+                        }
+                        fieldDefs.forEach(function(fieldDef, iColumn){
+                            var value=depot.row[fieldDef.name];
+                            if(fieldDef.defaultForOtherFields){
+                                var otherFields = JSON.parse(value);
+                                otherFields.forEach(function(otherField){
+                                    addCell(otherField.value, fieldDef, iColumn);
+                                    iColumn++;
+                                });
+                            }else{
+                                addCell(value, fieldDef, iColumn);
                             }
                         });
                     });
