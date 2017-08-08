@@ -18,6 +18,6 @@ module.exports = function(context){
             {name:'server_filepath'     , typeName:'text'                         },
             {name:'last_upload'         , typeName:'timestamp'                    },
         ],
-        primaryKey:['table_name', 'field'],
+        primaryKey:['table_name', 'field', 'field_index'],
     }, context);
 }

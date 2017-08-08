@@ -926,7 +926,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                             }
                         });
                     });
-                    ws["!ref"]="A1:"+XLSX.utils.encode_cell({c:fieldDefs.length+leftColumn,r:grid.depotsToDisplay.length+topRow});
+                    ws["!ref"]="A1:"+XLSX.utils.encode_cell({c:fieldDefs.length+leftColumn + grid.def.otherFields.length,r:grid.depotsToDisplay.length+topRow});
                 }
                 setTimeout(function(){
                     var wb = new Workbook();
