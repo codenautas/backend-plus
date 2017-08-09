@@ -849,12 +849,14 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                 ]).create();
                 dialogWindow.appendChild(mainDiv);
                 var txtToDownload;
+                var otherFieldsTabColumn = [];
                 setTimeout(function(){
                     var txtToDownload=grid.def.fields.map(function(fieldDef){
                             if(fieldDef.defaultForOtherFields){
                                 var textArray=[];
-                                grid.def.otherFields.forEach(function(otherField){
+                                grid.def.otherFields.forEach(function(otherField, index){
                                     textArray.push(otherField[grid.def.registerImports.fieldNames.fieldName]);
+                                    otherFieldsTabColumn[otherField[grid.def.registerImports.fieldNames.fieldName]] = index;
                                 });
                                 return textArray.join('|');
                             }else{
@@ -864,11 +866,12 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                         grid.depotsToDisplay.map(function(depot){
                             return grid.def.fields.map(function(fieldDef){
                                 var value=depot.row[fieldDef.name];
+                                var textArrayInitialization = Array.apply(null, Array(grid.def.otherFields.length)).map(function () {return "";});
                                 if(fieldDef.defaultForOtherFields){
-                                    var otherFields = JSON.parse(value);
-                                    var textArray = [];
+                                    var otherFields = JSON.parse(value) || [];
+                                    var textArray = textArrayInitialization;
                                     otherFields.forEach(function(otherField){
-                                        textArray.push(otherField.value);
+                                        textArray[otherFieldsTabColumn[otherField.name]] = otherField.value;
                                     });
                                     return textArray.join('|');
                                 }else{
@@ -882,12 +885,14 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     downloadElementText.href=url;
                     downloadElementText.setAttribute("download", grid.def.name+".tab");
                 },10);
+                var otherFieldsExcelColumns = [];
                 var populateTableXLS = function populateTableXLS(ws, depots, fieldDefs, topRow, leftColumn){
                     topRow=topRow||0;
                     leftColumn=leftColumn||0;
                     fieldDefs.forEach(function(field,iColumn){
                         if(field.defaultForOtherFields){
                             grid.def.otherFields.forEach(function(otherField){
+                                otherFieldsExcelColumns[otherField[grid.def.registerImports.fieldNames.fieldName]] = iColumn+leftColumn;
                                 ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:topRow})]={t:'s',v:otherField[grid.def.registerImports.fieldNames.fieldName], s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
                                 iColumn++;
                             });
@@ -916,10 +921,9 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                         fieldDefs.forEach(function(fieldDef, iColumn){
                             var value=depot.row[fieldDef.name];
                             if(fieldDef.defaultForOtherFields){
-                                var otherFields = JSON.parse(value);
+                                var otherFields = JSON.parse(value) || [];
                                 otherFields.forEach(function(otherField){
-                                    addCell(otherField.value, fieldDef, iColumn);
-                                    iColumn++;
+                                    addCell(otherField.value, fieldDef, otherFieldsExcelColumns[otherField.name]);
                                 });
                             }else{
                                 addCell(value, fieldDef, iColumn);
