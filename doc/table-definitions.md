@@ -77,7 +77,7 @@ name                  | T    |               | name in database and field id
 typeName              | T    |               | data type
 title                 | T    | `name`        | title in the grid if you don't want to use name property default value
 inTable               | L    | true          | determine if field belongs physically to the table and the dump.
-defaultForOtherFields | B    | false         | determines if field (must to be defined as "text") is used to save a JSON with other fields when any person imports a file
+defaultForOtherFields | B    | false         | determines if field (must to be defined as "text") is used to save a JSON with other fields when any person imports a file (*it works* **__only if you configures "registerImports"__** *(see tableDef)*)
 
 
 ## registerImportsDef

@@ -849,14 +849,34 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                 ]).create();
                 dialogWindow.appendChild(mainDiv);
                 var txtToDownload;
+                var otherFieldsTabColumn = [];
                 setTimeout(function(){
                     var txtToDownload=grid.def.fields.map(function(fieldDef){
-                            return fieldDef.name;
+                            if(fieldDef.defaultForOtherFields){
+                                var textArray=[];
+                                grid.def.otherFields.forEach(function(otherField, index){
+                                    textArray.push(otherField[grid.def.registerImports.fieldNames.fieldName]);
+                                    otherFieldsTabColumn[otherField[grid.def.registerImports.fieldNames.fieldName]] = index;
+                                });
+                                return textArray.join('|');
+                            }else{
+                                return fieldDef.name;
+                            }
                         }).join('|')+'\r\n'+
                         grid.depotsToDisplay.map(function(depot){
                             return grid.def.fields.map(function(fieldDef){
                                 var value=depot.row[fieldDef.name];
-                                return value==null?'':depot.row[fieldDef.name].toString().trim();
+                                var textArrayInitialization = Array.apply(null, Array(grid.def.otherFields.length)).map(function () {return "";});
+                                if(fieldDef.defaultForOtherFields){
+                                    var otherFields = JSON.parse(value) || [];
+                                    var textArray = textArrayInitialization;
+                                    otherFields.forEach(function(otherField){
+                                        textArray[otherFieldsTabColumn[otherField.name]] = otherField.value;
+                                    });
+                                    return textArray.join('|');
+                                }else{
+                                    return value==null?'':depot.row[fieldDef.name].toString().trim();
+                                }
                             }).join('|');
                         }).join('\r\n')+'\r\n';
                     mainDiv.setAttribute("current-state-txt", "ready");
@@ -865,15 +885,23 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     downloadElementText.href=url;
                     downloadElementText.setAttribute("download", grid.def.name+".tab");
                 },10);
+                var otherFieldsExcelColumns = [];
                 var populateTableXLS = function populateTableXLS(ws, depots, fieldDefs, topRow, leftColumn){
                     topRow=topRow||0;
                     leftColumn=leftColumn||0;
                     fieldDefs.forEach(function(field,iColumn){
-                        ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:topRow})]={t:'s',v:field.name, s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                        if(field.defaultForOtherFields){
+                            grid.def.otherFields.forEach(function(otherField){
+                                otherFieldsExcelColumns[otherField[grid.def.registerImports.fieldNames.fieldName]] = iColumn+leftColumn;
+                                ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:topRow})]={t:'s',v:otherField[grid.def.registerImports.fieldNames.fieldName], s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                                iColumn++;
+                            });
+                        }else{
+                            ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:topRow})]={t:'s',v:field.name, s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                        }
                     });
                     depots.forEach(function(depot, iRow){
-                        fieldDefs.forEach(function(fieldDef, iColumn){
-                            var value=depot.row[fieldDef.name];
+                        var addCell = function addCell(value, fieldDef, iColumn){
                             var valueType='s';
                             var type=fieldDef.typeName;
                             if(value!=null){
@@ -889,9 +917,20 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                                 }
                                 ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:iRow+1+topRow})]=cell;
                             }
+                        }
+                        fieldDefs.forEach(function(fieldDef, iColumn){
+                            var value=depot.row[fieldDef.name];
+                            if(fieldDef.defaultForOtherFields){
+                                var otherFields = JSON.parse(value) || [];
+                                otherFields.forEach(function(otherField){
+                                    addCell(otherField.value, fieldDef, otherFieldsExcelColumns[otherField.name]);
+                                });
+                            }else{
+                                addCell(value, fieldDef, iColumn);
+                            }
                         });
                     });
-                    ws["!ref"]="A1:"+XLSX.utils.encode_cell({c:fieldDefs.length+leftColumn,r:grid.depotsToDisplay.length+topRow});
+                    ws["!ref"]="A1:"+XLSX.utils.encode_cell({c:fieldDefs.length+leftColumn + grid.def.otherFields.length,r:grid.depotsToDisplay.length+topRow});
                 }
                 setTimeout(function(){
                     var wb = new Workbook();

@@ -152,6 +152,13 @@ defaultValue  | según typeName |                | valor por defecto del paráme
 typeName      | T              |                | tipo de dato
 label         | T              | name           | etiqueta del parámetro
 
+#### coreFunction(context, parameters)
+
+context  | uso
+---------|----------------------
+be       | objeto de la aplicación que se está corriendo
+username | nombre de usuario
+
 <!--lang:en--]
 ### Procedures definition
 
@@ -171,6 +178,13 @@ name          | T              |                | name of the parameter that is 
 defaultValue  | según typeName |                | parameter default value
 typeName      | T              |                | to define the data type
 label         | T              | name           | if you don't want to use default value to display on screen
+
+#### coreFunction(context, parameters)
+
+context  | uso
+---------|----------------------
+be       | backendApp object
+username | username
 
 [!--lang:es-->
 Ejemplo de definición de proceso:
