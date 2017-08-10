@@ -271,7 +271,7 @@ devel:
 
 [!--lang:*-->
 ```sh
-$ npm install backend-plus
+$ npm install -g backend-plus
 ```
 
 ## License
