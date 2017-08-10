@@ -156,6 +156,7 @@ label         | T              | name           | etiqueta del parámetro
 
 context  | uso
 ---------|----------------------
+be       | objeto de la aplicación que se está corriendo
 username | nombre de usuario
 
 <!--lang:en--]
@@ -182,6 +183,7 @@ label         | T              | name           | if you don't want to use defau
 
 context  | uso
 ---------|----------------------
+be       | backendApp object
 username | username
 
 [!--lang:es-->
