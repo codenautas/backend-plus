@@ -1656,7 +1656,7 @@ myOwn.autoSetupFunctions.push(function autoSetupMyTables(){
                     };
                     dialogWindow.appendChild(html.div([
                         html.div(my.messages.loading+'...'),
-                        html.img({src:my.path.img+'hamster.gif'}),
+                        html.img({class:'hamster-gif', src:my.path.img+'hamster.gif'}),
                         html.div([cancelButton])
                     ]).create());
                     dataReady.then(function(){
