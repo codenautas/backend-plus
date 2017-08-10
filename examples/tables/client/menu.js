@@ -16,16 +16,16 @@ myOwn.wScreens["demo-screen"] = function(addrParams){
             html.thead([
                 html.tr(bases.map(function(base){
                     return th(base);
-                });
+                }))
             ]),
             html.tbody(
                 props.map(function(prop){
                     return html.tr(bases.map(function(base){
                         return prop in window[base]?prop in window[base][prop]:'-'
-                    });
+                    }));
                 })
             )
-        });
+        ]);
     },10);
 }
 
