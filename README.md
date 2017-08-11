@@ -1,9 +1,8 @@
 
-
 # backend-plus
 
-Backend for typed-controls. 
-Backend-plus is a CRUD generator framework writed in node.
+Backend for typed-controls
+
 
 ![extending](https://img.shields.io/badge/stability-extending-orange.svg)
 [![npm-version](https://img.shields.io/npm/v/backend-plus.svg)](https://npmjs.org/package/backend-plus)
@@ -164,6 +163,25 @@ devel:
 ```sh
 $ npm install -g backend-plus
 ```
+
+## Usage
+1)
+  Define model in files table-nameOfModel.js
+
+2)
+  Generate sql scripts for DB creation running the command
+```$ npm run example-tables -- --dump-db
+```
+3)
+  Execute sql scripts in Postgress (tied to this dbms)
+
+4)
+  Run app executing command
+  ```$ npm start
+  ```
+5) In your web browser access url
+  http://localhost:port/base-url/
+  See your port and base-url parameters in def-config.yml file
 
 ## License
 
