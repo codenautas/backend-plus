@@ -621,7 +621,7 @@ myOwn.prepareRulerToggle = function prepareRulerToggle(){
         window.addEventListener('scroll', rePosition);
         window.addEventListener('resize', rePosition);
         var autoPosition=function(){
-            var tables = document.querySelectorAll(".my-grid");
+            var tables = document.querySelectorAll(".table");
             if(tables){
                 Array.prototype.forEach.call(tables,function(table){
                     var myTableName = table.getAttribute("my-table");

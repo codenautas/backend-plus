@@ -2,8 +2,8 @@
 
 # backend-plus
 
-Backend for typed-controls
-
+Backend for typed-controls. 
+Backend-plus is a CRUD generator framework writed in node.
 
 ![extending](https://img.shields.io/badge/stability-extending-orange.svg)
 [![npm-version](https://img.shields.io/npm/v/backend-plus.svg)](https://npmjs.org/package/backend-plus)
@@ -162,7 +162,7 @@ devel:
 ## Install
 
 ```sh
-$ npm install backend-plus
+$ npm install -g backend-plus
 ```
 
 ## License
