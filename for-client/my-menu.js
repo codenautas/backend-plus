@@ -68,10 +68,10 @@ myOwn.wScreens.proc = function(addrParams){
         });
     }
 }
+
 myOwn.wScreens.path = function(addrParams){
     window.location.href='.'+addrParams.path;
 }
-
 
 myOwn.UriSearchToObject = function UriSearchToObject(locationSearch){
     var parts=locationSearch.split('&');
@@ -107,6 +107,8 @@ myOwn.showPage = function showPage(pageDef){
             w=menu.selectedItem.menuType;
         }
         if(typeof my.wScreens[w] === 'function'){
+            var pageTitle = addrParams.pageTitle || addrParams.title || addrParams.name;
+            document.title = pageTitle;
             my.wScreens[w].call(my, addrParams);
         }
         var rightMenu = document.getElementById('right-menu');
