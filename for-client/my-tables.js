@@ -866,8 +866,8 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                         grid.depotsToDisplay.map(function(depot){
                             return grid.def.fields.map(function(fieldDef){
                                 var value=depot.row[fieldDef.name];
-                                var textArrayInitialization = Array.apply(null, Array(grid.def.otherFields.length)).map(function () {return "";});
                                 if(fieldDef.defaultForOtherFields){
+                                    var textArrayInitialization = Array.apply(null, Array(grid.def.otherFields.length)).map(function () {return "";});
                                     var otherFields = JSON.parse(value) || [];
                                     var textArray = textArrayInitialization;
                                     otherFields.forEach(function(otherField){
@@ -930,7 +930,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                             }
                         });
                     });
-                    ws["!ref"]="A1:"+XLSX.utils.encode_cell({c:fieldDefs.length+leftColumn + grid.def.otherFields.length,r:grid.depotsToDisplay.length+topRow});
+                    ws["!ref"]="A1:"+XLSX.utils.encode_cell({c:fieldDefs.length||iColumn+leftColumn + grid.def.otherFields.length,r:grid.depotsToDisplay.length+topRow});
                 }
                 setTimeout(function(){
                     var wb = new Workbook();
