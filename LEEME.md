@@ -7,10 +7,11 @@
 
 <!--lang:es-->
 Backend for typed-controls
-Backend-plus es un framework generador de ABMs escrito en Node.
+Backend-plus es un framework escrito en Node para generar aplicaciones (ABMs, etc) basadas en modelos relacionales. Genera doble validación de campos (front/back), soporta in line edit de campos en grillas.
 
 <!--lang:en--]
 Backend for typed-controls
+Backend-plus is a framework writed in Node for generate apps (CRUDs, etc) based in relational models.
 
 [!--lang:*-->
 
@@ -271,10 +272,11 @@ devel:
 
 [!--lang:*-->
 ```sh
-$ npm install -g backend-plus
+$ npm install backend-plus
 ```
 
-## Como usarlo
+<!--lang:es-->
+## Como crear un nuevo proyecto
 1)
   Definir modelo en archivos table-nombreDeModelo.js
 
@@ -286,10 +288,14 @@ $ npm install -g backend-plus
   Ejecutar scripts SQL (atado a DBMS Postgress)
 
 4) 
-  Levantar nueva app
-  npm start 
-  
+  Copiar estructura de proyecto de otra aplicación basada en backend-plus
 
+5) 
+  Levantar nueva app
+  ```$npm start 
+  ```
+
+[!--lang:*-->
 ## License
 
 [MIT](LICENSE)

@@ -1197,7 +1197,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     grid.dom.footInfo.displayTo.textContent = my.messages.loading;
     grid.actualName = grid.def.name + (grid.connector.fixedFields.length ? '-' + JSON4all.stringify(grid.connector.fixedFields.map(function(pair){ return pair.value; })) : '')
     if(grid.vertical){
-        grid.dom.table = html.table({"class":"table", "my-table": grid.actualName},[
+        grid.dom.table = html.table({"class":['my-grid', 'table'], "my-table": grid.actualName},[
             html.caption(grid.def.title),
             html.tbody(
                 grid.columns.map(function(column){ 
@@ -1212,7 +1212,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
             ])
         ]).create();
     }else{
-        grid.dom.table = html.table({"class":"table", "my-table": grid.actualName},[
+        grid.dom.table = html.table({"class":['my-grid', 'table'], "my-table": grid.actualName},[
             html.caption(grid.def.title),
             html.thead([
                 html.tr(grid.columns.map(function(column){ return column.th(); })),
