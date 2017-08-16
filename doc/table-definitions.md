@@ -36,7 +36,7 @@ editable          | L    | `false`               | permissions
 allow             | PO   | `editable`            | individual permissions object
 primaryKey        | [T]  | `[]`                  | PK name field list
 foreignKeys       | [O]  | `[]`                  | FK definition list
-softForeignKeys   | [O]  | `[]`                  | SFK definition list. It's used to specify an specific field for composed FKs (has not effect in database)
+softForeignKeys   | [O]  | `[]`                  | SFK definition list. It's used to specify FKs (one to one) not defined in database.
 constraints       | [O]  | `[]`                  | constraints list (except PK and FK)
 sql               | O    | *deduced*             | SQL syntax for special cases
 isTable           | L    | `true`                | (see Spanish)

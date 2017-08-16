@@ -43,7 +43,7 @@ editable          | L    | `false`               | los permisos
 allow             | OP   | `editable`            | objeto de permisos individuales
 primaryKey        | [T]  | `[]`                  | lista de nombres de campos que son PK
 foreignKeys       | [O]  | `[]`                  | lista las definiciones de las FK
-softForeignKeys   | [O]  | `[]`                  | lista las definiciones de las SFK. Se usan para especificar un campo específico para FKs compuestas (no aplica a BBDD)
+softForeignKeys   | [O]  | `[]`                  | lista las definiciones de las SFK. Especifica FKs (uno a uno) que no se define en la BBDD
 constraints       | [O]  | `[]`                  | lista de constraints (salvo las Pk, FK que van en otra lista)
 sql               | O    | *deducido*            | sintaxis SQL para casos especiales
 isTable           | L    | `true`                | si es una tabla y por lo tanto hay que hacer el dump para el create table y si se le deben deducir los campos name de sus FK
@@ -86,7 +86,7 @@ editable          | L    | `false`               | permissions
 allow             | PO   | `editable`            | individual permissions object
 primaryKey        | [T]  | `[]`                  | PK name field list
 foreignKeys       | [O]  | `[]`                  | FK definition list
-softForeignKeys   | [O]  | `[]`                  | SFK definition list. It's used to specify an specific field for composed FKs (has not effect in database)
+softForeignKeys   | [O]  | `[]`                  | SFK definition list. It's used to specify FKs (one to one) not defined in database.
 constraints       | [O]  | `[]`                  | constraints list (except PK and FK)
 sql               | O    | *deduced*             | SQL syntax for special cases
 isTable           | L    | `true`                | (see Spanish)
