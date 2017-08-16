@@ -36,6 +36,7 @@ editable          | L    | `false`               | permissions
 allow             | PO   | `editable`            | individual permissions object
 primaryKey        | [T]  | `[]`                  | PK name field list
 foreignKeys       | [O]  | `[]`                  | FK definition list
+softForeignKeys   | [O]  | `[]`                  | SFK definition list. It's used to specify an specific field for composed FKs (has not effect in database)
 constraints       | [O]  | `[]`                  | constraints list (except PK and FK)
 sql               | O    | *deduced*             | SQL syntax for special cases
 isTable           | L    | `true`                | (see Spanish)
@@ -45,11 +46,12 @@ forInsertOnlyMode | L    | `false`               | (see Spanish)
 filterColumns     | [O]  | `[]`                  | (see Spanish)
 registerImports   | [O]  | (registerImportsDef)  | Object list. It is uset to configure how "others" fields are stored when any person imports a file (*it works* **__only if you set to true one field with "defaultForOtherFields"__** *(see fieldDef)*)
 
-list examples   | element format
-----------------|--------------------------------------
- foreignKeys    | {references:'ptable', fields:['atomic_number']}
- constraints    | {constraintType:'unique', fields:['atomic_number','order']}
- filterColumns  | {column:'atomic_number', operator:'=', value:7}
+list examples    | element format
+-----------------|--------------------------------------
+ foreignKeys     | {references:'ptable', fields:['atomic_number']}
+ softForeignKeys | {references:'ptable', fields:['atomic_number']}
+ constraints     | {constraintType:'unique', fields:['atomic_number','order']}
+ filterColumns   | {column:'atomic_number', operator:'=', value:7}
 
 permissions | table | field | allows:
 ------------|-------|-------|-------
