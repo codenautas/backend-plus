@@ -79,6 +79,7 @@ name                  | T    |               | name in database and field id
 typeName              | T    |               | data type
 title                 | T    | `name`        | title in the grid if you don't want to use name property default value
 inTable               | L    | true          | determine if field belongs physically to the table and the dump.
+sequence              | [O]  | (sequenceDef) | determine if field will have auto-incremental in this field.
 defaultForOtherFields | B    | false         | determines if field (must to be defined as "text") is used to save a JSON with other fields when any person imports a file (*it works* **__only if you configures "registerImports"__** *(see tableDef)*)
 
 
@@ -88,7 +89,18 @@ defaultForOtherFields | B    | false         | determines if field (must to be d
 property              | type | default value   | use
 ----------------------|------|-----------------|-------------------
 inTable               | T    | null            | table name used to save "other" fields. It's necessary to define if you want to save information (the table must exist, see integrating example)
-fieldNames            | [O]  | (fieldNamesDef) | Object with table fields configuration.
+fieldNames            | [(fieldNamesDef)]  | null | Object with table fields configuration.
+
+
+## sequenceDef
+
+A json containing the info for the generated sequence
+
+property              | type | default value   | use
+----------------------|------|-----------------|-------------------
+name                  | T    | null            | (REQUIRED) sequence name
+firstValue            | Number | 1             | sequence start number
+prefix                | T    | null            | sequence prefix
 
 
 ## fieldNamesDef
