@@ -81,11 +81,23 @@ Integrating example:
 
 #### procDef:
 
-property    | type | default value  | use
-------------|------|----------------|-----------------------------------------------------
-action      | T    |                | Name that will be invoked the procedure
-parameters  | POA  | `[]`           | Param Objects Array
-coreFunction| F    |                | Function that implements the procedure
+property    | type | default value                 | use
+------------|------|-------------------------------|-----------------------------------------------------
+action      | T    |                               | Name that will be invoked the procedure
+bitacora    | BO   | { error:false, always:false } | Bitacora Object for core functions register
+parameters  | POA  | `[]`                          | Param Objects Array
+coreFunction| F    |                               | Function that implements the procedure
+
+#### bitacoraDef:
+
+propiedad                         | tipo           | default value              | uso
+----------------------------------|----------------|----------------------------|-------------------
+error                             | B              | false                      | If true, bitacora saves data of error ocurred during core function execution
+always                            | B              | false                      | If true, bitacora saves all data ocurred during core function execution (overrides error)
+targetTable                       | T              | null                       | Tablename for update result of execution data (must to exists a record for update) (see **targetTableBitacoraFields**). Use null for ignore option
+targetTableBitacoraFields         | O              | { **init_date**: 'init_date', **end_date**: 'end_date', **has_error**: 'has_error', **end_status**: 'end_status'} | Objects who defines the fields where **'targetTable'** will reply bitacora fields (If targetTable is null it's ommited)
+targetTableUpdateFieldsCondition  | A             | null                       | Fields array to define update condition (each value must to be passed as parameter with the same field name)
+
 
 #### paramDef:
 
@@ -96,11 +108,30 @@ defaultValue  | según typeName |                | parameter default value
 typeName      | T              |                | to define the data type
 label         | T              | name           | if you don't want to use default value to display on screen
 
+#### coreFunction(context, parameters)
+
+context  | uso
+---------|----------------------
+be       | backendApp object
+username | username
+
 Process definition example:
 
 ```js
     {
         action:'count/without-isotopes',
+        bitacora:{
+                   error:true,
+                   always:true,
+                   targetTable:'other_table',
+                   targetTableBitacoraFields: {
+                                                init_date: 'fecha_hora_inicio',
+                                                end_date: 'fecha_hora_final',
+                                                has_error: 'hubo_error',
+                                                end_status: 'resultado'
+                                              },
+                   targetTableUpdateFieldsCondition: ['id']
+                 },
         parameters:[
             {name:'first_atomic_number', defaultValue:10, typeName:'integer'},
             {name:'last_atomic_number' , defaultValue:99, typeName:'integer'},
