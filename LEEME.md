@@ -137,11 +137,22 @@ Integrating example:
 
 #### procDef:
 
-propiedad   | tipo | predeterminado | uso
-------------|------|----------------|-----------------------------------------------------
-action      | T    |                | Nombre con que va a ser invocado el procedimiento
-parameters  | AOP  | `[]`           | Array de Objetos parámetro
-coreFunction| F    |                | Función que implementa el procedimiento
+propiedad   | tipo | predeterminado                | uso
+------------|------|-------------------------------|-----------------------------------------------------
+action      | T    |                               | Nombre con que va a ser invocado el procedimiento
+bitacora    | OB   | { error:false, always:false } | Objeto bitacora de procedimientos
+parameters  | AOP  | `[]`                          | Array de Objetos parámetro
+coreFunction| F    |                               | Función que implementa el procedimiento
+
+#### bitacoraDef:
+
+propiedad                         | tipo           | predeterminado             | uso
+-------------------------         |----------------|----------------------------|-------------------
+error                             | B              | false                      | Si es true, se guardan datos en la bitacora solo si hay error en la ejecucion del proceso
+always                            | B              | false                      | Si es true, se guardan datos en la bitacora siempre (tiene prioridad sobre 'error')
+targetTable                       | T              | null                       | Nombre de tabla para actualizar los datos de ejecucion (debe existir un registro a actualizar) (ver **targetTableBitacoraFields**). Si es null no se replica
+targetTableBitacoraFields         | O              | { **init_date**: 'init_date', **end_date**: 'end_date', **has_error**: 'has_error', **end_status**: 'end_status'} | Objeto que define en que campos de **'targetTable'** se replican los campos de la bitacora (solo si se define una tabla en targetTable)
+targetTableUpdateFieldsCondition  | A              | null                       | Arreglo de campos que definen la condicion de actualizacion (**el valor de cada uno debe pasarse como parametro con el mismo nombre**)
 
 #### paramDef:
 
@@ -164,11 +175,23 @@ username | nombre de usuario
 
 #### procDef:
 
-property    | type | default value  | use
-------------|------|----------------|-----------------------------------------------------
-action      | T    |                | Name that will be invoked the procedure
-parameters  | POA  | `[]`           | Param Objects Array
-coreFunction| F    |                | Function that implements the procedure
+property    | type | default value                 | use
+------------|------|-------------------------------|-----------------------------------------------------
+action      | T    |                               | Name that will be invoked the procedure
+bitacora    | BO   | { error:false, always:false } | Bitacora Object for core functions register
+parameters  | POA  | `[]`                          | Param Objects Array
+coreFunction| F    |                               | Function that implements the procedure
+
+#### bitacoraDef:
+
+propiedad                         | tipo           | default value              | uso
+----------------------------------|----------------|----------------------------|-------------------
+error                             | B              | false                      | If true, bitacora saves data of error ocurred during core function execution
+always                            | B              | false                      | If true, bitacora saves all data ocurred during core function execution (overrides error)
+targetTable                       | T              | null                       | Tablename for update result of execution data (must to exists a record for update) (see **targetTableBitacoraFields**). Use null for ignore option
+targetTableBitacoraFields         | O              | { **init_date**: 'init_date', **end_date**: 'end_date', **has_error**: 'has_error', **end_status**: 'end_status'} | Objects who defines the fields where **'targetTable'** will reply bitacora fields (If targetTable is null it's ommited)
+targetTableUpdateFieldsCondition  | A             | null                       | Fields array to define update condition (each value must to be passed as parameter with the same field name)
+
 
 #### paramDef:
 
@@ -196,6 +219,18 @@ Process definition example:
 ```js
     {
         action:'count/without-isotopes',
+        bitacora:{ 
+                   error:true, 
+                   always:true, 
+                   targetTable:'other_table', 
+                   targetTableBitacoraFields: {
+                                                init_date: 'fecha_hora_inicio', 
+                                                end_date: 'fecha_hora_final', 
+                                                has_error: 'hubo_error', 
+                                                end_status: 'resultado'
+                                              }, 
+                   targetTableUpdateFieldsCondition: ['id']
+                 },
         parameters:[
             {name:'first_atomic_number', defaultValue:10, typeName:'integer'},
             {name:'last_atomic_number' , defaultValue:99, typeName:'integer'},

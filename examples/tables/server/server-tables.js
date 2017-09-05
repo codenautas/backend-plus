@@ -37,11 +37,16 @@ class AppExample extends backendPlus.AppBackend{
                 {menuType:'table', name:'isotopes', label:'isotopes'},
                 {menuType:'table', name:'new_element', label:'new element'},
                 {menuType:'table', name:'new_isotopes', label:'new isotopes'},
-                {menuType:'proc' , name:'count/without-isotopes', label:'count'}
+                {menuType:'proc' , name:'count/without-isotopes', label:'count'},
             ]},
             {menuType:'table', name:'images', table:'element_images'},
             {menuType:'menu', name:'test', menuContent:[
                 {menuType:'table', name:'bigint'},
+            ]},
+            {menuType:'menu', name:'bitacora', menuContent:[
+                {menuType:'table', name:'bitacora'},
+                {menuType:'proc' , name:'bitacora/prueba', label:'prueba bitacora'},
+                {menuType:'proc' , name:'bitacora/prueba-error', label:'prueba bitacora c/error'}
             ]},
             {menuType:'menu', name:'config', menuContent:[
                 {name:'users', menuType:'table'},
