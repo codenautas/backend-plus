@@ -131,6 +131,7 @@ name                  | T    |                | nombre en la base de datos y id 
 typeName              | T    |                | tipo
 title                 | T    | `name`         | título para la grilla cuando no se quiere el name
 inTable               | L    | true           | si pertenece físicamente a la tabla y por lo tanto entra en el dump.
+defaultValue          | T    | por defecto no hay valor por defecto | Valor por defecto
 defaultForOtherFields | B    | false          | establece si el campo (que debe definirse como "text") se utiliza para guardar un JSON con los "otros" campos cuando se importa un archivo (*para que funcione **debe configurarse "registerImports"** (ver tableDef)*)
 
 <!--lang:en--]
