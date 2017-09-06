@@ -527,6 +527,9 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
     var forInsert = false; // TODO: Verificar que esto está en desuso
     var directInput=grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
     var td = html.td(this.cellAttributes({"typed-controls-direct-input":directInput})).create();
+    if(fieldDef.typeName=='number'){
+        throw new Error("There's a field in the table defined as Number (Number type is deprecated)");
+    }
     TypedControls.adaptElement(td, fieldDef);
     if(fieldDef.allow.update){
         td.addEventListener('click', function(){
