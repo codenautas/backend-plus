@@ -1,8 +1,8 @@
 
-
 # backend-plus
 
 Backend for typed-controls
+Backend-plus is a framework writed in Node for generate apps (CRUDs, etc) based in relational models.
 
 
 ![extending](https://img.shields.io/badge/stability-extending-orange.svg)
