@@ -10,7 +10,7 @@ module.exports = function(context){
             {name:'id'              , typeName:'integer'  , nullable:false},
             {name:'nombre'          , typeName:'text'                     },
             {name:'col_bigint'      , typeName:'bigint'                   },
-            {name:'col_number'      , typeName:'number'                   },
+            {name:'col_number'      , typeName:'decimal'                   },
             {name:'intervalos'      , typeName:'interval'                 },
             {name:'col_decimal'     , typeName:'decimal'                  },
             {name:'col_ts'          , typeName:'timestamp'                },
