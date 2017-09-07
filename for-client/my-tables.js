@@ -1625,7 +1625,7 @@ myOwn.clientSides={
         prepare: function(depot, fieldName){
             var td=depot.rowControls[fieldName];
             td.disable(false);
-            TypedControls.adaptElement(td, 'text');
+            TypedControls.adaptElement(td, {typeName:'text'});
             td.addEventListener('update', function(event){
                 var newPass = td.getTypedValue();
                 if(newPass.trim()){
