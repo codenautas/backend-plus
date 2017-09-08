@@ -1681,11 +1681,11 @@ myOwn.autoSetupFunctions.push(function autoSetupMyTables(){
     var my=this;
     TypedControls.Expanders.unshift({
         whenType: function(typedControl){ 
-            var typeInfo = typedControl.controledTypeInfo;
+            var typeInfo = typedControl.controledType.typeInfo;
             return typeInfo.references;
         },
         dialogInput:function(typedControl){
-            var typeInfo = typedControl.controledTypeInfo;
+            var typeInfo = typedControl.controledType.typeInfo;
             var canceled;
             var reference = my.getReference(typeInfo.references);
             var dataReady = reference.dataReady;
