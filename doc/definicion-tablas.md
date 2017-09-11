@@ -207,7 +207,7 @@ La definición de la tabla depende del parámetro `context` que  tiene la siguie
 
 propiedad | uso
 ----------|-------------------
-db        | la base de datos. En principo es solo para usar quoteObject y quoteText
+db        | la base de datos. En principo es solo para usar quoteIdent, y quoteNullable
 forDump   | indica si se pide la definición para hacer un dump de la base
 user      | objeto con la información del usuario una vez que está logueado. 
 

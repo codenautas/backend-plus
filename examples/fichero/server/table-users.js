@@ -16,7 +16,7 @@ module.exports = function(context){
         ],
         primaryKey:['username'],
         sql:{
-            where:admin?'true':"username = "+context.be.db.quoteText(context.user.username)
+            where:admin?'true':"username = "+context.be.db.quoteNullable(context.user.username)
         }
     });
 }
