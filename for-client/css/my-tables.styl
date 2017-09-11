@@ -149,14 +149,23 @@ td.autoFilter button{
   display inline-block
 }
 
-.number_miles + .number_miles{
-  margin-left 2px
+.number-separator::after{
+  xcontent '\202f'
+  content ','
 }
 
-.number_decimals
+.number-decimals
   font-size 90%
 
-.date_year
+[my-colname="weight"]
+  text-align right
+
+[my-colname="weight"] .number-decimals
+  display inline-block
+  min-width 50px
+  text-align left
+ 
+.date-year
   font-size 90%
 
 .img-lupa

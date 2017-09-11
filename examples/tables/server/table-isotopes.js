@@ -25,7 +25,7 @@ module.exports = function(context){
             {name:'others'                   , typeName:'text'    , width:700, defaultForOtherFields: true                },
         ],
         filterColumns:[
-            {column:'atomic_number', operator:'>', value:context.be.internalData.filterAtomicNumberForIsotopes}
+            //{column:'atomic_number', operator:'>', value:context.be.internalData.filterAtomicNumberForIsotopes}
         ],
         primaryKey:['atomic_number','mass_number'],
         constraints:[
