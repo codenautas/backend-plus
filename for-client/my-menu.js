@@ -34,8 +34,7 @@ myOwn.wScreens.proc = function(addrParams){
     console.log(procDef);
     var params={};
     var button = html.button(my.messages.proced).create();
-    var divResult = html.div().create();
-    divResult.style.minHeight='40px';
+    var divResult = html.div({class:procDef.resultClass}).create();
     main_layout.appendChild(html.table({class:"table-param-screen"},procDef.parameters.map(function(parameterDef){
         var control = html.td({"typed-controls-direct-input":true}).create();
         control.style.minWidth='200px';
@@ -58,14 +57,23 @@ myOwn.wScreens.proc = function(addrParams){
         console.log('x',params);
         button.disabled=true;
         my_ajax_actionFun(params).then(function(result){
-            divResult.textContent = result;
-            divResult.style.backgroundColor = '#5F5';
+            my.wScreens.proc.result[procDef.resultOk](result,divResult);
         },function(err){
-            divResult.textContent = err.message;
-            divResult.style.backgroundColor = 'orange';
+            my.wScreens.proc.result[procDef.resultErr](err,divResult);
         }).then(function(){
             button.disabled=false;
         });
+    }
+}
+
+myOwn.wScreens.proc.result={
+    showText:function(result, divResult){
+        divResult.textContent = result;
+        divResult.style.backgroundColor = '#5F5';
+    },
+    showError:function(err, divResult){
+        divResult.textContent = err.message;
+        divResult.style.backgroundColor = 'orange';
     }
 }
 

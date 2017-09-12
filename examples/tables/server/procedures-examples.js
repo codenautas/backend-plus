@@ -1,5 +1,5 @@
 "use strict";
-
+var json4all = require('json4all');
 var ProceduresExamples = {};
 
 ProceduresExamples = [
@@ -34,6 +34,24 @@ ProceduresExamples = [
             ).fetchUniqueRow().then(function(result){
                 return result.row.number_of_elements;
             });
+        }
+    },
+    {
+        action:'example/date',
+        parameters:[
+            {name:'date', typeName:'date'},
+        ],
+        resultClass:'result-pre',
+        coreFunction:function(context, parameters){
+            var answer=[]
+            answer.push(parameters.date);
+            answer.push(parameters.date.isRealDate);
+            answer.push(json4all.stringify(parameters.date));
+            answer.push(json4all.parse(json4all.stringify(parameters.date)));
+            answer.push(json4all.parse(json4all.stringify(parameters.date)).isRealDate);
+            console.log('xxxxxxxxx va');
+            console.log(answer);
+            return answer;
         }
     },
     {

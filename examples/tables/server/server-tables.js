@@ -42,6 +42,7 @@ class AppExample extends backendPlus.AppBackend{
             {menuType:'table', name:'images', table:'element_images'},
             {menuType:'menu', name:'test', menuContent:[
                 {menuType:'table', name:'bigint'},
+                {menuType:'proc', name:'example/date'},
             ]},
             {menuType:'menu', name:'bitacora', menuContent:[
                 {menuType:'table', name:'bitacora'},
