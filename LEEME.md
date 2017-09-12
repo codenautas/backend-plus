@@ -271,6 +271,13 @@ login                        | opciones de login
 log                          | log por consola
   req                        | muestra cada requerimiento
   session                    | muestra info de las sesiones
+client-setup                 | opciones para el front-end
+  cursors                    | (en preparación) dice si usa curores para mostrar dónde (con el cursor en qué registro) está cada usuario
+  skin                       | nombre del skin
+  menu                       | si usa los menúes integrados
+  title                      | título de la pantalla
+  lang                       | idioma (y locale) del frontend, por ahora "es" o "en"
+
 
 <!--lang:en--]
 entry                        | usage
