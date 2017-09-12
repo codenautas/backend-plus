@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for typed controls",
-  "version": "0.18.5",
+  "version": "0.18.6",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -14,7 +14,7 @@
     { "name": "Emilio Platzer", "email": "emilioplatzer@gmail.com" }
   ],
   "dependencies": {
-    "body-parser": "~1.18.0",
+    "body-parser": "~1.18.1",
     "connect-pg-simple": "~4.2.1",
     "cookie-parser": "~1.4.3",
     "es6-promise": "~4.1.1",
@@ -24,7 +24,7 @@
     "express-useragent": "~1.0.7",
     "fs-extra": "~4.0.1", 
     "fs-promise": "~2.0.3", 
-    "js-yaml": "~3.9.1",
+    "js-yaml": "~3.10.0",
     "multiparty": "~4.1.3",
     "numeral": "~2.0.6",
     "pikaday": "~1.6.1",
@@ -37,7 +37,7 @@
     "ajax-best-promise": "~0.3.3",
     "backend-skins": "~0.1.0",
     "best-globals": "~0.10.1",
-    "castellano": "~0.1.0",
+    "castellano": "~0.1.1",
     "dialog-promise": "~0.8.0",
     "extension-serve-static": "~0.1.6",
     "js-to-html": "~0.9.3",
@@ -51,13 +51,13 @@
     "require-bro": "~0.1.5",
     "self-explain": "~0.10.15",
     "serve-content": "~0.3.8",
-    "type-store": "~0.2.4",
+    "type-store": "~0.2.5",
     "typed-controls": "~0.7.11"
   },
   "devDependencies": {
     "expect.js": "~0.3.1",
     "istanbul": "~0.4.5",
-    "mocha": "~3.5.2",
+    "mocha": "~3.5.3",
     "sinon": "~3.2.1",
     "supertest": "~3.0.0",
     
