@@ -570,12 +570,12 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
                         var picker = new Pikaday({
                             defaultDate: actualValue,
                             onSelect: function(date) {
-                                closeWindow(new Date(picker.toString()));
+                                closeWindow(bestGlobals.date(date));
                             }
                         });
                         divPicker.appendChild(picker.el);
                         button.addEventListener('click',function(){
-                            closeWindow(new Date(picker.toString()));
+                            closeWindow(actualValue);
                         });
                         dialogWindow.appendChild(html.div([
                              html.div(fieldDef.label),
