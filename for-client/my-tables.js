@@ -560,8 +560,7 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
             buttonLupa.style.top=rect.top+rect.height-8+'px';
             buttonLupa.addEventListener('click', function(){
                 var actualValue=actualControl.getTypedValue();
-                actualValue=(typeStore.type[fieldDef.typeName]&& typeStore.type[fieldDef.typeName].toPlainString)?
-                    typeStore.type[fieldDef.typeName].toPlainString(actualValue):actualValue
+                actualValue=actualControl.controledType.toPlainString(actualValue);
                 var optDialog={underElement:actualControl};
                 if(fieldDef.typeName=='date'){
                     dialogPromise(function(dialogWindow, closeWindow){
@@ -588,8 +587,7 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
                      });
                 }else{
                     promptPromise(fieldDef.label, actualValue,optDialog ).then(function(value){
-                        value=(typeStore.type[fieldDef.typeName]&& typeStore.type[fieldDef.typeName].fromString)?
-                            typeStore.type[fieldDef.typeName].fromString(value):value;
+                        value=actualControl.controledType.fromString(value);
                         actualControl.setTypedValue(value);
                         actualControl.dispatchEvent(new CustomEvent('update'));
                     });
