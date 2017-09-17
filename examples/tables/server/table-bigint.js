@@ -11,7 +11,7 @@ module.exports = function(context){
             {name:'nombre'          , typeName:'text'                     },
             {name:'col_bigint'      , typeName:'bigint'                   },
             {name:'col_number'      , typeName:'decimal'                   },
-            {name:'intervalos'      , typeName:'interval'                 },
+            {name:'intervalos'      , typeName:'interval', timeUnit:'minutes' },
             {name:'col_decimal'     , typeName:'decimal'                  },
             {name:'col_ts'          , typeName:'timestamp'                },
         ],
