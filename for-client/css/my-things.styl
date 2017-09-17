@@ -118,3 +118,21 @@ animation-time = 2s
   font inherit
   font-size 80%
   border-bottom 1px solid #F44
+
+[type-align=left]
+  text-align left
+
+[type-align=right]
+  text-align right
+
+[non-copyable="."]::after{
+  content '.'
+}
+
+[non-copyable=","]::after{
+  content ','
+}
+
+[non-copyable=" "]::after{
+  content '\202f'
+}

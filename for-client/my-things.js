@@ -117,6 +117,8 @@ myOwn.autoSetupFunctions = [
                 my.log('error', event.reason.message);
             }
         });
+        TypeStore.options.doNotCopyNonCopyables=true;
+        TypeStore.options.doNotOutputNonCopyables=true;
         return readProcedureDefinitions();
     }
 ];

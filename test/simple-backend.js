@@ -49,11 +49,6 @@ var localProcedures=[
                     throw new Error("fail to update id=123456");
                 }
                 return context.client.query("UPDATE employees SET id='Perkins' WHERE id=123456").execute();
-            }).then(function(rta){
-                console.log('xxxxx',rta);
-            }).catch(function(rta){
-                console.log('xxxxx catch',rta);
-                throw rta;
             });
         }
     },
