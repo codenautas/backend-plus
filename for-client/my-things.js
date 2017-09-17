@@ -34,7 +34,8 @@ myOwn.messages = {
     reLogin  : "Sign in"
 };
 
-myOwn.es = {
+myOwn.i18n={messages:{}};
+myOwn.i18n.messages.es = {
     Cancel   : "Cancelar",
     notLogged: "Sin sesión activa",
     noServer : "No se puede acceder al servidor",

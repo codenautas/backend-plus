@@ -11,7 +11,7 @@ myOwn.messages=changing(myOwn.messages, {
     user:'user',
 });
 
-myOwn.es=changing(myOwn.es, {
+myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     chpass:'cambiar clave',
     exit:'salir',
     proced:'proceder',

@@ -29,7 +29,7 @@ myOwn.wScreens["demo-screen"] = function(addrParams){
     },10);
 }
 
-my.tableAction.showImg={
+myOwn.tableAction.showImg={
     img: my.path.img+'picture.png',
     alt: 'img',
     titleMsg: 'showImage',
@@ -51,7 +51,7 @@ my.tableAction.showImg={
     }
 };
 
-my.clientSides.colorSample={
+myOwn.clientSides.colorSample={
     update: true,
     prepare: function(depot, fieldName){
         depot.row[fieldName]=depot.row.color;
@@ -77,5 +77,5 @@ window.addEventListener('load', function(){
     ].join(',')+')';
 });
 
-my.messages.showImage='show image';
-// my.messages.es.showImage='mostrar imagen';
+myOwn.messages.showImage='show image';
+myOwn.i18n.messages.es.showImage='mostrar imagen';

@@ -87,7 +87,7 @@ myOwn.messages=changing(myOwn.messages, {
     zoom: "zoom",
 });
 
-myOwn.es=changing(myOwn.es, {
+myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     Delete : "Eliminar",
     Filter : "Filtrar",
     actualValueInDB: "valor actual en la base de datos",

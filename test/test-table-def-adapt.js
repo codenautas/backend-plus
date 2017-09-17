@@ -13,7 +13,27 @@ describe("table-def-adapt", function(){
             name: 'the-table-name',
             fields:[{name: 'id'}]
         });
+        var fieldId = {
+          "allow": {
+            "delete": false,
+            "filter": true ,
+            "import": false,
+            "insert": false,
+            "select": true ,
+            "update": false
+          },
+          "name": "id",
+          "defaultForOtherFields": false,
+          "label": "id",
+          "title": "id",
+          "sequence": {
+            "firstValue": 1,
+            "name": null,
+            "prefix": null
+          }
+        };
         var expected = {
+            JSONFieldForOtherFields: false,
             "action": "all/defaults",
             "actionNamesList": [],
             "alias": "the-table-name",
@@ -30,35 +50,9 @@ describe("table-def-adapt", function(){
             },
             "detailTables": [],
             "field": {
-              "id": {
-                "allow": {
-                  "delete": false,
-                  "filter": true ,
-                  "import": false,
-                  "insert": false,
-                  "select": true ,
-                  "update": false
-                },
-                "name": "id",
-                "label": "id",
-                "title": "id"
-              }
+              "id": fieldId
             },
-            "fields": [
-              {
-                "allow": {
-                  "delete": false,
-                  "filter": true ,
-                  "import": false,
-                  "insert": false,
-                  "select": true ,
-                  "update": false,
-                },
-                "name": "id",
-                "label": "id",
-                "title": "id"
-              }
-            ],
+            "fields": [ fieldId ],
             "filterColumns": [],
             "foreignKeys":[],
             "layout":{
@@ -79,6 +73,17 @@ describe("table-def-adapt", function(){
               tableName: "the-table-name"
             },
             "title": "the-table-name",
+            "registerImports": {
+              "fieldNames": {
+                "fieldIndex": "field_index",
+                "fieldName": "field",
+                "lastUpload": null,
+                "originalFileName": null,
+                "serverPath": null,
+                "tableName": "table_name",
+              },
+              "inTable": null
+            }
         }
         expect(result).to.eql(expected);
     });
@@ -119,5 +124,15 @@ describe("table-def-adapt", function(){
             fields:[{name: 'invisible', allow:{select:false}}]
         });
         expect(result.field.invisible).to.not.be.ok();
+    });
+    it("detects multiple JSONFieldForOtherFields=true", function(){
+        expect(function(){
+            tableDefAdapt({
+                fields:[
+                    {name: 'one', defaultForOtherFields:true},
+                    {name: 'two', defaultForOtherFields:true}
+                ],
+            });
+        }).to.throwError('xxxAny');
     });
 });
