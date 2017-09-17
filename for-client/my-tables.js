@@ -13,8 +13,6 @@ var typeStore=require('type-store');
 var changing = bestGlobals.changing;
 var coalesce = bestGlobals.coalesce;
 
-var pikaday = require('pikaday');
-
 var MAX_SAFE_INTEGER = 9007199254740991;
 
 function sameMembers(a,b){
@@ -531,71 +529,6 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
         throw new Error("There's a field in the table defined as Number (Number type is deprecated)");
     }
     TypedControls.adaptElement(td, fieldDef);
-    if(fieldDef.allow.update){
-        td.addEventListener('click', function(){
-            var actualControl = this;
-            var rect = my.getRect(actualControl);
-            var buttonContainer = document;
-            if(this.lupa){
-                return;
-            }
-            var buttonLupa = buttonContainer.buttonLupa;
-            if(buttonLupa){
-                document.body.removeChild(buttonLupa);
-                if(buttonContainer.buttonLupaTimmer){
-                    clearTimeout(buttonContainer.buttonLupaTimmer);
-                }
-            }
-            buttonLupa=html.img({
-                class:'img-lupa', 
-                src:my.path.img+'lupa.png',
-                alt:"zoom",
-                title:my.messages.zoom
-            }).create();
-            buttonLupa.forElement=actualControl;
-            buttonContainer.buttonLupa=buttonLupa;
-            document.body.appendChild(buttonLupa);
-            buttonLupa.style.position='absolute';
-            buttonLupa.style.left=rect.left+rect.width-6+'px';
-            buttonLupa.style.top=rect.top+rect.height-8+'px';
-            buttonLupa.addEventListener('click', function(){
-                var actualValue=actualControl.getTypedValue();
-                actualValue=actualControl.controledType.toPlainString(actualValue);
-                var optDialog={underElement:actualControl};
-                if(fieldDef.typeName=='date'){
-                    dialogPromise(function(dialogWindow, closeWindow){
-                        var button=html.button(DialogPromise.messages.Ok).create();
-                        var divPicker=html.div({id:'datepicker'}).create();
-                        var picker = new Pikaday({
-                            defaultDate: actualValue,
-                            onSelect: function(date) {
-                                closeWindow(bestGlobals.date(date));
-                            }
-                        });
-                        divPicker.appendChild(picker.el);
-                        button.addEventListener('click',function(){
-                            closeWindow(actualValue);
-                        });
-                        dialogWindow.appendChild(html.div([
-                             html.div(fieldDef.label),
-                             html.div([divPicker]),
-                             html.div([button])
-                        ]).create());
-                    }, optDialog).then(function(value){
-                        actualControl.setTypedValue(value);
-                        actualControl.dispatchEvent(new CustomEvent('update'));
-                     });
-                }else{
-                    promptPromise(fieldDef.label, actualValue,optDialog ).then(function(value){
-                        value=actualControl.controledType.fromString(value);
-                        actualControl.setTypedValue(value);
-                        actualControl.dispatchEvent(new CustomEvent('update'));
-                    });
-                }
-            });
-            buttonContainer.buttonLupaTimmer=setTimeout(my.quitarLupa,3000);
-        });
-    }
     depot.rowControls[fieldDef.name] = td;
     if(depot.row[fieldDef.name]!=null){
         td.setTypedValue(depot.row[fieldDef.name]);

@@ -136,10 +136,14 @@ animation-time = 2s
   content '.'
 }
 
-[non-copyable=","]::after{
-  content ','
+[non-copyable="\002c"]::after{
+  content '\002c'
 }
 
 [non-copyable=" "]::after{
   content '\202f'
 }
+
+.pika-single
+  width 360px
+    
