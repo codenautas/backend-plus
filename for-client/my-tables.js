@@ -1029,6 +1029,11 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     var grid = this;
     var my = grid.my;
     grid.view.hiddenColumns=grid.view.hiddenColumns||grid.def.hiddenColumns||[];
+    grid.def.fields.forEach(function(fieldDef){
+        if(!fieldDef.visible){
+            grid.view.hiddenColumns.push(fieldDef.name);
+        }
+    });
     grid.hideColumnsViaCss();
     var buttonInsert;
     var buttonCreateFilter;

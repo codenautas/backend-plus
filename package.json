@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for typed controls",
-  "version": "0.18.10",
+  "version": "0.18.11",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
