@@ -76,7 +76,7 @@ postCreateSqls | (see Spanish)
 property              | type | default value | use
 ----------------------|------|---------------|-------------------
 name                  | T    |               | name in database and field id
-visible               | B    | true          | field visibility
+visible               | B    | true          | show/hide a field by default
 typeName              | T    |               | data type
 title                 | T    | `name`        | title in the grid if you don't want to use name property default value
 inTable               | L    | true          | determine if field belongs physically to the table and the dump.
