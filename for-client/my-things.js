@@ -49,7 +49,7 @@ var coalesce = bestGlobals.coalesce;
 var changing = bestGlobals.changing;
 
 var jsYaml = require('js-yaml');
-var typeStore=require('type-store');
+var TypeStore=require('type-store');
 
 var JSON4all = require('json4all');
 
