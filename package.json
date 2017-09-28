@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for typed controls",
-  "version": "0.18.11",
+  "version": "0.18.13",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -14,7 +14,7 @@
     { "name": "Emilio Platzer", "email": "emilioplatzer@gmail.com" }
   ],
   "dependencies": {
-    "body-parser": "~1.18.1",
+    "body-parser": "~1.18.2",
     "connect-pg-simple": "~4.2.1",
     "cookie-parser": "~1.4.3",
     "es6-promise": "~4.1.1",
@@ -58,7 +58,7 @@
     "expect.js": "~0.3.1",
     "istanbul": "~0.4.5",
     "mocha": "~3.5.3",
-    "sinon": "~3.2.1",
+    "sinon": "~3.3.0",
     "supertest": "~3.0.0",
     
     "kill-9": "~0.4.2"
