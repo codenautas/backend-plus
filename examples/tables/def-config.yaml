@@ -1,6 +1,5 @@
 server:
   port: 3033
-  base-url: /table
   kill-9:
     pid: 1234
     master-pass: 3920192
