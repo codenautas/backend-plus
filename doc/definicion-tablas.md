@@ -128,6 +128,7 @@ postCreateSqls | (see Spanish)
 propiedad             | tipo | predeterminado | uso
 ----------------------|------|----------------|-------------------
 name                  | T    |                | nombre en la base de datos y id de campo
+visible               | B    | true           | muestra/oculta un campo de manera predeterminada
 typeName              | T    |                | tipo
 title                 | T    | `name`         | título para la grilla cuando no se quiere el name
 inTable               | L    | true           | si pertenece físicamente a la tabla y por lo tanto entra en el dump.
@@ -139,6 +140,7 @@ defaultForOtherFields | B    | false          | establece si el campo (que debe 
 property              | type | default value | use
 ----------------------|------|---------------|-------------------
 name                  | T    |               | name in database and field id
+visible               | B    | true          | show/hide a field by default
 typeName              | T    |               | data type
 title                 | T    | `name`        | title in the grid if you don't want to use name property default value
 inTable               | L    | true          | determine if field belongs physically to the table and the dump.
