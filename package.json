@@ -14,13 +14,13 @@
     { "name": "Emilio Platzer", "email": "emilioplatzer@gmail.com" }
   ],
   "dependencies": {
-    "body-parser": "~1.18.1",
+    "body-parser": "~1.18.2",
     "connect-pg-simple": "~4.2.1",
     "cookie-parser": "~1.4.3",
     "es6-promise": "~4.1.1",
     "escape-string-regexp": "~1.0.5",
-    "express": "~4.15.4",
-    "express-session": "~1.15.5",
+    "express": "~4.16.0",
+    "express-session": "~1.15.6",
     "express-useragent": "~1.0.8",
     "fs-extra": "~4.0.2", 
     "fs-promise": "~2.0.3", 
@@ -38,7 +38,7 @@
     "backend-skins": "~0.1.0",
     "best-globals": "~0.10.1",
     "castellano": "~0.1.3",
-    "dialog-promise": "~0.8.2",
+    "dialog-promise": "~0.8.3",
     "extension-serve-static": "~0.1.6",
     "js-to-html": "~0.9.3",
     "json4all": "~0.3.10",
@@ -58,7 +58,7 @@
     "expect.js": "~0.3.1",
     "istanbul": "~0.4.5",
     "mocha": "~3.5.3",
-    "sinon": "~3.2.1",
+    "sinon": "~4.0.0",
     "supertest": "~3.0.0",
     
     "kill-9": "~0.4.2"
