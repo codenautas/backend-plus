@@ -132,6 +132,7 @@ visible               | B    | true           | muestra/oculta un campo de maner
 typeName              | T    |                | tipo
 title                 | T    | `name`         | título para la grilla cuando no se quiere el name
 inTable               | L    | true           | si pertenece físicamente a la tabla y por lo tanto entra en el dump.
+sequence              | [O]  | (sequenceDef)  | determina si el campo tendria un valor auto-incremental
 defaultValue          | T    | por defecto no hay valor por defecto | Valor por defecto
 defaultForOtherFields | B    | false          | establece si el campo (que debe definirse como "text") se utiliza para guardar un JSON con los "otros" campos cuando se importa un archivo (*para que funcione **debe configurarse "registerImports"** (ver tableDef)*)
 
@@ -144,6 +145,7 @@ visible               | B    | true          | show/hide a field by default
 typeName              | T    |               | data type
 title                 | T    | `name`        | title in the grid if you don't want to use name property default value
 inTable               | L    | true          | determine if field belongs physically to the table and the dump.
+sequence              | [O]  | (sequenceDef) | determine if field will have auto-incremental value.
 defaultForOtherFields | B    | false         | determines if field (must to be defined as "text") is used to save a JSON with other fields when any person imports a file (*it works* **__only if you configures "registerImports"__** *(see tableDef)*)
 
 [!--lang:*-->
@@ -165,6 +167,31 @@ inTable               | T    | null            | table name used to save "other"
 fieldNames            | [O]  | (fieldNamesDef) | Object with table fields configuration.
 
 [!--lang:*-->
+
+## sequenceDef
+
+<!--lang:es-->
+
+Un json que contiene información para generar una secuencia auto-incremental
+
+property              | type | default value   | use
+----------------------|------|-----------------|-------------------
+name                  | T    | null            | (REQUIRED) nombre de la secuencia
+firstValue            | Number | 1             | primer número de la secuencia
+prefix                | T    | null            | prefijo de la secuencia 
+
+<!--lang:en--]
+
+A json containing the info for the generated sequence
+
+property              | type | default value   | use
+----------------------|------|-----------------|-------------------
+name                  | T    | null            | (REQUIRED) sequence name
+firstValue            | Number | 1             | sequence first number
+prefix                | T    | null            | sequence prefix
+
+[!--lang:*-->
+
 
 ## fieldNamesDef
 
