@@ -257,7 +257,7 @@ entrada                      | uso
 -----------------------------|---------------
 install                      | opciones de instalación
   dump                       | opciones del dump de instalación
-    db.user                  | usuario dueño de la base de datos
+    db.owner                 | usuario dueño de la base de datos
     scripts.post-adapt       | lista de nombres de archivos para adaptar la estructura de la base de datos
 devel                        | conjunto de opciones para el ambiente de desarrollo y testing
   delay                      | tiempo de espera promedio adicional (para simular un servidor lento)
@@ -284,7 +284,7 @@ entry                        | usage
 -----------------------------|---------------
 install                      | (see Spanish)
   dump                       | (see Spanish)
-    db.user                  | (see Spanish)
+    db.owner                 | (see Spanish)
     scripts.post-adapt       | (see Spanish)
 devel                        | (see Spanish)
   delay                      | (see Spanish)
