@@ -19,7 +19,6 @@ login:
   activeClausule: current_timestamp<=active_until
   lockedClausule: current_timestamp>=locked_since
   plus:
-    fileStore: true
     secret: secret cat in 1 of the tables
     successRedirect: /admin
     loginForm:

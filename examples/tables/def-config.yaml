@@ -30,7 +30,6 @@ login:
   plus:
     allowHttpLogin: true
     chPassUrlPath: false
-    fileStore: false
     secret: secret cat in the table
     loginForm:
       formTitle: example tables

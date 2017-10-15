@@ -14,7 +14,6 @@ login:
   passFieldName: md5pass
   infoFieldList: [username, rol, iddato]
   plus:
-    fileStore: true
     loginForm:
       usernameLabel: usuario
       passwordLabel: contraseña

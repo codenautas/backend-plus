@@ -17,7 +17,6 @@ login:
   infoFieldList: [username, rol]
   plus:
     allowHttpLogin: true
-    fileStore: true
     loginForm:
       formTitle: simple app
       formImg: unlogged/tables-lock.png
