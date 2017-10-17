@@ -26,7 +26,10 @@
 var myOwn = {};
 /*jshint +W004 */
 
-myOwn.messages = {
+myOwn.messages={};
+myOwn.i18n={messages:{}};
+
+myOwn.i18n.messages.en = {
     Cancel   : "Cancel",
     notLogged: "Not logged in",
     noServer : "The server is inaccessible",
@@ -34,7 +37,6 @@ myOwn.messages = {
     reLogin  : "Sign in"
 };
 
-myOwn.i18n={messages:{}};
 myOwn.i18n.messages.es = {
     Cancel   : "Cancelar",
     notLogged: "Sin sesión activa",
@@ -106,6 +108,9 @@ myOwn.autoSetupFunctions = [
                 my.quitarLupa();
             }
         });
+        setInterval(function(){
+            my.testKeepAlive();
+        },1000);
         setInterval(function(){
             my.testKeepAlive();
         },my.debuggingStatus?6*1000:60*1000);
@@ -390,17 +395,32 @@ myOwn.ajaxPromise = function(procedureDef,data,opts){
 
 myOwn.testKeepAlive = function testKeepAlive(){
     var my = this;
+    var skin=this.config.config.skin;
+    var skinUrl=(skin?skin+'/':'');
     var element = document.getElementById('keep-alive-signal') || my.debugging && document.body.appendChild(html.div({id:'keep-alive-signal'}).create());
     if(element){
         element.textContent='t';
         element.style.backgroundColor='#4DD';
         element.style.display='';
     }
+    var startTime=new Date().getTime();
     return my.ajaxPromise({
         parameters:[],
         method:'post',
         action:'keep-alive',
         encoding:'plain'
+    }).then(function(){
+        if(window.updateOnlineStatus){
+            updateOnlineStatus();
+        }
+        var lightServer = document.getElementById('light-server');
+        lightServer.src=skinUrl+'img/server-ok.png';
+        var speed=1000/(1+new Date().getTime()-startTime);
+        if(isNaN(lightServer.result.speed)){
+            lightServer.result.speed = speed; 
+        }
+        lightServer.result.speed = Math.ceil((lightServer.result.speed*7 + speed)/8); 
+        lightServer.title = lightServer.result.speed;
     }).then(function(){
         if(element){
             element.textContent='ok';
@@ -454,10 +474,10 @@ myOwn.scrollToTop = function(element, to, duration) {
 };
 
 myOwn["connection-status"]={
-   logged   : { show: false , mustAsk: false },
-   notLogged: { show: true  , mustAsk: {idMessage:'reLogin', url:'login'}},
-   noServer : { show: true  , mustAsk: false },
-   noNetwork: { show: true  , mustAsk: false },
+   logged   : { show: false, mustAsk: false },
+   notLogged: { show: true , mustAsk: {idMessage:'reLogin', url:'login'}},
+   noServer : { show: true , mustAsk: false, id:'light-server' , img:'server-error'     },
+   noNetwork: { show: true , mustAsk: false, id:'light-network', img:'network-no-signal'},
 };
 
 myOwn.debuggingStatus=false;  // /* 

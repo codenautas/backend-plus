@@ -32,7 +32,7 @@ function sameValue(a,b){
       a && !!a.sameValue && a.sameValue(b);
 }
 
-myOwn.messages=changing(myOwn.messages, {
+myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     Delete : "Delete",
     Filter : "Filter",
     actualValueInDB: "actual value in database",

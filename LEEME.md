@@ -255,53 +255,59 @@ Process definition example:
 <!--lang:es-->
 entrada                      | uso
 -----------------------------|---------------
+server                       | opciones a nivel del servidor
+  .module-store              | nombre del módulo que guarda sesiones: file, memory (en modo devel guarda en disco cada tanto)
 install                      | opciones de instalación
-  dump                       | opciones del dump de instalación
-    db.owner                 | usuario dueño de la base de datos
-    scripts.post-adapt       | lista de nombres de archivos para adaptar la estructura de la base de datos
+  .dump                      | opciones del dump de instalación
+    ..db.owner               | usuario dueño de la base de datos
+    ..scripts.post-adapt     | lista de nombres de archivos para adaptar la estructura de la base de datos
 devel                        | conjunto de opciones para el ambiente de desarrollo y testing
-  delay                      | tiempo de espera promedio adicional (para simular un servidor lento)
-  cache-content              | hace caché de imágenes y archivos en general (si no está en modo "devel" siempre hace caché, no se puede apagar el caché fuera del modo devel)
-  forceShowAsEditable        | fuerza mostrar las grillas como grillas editables para mostrar cómo el servidor impide la modificación
+  .delay                     | tiempo de espera promedio adicional (para simular un servidor lento)
+  .cache-content             | hace caché de imágenes y archivos en general (si no está en modo "devel" siempre hace caché, no se puede apagar el caché fuera del modo devel)
+  .forceShowAsEditable       | fuerza mostrar las grillas como grillas editables para mostrar cómo el servidor impide la modificación
 login                        | opciones de login
-  plus                       | opciones a pasar al módulo login-plus
-    allowHttpLogin           | si permite loguerse desde conexiones HTTP
-    store                    | opciones de store de sesion
-      module-name            | nombre del módulo (ej: file)
+  .plus                      | opciones a pasar al módulo login-plus
+    ..allowHttpLogin         | si permite loguerse desde conexiones HTTP
 log                          | log por consola
-  req                        | muestra cada requerimiento
-  session                    | muestra info de las sesiones
+  .req                       | muestra cada requerimiento
+  .session                   | muestra info de las sesiones
 client-setup                 | opciones para el front-end
-  cursors                    | (en preparación) dice si usa curores para mostrar dónde (con el cursor en qué registro) está cada usuario
-  skin                       | nombre del skin
-  menu                       | si usa los menúes integrados
-  title                      | título de la pantalla
-  lang                       | idioma (y locale) del frontend, por ahora "es" o "en"
+  .cursors                   | (en preparación) dice si usa curores para mostrar dónde (con el cursor en qué registro) está cada usuario
+  .skin                      | nombre del skin
+  .menu                      | si usa los menúes integrados
+  .title                     | título de la pantalla
+  .lang                      | idioma (y locale) del frontend, por ahora "es" o "en"
 
 
 <!--lang:en--]
 entry                        | usage
 -----------------------------|---------------
+server                       |
+  .module-store              |
 install                      | (see Spanish)
-  dump                       | (see Spanish)
-    db.owner                 | (see Spanish)
-    scripts.post-adapt       | (see Spanish)
+  .dump                      | (see Spanish)
+    ..db.owner               | (see Spanish)
+    ..scripts.post-adapt     | (see Spanish)
 devel                        | (see Spanish)
-  delay                      | (see Spanish)
-  cache-content              | (see Spanish)
-  forceShowAsEditable        | (see Spanish)
+  .delay                     | (see Spanish)
+  .cache-content             | (see Spanish)
+  .forceShowAsEditable       | (see Spanish)
 login                        | (see Spanish) 
-  plus                       | (see Spanish) 
-    allowHttpLogin           | (see Spanish) 
-    store                    | (see Spanish) 
-      module-name            | (see Spanish) 
+  .plus                      | (see Spanish) 
+    ..allowHttpLogin         | (see Spanish) 
 log                          | (see Spanish) 
-  req                        | (see Spanish) 
-  session                    | (see Spanish) 
+  .req                       | (see Spanish) 
+  .session                   | (see Spanish) 
+client-setup                 | (see Spanish) 
+  .cursors                   | (see Spanish) 
+  .skin                      | (see Spanish) 
+  .menu                      | (see Spanish) 
+  .title                     | (see Spanish) 
+  .lang                      | (see Spanish) 
 
-[!--lang:*-->
-```yaml
-install:
+[!--lang:*-->  
+```yaml  
+install:  
   dump:
     db:
       owner: user_owner

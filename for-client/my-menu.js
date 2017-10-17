@@ -4,17 +4,27 @@ require('lazy-some').bindToPrototypeIn(Array);
 
 myOwn.wScreens={}
 
-myOwn.messages=changing(myOwn.messages, {
+myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     chpass:'change password',
     exit:'exit',
+    networkSignal1:'network $1',
+    offLine:'off line',
+    onLine:'on line',
     proced:'proced',
+    signIn:'sign in',
+    speed1:'speed $1',
     user:'user',
 });
 
 myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     chpass:'cambiar clave',
     exit:'salir',
+    networkSignal1:'estado de la red: $1',
+    offLine:'fuera de línea',
+    onLine:'en línea',
     proced:'proceder',
+    signIn:'login',
+    speed1:'velocidad $1',
     user:'usuario',
 });
 
@@ -119,7 +129,7 @@ myOwn.showPage = function showPage(pageDef){
             document.title = pageTitle;
             my.wScreens[w].call(my, addrParams);
         }
-        var rightMenu = document.getElementById('right-menu');
+        var rightMenu = document.getElementById('right-menu-icon');
     }else{
         var rightMenu = html.span({id: "right-menu"}, [
             html.img({class: "right-menu", src: my.path.img+"three-dot-menu.png",id: "right-menu-icon"}),
@@ -136,7 +146,7 @@ myOwn.showPage = function showPage(pageDef){
 };
 
 myOwn.createForkeableButton = function createForkeableButton(menu, label){
-    var be = this;
+    var my = this;
     var button=html.a({"class": "menu-item", "menu-type":menu.menuType||menu.w, "menu-name":menu.name||'noname'}, label || menu.label || menu.name).create();
     button.setForkeableHref = function setForkeableHref(menu){
         var href;
@@ -182,14 +192,23 @@ myOwn.replaceAddrParams = function replaceAddrParams(params){
     history.replaceState(null, null, 'menu?'+my.paramsToUriPart(params));
 }
 
+myOwn.light = function light(name, onclick){
+    var skin=this.config.config.skin;
+    var skinUrl=(skin?skin+'/':'');
+    var img = html.img({class:"light", id:'light-'+name, src:skinUrl+'img/'+name+'.png'}).create();
+    img.result={};
+    img.onclick=onclick;
+    return img;
+}
+
 myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
-    var be = this;
+    var my = this;
     var next = false;
     var selectedItem = null;
     var newMenuLine;
     var elements=[];
     var depth = parents.length;
-    var skin=be.config.config.skin;
+    var skin=my.config.config.skin;
     var skinUrl=(skin?skin+'/':'');
     if(depth===0){
         elements.push(html.img({id: "main-logo", src: skinUrl+"img/logo.png"}));
@@ -204,15 +223,28 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
         return button;
     }))
     if(depth===0){
-        elements.push(html.span({id: "right-menu"}, [
-            html.span({id: "active-user"}, my.config.username||"user"),
-            html.img({class: "right-menu", src: skinUrl+"img/three-dot-menu.png",id: "right-menu-icon"}),
-        ]));
+        elements.push(html.img({src: skinUrl+"img/three-dot-menu.png",id: "right-menu-icon"}));
+        elements.push(html.span({id: "active-user"}, my.config.username||"user"));
+        elements.push(html.a({id: "not-logged", href:'/login'}, my.messages.signIn));
         var status=html.span({id: "mini-console"}).create();
-        elements.push(status);
         status.addEventListener('click',function(){
             alertPromise(status.textContent,{underElement:status, withCloseButton:true, mainAttrs:{style:'white-space:pre'}});
         });
+        elements.push(html.span({class:'right-lights'},[
+            my.light('server', function(){
+                alertPromise(
+                    my.messages.speed1.replace('$1',this.result.speed),
+                    {underElement:this}
+                );
+            }),
+            my.light('network-signal', function(){
+                alertPromise(
+                    my.messages.networkSignal1.replace('$1',this.result.status),
+                    {underElement:this}
+                );
+            }),
+        ]));
+        elements.push(status);
     }
     var menuLine=html.div({id: "main-top-bar"+(depth||''), class: depth?"sub-menu-bar":"top-menu-bar"}, elements).create();
     layout.appendChild(menuLine);
@@ -228,10 +260,10 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
 };
 
 myOwn.displayMainMenu = function(addrParams){
-    var be = this;
+    var my = this;
     var totalLayout=document.getElementById('total-layout');
     totalLayout.innerHTML='';
-    var menu = be.displayMenu(totalLayout,my.config.menu,addrParams,[]);
+    var menu = my.displayMenu(totalLayout,my.config.menu,addrParams,[]);
     totalLayout.appendChild(html.div({id:'main_layout'}).create());
     setTimeout(function(){
         menu.realigns.reverse().forEach(function(realign){ if(realign){ realign(); }});
@@ -262,6 +294,23 @@ myOwn.rightMenu = function rightMenu(){
     });
 };
 
+myOwn.informDetectedStatus = function informDetectedStatus(statusCode, logged) {
+    var my=this;
+    if(my.debuggingStatus){ my.debuggingStatus(statusCode); }
+    var status = my["connection-status"][statusCode];
+    if(status.id){
+        var light = document.getElementById(status.id);
+        light.src = my.path.img+status.img+'.png';
+        light.title = statusCode;
+    }
+    if(statusCode==='notLogged'){
+        var notLogged = document.getElementById('not-logged');
+        notLogged.style.display='inherit';
+        var activeUser = document.getElementById('active-user');
+        activeUser.style.display='none';
+    }
+}
+
 window.addEventListener('popstate', function(){
     my.showPage();
 });
@@ -271,4 +320,28 @@ window.addEventListener('load', function(){
     my.autoSetup().then(function(){
         my.showPage();
     });
+    document.body.append(html.div({id:'cached-images'},[
+        html.img({src:my.path.img+'server.png'}),
+        html.img({src:my.path.img+'network-signal.png'}),
+        html.img({src:my.path.img+'server-error.png'}),
+        html.img({src:my.path.img+'network-no-signal.png'}),
+    ]).create());
 });
+
+function updateOnlineStatus(){
+    if(window.my){
+        var networkLight=document.getElementById('light-network-signal');
+        var skin=my.config.config.skin;
+        var skinUrl=(skin?skin+'/':'');
+        if(window.navigator.onLine){
+            networkLight.src=skinUrl+'img/network-signal-ok.png';
+            networkLight.result.status=my.messages.onLine;
+        }else{
+            networkLight.src=skinUrl+'img/network-no-signal.png';
+            networkLight.result.status=my.messages.offLine;
+        }
+    }
+}
+
+window.addEventListener('online',  updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
