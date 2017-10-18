@@ -345,3 +345,5 @@ function updateOnlineStatus(){
 
 window.addEventListener('online',  updateOnlineStatus);
 window.addEventListener('offline', updateOnlineStatus);
+
+myOwn.messages=myOwn.i18n.messages.en;
