@@ -53,6 +53,7 @@ vertical          | L    | `false`               | si el despliegue predetermina
 forInsertOnlyMode | L    | `false`               | si es una tabla de solo inserción
 filterColumns     | [O]  | `[]`                  | lista de objetos de la forma {column, operator, value} para que sea el filtro predeterminado de la grilla
 registerImports   | [O]  | (registerImportsDef)  | lista de objetos. Configura opciones para guardar la definicion de los "otros" campos al importar un archivo (*para que funcione **debe existir un campo seteado como "defaultForOtherFields"** (ver fieldDef)*)
+sortColumns       | [O]  | `[]`                  | ordenamiento predeterminado
 
 ejemplos lista       | formato elemento
 ---------------------|--------------------------------------
@@ -60,6 +61,7 @@ ejemplos lista       | formato elemento
  softForeignKeys     | {references:'ptable', fields:['atomic_number']}
  constraints         | {constraintType:'unique', fields:['atomic_number','order']}
  filterColumns       | {column:'atomic_number', operator:'=', value:7}
+ sortColumns         | {column:'discovery_date', order:-1}
 
 permisos | tabla | campo | indica si se permite...
 ---------|-------|-------|-------
@@ -95,6 +97,7 @@ vertical          | L    | `false`               | (see Spanish)
 forInsertOnlyMode | L    | `false`               | (see Spanish)
 filterColumns     | [O]  | `[]`                  | (see Spanish)
 registerImports   | [O]  | (registerImportsDef)  | Object list. It is uset to configure how "others" fields are stored when any person imports a file (*it works* **__only if you set to true one field with "defaultForOtherFields"__** *(see fieldDef)*)
+sortColumns       | [O]  | `[]`                  | default order
 
 list examples    | element format
 -----------------|--------------------------------------
@@ -102,6 +105,7 @@ list examples    | element format
  softForeignKeys | {references:'ptable', fields:['atomic_number']}
  constraints     | {constraintType:'unique', fields:['atomic_number','order']}
  filterColumns   | {column:'atomic_number', operator:'=', value:7}
+ sortColumns     | {column:'discovery_date', order:-1}
 
 permissions | table | field | allows:
 ------------|-------|-------|-------
