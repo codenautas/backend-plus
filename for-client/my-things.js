@@ -110,10 +110,7 @@ myOwn.autoSetupFunctions = [
         });
         setInterval(function(){
             my.testKeepAlive();
-        },1000);
-        setInterval(function(){
-            my.testKeepAlive();
-        },my.debuggingStatus?6*1000:60*1000);
+        },2000);
         window.addEventListener("error", function myErrorHandler(error, url, lineNumber) {
             my.log('error', error.message);
         });

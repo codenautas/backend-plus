@@ -1601,6 +1601,19 @@ myOwn.getReference = function initReference(referenceName, forceRefresh){
         var dataReady=connector.getData().then(function(rows){
             reference.rows=rows;
             reference.tableDef=connector.def;
+            reference.getValue = function getValue(row){
+                return row[reference.tableDef.primaryKey[0]];
+            };
+            reference.getLabels = function getLabels(row, includePk){
+                return (includePk || !reference.tableDef.nameFields.length?
+                        this.tableDef.primaryKey:[]
+                       ).concat(reference.tableDef.nameFields).map(function(fieldName){
+                    return row[fieldName];
+                });
+            };
+            reference.getLabel = function getLabel(row){
+                return this.getLabels(row).join(', ');
+            };
             return rows;
         });
         reference=my.references[referenceName]={
@@ -1662,10 +1675,8 @@ myOwn.autoSetupFunctions.push(function autoSetupMyTables(){
                 }
                 var opts=rows.map(function(row){
                     return {
-                        value:row[reference.tableDef.primaryKey[0]],
-                        labels:reference.tableDef.primaryKey.concat(reference.tableDef.nameFields).map(function(fieldName){
-                            return row[fieldName];
-                        })
+                        value:reference.getValue(row),
+                        labels:reference.getLabels(row,true)
                     };
                 });
                 if(typeInfo.nullable){
