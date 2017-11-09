@@ -126,10 +126,15 @@ myOwn.autoSetupFunctions = [
 ];
 myOwn.autoSetup = function autoSetup(){
     var my=this;
+    if(my.promiseChainAutoSetup){
+        console.log('Multiple calls to autoSetup()');
+        return my.promiseChainAutoSetup;
+    }
     var promiseChain=Promise.resolve();
     my.autoSetupFunctions.forEach(function(autoSetupFunction){
         promiseChain=promiseChain.then(autoSetupFunction.bind(my));
     });
+    my.promiseChainAutoSetup=promiseChain;
     return promiseChain;
 }
     
@@ -216,7 +221,16 @@ myOwn.fade = function fade(element, options){
     }
 };
 
+
+myOwn.focusFirstColumnOf = function focusFirstColumnOf(row){
+    var my = this;
+    var element = my.nextElementThatIs(row.cells[0],my.beInteractive);
+    element.focus();
+}
+
+
 myOwn.insertRow = function insertRow(where){
+    var my = this;
     var section, iRow, newTr;
     if(where.under){
         section = where.under.parentNode;
@@ -247,6 +261,9 @@ myOwn.insertRow = function insertRow(where){
             trDummy.style.display='none';
             tr.style.display='';
             section.removeChild(trDummy);
+            setTimeout(function(){
+                my.focusFirstColumnOf(tr);
+            },10);
         },500);
     }
     return tr;
@@ -513,7 +530,7 @@ function isInteracive(element){
     )
     && element.style.display!='none'
     && element.style.visibility!='hidden'
-    && !element.saltearEnter 
+    && !element.getAttribute('skip-enter')
     && (element.tabIndex==null || element.tabIndex>=0);
 }
 
@@ -547,13 +564,25 @@ function proximo_elemento_que_sea(elemento, controlador){
     return proximo;
 }
 
+myOwn.beInteractive = function beInteractive(element, controller){
+    return isInteracive(element)
+}
+
+myOwn.nextElementThatIs = function nextElementThatIs(element, controller){
+    return proximo_elemento_que_sea(element, controller);
+}
+
 function enter_hace_tab_en_este_elemento(elemento){
     return elemento.tagName!="TEXTAREA";
 }
 
 myOwn.captureKeys = function captureKeys() {
+    if(this.captureKeysInstaled){
+        throw new Error('captureKeysInstaled');
+    }
+    this.captureKeysInstaled=true;
     document.addEventListener('keypress', function(evento){
-        if(evento.which==13){ // Enter
+        if(evento.which==13 && !this.activeElement.getAttribute("enter-clicks")){ // Enter
             var enfoco=this.activeElement;
             var este=this.activeElement;
             if(enter_hace_tab_en_este_elemento(este)){

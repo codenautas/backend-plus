@@ -59,8 +59,8 @@ myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     hideOrShow: "hide or show colums",
     import: "import",
     importDataFromFile: "import data from external file",
-    insertBelow: "insert record below this",
-    insertRecordAtTop: "insert record at top",
+    insertAbove: "insert record above this",
+    insertRecordAtBottom: "insert a new record in the bottom of the table",
     lessThan:'less than',
     lessDetails: "hide details",
     lessEqualThan:'less equal than',
@@ -112,8 +112,8 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     hideOrShow: "ocultar o mostrar columnas",
     import: "importar",
     importDataFromFile: "importar datos de un archivo externo",
-    insertBelow: "agregar un registro debajo de éste",
-    insertRecordAtTop: "insertar un registro nuevo en la tabla",
+    insertAbove: "agregar un registro encima de éste",
+    insertRecordAtBottom: "insertar un registro nuevo en la tabla",
     lessThan:'menor que',
     lessDetails: "dejar de mostrar los detalles asocialdos al registro",
     lessEqualThan:'menor igual que',
@@ -410,7 +410,7 @@ myOwn.ActionColumnGrid.prototype.td = function td(depot){
         actionNamesList.forEach(function(actionName){
             var actionDef = my.tableAction[actionName];
             if(grid.def.allow[actionName]){
-                var buttonAction=html.button({class:'table-button'}, [
+                var buttonAction=html.button({class:'table-button', "skip-enter":true}, [
                     html.img({src:actionDef.img, alt:actionDef.alt, title:my.messages[actionDef.titleMsg]})
                 ]).create();
                 thActions.appendChild(buttonAction);
@@ -591,7 +591,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
         alt:'DETAIL',
         title:my.messages.details
     }).create();
-    var button = html.button({class:'table-button'}, [detailControl.img]).create();
+    var button = html.button({class:'table-button', "skip-enter":true}, [detailControl.img]).create();
     var td = html.td({class:['grid-th','grid-th-details'], "my-relname":detailTableDef.table}, button).create();
     depot.detailControls[detailTableDef.table] = detailControl;
     button.addEventListener('click',function(){
@@ -1051,13 +1051,14 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         });
     }
     if(grid.def.allow.insert && !grid.def.forInsertOnlyMode){
-        buttonInsert=html.button({class:'table-button'}, [
+        buttonInsert=html.button({class:'table-button', "enter-clicks":true}, [
             html.img({
                 src:my.path.img+'insert.png',
                 alt:'INS',
-                title:my.messages.insertRecordAtTop
+                title:my.messages.insertRecordAtBottom
             })
         ]).create();
+        grid.dom.buttonInsert=buttonInsert;
         buttonInsert.addEventListener('click', function(){
             grid.createRowInsertElements();
         });
@@ -1108,7 +1109,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     ]).create();
     grid.prepareMenu(buttonMenu);
     grid.columns=[new my.ActionColumnGrid({grid:grid, actions:[
-        buttonInsert,/*buttonSaveMode,*/buttonCreateFilter,buttonDestroyFilter,
+        /*buttonInsert,*//*buttonSaveMode,*/buttonCreateFilter,buttonDestroyFilter,
         buttonOrientation,
         buttonMenu,
     ]})].concat(
@@ -1148,7 +1149,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
                 })
             ),
             html.tfoot([
-                html.tr([html.th(),grid.dom.footInfo])
+                html.tr([html.th([buttonInsert]),grid.dom.footInfo])
             ])
         ]).create();
     }else{
@@ -1160,7 +1161,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
             ]),
             html.tbody(),
             html.tfoot([
-                html.tr([html.th(),grid.dom.footInfo])
+                html.tr([html.th([buttonInsert]),grid.dom.footInfo])
             ])
         ]).create();
     }
@@ -1168,27 +1169,29 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     grid.dom.main.appendChild(grid.dom.table);
 };
 
-myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElements(belowDepot){
+myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElements(aboveDepot){
     var grid = this;
     var position;
     if(grid.vertical){
         position=1;
     }else{
-        if(belowDepot){
-            var belowTr = belowDepot.tr;
-            position = ('sectionRowIndex' in belowTr?
-                belowTr.sectionRowIndex:
-                belowTr.rowIndex-grid.dom.table.tHead.rows.length
-            )+1;
+        if(aboveDepot){
+            var aboveTr = aboveDepot.tr;
+            position = ('sectionRowIndex' in aboveTr?
+                aboveTr.sectionRowIndex:
+                aboveTr.rowIndex-grid.dom.table.tHead.rows.length
+            );
         }else{
-            position = 0;
+            position = grid.dom.table.tBodies[0].rows.length;
         }
+        /*
         while(
             position<grid.dom.table.tBodies[0].rows.length && 
             grid.dom.table.tBodies[0].rows[position].isDetail
         ){
             position++;
         }
+        */
     }
     var depotForInsert = grid.createDepotFromRow({}, 'new');
     grid.connector.fixedFields.forEach(function(pair){
@@ -1462,11 +1465,12 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             grid.dom.footInfo.rowCount.innerHTML='';
             if(iRow<depotsToDisplay.length){
                 var addButtonRest = function addButtonRest(toNextRowNumber){
-                    var buttonRest=html.button({class:'foot-info'},"+..."+toNextRowNumber).create();
+                    var buttonRest=html.button({class:'foot-info', "enter-clicks":true},"+..."+toNextRowNumber).create();
                     grid.dom.footInfo.rowCount.appendChild(html.span('  ').create());
                     grid.dom.footInfo.rowCount.appendChild(buttonRest);
                     buttonRest.addEventListener('click',function(){
                         grid.displayRows(iRow, toNextRowNumber, true);
+                        my.focusFirstColumnOf(grid.dom.table.tBodies[0].rows[iRow]);
                     });
                 };
                 my.displayCountBreaks.forEach(function(size, iSize){
@@ -1476,6 +1480,9 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     }
                 });
                 addButtonRest(depotsToDisplay.length);
+                grid.dom.buttonInsert.style.visibility='hidden';
+            }else{
+                grid.dom.buttonInsert.style.visibility='visible';
             }
         };
         var linesToDisplay=depotsToDisplay.length<=myOwn.firstDisplayOverLimit?depotsToDisplay.length:my.firstDisplayCount;
@@ -1509,7 +1516,7 @@ myOwn.tableAction={
     "insert":{
         img: myOwn.path.img+'insert.png',
         alt: "INS",
-        titleMsg: 'insertBelow',
+        titleMsg: 'insertAbove',
         actionRow: function(depot){
             return depot.manager.createRowInsertElements(depot);
         }
@@ -1693,3 +1700,22 @@ myOwn.autoSetupFunctions.push(function autoSetupMyTables(){
         }
     });
 });
+
+myOwn.TableGrid.prototype.captureKeys = function captureKeys() {
+    document.addEventListener('keypress', function(evento){
+        if(evento.which==13){ // Enter
+            var enfoco=this.activeElement;
+            var este=this.activeElement;
+            if(enter_hace_tab_en_este_elemento(este)){
+                var no_me_voy_a_colgar=2000;
+                while(este && this.activeElement===enfoco && no_me_voy_a_colgar--){
+                    este=proximo_elemento_que_sea(este,isInteracive);
+                    este.focus();
+                }
+                if(este){
+                    evento.preventDefault();
+                }
+            }
+        }
+    });
+};
