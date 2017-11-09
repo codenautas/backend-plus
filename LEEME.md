@@ -268,6 +268,15 @@ devel                        | conjunto de opciones para el ambiente de desarrol
 login                        | opciones de login
   .plus                      | opciones a pasar al módulo login-plus
     ..allowHttpLogin         | si permite loguerse desde conexiones HTTP
+  .table                     | nombre de la tabla donde validar usuarios
+  .schema                    | esquema donde se encuentra la tabla de usuarios
+  .userFieldName             | nombre del campo que contiene el usuario
+  .passFieldName             | nombre del campo que contiene el md5(password+usuario)
+  .rolFieldName              | nombre del campo donde está el rol del usuario 
+  .infoFieldList             | array con los nombres de campo que van a al campo user
+  .activeClausule            | expresión booleana SQL que determina si el usuario está activo
+  .messages                  | mensajes a mostrar en la pantalla de login
+  .keepAlive                 | máxima duración logueado si solo se reciben mensajes keep-alive
 log                          | log por consola
   .req                       | muestra cada requerimiento
   .session                   | muestra info de las sesiones
@@ -277,6 +286,15 @@ client-setup                 | opciones para el front-end
   .menu                      | si usa los menúes integrados
   .title                     | título de la pantalla
   .lang                      | idioma (y locale) del frontend, por ahora "es" o "en"
+db                           | opciones de la base de datos
+  .motor                     | por ahora solo 'postgresql'
+  .database                  |
+  .user                      |
+  .password                  |
+  .port                      | 
+  .schema                    | esquema principal donde crear los objetos nuevos
+  .search_path               | array de nombres de esquemas, si no se especifica el search_path = [schema]  
+  .log-last-error            | true si se desea que se deje en un archivo la última sentencia SQL que contuvo error (solo funciona si config.devel está especficiada)
 
 
 <!--lang:en--]
