@@ -1060,7 +1060,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         ]).create();
         grid.dom.buttonInsert=buttonInsert;
         buttonInsert.addEventListener('click', function(){
-            grid.createRowInsertElements();
+            var tr=grid.createRowInsertElements();
         });
     }
     if(grid.def.allow.filter && !grid.def.forInsertOnlyMode){

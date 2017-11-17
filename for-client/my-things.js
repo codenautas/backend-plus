@@ -263,7 +263,8 @@ myOwn.insertRow = function insertRow(where){
             section.removeChild(trDummy);
             setTimeout(function(){
                 my.focusFirstColumnOf(tr);
-            },10);
+                window.keyStarForceFocusNow=true;
+            },100);
         },500);
     }
     return tr;
@@ -582,6 +583,15 @@ myOwn.captureKeys = function captureKeys() {
     }
     this.captureKeysInstaled=true;
     document.addEventListener('keypress', function(evento){
+        if(domElement.lupa){
+            domElement.lupa.style.opacity=0.5;
+        }
+        if(window.keyStarForceFocusNow){
+            window.keyStarForceFocusNow=false;
+            if(evento.which==106){
+                this.activeElement.focus();
+            }
+        }
         if(evento.which==13 && !this.activeElement.getAttribute("enter-clicks")){ // Enter
             var enfoco=this.activeElement;
             var este=this.activeElement;
