@@ -577,15 +577,133 @@ function enter_hace_tab_en_este_elemento(elemento){
     return elemento.tagName!="TEXTAREA";
 }
 
+function tableInfo(element){
+    var info={};
+    while(element && element.tagName!='TABLE'){
+        if(element.tagName=='TR'){
+            info.tr=info.tr||element;
+        }
+        if(element.tagName=='TD'){
+            info.td=info.td||element;
+        }
+        element=element.parentNode;
+    }
+    if(element){
+        info.table=element;
+    }
+    return info;
+}
+
+function getCaretPosition(editableDiv) {
+  // https://stackoverflow.com/questions/3972014/get-caret-position-in-contenteditable-div
+  var caretPos = 0,
+    sel, range;
+  if (window.getSelection) {
+    sel = window.getSelection();
+    if (sel.rangeCount) {
+      range = sel.getRangeAt(0);
+      if (editableDiv.contains(range.commonAncestorContainer)) {
+        caretPos = range.endOffset;
+      }
+    }
+  } else if (document.selection && document.selection.createRange) {
+    range = document.selection.createRange();
+    if (range.parentElement() == editableDiv) {
+      var tempEl = document.createElement("span");
+      editableDiv.insertBefore(tempEl, editableDiv.firstChild);
+      var tempRange = range.duplicate();
+      tempRange.moveToElementText(tempEl);
+      tempRange.setEndPoint("EndToEnd", range);
+      caretPos = tempRange.text.length;
+    }
+  }
+  return caretPos;
+}
+
 myOwn.captureKeys = function captureKeys() {
+    var previousKey;
+    var previousPosition;
+    var my=this;
     if(this.captureKeysInstaled){
         throw new Error('captureKeysInstaled');
     }
     this.captureKeysInstaled=true;
-    document.addEventListener('keypress', function(evento){
-        if(domElement.lupa){
-            domElement.lupa.style.opacity=0.5;
+    document.addEventListener('keydown', function(evento){
+        if(evento.which==37){ // KeyLeft
+            var info=tableInfo(this.activeElement);
+            if(info.table){
+                if(evento.ctrlKey || info.td.textContent=='' || !getCaretPosition(info.td)){
+                    var newPos=info.td.cellIndex-1;
+                    while(newPos && !my.beInteractive(info.tr.cells[newPos])){
+                        newPos--;
+                    }
+                    if(my.beInteractive(info.tr.cells[newPos])){
+                        info.tr.cells[newPos].focus();
+                        evento.preventDefault();
+                    }
+                }
+            }
         }
+        if(evento.which==39){ // KeyRight
+            var info=tableInfo(this.activeElement);
+            if(info.table){
+                if(evento.ctrlKey || info.td.textContent=='' || (previousKey == 39 && previousPosition===getCaretPosition(info.td))){
+                    var newPos=info.td.cellIndex+1;
+                    while(newPos<=info.tr.cells.length && !my.beInteractive(info.tr.cells[newPos])){
+                        newPos++;
+                    }
+                    if(my.beInteractive(info.tr.cells[newPos])){
+                        info.tr.cells[newPos].focus();
+                        evento.preventDefault();
+                    }
+                    previousPosition=false;
+                }else{
+                    previousPosition=getCaretPosition(info.td)
+                }
+            }
+        }
+        if(evento.which==40 || evento.which==38){ // KeyDown, KeyUp
+            var info=tableInfo(this.activeElement);
+            if(info.table){
+                var newPos=info.tr.rowIndex+evento.which-39;
+                var newRow=info.table.rows[newPos];
+                if(newRow){
+                    var newCell = newRow.cells[info.td.cellIndex];
+                    if(my.beInteractive(newCell)){
+                        newCell.focus();
+                        evento.preventDefault();
+                    }
+                }
+            }
+        }
+        if(evento.which==115){ // F4
+            var info=tableInfo(this.activeElement);
+            if(info.table){
+                var abovePos=info.tr.rowIndex-1;
+                var aboveRow=info.table.rows[abovePos];
+                if(aboveRow){
+                    var aboveCell = aboveRow.cells[info.td.cellIndex];
+                    if(aboveCell.getTypedValue){
+                        var value=aboveCell.getTypedValue();
+                        if(info.td.setTypedValue){
+                            info.td.setTypedValue(value);
+                            var belowPos=info.tr.rowIndex+1;
+                            var belowRow=info.table.rows[belowPos];
+                            if(belowRow){
+                                var belowCell = belowRow.cells[info.td.cellIndex];
+                                if(my.beInteractive(belowCell)){
+                                    belowCell.focus();
+                                    evento.preventDefault();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        previousKey=evento.which;
+    });
+    document.addEventListener('keypress', function(evento){
         if(window.keyStarForceFocusNow){
             window.keyStarForceFocusNow=false;
             if(evento.which==106){

@@ -1703,6 +1703,7 @@ myOwn.autoSetupFunctions.push(function autoSetupMyTables(){
 
 myOwn.TableGrid.prototype.captureKeys = function captureKeys() {
     document.addEventListener('keypress', function(evento){
+        return;
         if(evento.which==13){ // Enter
             var enfoco=this.activeElement;
             var este=this.activeElement;
