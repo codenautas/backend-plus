@@ -580,7 +580,8 @@ myOwn.DetailColumnGrid.prototype.th = function th(){
 myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
     var grid = this.grid;
     var detailTableDef = this.detailTableDef;
-    var detailControl = depot.detailControls[detailTableDef.table] || { show:false };
+    var detailTableNameAndAbr = detailTableDef.table+' '+detailTableDef.abr;
+    var detailControl = depot.detailControls[detailTableNameAndAbr] || { show:false };
     if(detailTableDef.condition){
         if(!my.conditions[detailTableDef.condition](depot)){
             return html.td({class:['grid-th','grid-th-details'], "my-relname":detailTableDef.table}).create();
@@ -593,7 +594,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
     }).create();
     var button = html.button({class:'table-button', "skip-enter":true}, [detailControl.img]).create();
     var td = html.td({class:['grid-th','grid-th-details'], "my-relname":detailTableDef.table}, button).create();
-    depot.detailControls[detailTableDef.table] = detailControl;
+    depot.detailControls[detailTableNameAndAbr] = detailControl;
     button.addEventListener('click',function(){
         var spansForSmooth = [iColumn+1, 999];
         if(!detailControl.show){
@@ -618,7 +619,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
                 tdGrid.appendChild(detailControl.table);
             }
             detailControl.show = true;
-            newTr.detailTableName=detailTableDef.table;
+            newTr.detailTableNameAndAbr=detailTableNameAndAbr;
             newTr.isDetail=true;
             depot.detailRows.push(newTr);
         }else{
@@ -1357,7 +1358,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         }
         if(iRow===-1){
             depot.detailRows.forEach(function(detailTr){
-                var detailControl = depot.detailControls[detailTr.detailTableName];
+                var detailControl = depot.detailControls[detailTr.detailTableNameAndAbr];
                 detailControl.tr = detailTr;
                 if(detailControl.show){
                     tbody.appendChild(detailTr);
