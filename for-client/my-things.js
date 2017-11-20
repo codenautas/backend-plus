@@ -410,7 +410,7 @@ myOwn.ajaxPromise = function(procedureDef,data,opts){
 
 myOwn.testKeepAlive = function testKeepAlive(){
     var my = this;
-    var skin=this.config.config.skin;
+    var skin=this.config.skin;
     var skinUrl=(skin?skin+'/':'');
     var element = document.getElementById('keep-alive-signal') || my.debugging && document.body.appendChild(html.div({id:'keep-alive-signal'}).create());
     if(element){
@@ -686,7 +686,7 @@ myOwn.captureKeys = function captureKeys() {
                     if(aboveCell.getTypedValue){
                         var value=aboveCell.getTypedValue();
                         if(info.td.setTypedValue){
-                            info.td.setTypedValue(value);
+                            info.td.setTypedValue(value, true);
                             var belowPos=info.tr.rowIndex+1;
                             var belowRow=info.table.rows[belowPos];
                             if(belowRow){

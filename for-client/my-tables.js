@@ -1694,8 +1694,7 @@ myOwn.autoSetupFunctions.push(function autoSetupMyTables(){
                     underElement:typedControl,
                     withCloseButton:true,
                 }).then(function(value){
-                    typedControl.setTypedValue(value);
-                    typedControl.dispatchEvent(new CustomEvent('udpdate'));
+                    typedControl.setTypedValue(value, true);
                 });
             });
         }
