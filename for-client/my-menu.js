@@ -320,7 +320,7 @@ window.addEventListener('load', function(){
     my.autoSetup().then(function(){
         my.showPage();
     });
-    document.body.append(html.div({id:'cached-images'},[
+    document.body.appendChild(html.div({id:'cached-images'},[
         html.img({src:my.path.img+'server.png'}),
         html.img({src:my.path.img+'network-signal.png'}),
         html.img({src:my.path.img+'server-error.png'}),
