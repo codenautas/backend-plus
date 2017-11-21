@@ -225,7 +225,7 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
     if(depth===0){
         elements.push(html.img({src: skinUrl+"img/three-dot-menu.png",id: "right-menu-icon"}));
         elements.push(html.span({id: "active-user"}, my.config.username||"user"));
-        elements.push(html.a({id: "not-logged", href:'/login'}, my.messages.signIn));
+        elements.push(html.a({id: "not-logged", href:'login'}, my.messages.signIn));
         var status=html.span({id: "mini-console"}).create();
         status.addEventListener('click',function(){
             alertPromise(status.textContent,{underElement:status, withCloseButton:true, mainAttrs:{style:'white-space:pre'}});

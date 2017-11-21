@@ -1,14 +1,15 @@
 {
   "name": "backend-plus",
   "description": "Backend for typed controls",
-  "version": "0.18.27",
+  "version": "0.18.28",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
   "main": "lib/backend-plus.js",
   "files": [
     "lib",
-    "for-client"
+    "for-client",
+    "unlogged"
   ],
   "contributors": [
     {
