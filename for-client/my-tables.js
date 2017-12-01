@@ -759,211 +759,11 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
         })
         return true;
     }});
-    myOwn.dialogDownload = function dialogDownload(){
-        return dialogPromise(function(dialogWindow, closeWindow){
-            var id1=my.getUniqueDomId();
-            var id2=my.getUniqueDomId();
-            var downloadElement=html.a({class:'export-a'},my.messages.download).create();
-            var downloadElementText=html.a({class:'export-a'},my.messages.download+" txt").create();
-            var mainDiv=html.div({class:'dialog-export',"current-state":"preparing"}, [
-                html.div({class:'dialog-preparing'}, my.messages.preparingForExport),
-                html.div([
-                    html.span(my.messages.format),
-                   // html.input({type:'radio', id:id1, name:'format', checked:true }), html.label({"for": id1}, '.txt'),
-                    html.input({class:'export-radio',type:'radio', id:id2, name:'format', checked:true}), html.label({"for": id2}, '.xlsx'),
-                ]),
-                html.img({
-                    class:['img-preparing', 'state-preparing'], 
-                    src:'img/preparing.png', 
-                    alt:my.messages.preparingForExport, 
-                    title:my.messages.preparingForExport, }),
-                html.div({class:'state-ready'}, [downloadElement]),
-                html.div({class:'state-ready-txt'}, [downloadElementText]),
-                html.div('.')
-            ]).create();
-            dialogWindow.appendChild(mainDiv);
-            var txtToDownload;
-            var otherFieldsTabColumn = [];
-            setTimeout(function(){
-                var txtToDownload=grid.def.fields.map(function(fieldDef){
-                        if(fieldDef.defaultForOtherFields){
-                            var textArray=[];
-                            grid.def.otherFields.forEach(function(otherField, index){
-                                textArray.push(otherField[grid.def.registerImports.fieldNames.fieldName]);
-                                otherFieldsTabColumn[otherField[grid.def.registerImports.fieldNames.fieldName]] = index;
-                            });
-                            return textArray.join('|');
-                        }else{
-                            return fieldDef.name;
-                        }
-                    }).join('|')+'\r\n'+
-                    grid.depotsToDisplay.map(function(depot){
-                        return grid.def.fields.map(function(fieldDef){
-                            var value=depot.row[fieldDef.name];
-                            if(fieldDef.defaultForOtherFields){
-                                var textArrayInitialization = Array.apply(null, Array(grid.def.otherFields.length)).map(function () {return "";});
-                                var otherFields = JSON.parse(value) || [];
-                                var textArray = textArrayInitialization;
-                                otherFields.forEach(function(otherField){
-                                    textArray[otherFieldsTabColumn[otherField.name]] = otherField.value;
-                                });
-                                return textArray.join('|');
-                            }else{
-                                return value==null?'':depot.row[fieldDef.name].toString().trim();
-                            }
-                        }).join('|');
-                    }).join('\r\n')+'\r\n';
-                mainDiv.setAttribute("current-state-txt", "ready");
-                var blob = new Blob([txtToDownload], {type: 'text/plain'});
-                var url = URL.createObjectURL(blob); 
-                downloadElementText.href=url;
-                downloadElementText.setAttribute("download", grid.def.name+".tab");
-            },10);
-            var otherFieldsExcelColumns = [];
-            var populateTableXLS = function populateTableXLS(ws, depots, fieldDefs, topRow, leftColumn){
-                topRow=topRow||0;
-                leftColumn=leftColumn||0;
-                fieldDefs.forEach(function(field,iColumn){
-                    if(field.defaultForOtherFields){
-                        grid.def.otherFields.forEach(function(otherField){
-                            otherFieldsExcelColumns[otherField[grid.def.registerImports.fieldNames.fieldName]] = iColumn+leftColumn;
-                            ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:topRow})]={t:'s',v:otherField[grid.def.registerImports.fieldNames.fieldName], s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
-                            iColumn++;
-                        });
-                    }else{
-                        ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:topRow})]={t:'s',v:field.name, s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
-                    }
-                });
-                depots.forEach(function(depot, iRow){
-                    var addCell = function addCell(value, fieldDef, iColumn){
-                        var valueType='s';
-                        var type=fieldDef.typeName;
-                        if(value!=null){
-                            if(typeStore.type[type] && typeStore.type[type].toExcelValue){
-                                value=typeStore.type[type].toExcelValue(value)
-                                valueType =typeStore.type[type].toExcelType(value)
-                            }
-                            var cell={t:valueType,v:value};
-                            if(fieldDef.isPk){
-                                cell.s={font:{bold:true}};
-                            }else if(!fieldDef.allow || !fieldDef.allow.update){
-                                cell.s={font:{color:{ rgb: "88AA00" }}};
-                            }
-                            ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:iRow+1+topRow})]=cell;
-                        }
-                    }
-                    fieldDefs.forEach(function(fieldDef, iColumn){
-                        var value=depot.row[fieldDef.name];
-                        if(fieldDef.defaultForOtherFields){
-                            var otherFields = JSON.parse(value) || [];
-                            otherFields.forEach(function(otherField){
-                                addCell(otherField.value, fieldDef, otherFieldsExcelColumns[otherField.name]);
-                            });
-                        }else{
-                            addCell(value, fieldDef, iColumn);
-                        }
-                    });
-                });
-                ws["!ref"]="A1:"+XLSX.utils.encode_cell({c:fieldDefs.length||iColumn+leftColumn + grid.def.otherFields.length,r:grid.depotsToDisplay.length+topRow});
-            }
-            setTimeout(function(){
-                var wb = new Workbook();
-                var ws = {};
-                var exportFileInformationWs={};
-                var i=0;
-                exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'table',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
-                exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:  i})]={t:'s',v:grid.def.name};
-                exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'date',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
-                exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:  i})]={t:'s',v:new Date().toISOString()};
-                exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'user',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
-                exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:  i})]={t:'s',v:my.config.username};
-                // grid.def.allow.forEach(function(action,iAction){
-                //     exportFileInformationWs[XLSX.utils.encode_cell({c:iAction,r:2})]={t:'s',v:action};
-                // })
-                if(grid.def.exportMetadata){
-                    if(grid.def.exportMetadata.fieldProperties){
-                        var fieldPropertiesDefs=grid.def.exportMetadata.fieldProperties.map(function(propName, i){
-                            return {name:propName, typeName:'text', isPk:!i};
-                        });
-                        var fieldPropertiesDepot=grid.def.fields.filter(function(fieldDef){
-                            return coalesce(fieldDef.exportMetadata,grid.def.exportMetadata.exportAnyField,true);
-                        }).map(function(fieldDef){
-                            return {row:fieldDef};
-                        });
-                        populateTableXLS(exportFileInformationWs, fieldPropertiesDepot,fieldPropertiesDefs,i+1,1);
-                    }
-                }
-                populateTableXLS(ws, grid.depotsToDisplay, grid.def.fields);
-                var sheet1name=grid.def.name;
-                var sheet2name=grid.def.name!=="metadata"?"metadata":"meta-data";
-                wb.SheetNames=[sheet1name,sheet2name];
-                wb.Sheets[sheet1name]=ws;
-                exportFileInformationWs["!ref"]="A1:F100";
-                wb.Sheets[sheet2name]=exportFileInformationWs;
-                var wbFile = XLSX.write(wb, {bookType:'xlsx', bookSST:false, type: 'binary'});
-                var blob = new Blob([s2ab(wbFile)],{type:"application/octet-stream"});
-                mainDiv.setAttribute("current-state", "ready");
-                var url = URL.createObjectURL(blob); 
-                downloadElement.href=url;
-                downloadElement.setAttribute("download", grid.def.name+".xlsx");
-            },10);
-        });
-    }
     if(grid.def.allow.export){
-        menuOptions.push({img:my.path.img+'export.png', value:true, label:my.messages.export, doneFun: myOwn.dialogDownload });
+        menuOptions.push({img:my.path.img+'export.png', value:true, label:my.messages.export, doneFun: function(){
+            myOwn.dialogDownload(grid);
+        }});
     }
-    myOwn.dialogUpload = function dialogUpload(ajaxPath, ajaxParams, ajaxPrepareResultFun, showWithMiniMenu, messages){
-        var doneFun = function doneFun(){
-            var buttonFile=html.input({class:'import-button',type:'file',style:'min-width:400px'}).create();
-            var buttonConfirmImport=html.input({class:'import-button',type:'button', value:my.messages.import}).create();
-            var progressIndicator=html.div({class:'indicator'},' ').create();
-            var progressBar=html.div({class:'progress-bar', style:'width:400px; height:8px;'},[progressIndicator]).create();
-            var uploadingProgress=function(progress){
-                if(progress.lengthComputable){
-                    progressIndicator.style.width=progress.loaded*100/progress.total+'%';
-                    progressIndicator.title=Math.round(progress.loaded*100/progress.total)+'%';
-                }else{
-                    progressIndicator.style.backgroundColor='#D4D';
-                    progressIndicator.title='N/D %';
-                }
-            };
-            buttonConfirmImport.addEventListener('click', function(){
-                var files = buttonFile.files;
-                buttonConfirmImport.value='cargando...';
-                buttonConfirmImport.disabled=true;
-                bestGlobals.sleep(100).then(function(){
-                    return my.ajax[ajaxPath[0]][ajaxPath[1]](changing(ajaxParams, {
-                        files:files
-                    }),{uploading:uploadingProgress});
-                }).then(ajaxPrepareResultFun).then(this.dialogPromiseDone,this.dialogPromiseDone);
-            });
-            simpleFormPromise({elementsList:[
-                changing(my.messages, messages).importDataFromFile,
-                buttonFile, 
-                html.br().create(),
-                buttonConfirmImport,
-                html.br().create(),
-                progressBar,
-            ]}).then(function(message){
-                return Promise.all([
-                    grid.refresh(),
-                    alertPromise(message)
-                ]);
-            },function(err){
-                return Promise.all([
-                    grid.refresh(),
-                    my.alertError(err)
-                ]);
-            });
-        }
-                        
-        if(showWithMiniMenu){
-            return {img:my.path.img+'import.png', value:true, label:my.messages.import, doneFun: doneFun};
-        }else{
-            doneFun();
-        }
-        
-    };
     if(grid.def.allow.import){
         var showWithMiniMenu = true;
         var messages = {};
@@ -1024,6 +824,212 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
             withCloseButton:false,
         });
     };
+};
+
+myOwn.dialogDownload = function dialogDownload(grid){
+    return dialogPromise(function(dialogWindow, closeWindow){
+        var id1=my.getUniqueDomId();
+        var id2=my.getUniqueDomId();
+        var downloadElement=html.a({class:'export-a'},my.messages.download).create();
+        var downloadElementText=html.a({class:'export-a'},my.messages.download+" txt").create();
+        var mainDiv=html.div({class:'dialog-export',"current-state":"preparing"}, [
+            html.div({class:'dialog-preparing'}, my.messages.preparingForExport),
+            html.div([
+                html.span(my.messages.format),
+               // html.input({type:'radio', id:id1, name:'format', checked:true }), html.label({"for": id1}, '.txt'),
+                html.input({class:'export-radio',type:'radio', id:id2, name:'format', checked:true}), html.label({"for": id2}, '.xlsx'),
+            ]),
+            html.img({
+                class:['img-preparing', 'state-preparing'], 
+                src:'img/preparing.png', 
+                alt:my.messages.preparingForExport, 
+                title:my.messages.preparingForExport, }),
+            html.div({class:'state-ready'}, [downloadElement]),
+            html.div({class:'state-ready-txt'}, [downloadElementText]),
+            html.div('.')
+        ]).create();
+        dialogWindow.appendChild(mainDiv);
+        var txtToDownload;
+        var otherFieldsTabColumn = [];
+        setTimeout(function(){
+            var txtToDownload=grid.def.fields.map(function(fieldDef){
+                    if(fieldDef.defaultForOtherFields){
+                        var textArray=[];
+                        grid.def.otherFields.forEach(function(otherField, index){
+                            textArray.push(otherField[grid.def.registerImports.fieldNames.fieldName]);
+                            otherFieldsTabColumn[otherField[grid.def.registerImports.fieldNames.fieldName]] = index;
+                        });
+                        return textArray.join('|');
+                    }else{
+                        return fieldDef.name;
+                    }
+                }).join('|')+'\r\n'+
+                grid.depotsToDisplay.map(function(depot){
+                    return grid.def.fields.map(function(fieldDef){
+                        var value=depot.row[fieldDef.name];
+                        if(fieldDef.defaultForOtherFields){
+                            var textArrayInitialization = Array.apply(null, Array(grid.def.otherFields.length)).map(function () {return "";});
+                            var otherFields = JSON.parse(value) || [];
+                            var textArray = textArrayInitialization;
+                            otherFields.forEach(function(otherField){
+                                textArray[otherFieldsTabColumn[otherField.name]] = otherField.value;
+                            });
+                            return textArray.join('|');
+                        }else{
+                            return value==null?'':depot.row[fieldDef.name].toString().trim();
+                        }
+                    }).join('|');
+                }).join('\r\n')+'\r\n';
+            mainDiv.setAttribute("current-state-txt", "ready");
+            var blob = new Blob([txtToDownload], {type: 'text/plain'});
+            var url = URL.createObjectURL(blob); 
+            downloadElementText.href=url;
+            downloadElementText.setAttribute("download", grid.def.name+".tab");
+        },10);
+        var otherFieldsExcelColumns = [];
+        var populateTableXLS = function populateTableXLS(ws, depots, fieldDefs, topRow, leftColumn){
+            topRow=topRow||0;
+            leftColumn=leftColumn||0;
+            fieldDefs.forEach(function(field,iColumn){
+                if(field.defaultForOtherFields){
+                    grid.def.otherFields.forEach(function(otherField){
+                        otherFieldsExcelColumns[otherField[grid.def.registerImports.fieldNames.fieldName]] = iColumn+leftColumn;
+                        ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:topRow})]={t:'s',v:otherField[grid.def.registerImports.fieldNames.fieldName], s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                        iColumn++;
+                    });
+                }else{
+                    ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:topRow})]={t:'s',v:field.name, s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                }
+            });
+            depots.forEach(function(depot, iRow){
+                var addCell = function addCell(value, fieldDef, iColumn){
+                    var valueType='s';
+                    var type=fieldDef.typeName;
+                    if(value!=null){
+                        if(typeStore.type[type] && typeStore.type[type].toExcelValue){
+                            value=typeStore.type[type].toExcelValue(value)
+                            valueType =typeStore.type[type].toExcelType(value)
+                        }
+                        var cell={t:valueType,v:value};
+                        if(fieldDef.isPk){
+                            cell.s={font:{bold:true}};
+                        }else if(!fieldDef.allow || !fieldDef.allow.update){
+                            cell.s={font:{color:{ rgb: "88AA00" }}};
+                        }
+                        ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:iRow+1+topRow})]=cell;
+                    }
+                }
+                fieldDefs.forEach(function(fieldDef, iColumn){
+                    var value=depot.row[fieldDef.name];
+                    if(fieldDef.defaultForOtherFields){
+                        var otherFields = JSON.parse(value) || [];
+                        otherFields.forEach(function(otherField){
+                            addCell(otherField.value, fieldDef, otherFieldsExcelColumns[otherField.name]);
+                        });
+                    }else{
+                        addCell(value, fieldDef, iColumn);
+                    }
+                });
+            });
+            ws["!ref"]="A1:"+XLSX.utils.encode_cell({c:fieldDefs.length||iColumn+leftColumn + grid.def.otherFields.length,r:grid.depotsToDisplay.length+topRow});
+        }
+        setTimeout(function(){
+            var wb = new Workbook();
+            var ws = {};
+            var exportFileInformationWs={};
+            var i=0;
+            exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'table',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+            exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:  i})]={t:'s',v:grid.def.name};
+            exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'date',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+            exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:  i})]={t:'s',v:new Date().toISOString()};
+            exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'user',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+            exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:  i})]={t:'s',v:my.config.username};
+            // grid.def.allow.forEach(function(action,iAction){
+            //     exportFileInformationWs[XLSX.utils.encode_cell({c:iAction,r:2})]={t:'s',v:action};
+            // })
+            if(grid.def.exportMetadata){
+                if(grid.def.exportMetadata.fieldProperties){
+                    var fieldPropertiesDefs=grid.def.exportMetadata.fieldProperties.map(function(propName, i){
+                        return {name:propName, typeName:'text', isPk:!i};
+                    });
+                    var fieldPropertiesDepot=grid.def.fields.filter(function(fieldDef){
+                        return coalesce(fieldDef.exportMetadata,grid.def.exportMetadata.exportAnyField,true);
+                    }).map(function(fieldDef){
+                        return {row:fieldDef};
+                    });
+                    populateTableXLS(exportFileInformationWs, fieldPropertiesDepot,fieldPropertiesDefs,i+1,1);
+                }
+            }
+            populateTableXLS(ws, grid.depotsToDisplay, grid.def.fields);
+            var sheet1name=grid.def.name;
+            var sheet2name=grid.def.name!=="metadata"?"metadata":"meta-data";
+            wb.SheetNames=[sheet1name,sheet2name];
+            wb.Sheets[sheet1name]=ws;
+            exportFileInformationWs["!ref"]="A1:F100";
+            wb.Sheets[sheet2name]=exportFileInformationWs;
+            var wbFile = XLSX.write(wb, {bookType:'xlsx', bookSST:false, type: 'binary'});
+            var blob = new Blob([s2ab(wbFile)],{type:"application/octet-stream"});
+            mainDiv.setAttribute("current-state", "ready");
+            var url = URL.createObjectURL(blob); 
+            downloadElement.href=url;
+            downloadElement.setAttribute("download", grid.def.name+".xlsx");
+        },10);
+    });
+};
+
+myOwn.dialogUpload = function dialogUpload(ajaxPath, ajaxParams, ajaxPrepareResultFun, showWithMiniMenu, messages, refresheable, acceptPhotos){
+    var doneFun = function doneFun(){
+        var fileAttr={class:'import-button',type:'file',style:'min-width:400px'};
+        if(acceptPhotos){
+            fileAttr.accept='image/*';
+        }
+        var buttonFile=html.input(fileAttr).create();
+        var buttonConfirmImport=html.input({class:'import-button',type:'button', value:changing(my.messages, messages).import}).create();
+        var progressIndicator=html.div({class:'indicator'},' ').create();
+        var progressBar=html.div({class:'progress-bar', style:'width:400px; height:8px;'},[progressIndicator]).create();
+        var uploadingProgress=function(progress){
+            if(progress.lengthComputable){
+                progressIndicator.style.width=progress.loaded*100/progress.total+'%';
+                progressIndicator.title=Math.round(progress.loaded*100/progress.total)+'%';
+            }else{
+                progressIndicator.style.backgroundColor='#D4D';
+                progressIndicator.title='N/D %';
+            }
+        };
+        buttonConfirmImport.addEventListener('click', function(){
+            var files = buttonFile.files;
+            buttonConfirmImport.value='cargando...';
+            buttonConfirmImport.disabled=true;
+            bestGlobals.sleep(100).then(function(){
+                return my.ajax[ajaxPath[0]][ajaxPath[1]](changing(ajaxParams, {
+                    files:files
+                }),{uploading:uploadingProgress});
+            }).then(ajaxPrepareResultFun).then(this.dialogPromiseDone,this.dialogPromiseDone);
+        });
+        simpleFormPromise({elementsList:[
+            changing(my.messages, messages).importDataFromFile,
+            buttonFile, 
+            html.br().create(),
+            buttonConfirmImport,
+            html.br().create(),
+            progressBar,
+        ]}).then(function(message){
+            return Promise.all([
+                refresheable && refresheable.refresh(),
+                alertPromise(message)
+            ]);
+        },function(err){
+            return Promise.all([
+                refresheable && refresheable.refresh(),
+                my.alertError(err)
+            ]);
+        });
+    }
+    if(showWithMiniMenu){
+        return {img:my.path.img+'import.png', value:true, label:my.messages.import, doneFun: doneFun};
+    }else{
+        doneFun();
+    }
 };
 
 myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
@@ -1481,12 +1487,20 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     }
                 });
                 addButtonRest(depotsToDisplay.length);
-                grid.dom.buttonInsert.style.visibility='hidden';
+                if(grid.dom.buttonInsert){
+                    grid.dom.buttonInsert.style.visibility='hidden';
+                }
             }else{
-                grid.dom.buttonInsert.style.visibility='visible';
+                if(grid.dom.buttonInsert){
+                    grid.dom.buttonInsert.style.visibility='visible';
+                }
             }
         };
-        var linesToDisplay=depotsToDisplay.length<=myOwn.firstDisplayOverLimit?depotsToDisplay.length:my.firstDisplayCount;
+        var linesToDisplay=(
+            depotsToDisplay.length<=(grid.def.firstDisplayOverLimit||myOwn.firstDisplayOverLimit)?
+            depotsToDisplay.length:
+            (grid.def.firstDisplayCount||my.firstDisplayCount)
+        );
         grid.depotsToDisplay=depotsToDisplay;
         grid.displayRows(0, linesToDisplay);
     };

@@ -424,7 +424,7 @@ myOwn.testKeepAlive = function testKeepAlive(){
         method:'post',
         action:'keep-alive',
         encoding:'plain'
-    }).then(function(){
+    },{},{visiblyLogErrors:false}).then(function(){
         if(window.updateOnlineStatus){
             updateOnlineStatus();
         }
@@ -491,8 +491,8 @@ myOwn.scrollToTop = function(element, to, duration) {
 myOwn["connection-status"]={
    logged   : { show: false, mustAsk: false },
    notLogged: { show: true , mustAsk: {idMessage:'reLogin', url:'login'}},
-   noServer : { show: true , mustAsk: false, id:'light-server' , img:'server-error'     },
-   noNetwork: { show: true , mustAsk: false, id:'light-network', img:'network-no-signal'},
+   noServer : { show: true , mustAsk: false, id:'light-server'        , img:'server-error'     },
+   noNetwork: { show: true , mustAsk: false, id:'light-network-signal', img:'network-no-signal'},
 };
 
 myOwn.debuggingStatus=false;  // /* 
