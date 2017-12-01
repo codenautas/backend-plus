@@ -410,7 +410,7 @@ myOwn.ajaxPromise = function(procedureDef,data,opts){
 
 myOwn.testKeepAlive = function testKeepAlive(){
     var my = this;
-    var skin=this.config.skin;
+    var skin=(this.config||{}).skin;
     var skinUrl=(skin?skin+'/':'');
     var element = document.getElementById('keep-alive-signal') || my.debugging && document.body.appendChild(html.div({id:'keep-alive-signal'}).create());
     if(element){
