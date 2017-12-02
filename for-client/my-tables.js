@@ -533,7 +533,7 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
     if(depot.row[fieldDef.name]!=null){
         td.setTypedValue(depot.row[fieldDef.name]);
     }
-    if(!fieldDef.clientSide){
+    if(!fieldDef.clientSide || fieldDef.serverSide){
         td.addEventListener('update',function(){
             var value = this.getTypedValue();
             if(!sameValue(value,depot.row[fieldDef.name])){

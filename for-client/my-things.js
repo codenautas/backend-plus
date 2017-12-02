@@ -704,6 +704,31 @@ myOwn.captureKeys = function captureKeys() {
         previousKey=evento.which;
     });
     document.addEventListener('keypress', function(evento){
+        if(my.config.useragent.isiPad && evento.which==231){ // F4
+            var info=tableInfo(this.activeElement);
+            if(info.table){
+                var abovePos=info.tr.rowIndex-1;
+                var aboveRow=info.table.rows[abovePos];
+                if(aboveRow){
+                    var aboveCell = aboveRow.cells[info.td.cellIndex];
+                    if(aboveCell.getTypedValue){
+                        var value=aboveCell.getTypedValue();
+                        if(info.td.setTypedValue){
+                            info.td.setTypedValue(value, true);
+                            var belowPos=info.tr.rowIndex+1;
+                            var belowRow=info.table.rows[belowPos];
+                            if(belowRow){
+                                var belowCell = belowRow.cells[info.td.cellIndex];
+                                if(my.beInteractive(belowCell)){
+                                    belowCell.focus();
+                                    evento.preventDefault();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
         if(window.keyStarForceFocusNow){
             window.keyStarForceFocusNow=false;
             if(evento.which==106){
