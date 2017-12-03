@@ -629,7 +629,7 @@ myOwn.captureKeys = function captureKeys() {
     }
     this.captureKeysInstaled=true;
     document.addEventListener('keydown', function(evento){
-        if(evento.which==37){ // KeyLeft
+        if(evento.which==37 && !evento.shiftKey  && !evento.ctrlKey  && !evento.altKey  && !evento.metaKey){ // KeyLeft
             var info=tableInfo(this.activeElement);
             if(info.table){
                 if(evento.ctrlKey || info.td.textContent=='' || !getCaretPosition(info.td)){
@@ -644,7 +644,7 @@ myOwn.captureKeys = function captureKeys() {
                 }
             }
         }
-        if(evento.which==39){ // KeyRight
+        if(evento.which==39 && !evento.shiftKey  && !evento.ctrlKey  && !evento.altKey  && !evento.metaKey){ // KeyRight
             var info=tableInfo(this.activeElement);
             if(info.table){
                 if(evento.ctrlKey || info.td.textContent=='' || (previousKey == 39 && previousPosition===getCaretPosition(info.td))){
@@ -662,7 +662,7 @@ myOwn.captureKeys = function captureKeys() {
                 }
             }
         }
-        if(evento.which==40 || evento.which==38){ // KeyDown, KeyUp
+        if((evento.which==40 || evento.which==38)  && !evento.shiftKey  && !evento.ctrlKey  && !evento.altKey  && !evento.metaKey){ // KeyDown, KeyUp
             var info=tableInfo(this.activeElement);
             if(info.table){
                 var newPos=info.tr.rowIndex+evento.which-39;
@@ -676,7 +676,32 @@ myOwn.captureKeys = function captureKeys() {
                 }
             }
         }
-        if(evento.which==115){ // F4
+        if(evento.which==115 && !evento.shiftKey  && !evento.ctrlKey  && !evento.altKey  && !evento.metaKey){ // F4
+            var info=tableInfo(this.activeElement);
+            if(info.table){
+                var abovePos=info.tr.rowIndex-1;
+                var aboveRow=info.table.rows[abovePos];
+                if(aboveRow){
+                    var aboveCell = aboveRow.cells[info.td.cellIndex];
+                    if(aboveCell.getTypedValue){
+                        var value=aboveCell.getTypedValue();
+                        if(info.td.setTypedValue){
+                            info.td.setTypedValue(value, true);
+                            var belowPos=info.tr.rowIndex+1;
+                            var belowRow=info.table.rows[belowPos];
+                            if(belowRow){
+                                var belowCell = belowRow.cells[info.td.cellIndex];
+                                if(my.beInteractive(belowCell)){
+                                    belowCell.focus();
+                                    evento.preventDefault();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if(evento.which==115 && evento.shiftKey  && !evento.ctrlKey  && !evento.altKey  && !evento.metaKey){ // F4
             var info=tableInfo(this.activeElement);
             if(info.table){
                 var abovePos=info.tr.rowIndex-1;
@@ -731,11 +756,11 @@ myOwn.captureKeys = function captureKeys() {
         }
         if(window.keyStarForceFocusNow){
             window.keyStarForceFocusNow=false;
-            if(evento.which==106){
+            if(evento.which==106 && !evento.shiftKey  && !evento.ctrlKey  && !evento.altKey  && !evento.metaKey){
                 this.activeElement.focus();
             }
         }
-        if(evento.which==13 && !this.activeElement.getAttribute("enter-clicks")){ // Enter
+        if(evento.which==13 && !evento.shiftKey  && !evento.ctrlKey  && !evento.altKey  && !evento.metaKey && !this.activeElement.getAttribute("enter-clicks")){ // Enter
             var enfoco=this.activeElement;
             var este=this.activeElement;
             if(enter_hace_tab_en_este_elemento(este)){
