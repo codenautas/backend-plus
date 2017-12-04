@@ -13,6 +13,5 @@ module.exports = function(context){
         layout:{vertical:true},
         // sql:{isTable:false}
     });
-    context.be.tableDefAdapt.forInsertOnly(defNewElement);
-    return defNewElement;
+    return context.be.tableDefAdapt.forInsertOnly(defNewElement);
 }
