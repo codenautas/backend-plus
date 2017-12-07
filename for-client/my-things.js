@@ -629,6 +629,7 @@ myOwn.captureKeys = function captureKeys() {
     }
     this.captureKeysInstaled=true;
     document.addEventListener('keydown', function(evento){
+        // document.title=evento.which+','+evento.shiftKey+','+evento.ctrlKey+','+evento.altKey+','+evento.metaKey;
         if(evento.which==37 && !evento.shiftKey  && !evento.ctrlKey  && !evento.altKey  && !evento.metaKey){ // KeyLeft
             var info=tableInfo(this.activeElement);
             if(info.table){
@@ -644,18 +645,21 @@ myOwn.captureKeys = function captureKeys() {
                 }
             }
         }
+        var goRight=function(){
+            var newPos=info.td.cellIndex+1;
+            while(newPos<=info.tr.cells.length && !my.beInteractive(info.tr.cells[newPos])){
+                newPos++;
+            }
+            if(my.beInteractive(info.tr.cells[newPos])){
+                info.tr.cells[newPos].focus();
+                evento.preventDefault();
+            }
+        };
         if(evento.which==39 && !evento.shiftKey  && !evento.ctrlKey  && !evento.altKey  && !evento.metaKey){ // KeyRight
             var info=tableInfo(this.activeElement);
             if(info.table){
                 if(evento.ctrlKey || info.td.textContent=='' || (previousKey == 39 && previousPosition===getCaretPosition(info.td))){
-                    var newPos=info.td.cellIndex+1;
-                    while(newPos<=info.tr.cells.length && !my.beInteractive(info.tr.cells[newPos])){
-                        newPos++;
-                    }
-                    if(my.beInteractive(info.tr.cells[newPos])){
-                        info.tr.cells[newPos].focus();
-                        evento.preventDefault();
-                    }
+                    goRight();
                     previousPosition=false;
                 }else{
                     previousPosition=getCaretPosition(info.td)
@@ -712,15 +716,7 @@ myOwn.captureKeys = function captureKeys() {
                         var value=aboveCell.getTypedValue();
                         if(info.td.setTypedValue){
                             info.td.setTypedValue(value, true);
-                            var belowPos=info.tr.rowIndex+1;
-                            var belowRow=info.table.rows[belowPos];
-                            if(belowRow){
-                                var belowCell = belowRow.cells[info.td.cellIndex];
-                                if(my.beInteractive(belowCell)){
-                                    belowCell.focus();
-                                    evento.preventDefault();
-                                }
-                            }
+                            goRight();
                         }
                     }
                 }
