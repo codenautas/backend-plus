@@ -59,7 +59,7 @@ ejemplos lista       | formato elemento
 ---------------------|--------------------------------------
  foreignKeys         | {references:'ptable', fields:['atomic_number']}
  softForeignKeys     | {references:'ptable', fields:['atomic_number']}
- constraints         | {constraintType:'unique', fields:['atomic_number','order']}
+ constraints         | {constraintType:'unique', fields:['atomic_number','order'], consName:'repeating order in atomic_number'}
  filterColumns       | {column:'atomic_number', operator:'=', value:7}
  sortColumns         | {column:'discovery_date', order:-1}
 
@@ -103,7 +103,7 @@ list examples    | element format
 -----------------|--------------------------------------
  foreignKeys     | {references:'ptable', fields:['atomic_number']}
  softForeignKeys | {references:'ptable', fields:['atomic_number']}
- constraints     | {constraintType:'unique', fields:['atomic_number','order']}
+ constraints     | {constraintType:'unique', fields:['atomic_number','order'], consName:'repeating order in atomic_number'}
  filterColumns   | {column:'atomic_number', operator:'=', value:7}
  sortColumns     | {column:'discovery_date', order:-1}
 
@@ -286,7 +286,7 @@ module.exports = function(context){
         ],
         primaryKey:['atomic_number','mass_number'],
         constraints:[
-            {constraintType:'unique', fields:['atomic_number','order']}
+            {constraintType:'unique', fields:['atomic_number','order'], consName:'repeating order in atomic_number'}
         ],
         foreignKeys:[
             {references:'ptable', fields:['atomic_number']}
