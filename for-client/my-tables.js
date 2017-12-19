@@ -867,6 +867,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
                 grid.depotsToDisplay.map(function(depot){
                     return grid.def.fields.map(function(fieldDef){
                         var value=depot.row[fieldDef.name];
+                        var type=fieldDef.typeName;
                         if(fieldDef.defaultForOtherFields){
                             var textArrayInitialization = Array.apply(null, Array(grid.def.otherFields.length)).map(function () {return "";});
                             var otherFields = JSON.parse(value) || [];
@@ -876,7 +877,12 @@ myOwn.dialogDownload = function dialogDownload(grid){
                             });
                             return textArray.join('|');
                         }else{
-                            return value==null?'':depot.row[fieldDef.name].toString().trim();
+                            if(value){
+                                value=typeStore.typerFrom({'typeName': type}).toPlainString(value);
+                            }else{
+                                value = '';
+                            }
+                            return value;
                         }
                     }).join('|');
                 }).join('\r\n')+'\r\n';
@@ -906,10 +912,8 @@ myOwn.dialogDownload = function dialogDownload(grid){
                     var valueType='s';
                     var type=fieldDef.typeName;
                     if(value!=null){
-                        if(typeStore.type[type] && typeStore.type[type].toExcelValue){
-                            value=typeStore.type[type].toExcelValue(value)
-                            valueType =typeStore.type[type].toExcelType(value)
-                        }
+                        value=typeStore.typerFrom({'typeName': type}).toExcelValue(value);
+                        valueType=typeStore.typerFrom({'typeName': type}).toExcelType(value);
                         var cell={t:valueType,v:value};
                         if(fieldDef.isPk){
                             cell.s={font:{bold:true}};
