@@ -1326,8 +1326,10 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         var grid = this;
         var forInsert = iRow>=0;
         var tr={};
+        depot.colNumber = null;
         if(grid.vertical){
             tr=grid.dom.table.rows[0];
+            depot.colNumber = grid.dom.table.rows[0].childNodes.length;
         }else{
             tr = grid.my.insertRow({section:tbody, iRow:iRow, smooth:depot.status==='new'?{ 
                 colCount:grid.def.detailTables.length + grid.def.fields.length
@@ -1517,7 +1519,26 @@ myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot){
     if(position>=0){
         grid.depots.splice(position,1);
     }
-    depot.my.fade(depot.tr);
+    if(grid.vertical){
+        var compareColNumberFun = function compareColNumberFun(a, b) {
+            var colNumberA = a.colNumber;
+            var colNumberB = b.colNumber;
+            return(colNumberA > colNumberB)?1:((colNumberA < colNumberB)?-1:0)
+        }
+        var i = 0;
+        Array.prototype.forEach.call(grid.dom.table.rows,function(tr){
+            if(i < grid.dom.table.rows.length-1 && tr.childNodes[depot.colNumber]){
+                depot.my.fade(tr.childNodes[depot.colNumber]);
+            }
+            i++;
+        });
+        var depots = grid.depots.sort(compareColNumberFun);
+        for(var j = depot.colNumber; j <= depots.length; j++){
+            depots[j-1].colNumber = j;
+        }
+    }else{
+        depot.my.fade(depot.tr);
+    }
     var newCount=depot.manager.dom.footInfo.displayTo.textContent-1;
     if(newCount>=0){
         depot.manager.dom.footInfo.displayTo.textContent=newCount;
