@@ -396,6 +396,7 @@ myOwn.ActionColumnGrid.prototype.thFilter = function thFilter(depot){
     var buttonFilter=html.button({id:'button-filter'},myOwn.messages.Filter+"!").create();
     var grid = this.grid;
     buttonFilter.addEventListener('click',function(){
+        grid.dom.footInfo.filterApplied.textContent = ' (F) ';
         grid.view.filter=depot;
         grid.displayBody();
     });
@@ -1087,6 +1088,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         ]).create();
         buttonDestroyFilter.addEventListener('click', function(){
             grid.destroyRowFilter(0);
+            grid.dom.footInfo.filterApplied.textContent = '';
             grid.view.filter=false;
             grid.displayBody();
         });
@@ -1134,6 +1136,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         {name:'displayFrom', value:'0'},
         {name:'elipsis', value:' ... '},
         {name:'displayTo', value:'?'},
+        {name:'filterApplied', value:''},
         {name:'rowCount', value:''}
     ].forEach(function(info, i_info){
         grid.dom.footInfo[info.name] = html.span(info.value).create();
