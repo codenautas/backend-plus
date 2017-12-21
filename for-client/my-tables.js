@@ -1538,6 +1538,11 @@ myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot){
         }
     }else{
         depot.my.fade(depot.tr);
+        for(var detailControl in depot.detailControls){
+            if(depot.detailControls[detailControl].tr){
+                depot.my.fade(depot.detailControls[detailControl].tr);
+            }
+        };
     }
     var newCount=depot.manager.dom.footInfo.displayTo.textContent-1;
     if(newCount>=0){
