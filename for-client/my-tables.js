@@ -877,12 +877,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
                             });
                             return textArray.join('|');
                         }else{
-                            if(value){
-                                value=typeStore.typerFrom({'typeName': type}).toPlainString(value);
-                            }else{
-                                value = '';
-                            }
-                            return value;
+                            return value?typeStore.typerFrom(fieldDef).toPlainString(value):'';
                         }
                     }).join('|');
                 }).join('\r\n')+'\r\n';
@@ -909,11 +904,9 @@ myOwn.dialogDownload = function dialogDownload(grid){
             });
             depots.forEach(function(depot, iRow){
                 var addCell = function addCell(value, fieldDef, iColumn){
-                    var valueType='s';
-                    var type=fieldDef.typeName;
                     if(value!=null){
-                        value=typeStore.typerFrom({'typeName': type}).toExcelValue(value);
-                        valueType=typeStore.typerFrom({'typeName': type}).toExcelType(value);
+                        value=typeStore.typerFrom(fieldDef).toExcelValue(value);
+                        var valueType=typeStore.typerFrom(fieldDef).toExcelType(value);
                         var cell={t:valueType,v:value};
                         if(fieldDef.isPk){
                             cell.s={font:{bold:true}};
