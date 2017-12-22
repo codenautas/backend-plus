@@ -1211,7 +1211,10 @@ myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElem
     grid.updateRowData(depotForInsert,true);
     return newRow;
 };
-
+myOwn.TableGrid.prototype.updateTotals = function updateTotals(){
+    this.dom.footInfo.displayFrom.textContent = this.depots.length?1:0;
+    this.dom.footInfo.displayTo.textContent = this.depots.length;
+};
 myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
     var grid = this;
     var tbody = grid.dom.table.tBodies[0];
@@ -1378,6 +1381,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 }
             });
         }
+        grid.updateTotals();
         return depot;
     };
     grid.destroyRowFilter = function destroyRowFilter(){
@@ -1547,10 +1551,7 @@ myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot){
             }
         };
     }
-    var newCount=depot.manager.dom.footInfo.displayTo.textContent-1;
-    if(newCount>=0){
-        depot.manager.dom.footInfo.displayTo.textContent=newCount;
-    }
+    grid.updateTotals();
 };
 
 myOwn.tableAction={
