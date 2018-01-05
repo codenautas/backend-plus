@@ -35,6 +35,7 @@ module.exports = function(context){
         constraints:[
             {constraintType:'unique', fields:['symbol']}
         ],
+        sortColumns:[{column:'group'},{column:'atomic_number', order:-1}, ],
         actionNamesList:['showImg'],
         allow:{showImg:true},
         sql:{

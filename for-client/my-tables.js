@@ -334,16 +334,26 @@ myOwn.TableGrid.prototype.prepareDepots = function prepareDepots(rows){
     grid.view.sortColumns=grid.view.sortColumns||grid.def.sortColumns||[];
 };
 
-myOwn.TableGrid.prototype.updateSortArrow = function updateSortArrow(newOrder, th){
+myOwn.TableGrid.prototype.updateSortArrow = function updateSortArrow(newOrder, th, firstSort, controlCutNumber){
     var grid = this;
     var arrowSymbol = newOrder==1?" \u2191":" \u2193";
     var arrowImgSource =  my.path.img + 'sort-' + (newOrder==1?"up":"down") + '.png';
     var sortImg=html.img({"class":"sort-img", "alt":arrowSymbol, src:arrowImgSource}).create();
+    var sortSpan=html.span({"class":"sort-span"}, "[" + controlCutNumber + "]").create();
     var oldSortImgs = grid.dom.table.getElementsByClassName('sort-img');
-    Array.prototype.forEach.call(oldSortImgs, function(oldSortImg){
-        oldSortImg.remove();
-    })
+    var oldSortSpans = grid.dom.table.getElementsByClassName('sort-span');
+    if(!firstSort){
+        for (var i = oldSortImgs.length; i > 0; i--) {
+            oldSortImgs[i-1].remove();
+        }
+        for (var i = oldSortSpans.length; i > 0; i--) {
+            oldSortSpans[i-1].remove();
+        }
+    }
     th.appendChild(sortImg);
+    if(controlCutNumber){
+        th.appendChild(sortSpan);
+    }
 };
 
 myOwn.TableGrid.prototype.refresh = function refresh(){
@@ -362,6 +372,14 @@ myOwn.TableGrid.prototype.prepareAndDisplayGrid = function prepareAndDisplayGrid
         return structureRequest.then(function(){
             grid.prepareDepots(rows);
             grid.displayGrid();
+            grid.view.sortColumns.forEach(function(sortColumn, index){
+                Array.prototype.forEach.call(grid.dom.table.getElementsByClassName('th-name'), function(th){
+                    if(th.getAttribute('my-colname') == sortColumn.column){
+                        var order = sortColumn.order?sortColumn.order:1;
+                        grid.updateSortArrow(order, th, true, index+1);
+                    }
+                });
+            });
             if(grid.def.forInsertOnlyMode){
                 grid.createRowInsertElements();
             }
@@ -481,7 +499,7 @@ myOwn.DataColumnGrid.prototype.th = function th(){
                 return sortColumn.column != fieldDef.name;
             });
             var newOrder = currentOrder?-currentOrder:1;
-            grid.updateSortArrow(newOrder,th);
+            grid.updateSortArrow(newOrder,th, false, 0);
             grid.view.sortColumns.unshift({column:fieldDef.name, order:newOrder});
             grid.displayBody();
         }
