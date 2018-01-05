@@ -334,6 +334,18 @@ myOwn.TableGrid.prototype.prepareDepots = function prepareDepots(rows){
     grid.view.sortColumns=grid.view.sortColumns||grid.def.sortColumns||[];
 };
 
+myOwn.TableGrid.prototype.updateSortArrow = function updateSortArrow(newOrder, th){
+    var grid = this;
+    var arrowSymbol = newOrder==1?" \u2191":" \u2193";
+    var arrowImgSource =  my.path.img + 'sort-' + (newOrder==1?"up":"down") + '.png';
+    var sortImg=html.img({"class":"sort-img", "alt":arrowSymbol, src:arrowImgSource}).create();
+    var oldSortImgs = grid.dom.table.getElementsByClassName('sort-img');
+    Array.prototype.forEach.call(oldSortImgs, function(oldSortImg){
+        oldSortImg.remove();
+    })
+    th.appendChild(sortImg);
+};
+
 myOwn.TableGrid.prototype.refresh = function refresh(){
     return this.prepareAndDisplayGrid();
 };
@@ -468,7 +480,9 @@ myOwn.DataColumnGrid.prototype.th = function th(){
             grid.view.sortColumns=grid.view.sortColumns.filter(function(sortColumn){
                 return sortColumn.column != fieldDef.name;
             });
-            grid.view.sortColumns.unshift({column:fieldDef.name, order:currentOrder?-currentOrder:1});
+            var newOrder = currentOrder?-currentOrder:1;
+            grid.updateSortArrow(newOrder,th);
+            grid.view.sortColumns.unshift({column:fieldDef.name, order:newOrder});
             grid.displayBody();
         }
     });
