@@ -490,7 +490,10 @@ myOwn.DataColumnGrid.prototype.th = function th(){
             grid.view.hiddenColumns.push(fieldDef.name);
             grid.hideColumnsViaCss();
         }else{
-            var currentOrder=grid.view.sortColumns.length && grid.view.sortColumns[0].column==fieldDef.name?grid.view.sortColumns[0].order:null;
+            var sortColumnResult = grid.view.sortColumns.find(function(sortColumn){
+                return sortColumn.column == fieldDef.name;
+            });
+            var currentOrder = sortColumnResult?sortColumnResult.order:null;
             grid.view.sortColumns=grid.view.sortColumns.filter(function(sortColumn){
                 return sortColumn.column != fieldDef.name;
             });
