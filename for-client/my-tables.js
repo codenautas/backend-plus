@@ -334,6 +334,31 @@ myOwn.TableGrid.prototype.prepareDepots = function prepareDepots(rows){
     grid.view.sortColumns=grid.view.sortColumns||grid.def.sortColumns||[];
 };
 
+myOwn.TableGrid.prototype.updateSortArrow = function updateSortArrow(){
+    var grid = this;
+    var oldSortImgs = grid.dom.table.getElementsByClassName('sort-img');
+    var oldSortSpans = grid.dom.table.getElementsByClassName('sort-span');
+    for (var i = oldSortImgs.length; i > 0; i--) {
+        oldSortImgs[i-1].remove();
+    }
+    for (var i = oldSortSpans.length; i > 0; i--) {
+        oldSortSpans[i-1].remove();
+    }
+    grid.view.sortColumns.forEach(function(sortColumn, index){
+        Array.prototype.forEach.call(grid.dom.table.getElementsByClassName('th-name'), function(th){
+            if(th.getAttribute('my-colname') == sortColumn.column){
+                var order = sortColumn.order?sortColumn.order:1;
+                var arrowSymbol = order==1?" \u2191":" \u2193";
+                var arrowImgSource =  my.path.img + 'sort-' + (order==1?"up":"down") + '.png';
+                var sortImg=html.img({"class":"sort-img", "alt":arrowSymbol, src:arrowImgSource}).create();
+                var sortSpan=html.span({"class":"sort-span"}, "[" + (index + 1) + "]").create();
+                th.appendChild(sortImg);
+                th.appendChild(sortSpan);
+            }
+        });
+    });
+};
+
 myOwn.TableGrid.prototype.refresh = function refresh(){
     return this.prepareAndDisplayGrid();
 };
@@ -350,6 +375,7 @@ myOwn.TableGrid.prototype.prepareAndDisplayGrid = function prepareAndDisplayGrid
         return structureRequest.then(function(){
             grid.prepareDepots(rows);
             grid.displayGrid();
+            grid.updateSortArrow();
             if(grid.def.forInsertOnlyMode){
                 grid.createRowInsertElements();
             }
@@ -396,6 +422,7 @@ myOwn.ActionColumnGrid.prototype.thFilter = function thFilter(depot){
     var buttonFilter=html.button({id:'button-filter'},myOwn.messages.Filter+"!").create();
     var grid = this.grid;
     buttonFilter.addEventListener('click',function(){
+        grid.updateFilterInfo(' (F) ');
         grid.view.filter=depot;
         grid.displayBody();
     });
@@ -463,11 +490,16 @@ myOwn.DataColumnGrid.prototype.th = function th(){
             grid.view.hiddenColumns.push(fieldDef.name);
             grid.hideColumnsViaCss();
         }else{
-            var currentOrder=grid.view.sortColumns.length && grid.view.sortColumns[0].column==fieldDef.name?grid.view.sortColumns[0].order:null;
+            var sortColumnResult = grid.view.sortColumns.find(function(sortColumn){
+                return sortColumn.column == fieldDef.name;
+            });
+            var currentOrder = sortColumnResult?sortColumnResult.order:null;
             grid.view.sortColumns=grid.view.sortColumns.filter(function(sortColumn){
                 return sortColumn.column != fieldDef.name;
             });
-            grid.view.sortColumns.unshift({column:fieldDef.name, order:currentOrder?-currentOrder:1});
+            var newOrder = currentOrder?-currentOrder:1;
+            grid.view.sortColumns.unshift({column:fieldDef.name, order:newOrder});
+            grid.updateSortArrow();
             grid.displayBody();
         }
     });
@@ -877,12 +909,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
                             });
                             return textArray.join('|');
                         }else{
-                            if(value){
-                                value=typeStore.typerFrom({'typeName': type}).toPlainString(value);
-                            }else{
-                                value = '';
-                            }
-                            return value;
+                            return value?typeStore.typerFrom(fieldDef).toPlainString(value):'';
                         }
                     }).join('|');
                 }).join('\r\n')+'\r\n';
@@ -909,11 +936,9 @@ myOwn.dialogDownload = function dialogDownload(grid){
             });
             depots.forEach(function(depot, iRow){
                 var addCell = function addCell(value, fieldDef, iColumn){
-                    var valueType='s';
-                    var type=fieldDef.typeName;
                     if(value!=null){
-                        value=typeStore.typerFrom({'typeName': type}).toExcelValue(value);
-                        valueType=typeStore.typerFrom({'typeName': type}).toExcelType(value);
+                        value=typeStore.typerFrom(fieldDef).toExcelValue(value);
+                        var valueType=typeStore.typerFrom(fieldDef).toExcelType(value);
                         var cell={t:valueType,v:value};
                         if(fieldDef.isPk){
                             cell.s={font:{bold:true}};
@@ -1094,6 +1119,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         ]).create();
         buttonDestroyFilter.addEventListener('click', function(){
             grid.destroyRowFilter(0);
+            grid.updateFilterInfo('');
             grid.view.filter=false;
             grid.displayBody();
         });
@@ -1136,17 +1162,23 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     if(grid.vertical){
         grid.modes.withColumnDetails=false;
     }
+    var createInfoColumnStructure = function(elementInfo){
+        [
+            {name:'displayFrom', value:'0'},
+            {name:'elipsis', value:' ... '},
+            {name:'displayTo', value:'?'},
+            {name:'filterApplied', value:''},
+            {name:'rowCount', value:''}
+        ].forEach(function(info, i_info){
+            elementInfo[info.name] = html.span(info.value).create();
+            elementInfo.appendChild(elementInfo[info.name]);
+        });
+        elementInfo.displayTo.textContent = my.messages.loading;    
+    }
+    grid.dom.headInfo = html.th({class: 'head-info', colspan:grid.columns.length-1, "is-processing":"1"}).create();
+    createInfoColumnStructure(grid.dom.headInfo);
     grid.dom.footInfo = html.td({colspan:grid.columns.length, "is-processing":"1"}).create();
-    [
-        {name:'displayFrom', value:'0'},
-        {name:'elipsis', value:' ... '},
-        {name:'displayTo', value:'?'},
-        {name:'rowCount', value:''}
-    ].forEach(function(info, i_info){
-        grid.dom.footInfo[info.name] = html.span(info.value).create();
-        grid.dom.footInfo.appendChild(grid.dom.footInfo[info.name]);
-    });
-    grid.dom.footInfo.displayTo.textContent = my.messages.loading;
+    createInfoColumnStructure(grid.dom.footInfo);
     grid.actualName = grid.def.name + (grid.connector.fixedFields.length ? '-' + JSON4all.stringify(grid.connector.fixedFields.map(function(pair){ return pair.value; })) : '')
     if(grid.vertical){
         grid.dom.table = html.table({"class":"my-grid", "my-table": grid.actualName},[
@@ -1167,6 +1199,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         grid.dom.table = html.table({"class":"my-grid", "my-table": grid.actualName},[
             html.caption(grid.def.title),
             html.thead([
+                html.tr([html.th(),grid.dom.headInfo]),
                 html.tr(grid.columns.map(function(column){ return column.th(); })),
                 grid.modes.withColumnDetails?html.tr(grid.columns.map(function(column){ return column.thDetail(); })):null,
             ]),
@@ -1215,7 +1248,20 @@ myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElem
     grid.updateRowData(depotForInsert,true);
     return newRow;
 };
-
+myOwn.TableGrid.prototype.updateTotals = function updateTotals(displayFromContent, displayToContent){
+    this.dom.headInfo.displayFrom.textContent = displayFromContent;
+    this.dom.headInfo.displayTo.textContent = displayToContent;
+    this.dom.footInfo.displayFrom.textContent = displayFromContent;
+    this.dom.footInfo.displayTo.textContent = displayToContent;
+};
+myOwn.TableGrid.prototype.updateFilterInfo = function updateFilterInfo(filterAppliedContent){
+    this.dom.headInfo.filterApplied.textContent = filterAppliedContent;
+    this.dom.footInfo.filterApplied.textContent = filterAppliedContent;
+};
+myOwn.TableGrid.prototype.updateRowCountHTML = function updateRowCountHTML(HTML){
+    this.dom.headInfo.rowCount.innerHTML=HTML;
+    this.dom.footInfo.rowCount.innerHTML=HTML;
+};
 myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
     var grid = this;
     var tbody = grid.dom.table.tBodies[0];
@@ -1333,8 +1379,10 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         var grid = this;
         var forInsert = iRow>=0;
         var tr={};
+        depot.colNumber = null;
         if(grid.vertical){
             tr=grid.dom.table.rows[0];
+            depot.colNumber = grid.dom.table.rows[0].childNodes.length;
         }else{
             tr = grid.my.insertRow({section:tbody, iRow:iRow, smooth:depot.status==='new'?{ 
                 colCount:grid.def.detailTables.length + grid.def.fields.length
@@ -1380,6 +1428,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 }
             });
         }
+        grid.updateTotals(grid.depots.length?1:0, grid.depots.length);
         return depot;
     };
     grid.destroyRowFilter = function destroyRowFilter(){
@@ -1471,18 +1520,26 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 })(depotsToDisplay[iRow]);
             }
             /*jshint loopfunc: false */
-            grid.dom.footInfo.displayFrom.textContent=depotsToDisplay.length?1:0;
-            grid.dom.footInfo.displayTo.textContent=iRow;
-            grid.dom.footInfo.rowCount.innerHTML='';
+            grid.updateTotals(depotsToDisplay.length?1:0, iRow);
+            grid.updateRowCountHTML('');
             if(iRow<depotsToDisplay.length){
                 var addButtonRest = function addButtonRest(toNextRowNumber){
-                    var buttonRest=html.button({class:'foot-info', "enter-clicks":true},"+..."+toNextRowNumber).create();
-                    grid.dom.footInfo.rowCount.appendChild(html.span('  ').create());
-                    grid.dom.footInfo.rowCount.appendChild(buttonRest);
-                    buttonRest.addEventListener('click',function(){
+                    var createRestButtonInto = function(domElement){
+                        var buttonRest=html.button({class:'foot-info', "enter-clicks":true},"+..."+toNextRowNumber).create();
+                        domElement.appendChild(html.span('  ').create());
+                        domElement.appendChild(buttonRest);
+                        return buttonRest;
+                    }
+                    var buttonRestClickFun = function(withFocus){
                         grid.displayRows(iRow, toNextRowNumber, true);
-                        my.focusFirstColumnOf(grid.dom.table.tBodies[0].rows[iRow]);
-                    });
+                        if(withFocus){
+                            my.focusFirstColumnOf(grid.dom.table.tBodies[0].rows[iRow]);
+                        }
+                    };
+                    var buttonRestHead = createRestButtonInto(grid.dom.headInfo.rowCount);
+                    var buttonRestFoot = createRestButtonInto(grid.dom.footInfo.rowCount);
+                    buttonRestHead.addEventListener('click', buttonRestClickFun.bind(this, false));
+                    buttonRestFoot.addEventListener('click', buttonRestClickFun.bind(this, true));
                 };
                 my.displayCountBreaks.forEach(function(size, iSize){
                     var cut=(iRow+size) - (iRow+size) % size;
@@ -1524,11 +1581,32 @@ myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot){
     if(position>=0){
         grid.depots.splice(position,1);
     }
-    depot.my.fade(depot.tr);
-    var newCount=depot.manager.dom.footInfo.displayTo.textContent-1;
-    if(newCount>=0){
-        depot.manager.dom.footInfo.displayTo.textContent=newCount;
+    if(grid.vertical){
+        var compareColNumberFun = function compareColNumberFun(a, b) {
+            var colNumberA = a.colNumber;
+            var colNumberB = b.colNumber;
+            return(colNumberA > colNumberB)?1:((colNumberA < colNumberB)?-1:0)
+        }
+        var i = 0;
+        Array.prototype.forEach.call(grid.dom.table.rows,function(tr){
+            if(i < grid.dom.table.rows.length-1 && tr.childNodes[depot.colNumber]){
+                depot.my.fade(tr.childNodes[depot.colNumber]);
+            }
+            i++;
+        });
+        var depots = grid.depots.sort(compareColNumberFun);
+        for(var j = depot.colNumber; j <= depots.length; j++){
+            depots[j-1].colNumber = j;
+        }
+    }else{
+        depot.my.fade(depot.tr);
+        for(var detailControl in depot.detailControls){
+            if(depot.detailControls[detailControl].tr){
+                depot.my.fade(depot.detailControls[detailControl].tr);
+            }
+        };
     }
+    grid.updateTotals(grid.depots.length?1:0, grid.depots.length);
 };
 
 myOwn.tableAction={
