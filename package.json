@@ -66,7 +66,7 @@
     "expect.js": "~0.3.1",
     "istanbul": "~0.4.5",
     "mocha": "~4.1.0",
-    "phantomjs-prebuilt": "~2.1.16",
+    "puppeteer": "~1.0.0",
     "sinon": "~4.1.3",
     "supertest": "~3.0.0",
     "kill-9": "~0.4.2"
@@ -78,7 +78,7 @@
     "test": "mocha --reporter spec --bail  test/test*.js",
     "test-ci": "mocha --reporter spec --bail  test/test*.js",
     "test-good": "mocha --reporter spec --bail --check-leaks test/test*.js",
-    "test-ph": "node_modules/.bin/phantomjs test/phantom/capture.js",
+    "test-pu": "node test/puppeteer/first-step.js",
     "server-test": "node test/run-simple-backend.js",
     "example-tables": "node examples/tables/server/server-tables.js --dir-x examples/tables",
     "example-fichas": "node examples/fichero/server/server-fichas.js",
