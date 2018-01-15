@@ -348,12 +348,8 @@ myOwn.TableGrid.prototype.updateSortArrow = function updateSortArrow(){
         Array.prototype.forEach.call(grid.dom.table.getElementsByClassName('th-name'), function(th){
             if(th.getAttribute('my-colname') == sortColumn.column){
                 var order = sortColumn.order?sortColumn.order:1;
-                var arrowSymbol = order==1?" \u2191":" \u2193";
-                var arrowImgSource =  my.path.img + 'sort-' + (order==1?"up":"down") + '.png';
-                var sortImg=html.img({"class":"sort-img", "alt":arrowSymbol, src:arrowImgSource}).create();
-                var sortSpan=html.span({"class":"sort-span"}, "[" + (index + 1) + "]").create();
-                th.appendChild(sortImg);
-                th.appendChild(sortSpan);
+                th.setAttribute('ordered-direction',order);
+                th.setAttribute('ordered-order',index+1);
             }
         });
     });
