@@ -1,0 +1,12 @@
+db:
+  port: 5435
+log:
+  req: true
+login:
+  plus:
+    secret: false
+    allowHttpLogin: true
+devel:
+  forceShowAsEditable: true    
+client-setup:
+  lang: es

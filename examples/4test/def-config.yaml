@@ -1,0 +1,30 @@
+server:
+  port: 3333
+db:
+  motor: postgresql
+  host: localhost
+  database: beplus_example_db
+  schema: tst
+  user: beplus_example_user
+  password: beplus_example_3948812bdz
+login:
+  table: users
+  userFieldName: username
+  passFieldName: md5pass
+  rolFieldName: rol
+  infoFieldList: [username, rol]
+  activeClausule: current_timestamp<=active_until
+  lockedClausule: current_timestamp>=locked_since
+  plus:
+    allowHttpLogin: true
+    chPassUrlPath: false
+    secret: simple secret cat
+    loginForm:
+      formTitle: example for test
+      formImg: unlogged/tables-lock.png
+client-setup:
+  cursors: true
+  menu: true
+  title: app for test
+logo: 
+  path: client/img
