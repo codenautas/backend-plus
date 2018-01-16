@@ -11,7 +11,8 @@ module.exports = function(context){
         elementName:'new isotope',
         forInsertOnlyMode:true,
         layout:{vertical:true},
-        // sql:{isTable:false}
+        sql:{isTable:false}
     });
-    return context.be.tableDefAdapt.forInsertOnly(defNewElement);
+    return context.be.tableDefAdapt(defNewElement,context);
+    return context.be.tableDefAdapt.forInsertOnly(context.be.tableDefAdapt(defNewElement,context));
 }

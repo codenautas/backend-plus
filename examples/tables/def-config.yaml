@@ -35,6 +35,12 @@ login:
       formTitle: example tables
       formImg: unlogged/tables-lock.png
     x-loginPagePath: false
+install:
+  dump:
+    scripts:
+      post-adapt: 
+      - ../examples/tables/install/data_db.sql
+    skip-content: true
 client-setup:
   cursors: true
   skin: confort-dark
