@@ -456,7 +456,7 @@ myOwn.DataColumnGrid.prototype.cellAttributes = function cellAttributes(specific
     var fieldDef = this.fieldDef;
     var grid=this.grid;
     var attr=changing({"my-colname":fieldDef.name},specificAttributes);
-    if(fieldDef.isPk){
+    if(fieldDef.nullable!==true && fieldDef.isPk){
         attr["my-mandatory"]="pk";
     }else if(fieldDef.nullable===false){
         attr["my-mandatory"]="normal";
@@ -1158,7 +1158,9 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     //     [new my.SpecialColumnGrid({class:"empty-right-column"})]
     );
     if(grid.modes.withColumnDetails==null){
-        grid.modes.withColumnDetails=grid.def.fields.some(function(fieldDef){ return fieldDef.label!=fieldDef.title; });
+        grid.modes.withColumnDetails=grid.def.fields.some(function(fieldDef){ 
+            return fieldDef.label!=fieldDef.title; 
+        });
     }
     if(grid.vertical){
         grid.modes.withColumnDetails=false;
@@ -1320,7 +1322,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             }
             if(depot.status==='new'){
                 if(grid.def.fields.some(function(fieldDef){
-                    return (fieldDef.isPk || fieldDef.nullable===false) && depot.row[fieldDef.name]==null
+                    return (fieldDef.nullable!==true && fieldDef.isPk || fieldDef.nullable===false) && depot.row[fieldDef.name]==null
                 })){
                     return Promise.resolve();
                 };
