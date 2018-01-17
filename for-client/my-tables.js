@@ -456,6 +456,11 @@ myOwn.DataColumnGrid.prototype.cellAttributes = function cellAttributes(specific
     var fieldDef = this.fieldDef;
     var grid=this.grid;
     var attr=changing({"my-colname":fieldDef.name},specificAttributes);
+    if(fieldDef.nullable!==true && fieldDef.isPk){
+        attr["my-mandatory"]="pk";
+    }else if(fieldDef.nullable===false){
+        attr["my-mandatory"]="normal";
+    }
     if(grid.connector.fixedField[fieldDef.name]){
         attr["inherited-pk-column"]="yes";
     }
@@ -1153,7 +1158,9 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     //     [new my.SpecialColumnGrid({class:"empty-right-column"})]
     );
     if(grid.modes.withColumnDetails==null){
-        grid.modes.withColumnDetails=grid.def.fields.some(function(fieldDef){ return fieldDef.label!=fieldDef.title; });
+        grid.modes.withColumnDetails=grid.def.fields.some(function(fieldDef){ 
+            return fieldDef.label!=fieldDef.title; 
+        });
     }
     if(grid.vertical){
         grid.modes.withColumnDetails=false;
@@ -1313,6 +1320,13 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             if(!Object.keys(depot.rowPendingForUpdate).length){
                 return Promise.resolve();
             }
+            if(depot.status==='new'){
+                if(grid.def.fields.some(function(fieldDef){
+                    return (fieldDef.nullable!==true && fieldDef.isPk || fieldDef.nullable===false) && depot.row[fieldDef.name]==null
+                })){
+                    return Promise.resolve();
+                };
+            }
             return grid.connector.saveRecord(depot, opts).then(function(result){
                 upadteNumberOfRows(depot,grid);
                 var retrievedRow = result.updatedRow;
@@ -1366,6 +1380,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 }
                 depot.retrievedRow = retrievedRow;
                 grid.updateRowData(depot);
+                depot.tr.dispatchEvent(new CustomEvent('savedRowOk'));
             }).catch(function(err){
                 changeIoStatus('error',depot.rowPendingForUpdate,err.message);
             });
