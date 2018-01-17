@@ -65,7 +65,7 @@ nowrap()
   background-color #CDE
   
 [io-status=updating]
-  background-color #ABC
+  background-color #DEF
   
 [io-status=error]
   background-color #DAA
@@ -248,4 +248,12 @@ rotate-infinite()
 [ordered-direction="-1"]
     background url("../img/order-arrow-down-3.png") top no-repeat
 
+[my-mandatory]:empty:before
+    content '*'
 
+[my-mandatory]:empty
+    color orange
+    text-align left
+
+[my-mandatory=pk]:empty
+    font-weigth bold
