@@ -26,6 +26,7 @@ describe("table-def-adapt", function(){
           "defaultForOtherFields": false,
           "label": "id",
           "title": "id",
+          "visible": true,
           "sequence": {
             "firstValue": 1,
             "name": null,
@@ -48,6 +49,7 @@ describe("table-def-adapt", function(){
               "update": false,
               "vertical-edit": true
             },
+            "constraints": [],
             "detailTables": [],
             "field": {
               "id": fieldId
@@ -68,11 +70,12 @@ describe("table-def-adapt", function(){
               "isTable": true,
               "postCreateSqls": "",
               "select": [
-                '"id"'
+                '"the-table-name"."id"'
               ],
               tableName: "the-table-name"
             },
             "title": "the-table-name",
+            "tableName": "the-table-name",
             "registerImports": {
               "fieldNames": {
                 "fieldIndex": "field_index",

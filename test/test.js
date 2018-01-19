@@ -20,7 +20,7 @@ describe('backend-plus', function describeBackendPlus(){
     [
         {base:''           ,root:true },
         {base:'/base'      ,root:false},
-    ].forEach(function(opt){
+    ].forEach(function(opt, i){
         describe('base:'+opt.base, function(){
                 var be;
                 var agent;
@@ -35,8 +35,10 @@ describe('backend-plus', function describeBackendPlus(){
                         agent=request.agent(be.getMainApp());
                     }).then(done,done);
                 });
-                after(function (done) {
-                    be.close().then(done,done);
+                after(async function(){
+                    console.log('cerrando el backend',i);
+                    await be.shootDownBackend();
+                    console.log('cerrado! el backend',i);
                 });
                 it('must set session cookie in the first connection', function(done){
                     agent
@@ -46,8 +48,8 @@ describe('backend-plus', function describeBackendPlus(){
                 it('must redirect if not logged in', function(done){
                     agent
                     .get(opt.base+'/echo')
-                    .expect('location', opt.base+'/login')
-                    .expect(302, /Redirecting to \/((doble\/)?base\/)?login/, done);
+                    .expect('location', 'login')
+                    .expect(302, /Redirecting to login/, done);
                 });
                 it('must get login page when not logged in', function(done){
                     agent
@@ -84,7 +86,7 @@ describe('backend-plus', function describeBackendPlus(){
                     .post(opt.base+'/login')
                     .type('form')
                     .send({username:'prueba', password:'prueba1'})
-                    .expect(302, /Redirecting to \/.*menu/, done);
+                    .expect(302, /Redirecting to \.\/menu/, done);
                 });
                 it('must serve data if logged', function(done){
                     agent
