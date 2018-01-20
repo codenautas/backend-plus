@@ -1321,10 +1321,14 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 return Promise.resolve();
             }
             if(depot.status==='new'){
-                if(grid.def.fields.some(function(fieldDef){
-                    return (fieldDef.nullable!==true && fieldDef.isPk || fieldDef.nullable===false) && depot.row[fieldDef.name]==null
+               if(grid.def.fields.some(function(fieldDef){
+                    return (fieldDef.nullable!==true && fieldDef.isPk || fieldDef.nullable===false) 
+                        && depot.row[fieldDef.name]==null 
+                        && (grid.connector.fixedFields.find(function(pair){
+                                return pair.fieldName===fieldDef.name
+                            })||{}).value == null
                 })){
-                    return Promise.resolve();
+                    return Promise.resolve(); // no grabo todavía
                 };
             }
             return grid.connector.saveRecord(depot, opts).then(function(result){
