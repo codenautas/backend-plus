@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for typed controls",
-  "version": "0.20.7",
+  "version": "0.20.8",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -61,7 +61,7 @@
     "self-explain": "~0.10.16",
     "serve-content": "~0.3.9",
     "type-store": "~0.2.13",
-    "typed-controls": "~0.7.26"
+    "typed-controls": "~0.7.27"
   },
   "devDependencies": {
     "expect.js": "~0.3.1",
