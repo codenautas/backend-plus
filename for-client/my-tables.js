@@ -174,7 +174,8 @@ myOwn.TableConnector = function(context, opts){
     for(var attr in context){
         connector[attr] = context[attr];
     }
-    connector.fixedFields = (opts||{}).fixedFields || [];
+    connector.opts = opts||{};
+    connector.fixedFields = connector.opts.fixedFields || [];
     connector.fixedField = {};
     connector.fixedFields.forEach(function(pair){
         connector.fixedField[pair.fieldName] = pair.value;
@@ -186,7 +187,7 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
     connector.whenStructureReady = this.my.ajax.table.structure({
         table:connector.tableName,
     }).then(function(tableDef){
-        connector.def = tableDef;
+        connector.def = changing(tableDef, connector.opts.tableDef||{});
         return connector.def;
     });
     return connector.whenStructureReady;
