@@ -261,6 +261,7 @@ install                      | opciones de instalación
   .dump                      | opciones del dump de instalación
     ..db.owner               | usuario dueño de la base de datos
     ..scripts.post-adapt     | lista de nombres de archivos para adaptar la estructura de la base de datos
+    ..scripts.parts-order    | orden de las partes en que se genera el dump-db
 devel                        | conjunto de opciones para el ambiente de desarrollo y testing
   .delay                     | tiempo de espera promedio adicional (para simular un servidor lento)
   .cache-content             | hace caché de imágenes y archivos en general (si no está en modo "devel" siempre hace caché, no se puede apagar el caché fuera del modo devel)
@@ -306,6 +307,7 @@ install                      | (see Spanish)
   .dump                      | (see Spanish)
     ..db.owner               | (see Spanish)
     ..scripts.post-adapt     | (see Spanish)
+    ..scripts.parts-order    | (see Spanish)
 devel                        | (see Spanish)
   .delay                     | (see Spanish)
   .cache-content             | (see Spanish)

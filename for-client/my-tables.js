@@ -860,6 +860,8 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
     };
 };
 
+myOwn.INCLUDE_LOOKUP_COLUMNS_IN_TXT_EXPORT=true;
+
 myOwn.dialogDownload = function dialogDownload(grid){
     return dialogPromise(function(dialogWindow, closeWindow){
         var id1=my.getUniqueDomId();
@@ -887,34 +889,36 @@ myOwn.dialogDownload = function dialogDownload(grid){
         var otherFieldsTabColumn = [];
         setTimeout(function(){
             var txtToDownload=grid.def.fields.map(function(fieldDef){
+                if(!fieldDef.inTable && !my.INCLUDE_LOOKUP_COLUMNS_IN_TXT_EXPORT) return '';
+                if(fieldDef.defaultForOtherFields){
+                    var textArray=[];
+                    grid.def.otherFields.forEach(function(otherField, index){
+                        textArray.push(otherField[grid.def.registerImports.fieldNames.fieldName]);
+                        otherFieldsTabColumn[otherField[grid.def.registerImports.fieldNames.fieldName]] = index;
+                    });
+                    return textArray.join('|');
+                }else{
+                    return fieldDef.name;
+                }
+            }).join('|')+'\r\n'+
+            grid.depotsToDisplay.map(function(depot){
+                if(!fieldDef.inTable && !my.INCLUDE_LOOKUP_COLUMNS_IN_TXT_EXPORT) return '';
+                return grid.def.fields.map(function(fieldDef){
+                    var value=depot.row[fieldDef.name];
+                    var type=fieldDef.typeName;
                     if(fieldDef.defaultForOtherFields){
-                        var textArray=[];
-                        grid.def.otherFields.forEach(function(otherField, index){
-                            textArray.push(otherField[grid.def.registerImports.fieldNames.fieldName]);
-                            otherFieldsTabColumn[otherField[grid.def.registerImports.fieldNames.fieldName]] = index;
+                        var textArrayInitialization = Array.apply(null, Array(grid.def.otherFields.length)).map(function () {return "";});
+                        var otherFields = JSON.parse(value) || [];
+                        var textArray = textArrayInitialization;
+                        otherFields.forEach(function(otherField){
+                            textArray[otherFieldsTabColumn[otherField.name]] = otherField.value;
                         });
                         return textArray.join('|');
                     }else{
-                        return fieldDef.name;
+                        return value!=null?typeStore.typerFrom(fieldDef).toPlainString(value):'';
                     }
-                }).join('|')+'\r\n'+
-                grid.depotsToDisplay.map(function(depot){
-                    return grid.def.fields.map(function(fieldDef){
-                        var value=depot.row[fieldDef.name];
-                        var type=fieldDef.typeName;
-                        if(fieldDef.defaultForOtherFields){
-                            var textArrayInitialization = Array.apply(null, Array(grid.def.otherFields.length)).map(function () {return "";});
-                            var otherFields = JSON.parse(value) || [];
-                            var textArray = textArrayInitialization;
-                            otherFields.forEach(function(otherField){
-                                textArray[otherFieldsTabColumn[otherField.name]] = otherField.value;
-                            });
-                            return textArray.join('|');
-                        }else{
-                            return value?typeStore.typerFrom(fieldDef).toPlainString(value):'';
-                        }
-                    }).join('|');
-                }).join('\r\n')+'\r\n';
+                }).join('|');
+            }).join('\r\n')+'\r\n';
             mainDiv.setAttribute("current-state-txt", "ready");
             var blob = new Blob([txtToDownload], {type: 'text/plain'});
             var url = URL.createObjectURL(blob); 
