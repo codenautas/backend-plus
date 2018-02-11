@@ -1390,6 +1390,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 depot.retrievedRow = retrievedRow;
                 grid.updateRowData(depot);
                 depot.tr.dispatchEvent(new CustomEvent('savedRowOk'));
+                grid.dom.main.dispatchEvent(new CustomEvent('savedRowOk'));
             }).catch(function(err){
                 changeIoStatus('error',depot.rowPendingForUpdate,err.message);
             });
