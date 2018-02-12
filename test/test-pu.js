@@ -1,5 +1,7 @@
 "use strict";
 
+var AppExample = require('../examples/4test/server/app-4test.js');
+
 const puppeteer = require('puppeteer');
 
 const pg = require('pg-promise-strict');
@@ -12,31 +14,31 @@ describe("interactive ",function(){
     var page;
     var client;
     var config;
+    var server;
     before(async function(){
         this.timeout(50000);
-        [ await async function(){
-            config = await MiniTools.readConfig(['examples/4test/def-config','examples/4test/local-config']);
-            client = await pg.connect(config.db);
-            await client.executeSqlScript('test/fixtures/local-db-dump.sql');
-            console.log('base abierta y limpia');
-        }(), await async function(){
-            browser = await puppeteer.launch(process.env.TRAVIS?null:{headless: false, slowMo: 50});
-            page = await browser.newPage();
-            page.on('console', msg => { 
-                console.log('console.'+msg.type(), msg.text()) 
-            });
-            await page.setViewport({width:1360, height:768});
-            await page.goto('http://localhost:3333');
-            await page.type('#username', 'bob');
-            await page.type('#password', 'bobpass');
-            await page.click('[type=submit]');
-            await page.waitForSelector('#light-network-signal');
-            console.log('sistema logueado');
-        }()]
-        console.log('ok');
-    });
-    it("ok",function(){
-        return 1;
+        server = new AppExample();
+        console.log("starting server");
+        config = await MiniTools.readConfig(
+            ['examples/4test/def-config','examples/4test/local-config'],
+            {readConfig:{whenNotExist:'ignore'}, testing:true}
+        );
+        client = await pg.connect(config.db);
+        await client.executeSqlScript('test/fixtures/dump-4test.sql');
+        console.log('base abierta y limpia');
+        await server.start();
+        browser = await puppeteer.launch(process.env.TRAVIS?null:{headless: process.env.TRAVIS || !config.test["view-chrome"], slowMo: 50});
+        page = await browser.newPage();
+        page.on('console', msg => { 
+            console.log('console.'+msg.type(), msg.text()) 
+        });
+        await page.setViewport({width:1360, height:768});
+        await page.goto('http://localhost:3333');
+        await page.type('#username', 'bob');
+        await page.type('#password', 'bobpass');
+        await page.click('[type=submit]');
+        await page.waitForSelector('#light-network-signal');
+        console.log('sistema logueado');
     });
     it("inserts one record", async function(){
         this.timeout(8000);
@@ -66,6 +68,7 @@ describe("interactive ",function(){
         await client.done();
         await page.waitFor(process.env.TRAVIS?10:1000);
         await browser.close()
+        await server.shootDownBackend();
     });
 });
 

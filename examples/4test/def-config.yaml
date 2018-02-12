@@ -1,12 +1,13 @@
 server:
   port: 3333
+  session-store: false
 db:
   motor: postgresql
   host: localhost
-  database: beplus_example_db
-  schema: tst
-  user: beplus_example_user
-  password: beplus_example_3948812bdz
+  database: test_db
+  schema: tst4
+  user: test_user
+  password: test_pass
 login:
   table: users
   userFieldName: username
@@ -28,3 +29,5 @@ client-setup:
   title: app for test
 logo: 
   path: client/img
+test:
+  view-chrome: false
