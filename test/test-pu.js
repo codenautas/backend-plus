@@ -47,7 +47,6 @@ describe("interactive ",function(){
         await page.click('[menu-name=simple]');
         await page.waitForSelector('[my-table=simple] tbody tr [alt=INS]');
         await page.click('[my-table=simple] tbody tr [alt=INS]');
-        return; 
         await page.waitFor(500);
         await page.screenshot({path: 'local-capture1.png'});
         var pkNewRecord = await page.$('[my-table=simple] tbody tr td');
