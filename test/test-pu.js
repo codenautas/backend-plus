@@ -41,7 +41,7 @@ describe("interactive ",function(){
         console.log('sistema logueado');
     });
     it("inserts one record", async function(){
-        this.timeout(18000);
+        this.timeout(38000);
         console.log('tengo el menu')
         await page.click('[menu-name=tables]');
         await page.click('[menu-name=simple]');
