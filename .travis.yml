@@ -1,8 +1,7 @@
 language: node_js
 node_js:
-  - "4"
-  - "6"
   - "8"
+  - "9"
 matrix:
   fast_finish: true
 script: "npm run-script test-ci"
@@ -12,6 +11,7 @@ sudo: required
 addons:
   postgresql: "9.5"
 before_script:
+  - cp examples/4test/travis-config.yaml examples/4test/local-config.yaml
   - psql -c 'create user test_user password $$test_pass$$;' -U postgres
   - psql -c 'create database test_db owner test_user;' -U postgres
   - psql -U postgres -f test/populate_db.sql test_db

@@ -28,9 +28,9 @@ describe('backend-plus', function describeBackendPlus(){
                     this.timeout(50000);
                     createServerGetAgent({server:{"base-url":opt.base}}).then(function(_be){ 
                         be=_be;
-                        return be.getDbClient();
-                    }).then(function(client){
-                        return client.executeSqlScript('./test/populate_db.sql');
+                        return be.inDbClient({}, function(client){
+                            return client.executeSqlScript('./test/populate_db.sql');
+                        });
                     }).then(function(){
                         agent=request.agent(be.getMainApp());
                     }).then(done,done);
@@ -38,6 +38,7 @@ describe('backend-plus', function describeBackendPlus(){
                 after(async function(){
                     console.log('cerrando el backend',i);
                     await be.shootDownBackend();
+                    be=null;
                     console.log('cerrado! el backend',i);
                 });
                 it('must set session cookie in the first connection', function(done){
@@ -285,12 +286,13 @@ describe('backend-plus', function describeBackendPlus(){
             describe("jsonb", function(){
                 it("read jsonb in a where", function(){
                     var idj={uno:'dos', tres:'cuatro'}
-                    return be.getDbClient().then(function(client){
-                        return client.query("select data, idj, idn from conjson where idj = $1",[idj]).execute();
-                    }).then(function(result){
-                        expect(result.rows).to.eql([
-                            {data:'1,2,3,4', idj:idj, idn:1}
-                        ])
+                    return be.inDbClient({},function(client){
+                        return client.query("select data, idj, idn from conjson where idj = $1",[idj])
+                        .fetchAll().then(function(result){
+                            expect(result.rows).to.eql([
+                                {data:'1,2,3,4', idj:idj, idn:1}
+                            ])
+                        });
                     });
                 });
             });
@@ -331,49 +333,4 @@ var INTERNAL_PORT=34444;
 function createServerGetAgent(opts) {
     var appStarted = require('./simple-backend.js')(opts);
     return appStarted;
-    /////////////////////////
-    return new Promise(function(resolve, reject){
-        var app = express();
-        app.use(cookieParser());
-        var concat = require('concat-stream');
-        app.use(bodyParser.urlencoded({extended:true}));
-        if("show raw body"){
-            app.use(function(req, res, next){
-              req.pipe(concat(function(data){
-                req.bodyRaw = data.toString();
-                next();
-              }));
-            });
-        }
-        var opts2 = opts||{};
-        opts2.baseUrl = opts2.baseUrl||'';
-        app.get(opts2.baseUrl+'/php-set-cookie', function(req,res){
-            res.cookie('PHPSESSID', 'oek1ort6vbqdd7374eft6adv61');
-            res.end('ok');
-        });
-        // loginPlus.logAll=true;
-        loginPlusManager.init(app,opts);
-        loginPlusManager.setValidatorStrategy(function(req, username, password, done){
-            // console.log('********* intento de entrar de ',username,password);
-            if(username=='prueba' && password=='prueba1'){
-                if(opts2.userFieldName){
-                    done(null, {userFieldName: 'prueba', userData: 'data-user'});
-                }else{
-                    done(null, {username: 'user'});
-                }
-            }else{
-                done('user not found in this test.');
-            }
-        });
-        app.get(opts2.baseUrl+'/private/:id',function(req,res){
-            res.end('private: '+req.params.id);
-        });
-        app.get(opts2.baseUrl+'/whoami',function(req,res){
-            res.end('I am: '+JSON.stringify(req.user));
-        });
-        var server = app.listen(INTERNAL_PORT++,function(){
-            // resolve(server);
-            resolve(request.agent(server));
-        });
-    });
 }

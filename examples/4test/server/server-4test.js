@@ -1,47 +1,27 @@
 "use strict";
 
-var Path = require('path');
-var backendPlus = require("../../..");
-var MiniTools = require('mini-tools');
+console.log(require.resolve.paths('./app-4test.js'));
+console.log(require.resolve('./app-4test.js'));
 
-var changing = require('best-globals').changing;
+var AppExample = require('./app-4test.js');
 
-class AppExample extends backendPlus.AppBackend{
-    constructor(){
-        super();
-    }
-    get rootPath(){ return Path.resolve(__dirname,'..'); }
-    addLoggedServices(){
-        var be = this;
-        super.addLoggedServices();
-        this.app.get('/echo', function(req,res){
-            res.end('echo');
+var server = new AppExample();
+
+var fs = require('fs-extra');
+
+server.start().then(function(){
+    var thisInterval=setInterval(function(){
+        fs.rename('local-shootdown.yes','local-shootdown.done').then(function(){
+            console.log('shooting down...');
+            if(!server.shootDownBackend){
+                server.shootDownBackend=function(){ return Promise.resolve()};
+            }
+            return server.shootDownBackend().then(function(){
+                clearInterval(thisInterval);
+                console.log('shooted down!');
+            });
+        },function(){ "not shootdown yet"; }).catch(function(err){
+            console.log(err);
         });
-    }
-    getProcedures(){
-        var be = this;
-        return super.getProcedures().then(function(procedures){
-            return procedures.concat(
-                require('./procedures-4test.js').map(be.procedureDefCompleter, be)
-            );
-        });
-    }
-    getMenu(context){
-        return {menu:[
-            {menuType:'menu', name:'tables', menuContent:[
-                {menuType:'table', name:'simple'},
-            ]},
-            {menuType:'menu', name:'config', menuContent:[
-                {name:'users', menuType:'table'},
-            ]},
-        ]}
-    }
-    getTables(){
-        return super.getTables().concat([
-            'users',
-            'simple',
-        ]);
-    }
-}
-
-new AppExample().start();
+    },1000);
+});
