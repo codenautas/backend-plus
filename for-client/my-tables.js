@@ -1713,7 +1713,7 @@ myOwn.clientSides={
 
 myOwn.references={};
 
-myOwn.getReference = function initReference(referenceName, forceRefresh){
+myOwn.getReference = function getReference(referenceName, forceRefresh){
     var reference={};
     if(!my.references[referenceName]){
         var dummyElement = html.div().create();

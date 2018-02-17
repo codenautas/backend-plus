@@ -49,6 +49,19 @@ create table "simple" (
 grant select, insert, update, delete on "simple" to "test_user";
 
 
+CREATE SEQUENCE "simpe_seq" START 3;
+ALTER TABLE "simple" ALTER COLUMN "simple_code" SET DEFAULT nextval('simpe_seq'::regclass);
+GRANT USAGE, SELECT ON SEQUENCE "simpe_seq" TO "test_user";
+
+create table "with_fk" (
+  "simple_code" text, 
+  "wf_code" text, 
+  "wf_name" text
+, primary key ("simple_code", "wf_code")
+);
+grant select, insert, update, delete on "with_fk" to "test_user";
+
+
 
 
 -- pre-ADAPTs
@@ -72,5 +85,5 @@ insert into "simple" ("simple_code", "simple_name") values
 
 -- conss
 -- FKs
-
+alter table "with_fk" add constraint  "with_fk simple REL " foreign key ("simple_code") references "simple" ("simple_code")  on update cascade;
 

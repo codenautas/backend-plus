@@ -6,9 +6,9 @@ module.exports = function(context){
         name:'simple',
         editable:admin,
         fields:[
-            {name:'simple_code'          , typeName:'text'                 },
-            {name:'simple_name'          , typeName:'text'                 },
+            {name:'simple_code'          , typeName:'text', sequence:{name:'simpe_seq', firstValue:3}},
+            {name:'simple_name'          , typeName:'text', isName: true          },
         ],
         primaryKey:['simple_code']
-    });
+    },context);
 }
