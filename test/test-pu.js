@@ -63,7 +63,7 @@ describe("interactive ",function(){
         discrepances.showAndThrow(result.value,data);
         return 1;
     });
-    it.only("inserts one record with fk data", async function(){
+    it.skip("inserts one record with fk data", async function(){
         this.timeout(38000);
         console.log('tengo el menu')
         await page.click('[menu-name=tables]');
@@ -82,13 +82,16 @@ describe("interactive ",function(){
         await pkNewRecord.press('Enter');  // keep empty simple_code
         await page.keyboard.type('Three');          // simple_name (lookup field)
         await page.keyboard.press('Enter');
-        await page.keyboard.type(pkValue);
-        await page.keyboard.press('Enter'); 
-        await page.waitForSelector('[my-colname=wf_code][io-status="temporal-ok"]');
-        await page.screenshot({path: 'local-capture2.png'});
-        await page.keyboard.press('Enter');
+        await page.waitForSelector('[my-colname=simple_name][io-status="temporal-ok"]');
         var result = await client.query("select simple_code, simple_name from simple where simple_name = $1",['Three']).fetchUniqueRow();
         discrepances.showAndThrow(result.row,{simple_code:'3', simple_name:'Three'});
+        var result = await page.$eval('[my-colname=simple_code]', td => td.textContent);
+        discrepances.showAndThrow(result,'3');
+        return ;
+        await page.keyboard.type(pkValue);
+        await page.keyboard.press('Enter'); 
+        await page.screenshot({path: 'local-capture2.png'});
+        await page.keyboard.press('Enter');
         var result = await client.query("select * from with_fk where wf_code = $1",['A1']).fetchUniqueRow();
         discrepances.showAndThrow(result.row,{simple_code:'3', wf_code:'A1'});
         return 1;

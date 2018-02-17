@@ -195,6 +195,9 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
 
 myOwn.TableConnector.prototype.getData = function getData(){
     var connector = this;
+    if(((connector.opts||{}).tableDef||{}).forInsertOnlyMode){
+        return Promise.resolve([]);
+    }
     return connector.my.ajax.table.data({
         table:connector.tableName,
         fixedFields:connector.fixedFields

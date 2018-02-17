@@ -12,7 +12,7 @@ module.exports = function(context){
         ],
         primaryKey:['simple_code','wf_code'],
         foreignKeys:[
-            {references:'simple', fields:['simple_code']}
+            {references:'simple', fields:['simple_code'], allowNewRecords:true}
         ],
     },context);
 }
