@@ -77,5 +77,11 @@ window.addEventListener('load', function(){
     ].join(',')+')';
 });
 
+myOwn.autoSetupFunctions.push(
+    function getReferences(){
+//        myOwn.getReference('pgroups');
+    }
+);
+
 myOwn.messages.showImage='show image';
 myOwn.i18n.messages.es.showImage='mostrar imagen';

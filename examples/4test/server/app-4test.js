@@ -30,6 +30,7 @@ class AppExample extends backendPlus.AppBackend{
         return {menu:[
             {menuType:'menu', name:'tables', menuContent:[
                 {menuType:'table', name:'simple'},
+                {menuType:'table', name:'with_fk'},
             ]},
             {menuType:'menu', name:'config', menuContent:[
                 {name:'users', menuType:'table'},
@@ -40,6 +41,7 @@ class AppExample extends backendPlus.AppBackend{
         return super.getTables().concat([
             'users',
             'simple',
+            'with_fk',
         ]);
     }
 }

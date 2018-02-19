@@ -195,6 +195,9 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
 
 myOwn.TableConnector.prototype.getData = function getData(){
     var connector = this;
+    if(((connector.opts||{}).tableDef||{}).forInsertOnlyMode){
+        return Promise.resolve([]);
+    }
     return connector.my.ajax.table.data({
         table:connector.tableName,
         fixedFields:connector.fixedFields
@@ -1713,7 +1716,7 @@ myOwn.clientSides={
 
 myOwn.references={};
 
-myOwn.getReference = function initReference(referenceName, forceRefresh){
+myOwn.getReference = function getReference(referenceName, forceRefresh){
     var reference={};
     if(!my.references[referenceName]){
         var dummyElement = html.div().create();
