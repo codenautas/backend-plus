@@ -103,11 +103,11 @@ myOwn.autoSetupFunctions = [
             });
         };
         my.captureKeys();
-        document.addEventListener('click', function(event){
-            if(document.buttonLupa && !document.buttonLupa.forElement.contains(event.target)){
-                my.quitarLupa();
-            }
-        });
+        // document.addEventListener('click', function(event){
+        //     if(document.buttonLupa && !document.buttonLupa.forElement.contains(event.target)){
+        //         my.quitarLupa();
+        //     }
+        // });
         setInterval(function(){
             my.testKeepAlive();
         },2000);
@@ -783,14 +783,14 @@ myOwn.getRect = function getRect(element){
     return rect;
 }
 
-myOwn.quitarLupa = function quitarLupa(){
-    if(document.buttonLupa){
-        document.body.removeChild(document.buttonLupa);
-        clearTimeout(document.buttonLupaTimmer);
-        document.buttonLupaTimmer=null;
-        document.buttonLupa=null;
-    }
-}
+// myOwn.quitarLupa = function quitarLupa(){
+//     if(document.buttonLupa){
+//         document.body.removeChild(document.buttonLupa);
+//         clearTimeout(document.buttonLupaTimmer);
+//         document.buttonLupaTimmer=null;
+//         document.buttonLupa=null;
+//     }
+// }
 
 myOwn.path={
     img:'img/'
