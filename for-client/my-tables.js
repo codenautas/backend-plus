@@ -222,6 +222,10 @@ myOwn.TableConnector.prototype.deleteRecord = function deleteRecord(depot, opts)
             table:depot.def.name, 
             primaryKeyValues:depot.primaryKeyValues,
             launcher:opts.launcher
+        }).then(function(){
+            depot.tr.dispatchEvent(new CustomEvent('deletedRowOk'));
+            var grid=depot.manager;
+            grid.dom.main.dispatchEvent(new CustomEvent('deletedRowOk'));
         })
     );
 };
