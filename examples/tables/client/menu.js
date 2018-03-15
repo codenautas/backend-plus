@@ -1,7 +1,6 @@
 "use string";
 
-// var html=require('js-to-html').html;
-var html=jsToHtml.html;
+var html=require('js-to-html').html;
 
 var my = myOwn;
 
