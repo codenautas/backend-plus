@@ -222,6 +222,10 @@ myOwn.TableConnector.prototype.deleteRecord = function deleteRecord(depot, opts)
             table:depot.def.name, 
             primaryKeyValues:depot.primaryKeyValues,
             launcher:opts.launcher
+        }).then(function(){
+            depot.tr.dispatchEvent(new CustomEvent('deletedRowOk'));
+            var grid=depot.manager;
+            grid.dom.main.dispatchEvent(new CustomEvent('deletedRowOk'));
         })
     );
 };
@@ -1633,6 +1637,13 @@ myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot){
     grid.updateTotals(grid.depots.length?1:0, grid.depots.length);
 };
 
+myOwn.confirmDelete=function confirmDelete(depot, opts){
+    return depot.my.showQuestion(
+        depot.my.messages.Delete+' '+JSON.stringify(depot.primaryKeyValues)+' ?', 
+        {askForNoRepeat:depot.my.messages.Delete+', '+depot.def.name}
+    );
+}
+
 myOwn.tableAction={
     "insert":{
         img: myOwn.path.img+'insert.png',
@@ -1647,13 +1658,12 @@ myOwn.tableAction={
         alt: "DEL",
         titleMsg: 'deleteRecord',
         actionRow: function(depot, opts){
-            return depot.my.showQuestion(
-                depot.my.messages.Delete+' '+JSON.stringify(depot.primaryKeyValues)+' ?', 
-                {askForNoRepeat:depot.my.messages.Delete+', '+depot.def.name}
-            ).then(function(result){
-                return depot.connector.deleteRecord(depot, opts).then(function(){
-                    depot.manager.displayAsDeleted(depot);
-                }).catch(depot.my.alertError);
+            return depot.my.confirmDelete(depot, opts).then(function(result){
+                if(result){
+                    return depot.connector.deleteRecord(depot, changing({reject:false},opts)).then(function(){
+                        depot.manager.displayAsDeleted(depot);
+                    }).catch(depot.my.alertError);
+                }
             });
         }
     },
