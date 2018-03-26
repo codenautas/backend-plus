@@ -68,6 +68,7 @@ describe("table-def-adapt", function(){
               "from": '"the-table-name"',
               "fromWoAs": '"the-table-name"',
               "isTable": true,
+              "originalFrom": undefined,
               "postCreateSqls": "",
               "select": [
                 '"the-table-name"."id"'
