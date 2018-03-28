@@ -400,8 +400,12 @@ myOwn.ColumnGrid.prototype.th = function th(){
     return html.th();
 };
 
-myOwn.ColumnGrid.prototype.thDetail = function thLabel(){
+myOwn.ColumnGrid.prototype.thDetail = function thDetail(){
     return html.th({class:'th-detail'}, (this.fieldDef||{}).label);
+};
+
+myOwn.ColumnGrid.prototype.thAgg = function thAgg(){
+    return html.th({class:'th-agg'});
 };
 
 myOwn.ColumnGrid.prototype.thFilter = function thFilter(){
@@ -512,6 +516,9 @@ myOwn.DataColumnGrid.prototype.th = function th(){
             grid.displayBody();
         }
     });
+    th.addEventListener('update', function(){
+        grid.refreshAggregates();
+    })
     return th;
 };
 
@@ -555,9 +562,19 @@ myOwn.DataColumnGrid.prototype.thFilter = function thFilter(depot, iColumn){
     return th;
 };
 
-myOwn.DataColumnGrid.prototype.thDetail = function thLabel(){
+myOwn.DataColumnGrid.prototype.thDetail = function thDetail(){
     var grid=this.grid;
     return html.th(this.cellAttributes({class:"th-detail"}), (this.fieldDef||{}).label);
+};
+
+myOwn.DataColumnGrid.prototype.thAgg = function thAgg(){
+    var grid=this.grid;
+    var th=html.th(this.cellAttributes({class:"th-agg"}), (this.fieldDef||{}).label);
+    if(this.fieldDef.aggregate){
+        TypedControls.adaptElement(th,{typeName:'decimal'});
+        grid.dom.aggregate[this.fieldDef.name]=th;
+    }
+    return th;
 };
 
 myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
@@ -687,6 +704,7 @@ myOwn.SpecialColumnGrid.prototype.th = function th(){
 };
 
 myOwn.SpecialColumnGrid.prototype.thDetail = myOwn.SpecialColumnGrid.prototype.th;
+myOwn.SpecialColumnGrid.prototype.thAgg = myOwn.SpecialColumnGrid.prototype.th;
 
 function s2ab(s) {
     var buf;
@@ -1074,6 +1092,37 @@ myOwn.dialogUpload = function dialogUpload(ajaxPath, ajaxParams, ajaxPrepareResu
     }
 };
 
+myOwn.TableAggregates={
+    avg:function(){
+        this.n=0;
+        this.sum=0;
+        this.acum=function acum(value){
+            if(value!=null){
+                this.n++;
+                this.sum+=value;
+            }
+        }
+    }
+}
+
+myOwn.TableGrid.prototype.refreshAggregates = function refreshAggregates(){
+    var grid = this;
+    var my = grid.my;
+    var aggData={};
+    grid.fieldDefs.forEach(function(fieldDef){
+        if(fielDef.aggregate){
+            aggData[fielDef.name]=new myOwn.TableAggregates[fieldDef.aggregate]();
+        }
+    });
+    grid.depots.forEach(function(depot){
+        grid.fieldDefs.forEach(function(fieldDef){
+            if(fielDef.aggregate){
+                aggData[fielDef.name]=myOwn.TableAggregates[fieldDef.aggregate].init();
+            }
+        })
+    });
+};
+
 myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     var grid = this;
     var my = grid.my;
@@ -1081,6 +1130,9 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     grid.def.fields.forEach(function(fieldDef){
         if(!fieldDef.visible){
             grid.view.hiddenColumns.push(fieldDef.name);
+        }
+        if(fieldDef.aggregate){
+            grid.modes.withAggregateRow=true;
         }
     });
     grid.hideColumnsViaCss();
@@ -1211,6 +1263,15 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
             ])
         ]).create();
     }else{
+        var footRows;
+        if(grid.modes.withAggregateRow){
+            footRows=[
+                html.tr(grid.columns.map(function(column){ return column.thAgg(); })),
+                html.tr([html.th(),grid.dom.footInfo])
+            ];
+        }else{
+            footRows=[html.tr([html.th([buttonInsert]),grid.dom.footInfo])];
+        }
         grid.dom.table = html.table({"class":"my-grid", "my-table": grid.actualName},[
             html.caption(grid.def.title),
             html.thead([

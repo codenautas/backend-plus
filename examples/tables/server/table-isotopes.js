@@ -19,7 +19,7 @@ module.exports = function(context){
         },
         fields:[
             {name:'atomic_number', title:'A#', typeName:'integer' , width:100, nullable:false,      orderForInsertOnly:'1' },
-            {name:'mass_number'              , typeName:'integer' , width:100,                      orderForInsertOnly:'2' },
+            {name:'mass_number'              , typeName:'integer' , width:100,                      orderForInsertOnly:'2' , aggregate:'avg'},
             {name:'order'                    , typeName:'integer' , width:100,                      orderForInsertOnly:'4' },
             {name:'stable'                   , typeName:'boolean' , width:100,                                             },
             {name:'others'                   , typeName:'text'    , width:700, defaultForOtherFields: true                },
