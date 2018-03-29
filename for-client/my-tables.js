@@ -680,7 +680,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
             if(!detailControl.table){
                 grid.my.tableGrid(detailTableDef.table, tdGrid, {fixedFields: fixedFields}).waitForReady(function(g){
                     detailControl.table=g.dom.table;
-                    if(grid.def.complexDef || detailTableDef.refreshParent){
+                    if(detailTableDef.refreshParent || grid.def.complexDef && detailTableDef.refreshParent!==false){
                         var refresh = function refresh(){
                             grid.retrieveRowAndRefresh(depot);
                         }

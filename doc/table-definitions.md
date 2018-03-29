@@ -45,13 +45,17 @@ vertical          | L    | `false`               | (see Spanish)
 forInsertOnlyMode | L    | `false`               | (see Spanish)
 filterColumns     | [O]  | `[]`                  | (see Spanish)
 registerImports   | [O]  | (registerImportsDef)  | Object list. It is uset to configure how "others" fields are stored when any person imports a file (*it works* **__only if you set to true one field with "defaultForOtherFields"__** *(see fieldDef)*)
+sortColumns       | [O]  | `[]`                  | default order
+detailTables      | [O]  | `[]`                  | master/detail subgrids based in other tables
 
 list examples    | element format
 -----------------|--------------------------------------
  foreignKeys     | {references:'ptable', fields:['atomic_number']}
  softForeignKeys | {references:'ptable', fields:['atomic_number']}
- constraints     | {constraintType:'unique', fields:['atomic_number','order']}
+ constraints     | {constraintType:'unique', fields:['atomic_number','order'], consName:'repeating order in atomic_number'}
  filterColumns   | {column:'atomic_number', operator:'=', value:7}
+ sortColumns     | {column:'discovery_date', order:-1}
+detailTables     | {table:'ptable', fields:['atomic_number'], abr:'A', refreshParent:true}
 
 permissions | table | field | allows:
 ------------|-------|-------|-------
@@ -80,6 +84,7 @@ visible               | B    | true          | show/hide a field by default
 typeName              | T    |               | data type
 title                 | T    | `name`        | title in the grid if you don't want to use name property default value
 inTable               | L    | true          | determine if field belongs physically to the table and the dump.
+sequence              | [O]  | (sequenceDef) | determine if field will have auto-incremental value.
 defaultForOtherFields | B    | false         | determines if field (must to be defined as "text") is used to save a JSON with other fields when any person imports a file (*it works* **__only if you configures "registerImports"__** *(see tableDef)*)
 
 
@@ -90,6 +95,19 @@ property              | type | default value   | use
 ----------------------|------|-----------------|-------------------
 inTable               | T    | null            | table name used to save "other" fields. It's necessary to define if you want to save information (the table must exist, see integrating example)
 fieldNames            | [O]  | (fieldNamesDef) | Object with table fields configuration.
+
+
+## sequenceDef
+
+
+A json containing the info for the generated sequence
+
+property              | type | default value   | use
+----------------------|------|-----------------|-------------------
+name                  | T    | null            | (REQUIRED) sequence name
+firstValue            | Number | 1             | sequence first number
+prefix                | T    | null            | sequence prefix
+
 
 
 ## fieldNamesDef
@@ -147,7 +165,7 @@ module.exports = function(context){
         ],
         primaryKey:['atomic_number','mass_number'],
         constraints:[
-            {constraintType:'unique', fields:['atomic_number','order']}
+            {constraintType:'unique', fields:['atomic_number','order'], consName:'repeating order in atomic_number'}
         ],
         foreignKeys:[
             {references:'ptable', fields:['atomic_number']}

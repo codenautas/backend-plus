@@ -27,7 +27,7 @@ module.exports = function(context){
         primaryKey:['atomic_number'],
         detailTables:[
             {table: 'isotopes'      , fields:[{source:'atomic_number', target:'atomic_number'}], abr:'iso', label:'isotopes'},
-            {table: 'element_images', fields:[{source:'atomic_number', target:'atomic_number'}], abr:'img', label:'images'  , refreshParent:true}
+            {table: 'element_images', fields:[{source:'atomic_number', target:'atomic_number'}], abr:'img', label:'images'  }
         ],
         foreignKeys:[
             {references: 'pgroups' , fields:['group'], abr:'g'},
