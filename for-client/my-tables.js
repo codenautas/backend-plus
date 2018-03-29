@@ -1400,7 +1400,10 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     grid.my.clientSides[fieldDef.clientSide].update(depot, fieldDef.name);
                 }
             }else if(!skipUpdateStatus){
-                td.setTypedValue(coalesce(depot.row[fieldDef.name],null));
+                var newValue=coalesce(depot.row[fieldDef.name],null);
+                if(!sameValue(newValue,td.getTypedValue())){
+                    td.setTypedValue(newValue);
+                }
             }
         });
     };
