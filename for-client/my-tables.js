@@ -1489,6 +1489,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 grid.updateRowData(depot);
                 depot.tr.dispatchEvent(new CustomEvent('savedRowOk'));
                 grid.dom.main.dispatchEvent(new CustomEvent('savedRowOk'));
+                grid.refreshAggregates();
             }).catch(function(err){
                 changeIoStatus('error',depot.rowPendingForUpdate,err.message);
             });
@@ -1753,6 +1754,7 @@ myOwn.tableAction={
                 if(result){
                     return depot.connector.deleteRecord(depot, changing({reject:false},opts)).then(function(){
                         depot.manager.displayAsDeleted(depot);
+                        depot.manager.refreshAggregates();
                     }).catch(depot.my.alertError);
                 }
             });
