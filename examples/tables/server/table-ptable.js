@@ -8,7 +8,7 @@ module.exports = function(context){
         editable:true,
         editableFieldDef:true,
         fields:[
-            {name:'atomic_number', title:'A#', typeName:'integer', editable:admin},
+            {name:'atomic_number', title:'A#', typeName:'integer', editable:admin, aggregate:'sum'},
             {name:'symbol'              , typeName:'text'   , nullable:false, 'max-length':4 ,isName:true},
             {name:'name'                , typeName:'text'   , allow:{insert:admin}           ,isName:true},
             {name:'weight'              , typeName:'decimal', nullable:true, exact:true, decimals: true     },

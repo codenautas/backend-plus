@@ -274,7 +274,8 @@ myOwn.TableGrid = function(context, mainElement){
         grid[attr] = context[attr];
     }
     grid.dom={
-        main: mainElement
+        main: mainElement,
+        aggregate: {}
     };
     grid.modes = {
         saveByField: true,
@@ -383,6 +384,7 @@ myOwn.TableGrid.prototype.prepareAndDisplayGrid = function prepareAndDisplayGrid
             if(grid.def.forInsertOnlyMode){
                 grid.createRowInsertElements();
             }
+            grid.refreshAggregates();
             return grid;
         });
     }).catch(function(err){
@@ -458,6 +460,10 @@ myOwn.ActionColumnGrid.prototype.td = function td(depot){
     return thActions;
 };
 
+myOwn.ActionColumnGrid.prototype.thAgg = function thAgg(){
+    return html.th({class:'th-action'}, this.actionsBottom);
+};
+
 myOwn.DataColumnGrid = function DataColumnGrid(opts){
     myOwn.ColumnGrid.call(this,opts);
 };
@@ -516,9 +522,6 @@ myOwn.DataColumnGrid.prototype.th = function th(){
             grid.displayBody();
         }
     });
-    th.addEventListener('update', function(){
-        grid.refreshAggregates();
-    })
     return th;
 };
 
@@ -569,7 +572,7 @@ myOwn.DataColumnGrid.prototype.thDetail = function thDetail(){
 
 myOwn.DataColumnGrid.prototype.thAgg = function thAgg(){
     var grid=this.grid;
-    var th=html.th(this.cellAttributes({class:"th-agg"}), (this.fieldDef||{}).label);
+    var th=html.th(this.cellAttributes({class:"th-agg"})).create();
     if(this.fieldDef.aggregate){
         TypedControls.adaptElement(th,{typeName:'decimal'});
         grid.dom.aggregate[this.fieldDef.name]=th;
@@ -621,6 +624,9 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
             }
         });
     }
+    td.addEventListener('update', function(){
+        grid.refreshAggregates();
+    })
     return td;
 };
 
@@ -1102,6 +1108,24 @@ myOwn.TableAggregates={
                 this.sum+=value;
             }
         }
+        this.result=function result(){
+            if(!this.n) return null;
+            return this.sum/this.n;
+        }
+    },
+    sum:function(){
+        this.n=0;
+        this.sum=0;
+        this.acum=function acum(value){
+            if(value!=null){
+                this.n++;
+                this.sum+=value;
+            }
+        }
+        this.result=function result(){
+            if(!this.n) return null;
+            return this.sum;
+        }
     }
 }
 
@@ -1109,18 +1133,23 @@ myOwn.TableGrid.prototype.refreshAggregates = function refreshAggregates(){
     var grid = this;
     var my = grid.my;
     var aggData={};
-    grid.fieldDefs.forEach(function(fieldDef){
-        if(fielDef.aggregate){
-            aggData[fielDef.name]=new myOwn.TableAggregates[fieldDef.aggregate]();
+    grid.def.fields.forEach(function(fieldDef){
+        if(fieldDef.aggregate){
+            aggData[fieldDef.name]=new myOwn.TableAggregates[fieldDef.aggregate]();
         }
     });
     grid.depots.forEach(function(depot){
-        grid.fieldDefs.forEach(function(fieldDef){
-            if(fielDef.aggregate){
-                aggData[fielDef.name]=myOwn.TableAggregates[fieldDef.aggregate].init();
+        grid.def.fields.forEach(function(fieldDef){
+            if(fieldDef.aggregate){
+                aggData[fieldDef.name].acum(depot.row[fieldDef.name]);
             }
         })
     });
+    grid.def.fields.forEach(function(fieldDef){
+        if(fieldDef.aggregate){
+            grid.dom.aggregate[fieldDef.name].setTypedValue(aggData[fieldDef.name].result());
+        }
+    })
 };
 
 myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
@@ -1210,11 +1239,17 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         })
     ]).create();
     grid.prepareMenu(buttonMenu);
-    grid.columns=[new my.ActionColumnGrid({grid:grid, actions:[
-        /*buttonInsert,*//*buttonSaveMode,*/buttonCreateFilter,buttonDestroyFilter,
-        buttonOrientation,
-        buttonMenu,
-    ]})].concat(
+    grid.columns=[new my.ActionColumnGrid({
+        grid:grid, 
+        actions:[
+            /*buttonInsert,*//*buttonSaveMode,*/buttonCreateFilter,buttonDestroyFilter,
+            buttonOrientation,
+            buttonMenu,
+        ],
+        actionsBottom:[
+            buttonInsert
+        ]
+    })].concat(
         grid.def.detailTables.map(function(detailTableDef){ return new my.DetailColumnGrid({grid:grid, detailTableDef:detailTableDef}); })
     ).concat(
         grid.def.fields.map(function(fieldDef){ return new my.DataColumnGrid({grid:grid, fieldDef:fieldDef}); })
@@ -1280,9 +1315,8 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
                 grid.modes.withColumnDetails?html.tr(grid.columns.map(function(column){ return column.thDetail(); })):null,
             ]),
             html.tbody(),
-            html.tfoot([
-                html.tr([html.th([buttonInsert]),grid.dom.footInfo])
-            ])
+            html.tfoot(footRows)
+                // [html.tr([html.th([buttonInsert]),grid.dom.footInfo])]
         ]).create();
     }
     grid.dom.main.innerHTML='';
