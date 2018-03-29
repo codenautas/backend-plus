@@ -4,6 +4,7 @@
 /*global miniMenuPromise, dialogPromise, alertPromise, confirmPromise, promptPromise, simpleFormPromise */
 /*global Blob, document, CustomEvent, URL  */
 
+var Big = require('big.js');
 var bestGlobals = require('best-globals');
 var html = require('js-to-html').html;
 var JSON4all = require('json4all');
@@ -1098,35 +1099,27 @@ myOwn.dialogUpload = function dialogUpload(ajaxPath, ajaxParams, ajaxPrepareResu
     }
 };
 
-myOwn.TableAggregates={
-    avg:function(){
-        this.n=0;
-        this.sum=0;
-        this.acum=function acum(value){
-            if(value!=null){
-                this.n++;
-                this.sum+=value;
-            }
-        }
-        this.result=function result(){
-            if(!this.n) return null;
-            return this.sum/this.n;
-        }
-    },
-    sum:function(){
-        this.n=0;
-        this.sum=0;
-        this.acum=function acum(value){
-            if(value!=null){
-                this.n++;
-                this.sum+=value;
-            }
-        }
-        this.result=function result(){
-            if(!this.n) return null;
-            return this.sum;
-        }
+myOwn.TableAggregates={}
+myOwn.TableAggregates.avg=function(){
+    this.n=0;
+    this.sum=new Big(0);
+};
+myOwn.TableAggregates.avg.prototype.acum=function acum(value){
+    if(value!=null){
+        this.n++;
+        this.sum = this.sum.plus(value);
     }
+}
+myOwn.TableAggregates.avg.prototype.result=function result(){
+    if(!this.n) return null;
+    return this.sum.div(this.n);
+}
+myOwn.TableAggregates.sum = function(){
+    myOwn.TableAggregates.avg.call(this);
+}
+myOwn.TableAggregates.sum.prototype = Object.create(myOwn.TableAggregates.avg.prototype);
+myOwn.TableAggregates.avg.prototype.result=function result(){
+    return this.sum;
 }
 
 myOwn.TableGrid.prototype.refreshAggregates = function refreshAggregates(){
