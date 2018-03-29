@@ -54,6 +54,7 @@ forInsertOnlyMode | L    | `false`               | si es una tabla de solo inser
 filterColumns     | [O]  | `[]`                  | lista de objetos de la forma {column, operator, value} para que sea el filtro predeterminado de la grilla
 registerImports   | [O]  | (registerImportsDef)  | lista de objetos. Configura opciones para guardar la definicion de los "otros" campos al importar un archivo (*para que funcione **debe existir un campo seteado como "defaultForOtherFields"** (ver fieldDef)*)
 sortColumns       | [O]  | `[]`                  | ordenamiento predeterminado
+detailTables      | [O]  | `[]`                  | lista de tablas que permitirán desplegar subgrillas (estilo maestro/detalle)
 
 ejemplos lista       | formato elemento
 ---------------------|--------------------------------------
@@ -62,6 +63,7 @@ ejemplos lista       | formato elemento
  constraints         | {constraintType:'unique', fields:['atomic_number','order'], consName:'repeating order in atomic_number'}
  filterColumns       | {column:'atomic_number', operator:'=', value:7}
  sortColumns         | {column:'discovery_date', order:-1}
+ detailTables        | {table:'ptable', fields:['atomic_number'], abr:'A', refreshParent:true}
 
 permisos | tabla | campo | indica si se permite...
 ---------|-------|-------|-------
@@ -98,6 +100,7 @@ forInsertOnlyMode | L    | `false`               | (see Spanish)
 filterColumns     | [O]  | `[]`                  | (see Spanish)
 registerImports   | [O]  | (registerImportsDef)  | Object list. It is uset to configure how "others" fields are stored when any person imports a file (*it works* **__only if you set to true one field with "defaultForOtherFields"__** *(see fieldDef)*)
 sortColumns       | [O]  | `[]`                  | default order
+detailTables      | [O]  | `[]`                  | master/detail subgrids based in other tables
 
 list examples    | element format
 -----------------|--------------------------------------
@@ -106,6 +109,7 @@ list examples    | element format
  constraints     | {constraintType:'unique', fields:['atomic_number','order'], consName:'repeating order in atomic_number'}
  filterColumns   | {column:'atomic_number', operator:'=', value:7}
  sortColumns     | {column:'discovery_date', order:-1}
+detailTables     | {table:'ptable', fields:['atomic_number'], abr:'A', refreshParent:true}
 
 permissions | table | field | allows:
 ------------|-------|-------|-------

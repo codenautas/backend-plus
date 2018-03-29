@@ -10,6 +10,7 @@ var html = require('js-to-html').html;
 var JSON4all = require('json4all');
 var TypedControls = require('typed-controls');
 var typeStore=require('type-store');
+var likeAr=require('like-ar');
 
 var changing = bestGlobals.changing;
 var coalesce = bestGlobals.coalesce;
@@ -679,6 +680,13 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
             if(!detailControl.table){
                 grid.my.tableGrid(detailTableDef.table, tdGrid, {fixedFields: fixedFields}).waitForReady(function(g){
                     detailControl.table=g.dom.table;
+                    if(grid.def.complexDef || detailTableDef.refreshParent){
+                        var refresh = function refresh(){
+                            grid.retrieveRowAndRefresh(depot);
+                        }
+                        g.dom.main.addEventListener('deletedRowOk', refresh);
+                        g.dom.main.addEventListener('savedRowOk', refresh);
+                    }
                 });
             }else{
                 tdGrid.appendChild(detailControl.table);
@@ -1400,25 +1408,25 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             }
         });
     };
+    var changeIoStatus = function changeIoStatus(depot,newStatus, objectWithFieldsOrListOfFieldNames, title){
+        var fieldNames=typeof objectWithFieldsOrListOfFieldNames === "string"?[objectWithFieldsOrListOfFieldNames]:(
+            objectWithFieldsOrListOfFieldNames instanceof Array?objectWithFieldsOrListOfFieldNames:Object.keys(objectWithFieldsOrListOfFieldNames)
+        );
+        fieldNames.forEach(function(name){ 
+            var td=depot.rowControls[name];
+            td.setAttribute('io-status', newStatus); 
+            if(title){
+                td.title=title;
+            }else{
+                td.title='';
+            }
+        });
+    };
     var saveRow = function(depot, opts){
         if(!('saving' in depot)){
             depot.saving = Promise.resolve();
         }
-        var changeIoStatus = function changeIoStatus(newStatus, objectWithFieldsOrListOfFieldNames, title){
-            var fieldNames=typeof objectWithFieldsOrListOfFieldNames === "string"?[objectWithFieldsOrListOfFieldNames]:(
-                objectWithFieldsOrListOfFieldNames instanceof Array?objectWithFieldsOrListOfFieldNames:Object.keys(objectWithFieldsOrListOfFieldNames)
-            );
-            fieldNames.forEach(function(name){ 
-                var td=depot.rowControls[name];
-                td.setAttribute('io-status', newStatus); 
-                if(title){
-                    td.title=title;
-                }else{
-                    td.title='';
-                }
-            });
-        };
-        changeIoStatus('updating',depot.rowPendingForUpdate);
+        changeIoStatus(depot,'updating',depot.rowPendingForUpdate);
         depot.saving = depot.saving.then(function(){
             if(!Object.keys(depot.rowPendingForUpdate).length){
                 return Promise.resolve();
@@ -1435,66 +1443,80 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 };
             }
             return grid.connector.saveRecord(depot, opts).then(function(result){
-                upadteNumberOfRows(depot,grid);
-                var retrievedRow = result.updatedRow;
-                for(var fieldName in retrievedRow){
-                    if(!grid.def.field[fieldName].clientSide){
-                        var value = depot.rowControls[fieldName].getTypedValue();
-                        if(!sameValue(depot.row[fieldName], value)){
-                            if(grid.def.field[fieldName].allow.update){
-                                depot.rowPendingForUpdate[fieldName] = value;
-                            }
-                            depot.row[fieldName] = value;
-                        }
-                    }
-                    if(fieldName in depot.rowPendingForUpdate){
-                        var source = fieldName in result.sendedForUpdate?result.sendedForUpdate:depot.retrievedRow;
-                        if(sameValue(depot.rowPendingForUpdate[fieldName], retrievedRow[fieldName])){
-                            // ok, lo que viene coincide con lo pendiente
-                            delete depot.rowPendingForUpdate[fieldName];
-                            changeIoStatus('temporal-ok', fieldName);
-                            /*jshint loopfunc: true */
-                            setTimeout(function(fieldName){
-                                changeIoStatus('ok', fieldName);
-                            },3000,fieldName);
-                            /*jshint loopfunc: false */
-                        }else if(sameValue(retrievedRow[fieldName], source[fieldName])){
-                            // ok, si bien lo que viene no coincide con lo pendiente que sigue pendiente, 
-                            // sí coincide con lo que estaba antes de mandar a grabar, 
-                            // entonces no hay conflicto el usuario sabe sobre qué está modificando
-                        }else{
-                            // no coincide con lo pendiente ni con lo anterior, 
-                            // hay un conflicto con el conocimiento del usuario que modificó algo que estaba en otro estado
-                            changeIoStatus('write-read-conflict', 
-                                fieldName, 
-                                myOwn.messages.anotherUserChangedTheRow+'. \n'+
-                                myOwn.messages.oldValue+': '+source[fieldName]+' \n'+
-                                myOwn.messages.actualValueInDB+': '+retrievedRow[fieldName]
-                            );
-                        }
-                    }else{
-                        if(!sameValue(retrievedRow[fieldName], depot.row[fieldName])){
-                            changeIoStatus('background-change', fieldName);
-                            depot.row[fieldName] = retrievedRow[fieldName];
-                            depot.rowControls[fieldName].setTypedValue(retrievedRow[fieldName]);
-                            /*jshint loopfunc: true */
-                            setTimeout(function(fieldName){
-                                changeIoStatus('ok', fieldName);
-                            },3000,fieldName);
-                            /*jshint loopfunc: false */
-                        }
-                    }
-                }
-                depot.retrievedRow = retrievedRow;
-                grid.updateRowData(depot);
-                depot.tr.dispatchEvent(new CustomEvent('savedRowOk'));
-                grid.dom.main.dispatchEvent(new CustomEvent('savedRowOk'));
-                grid.refreshAggregates();
+                grid.depotRefresh(depot,result);
             }).catch(function(err){
-                changeIoStatus('error',depot.rowPendingForUpdate,err.message);
+                changeIoStatus(depot,'error',depot.rowPendingForUpdate,err.message);
             });
         });
     };
+    grid.retrieveRowAndRefresh = function retrieveRowAndRefresh(depot){
+        // var sendedForUpdate = depot.my.cloneRow(depot.rowPendingForUpdate);
+        return my.ajax.table.data({
+            table:depot.def.name,
+            fixedFields:grid.def.primaryKey.map(function(fieldName, i){ 
+                return {fieldName:fieldName, value:depot.primaryKeyValues[i]};
+            })
+        }).then(function(result){
+            grid.depotRefresh(depot,{updatedRow:result[0], sendedForUpdate:{}});
+        })
+    }
+    grid.depotRefresh = function depotRefresh(depot,result){
+        upadteNumberOfRows(depot,grid);
+        var retrievedRow = result.updatedRow;
+        for(var fieldName in retrievedRow){
+            if(!grid.def.field[fieldName].clientSide){
+                var value = depot.rowControls[fieldName].getTypedValue();
+                if(!sameValue(depot.row[fieldName], value)){
+                    if(grid.def.field[fieldName].allow.update){
+                        depot.rowPendingForUpdate[fieldName] = value;
+                    }
+                    depot.row[fieldName] = value;
+                }
+            }
+            if(fieldName in depot.rowPendingForUpdate){
+                var source = fieldName in result.sendedForUpdate?result.sendedForUpdate:depot.retrievedRow;
+                if(sameValue(depot.rowPendingForUpdate[fieldName], retrievedRow[fieldName])){
+                    // ok, lo que viene coincide con lo pendiente
+                    delete depot.rowPendingForUpdate[fieldName];
+                    changeIoStatus(depot,'temporal-ok', fieldName);
+                    /*jshint loopfunc: true */
+                    setTimeout(function(fieldName){
+                        changeIoStatus(depot,'ok', fieldName);
+                    },3000,fieldName);
+                    /*jshint loopfunc: false */
+                }else if(sameValue(retrievedRow[fieldName], source[fieldName])){
+                    // ok, si bien lo que viene no coincide con lo pendiente que sigue pendiente, 
+                    // sí coincide con lo que estaba antes de mandar a grabar, 
+                    // entonces no hay conflicto el usuario sabe sobre qué está modificando
+                }else{
+                    // no coincide con lo pendiente ni con lo anterior, 
+                    // hay un conflicto con el conocimiento del usuario que modificó algo que estaba en otro estado
+                    changeIoStatus(depot,'write-read-conflict', 
+                        fieldName, 
+                        myOwn.messages.anotherUserChangedTheRow+'. \n'+
+                        myOwn.messages.oldValue+': '+source[fieldName]+' \n'+
+                        myOwn.messages.actualValueInDB+': '+retrievedRow[fieldName]
+                    );
+                }
+            }else{
+                if(!sameValue(retrievedRow[fieldName], depot.row[fieldName])){
+                    changeIoStatus(depot,'background-change', fieldName);
+                    depot.row[fieldName] = retrievedRow[fieldName];
+                    depot.rowControls[fieldName].setTypedValue(retrievedRow[fieldName]);
+                    /*jshint loopfunc: true */
+                    setTimeout(function(fieldName){
+                        changeIoStatus(depot,'ok', fieldName);
+                    },3000,fieldName);
+                    /*jshint loopfunc: false */
+                }
+            }
+        }
+        depot.retrievedRow = retrievedRow;
+        grid.updateRowData(depot);
+        depot.tr.dispatchEvent(new CustomEvent('savedRowOk'));
+        grid.dom.main.dispatchEvent(new CustomEvent('savedRowOk'));
+        grid.refreshAggregates();
+    }
     grid.createRowElements = function createRowElements(iRow, depot){
         var grid = this;
         var forInsert = iRow>=0;
