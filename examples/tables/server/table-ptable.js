@@ -30,7 +30,7 @@ module.exports = function(context){
             {table: 'element_images', fields:[{source:'atomic_number', target:'atomic_number'}], abr:'img', label:'images'  }
         ],
         foreignKeys:[
-            {references: 'pgroups' , fields:['group'], abr:'g'},
+            {references: 'pgroups' , fields:['group'], abr:'g', displayAllFields:true},
         ],
         constraints:[
             {constraintType:'unique', fields:['symbol']}

@@ -32,7 +32,7 @@ module.exports = function(context){
             {constraintType:'unique', fields:['atomic_number','order']}
         ],
         foreignKeys:[
-            {references:'ptable', fields:['atomic_number']}
+            {references:'ptable', fields:['atomic_number'], displayFields:['symbol','name','group']}
         ]
     },context);
 }
