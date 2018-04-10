@@ -942,8 +942,8 @@ myOwn.dialogDownload = function dialogDownload(grid){
                 }
             }).join('|')+'\r\n'+
             grid.depotsToDisplay.map(function(depot){
-                if(!fieldDef.inTable && !my.INCLUDE_LOOKUP_COLUMNS_IN_TXT_EXPORT) return '';
                 return grid.def.fields.map(function(fieldDef){
+                    if(!fieldDef.inTable && !my.INCLUDE_LOOKUP_COLUMNS_IN_TXT_EXPORT) return '';
                     var value=depot.row[fieldDef.name];
                     var type=fieldDef.typeName;
                     if(fieldDef.defaultForOtherFields){
