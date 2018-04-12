@@ -147,7 +147,7 @@ myOwn.showPage = function showPage(pageDef){
 
 myOwn.createForkeableButton = function createForkeableButton(menu, label){
     var my = this;
-    var button=html.a({"class": "menu-item", "menu-type":menu.menuType||menu.w, "menu-name":menu.name||'noname'}, label || menu.label || menu.name).create();
+    var button=html.a({"class": menu["class"]||"menu-item", "menu-type":menu.menuType||menu.w, "menu-name":menu.name||'noname'}, label || menu.label || menu.name).create();
     button.setForkeableHref = function setForkeableHref(menu){
         var href;
         if(!menu.w && menu.menuType){
