@@ -31,7 +31,11 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
 myOwn.wScreens.table = function(addrParams){
     setTimeout(function(){
         var layout = document.getElementById('main_layout');
-        my.tableGrid(addrParams.table||addrParams.name,layout);
+		var opts={};
+		if(addrParams.ff){
+			opts.fixedFields=likeAr(JSON.parse(addrParams.ff)).map(function(value, key){ return {fieldName:key, value:value}; }).array();
+		}
+        my.tableGrid(addrParams.table||addrParams.name,layout, opts);
     },10);
 }
 
