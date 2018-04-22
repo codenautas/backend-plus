@@ -43,6 +43,8 @@ class AppExample extends backendPlus.AppBackend{
             {menuType:'menu', name:'test', menuContent:[
                 {menuType:'table', name:'bigint'},
                 {menuType:'proc', name:'example/date'},
+				{menuType:'table', table:'ptable', name:'ptable-actinide' , label:'actinide elements' , ff:{group:'Actinide' }},
+				{menuType:'table', table:'ptable', name:'ptable-metalloid', label:'metalloid elements', ff:{group:'Metalloid'}, showParams:["ff"], selectedByDefault:true, directUrl:true}
             ]},
             {menuType:'menu', name:'bitacora', menuContent:[
                 {menuType:'table', name:'bitacora'},

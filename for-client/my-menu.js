@@ -33,7 +33,7 @@ myOwn.wScreens.table = function(addrParams){
         var layout = document.getElementById('main_layout');
 		var opts={};
 		if(addrParams.ff){
-			opts.fixedFields=likeAr(JSON.parse(addrParams.ff)).map(function(value, key){ return {fieldName:key, value:value}; }).array();
+			opts.fixedFields=likeAr(addrParams.ff).map(function(value, key){ return {fieldName:key, value:value}; }).array();
 		}
         my.tableGrid(addrParams.table||addrParams.name,layout, opts);
     },10);
@@ -105,10 +105,24 @@ myOwn.UriSearchToObject = function UriSearchToObject(locationSearch){
         var eq = pair.indexOf('=');
         if(eq !== -1){
             var varName=pair.substr(0, eq);
-            addrParams[varName] = decodeURIComponent(pair.substr(eq+1));
+            var value = decodeURIComponent(pair.substr(eq+1));
+			var paramDef=myOwn.UriSearchToObjectParams[varName];
+			if(paramDef && paramDef.encoding=='JSON'){
+				value = JSON.parse(value);
+			}
+            addrParams[varName] = value;
         }
     });
     return addrParams;
+}
+
+myOwn.UriSearchToObjectParams={
+	ff               :{ encoding:'JSON' },
+	section          :{ showInMenu:true },
+	directUrl        :{ hide:true       },
+	selectedByDefault:{ hide:true       },
+	showParams       :{ hide:true       },
+	parents          :{ hide:true       },
 }
 
 myOwn.showPage = function showPage(pageDef){
@@ -125,7 +139,7 @@ myOwn.showPage = function showPage(pageDef){
         var menu = my.displayMainMenu(addrParams);
         var w=addrParams.w;
         if(!w && menu && menu.selectedItem){
-            addrParams = changing(addrParams, menu.selectedItem);
+            addrParams = changing(menu.selectedItem, addrParams);
             w=menu.selectedItem.menuType;
         }
         if(typeof my.wScreens[w] === 'function'){
@@ -155,10 +169,11 @@ myOwn.createForkeableButton = function createForkeableButton(menu, label){
     button.setForkeableHref = function setForkeableHref(menu){
         var href;
         if(!menu.w && menu.menuType){
-            href = 'menu?i=' + menu.parents.concat(menu.name).join(',');
-            if(menu.section){
-                href += '&section='+menu.section;
-            }
+			if(menu.directUrl){
+				href = 'menu?' + my.paramsToUriPart(changing({w:menu.menuType}, changing(menu,{menuType:null, name:null, label:null},changing.options({deletingValue:undefined}))));
+			}else{
+				href = 'menu?i=' + menu.parents.concat(menu.name).join(',')+my.paramsToUriPart(menu,true);
+			}
         }else{
             href = 'menu?' + my.paramsToUriPart(menu);
         }
@@ -184,12 +199,19 @@ function encodeMinimalURIComponent(text){
         .replace(/%/g, '%25');
 }
 
-myOwn.paramsToUriPart = function paramsToUriPart(params){
-    return likeAr(params).map(function(value, name){
-        if(value!=null){
-            return name+'='+encodeMinimalURIComponent(value);
-        }
-    }).join('&');
+myOwn.paramsToUriPart = function paramsToUriPart(params, inMenu){
+    var paramStr=likeAr(params).map(function(value, name){
+		var paramDef=myOwn.UriSearchToObjectParams[name] || {};
+		if((paramDef.showInMenu || !inMenu) && !paramDef.hide || (params.showParams && params.showParams.includes(name))){
+			if(value!=null){
+				if(paramDef.encoding=='JSON'){
+					value=JSON.stringify(value);
+				}
+				return name+'='+encodeMinimalURIComponent(value);
+			}
+		}
+    }).filter(function(expr){return expr;}).join('&');
+	return (inMenu && paramStr?'&':'')+paramStr;
 }
 
 myOwn.replaceAddrParams = function replaceAddrParams(params){
