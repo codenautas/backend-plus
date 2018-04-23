@@ -427,7 +427,7 @@ myOwn.ActionColumnGrid = function ActionColumnGrid(opts){
 myOwn.ActionColumnGrid.prototype = Object.create(myOwn.ColumnGrid.prototype);
 
 myOwn.ActionColumnGrid.prototype.th = function th(){
-    return html.th({class:'th-action'}, this.actions);
+    return html.th({class:'grid-th-actions'}, this.actions);
 };
 
 myOwn.ActionColumnGrid.prototype.thFilter = function thFilter(depot){
@@ -639,7 +639,7 @@ myOwn.DetailColumnGrid = function DetailColumnGrid(opts){
 myOwn.DetailColumnGrid.prototype = Object.create(myOwn.ColumnGrid.prototype);
 
 myOwn.DetailColumnGrid.prototype.th = function th(){
-    var th=html.th({"my-defname":this.detailTableDef.table, title:this.detailTableDef.label},this.detailTableDef.abr);
+    var th=html.th({class:'grid-th-details', "my-defname":this.detailTableDef.table, title:this.detailTableDef.label},this.detailTableDef.abr);
     return th;
 };
 
@@ -1280,7 +1280,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     }
     grid.dom.headInfo = html.th({class: 'head-info', colspan:grid.columns.length-1, "is-processing":"1"}).create();
     createInfoColumnStructure(grid.dom.headInfo);
-    grid.dom.footInfo = html.td({colspan:grid.columns.length, "is-processing":"1"}).create();
+    grid.dom.footInfo = html.th({colspan:grid.columns.length, "is-processing":"1"}).create();
     createInfoColumnStructure(grid.dom.footInfo);
     grid.actualName = grid.def.name + (grid.connector.fixedFields.length ? '-' + JSON4all.stringify(grid.connector.fixedFields.map(function(pair){ return pair.value; })) : '')
     if(grid.vertical){

@@ -19,6 +19,8 @@ border-table()
   border-table()
 
 nowrap()
+  @media print
+    white-space unset
   white-space pre
   overflow hidden
   max-width 300px
@@ -258,3 +260,18 @@ td[my-mandatory=pk]:empty
 
 th.th-agg
   background-color #DDD
+  
+@media print
+  .grid-th-actions
+    display none
+  .grid-th-details
+    display none
+  .my-grid th button
+    display none
+  table
+    max-width 100%
+    font-size 80%
+  .img-lupa
+    display none
+  .my-grid th
+    font-size 80%
