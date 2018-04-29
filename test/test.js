@@ -57,37 +57,12 @@ describe('backend-plus', function describeBackendPlus(){
                     .get(opt.base+'/login')
                     .expect(200, /username.*password/, done);
                 });
-                //it('must redirect to root if not logged in', function(done){
-                //    agent
-                //    .get(opt.base+'/this/and/this/algo.txt')
-                //    .expect('location', opt.base+'/login')
-                //    .expect(302, /Redirecting to \/((doble\/)?base\/)?login/, done);
-                //});
-                //if(!opt.root){
-                //    it('must fail outside the base', function(done){
-                //        agent
-                //        .get('/algo.txt')
-                //        .expect(function(rec){
-                //            if(rec.status!=404){
-                //                console.log('***************')
-                //                console.log(rec);
-                //            }
-                //        })
-                //        .expect(404, done);
-                //    });
-                //};
-            //    var agent;
-            //    before(function (done) {
-            //        createServerGetAgent({baseUrl:opt.base, loginPageServe:simpleLoginPageServe, userFieldName:'userFieldName'}).then(function(_agent){ 
-            //            agent=_agent; 
-            //        }).then(done,done);
-            //    });
                 it('must receive login parameters', function(done){
                     agent
                     .post(opt.base+'/login')
                     .type('form')
                     .send({username:'prueba', password:'prueba1'})
-                    .expect(302, /Redirecting to \.\/menu/, done);
+                    .expect(302, /Redirecting to .*\/echo/, done);
                 });
                 it('must serve data if logged', function(done){
                     agent
