@@ -116,13 +116,17 @@ myOwn.UriSearchToObject = function UriSearchToObject(locationSearch){
     return addrParams;
 }
 
+function noChange(x){ return x; }
+
 myOwn.UriSearchToObjectParams={
-	ff               :{ encoding:'JSON' },
-	section          :{ showInMenu:true },
+	i                :{ showInMenu:true , encode:(value,menu)=> (menu.parents||[]).concat(menu.name).join(',') },
+	ff               :{                   encode:x=>JSON.stringify(x) },
+	section          :{ showInMenu:true , encode:noChange             },
 	directUrl        :{ hide:true       },
 	selectedByDefault:{ hide:true       },
 	showParams       :{ hide:true       },
-	parents          :{ hide:true       },
+    parents          :{ hide:true       },
+    button           :{ hide:true       }
 }
 
 myOwn.showPage = function showPage(pageDef){
@@ -168,11 +172,11 @@ myOwn.createForkeableButton = function createForkeableButton(menu, label){
     var button=html.a({"class": menu["class"]||"menu-item", "menu-type":menu.menuType||menu.w, "menu-name":menu.name||'noname'}, label || menu.label || menu.name).create();
     button.setForkeableHref = function setForkeableHref(menu){
         var href;
-        if(!menu.w && menu.menuType || menu.directUrl && menu.i){
+        if(!menu.w && menu.menuType){
 			if(menu.directUrl){
-				href = 'menu?' + my.paramsToUriPart(changing({w:menu.menuType}, changing(menu,{menuType:null, name:null, label:null, button:null, i:null},changing.options({deletingValue:undefined}))));
+				href = 'menu?' + my.paramsToUriPart(changing({w:menu.menuType}, changing(menu,{menuType:null, label:null, button:null},changing.options({deletingValue:undefined}))));
 			}else{
-				href = 'menu?i=' + menu.parents.concat(menu.name).join(',')+my.paramsToUriPart(menu,true);
+				href = 'menu?' + my.paramsToUriPart(changing({i:menu.name},menu),true);
 			}
         }else{
             href = 'menu?' + my.paramsToUriPart(menu);
@@ -201,17 +205,15 @@ function encodeMinimalURIComponent(text){
 
 myOwn.paramsToUriPart = function paramsToUriPart(params, inMenu){
     var paramStr=likeAr(params).map(function(value, name){
-		var paramDef=myOwn.UriSearchToObjectParams[name] || {};
+		var paramDef=myOwn.UriSearchToObjectParams[name] || { encode:function(x){return x} };
 		if((paramDef.showInMenu || !inMenu) && !paramDef.hide || (params.showParams && params.showParams.includes(name))){
 			if(value!=null){
-				if(paramDef.encoding=='JSON'){
-					value=JSON.stringify(value);
-				}
+                value=paramDef.encode(value, params);
 				return name+'='+encodeMinimalURIComponent(value);
 			}
 		}
     }).filter(function(expr){return expr;}).join('&');
-	return (inMenu && paramStr?'&':'')+paramStr;
+	return paramStr;
 }
 
 myOwn.replaceAddrParams = function replaceAddrParams(params){
