@@ -168,9 +168,9 @@ myOwn.createForkeableButton = function createForkeableButton(menu, label){
     var button=html.a({"class": menu["class"]||"menu-item", "menu-type":menu.menuType||menu.w, "menu-name":menu.name||'noname'}, label || menu.label || menu.name).create();
     button.setForkeableHref = function setForkeableHref(menu){
         var href;
-        if(!menu.w && menu.menuType){
+        if(!menu.w && menu.menuType || menu.directUrl && menu.i){
 			if(menu.directUrl){
-				href = 'menu?' + my.paramsToUriPart(changing({w:menu.menuType}, changing(menu,{menuType:null, name:null, label:null},changing.options({deletingValue:undefined}))));
+				href = 'menu?' + my.paramsToUriPart(changing({w:menu.menuType}, changing(menu,{menuType:null, name:null, label:null, button:null, i:null},changing.options({deletingValue:undefined}))));
 			}else{
 				href = 'menu?i=' + menu.parents.concat(menu.name).join(',')+my.paramsToUriPart(menu,true);
 			}

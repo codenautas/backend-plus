@@ -180,7 +180,9 @@ myOwn.TableConnector = function(context, opts){
     connector.fixedFields = connector.opts.fixedFields || [];
     connector.fixedField = {};
     connector.fixedFields.forEach(function(pair){
-        connector.fixedField[pair.fieldName] = pair.value;
+        if(!pair.range){
+            connector.fixedField[pair.fieldName] = pair.value;
+        }
     });
 };
 
@@ -675,7 +677,11 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
             tdGrid.colSpan = tr.cells.length-td.cellIndex;
             tdGrid.style.maxWidth='inherit';
             var fixedFields = detailTableDef.fields.map(function(pair){
-                return {fieldName: pair.target, value:depot.row[pair.source]};
+                var fieldCondition={fieldName: pair.target, value:depot.row[pair.source]}
+                if(pair.range){
+                    fieldCondition.range=pair.range;
+                }
+                return fieldCondition;
             });
             if(!detailControl.table){
                 grid.my.tableGrid(detailTableDef.table, tdGrid, {fixedFields: fixedFields}).waitForReady(function(g){
@@ -1350,8 +1356,10 @@ myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElem
     }
     var depotForInsert = grid.createDepotFromRow({}, 'new');
     grid.connector.fixedFields.forEach(function(pair){
-        depotForInsert.row[pair.fieldName] = pair.value;
-        depotForInsert.rowPendingForUpdate[pair.fieldName] = pair.value;
+        if(!pair.range){
+            depotForInsert.row[pair.fieldName] = pair.value;
+            depotForInsert.rowPendingForUpdate[pair.fieldName] = pair.value;
+        }
     });
     //TODO: mejorar la posición dentro del splice o concluir que no sirve el splice
     grid.depots.splice(Math.min(grid.depots.length,Math.max(0,position)),0,depotForInsert);
@@ -1432,11 +1440,18 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 return Promise.resolve();
             }
             if(depot.status==='new'){
-               if(grid.def.fields.some(function(fieldDef){
+                var cual=grid.def.fields.filter(function(fieldDef){
                     return (fieldDef.nullable!==true && fieldDef.isPk || fieldDef.nullable===false) 
                         && depot.row[fieldDef.name]==null 
                         && (grid.connector.fixedFields.find(function(pair){
-                                return pair.fieldName===fieldDef.name
+                                return !pair.range && pair.fieldName===fieldDef.name
+                            })||{}).value == null
+                })
+                if(grid.def.fields.some(function(fieldDef){
+                    return (fieldDef.nullable!==true && fieldDef.isPk || fieldDef.nullable===false) 
+                        && depot.row[fieldDef.name]==null 
+                        && (grid.connector.fixedFields.find(function(pair){
+                                return !pair.range && pair.fieldName===fieldDef.name
                             })||{}).value == null
                 })){
                     return Promise.resolve(); // no grabo todavía
@@ -1541,7 +1556,6 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             tr.addEventListener('focusout', function(event){
                 if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
                     depot.connector.deleteEnter(depot).then(function(result){
-                        console.log("result",result);
                     });
                     if(Object.keys(depot.rowPendingForUpdate).length){
                         saveRow(depot);
@@ -1551,7 +1565,6 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             tr.addEventListener('focusin',function(event){
                 if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
                     return depot.connector.enterRecord(depot).then(function(result){
-                        console.log("result",result);
                     });
                 }
             });
