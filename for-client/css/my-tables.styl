@@ -92,9 +92,6 @@ nowrap()
 .table-button img
   height 16px
 
-.autoFilter
-  width 30px
-  
 [has-filter='1'] 
   [when-filter=no] 
     display none
@@ -106,12 +103,6 @@ nowrap()
     display none
   [when-filter=no] 
     display inherit
-
-.filter-span
-  display inline-block
-  background-color #CEF
-  min-height 20px
-  min-width 20px
 
 .filter-line
   th
@@ -145,10 +136,11 @@ nowrap()
 .my-grid td.autoFilter{
   nowrap()
   white-space nowrap
-}
-
-td.autoFilter button{
-  display inline-block
+  padding-left 16px
+  background padding-box #CEF no-repeat
+  background-size 16px
+  min-height 20px
+  min-width 20px
 }
 
 .number-decimals

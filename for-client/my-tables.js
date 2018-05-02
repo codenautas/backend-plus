@@ -474,14 +474,17 @@ myOwn.DataColumnGrid = function DataColumnGrid(opts){
 
 myOwn.DataColumnGrid.prototype = Object.create(myOwn.ColumnGrid.prototype);
 
-myOwn.DataColumnGrid.prototype.cellAttributes = function cellAttributes(specificAttributes){
+myOwn.DataColumnGrid.prototype.cellAttributes = function cellAttributes(specificAttributes,opts){
     var fieldDef = this.fieldDef;
     var grid=this.grid;
+    var opts=opts||{};
     var attr=changing({"my-colname":fieldDef.name},specificAttributes);
-    if(fieldDef.nullable!==true && fieldDef.isPk){
-        attr["my-mandatory"]="pk";
-    }else if(fieldDef.nullable===false){
-        attr["my-mandatory"]="normal";
+    if(!opts.skipMandatory){
+        if(fieldDef.nullable!==true && fieldDef.isPk){
+            attr["my-mandatory"]="pk";
+        }else if(fieldDef.nullable===false){
+            attr["my-mandatory"]="normal";
+        }
     }
     if(grid.connector.fixedField[fieldDef.name]){
         attr["inherited-pk-column"]="yes";
@@ -535,9 +538,10 @@ myOwn.DataColumnGrid.prototype.thFilter = function thFilter(depot, iColumn){
     var fieldName=fieldDef.name;
     depot.rowSymbols[fieldDef.name]=depot.rowSymbols[fieldDef.name]||'~';
     var filterImage=my.path.img+my.comparator.traductor[depot.rowSymbols[fieldDef.name]]+'.png';
-    var imgFilter=html.img({src:filterImage}); 
-    var symbolFilter=html.button({"class":'table-button', tabindex:-1},imgFilter).create();
-    var elementFilter=html.span({"class":"filter-span", "typed-controls-direct-input":true}).create();
+    var th=html.td(this.cellAttributes({class:"autoFilter", "typed-controls-direct-input":true},{skipMandatory:true})).create();
+    var symbolFilter=th;
+    symbolFilter.style.backgroundImage='url('+filterImage+')';
+    var elementFilter=th;
     depot.rowControls[fieldName]=elementFilter;
     TypedControls.adaptElement(elementFilter,fieldDef);
     if(fieldName in depot.row){
@@ -546,25 +550,25 @@ myOwn.DataColumnGrid.prototype.thFilter = function thFilter(depot, iColumn){
     elementFilter.addEventListener('update',function(){
         depot.row[fieldDef.name]=this.getTypedValue();
     });
-    var th=html.td(this.cellAttributes({class:"autoFilter"}),[symbolFilter,elementFilter]).create();
-    elementFilter.width=grid.sizesForFilters[iColumn]-myOwn.comparatorWidth-5;
-    elementFilter.style.width=elementFilter.width.toString()+'px';
-    symbolFilter.addEventListener('click',function(){
-        miniMenuPromise([
-            {value:'=',     img:my.path.img+'igual.png'      ,label:myOwn.messages.equalTo},
-            {value:'~',     img:my.path.img+'parecido.png'   ,label:myOwn.messages.similarTo},
-            {value:'!~',    img:my.path.img+'not-like.png'   ,label:myOwn.messages.distinctFrom},
-            {value:'\u2205',img:my.path.img+'vacio.png'      ,label:myOwn.messages.empty},
-            {value:'>',     img:my.path.img+'mayor.png'      ,label:myOwn.messages.greaterThan},
-            {value:'>=',    img:my.path.img+'mayor-igual.png',label:myOwn.messages.greaterEqualThan},
-            {value:'<',     img:my.path.img+'menor.png'      ,label:myOwn.messages.lessThan},
-            {value:'<=',    img:my.path.img+'menor-igual.png',label:myOwn.messages.lessEqualThan},
-        ],{underElement:symbolFilter}).then(function(result){
-            filterImage=my.path.img+my.comparator.traductor[result]+'.png';
-           // imgFilter.src=filterImage;
-            symbolFilter.childNodes[0].src=filterImage;
-            depot.rowSymbols[fieldDef.name]=result;
-        });
+    symbolFilter.addEventListener('click',function(event){
+        var rect=my.getRect(this);
+        if(event.pageX>=rect.left && event.pageX<=rect.left + myOwn.comparatorWidth){
+            miniMenuPromise([
+                {value:'=',     img:my.path.img+'igual.png'      ,label:myOwn.messages.equalTo},
+                {value:'~',     img:my.path.img+'parecido.png'   ,label:myOwn.messages.similarTo},
+                {value:'!~',    img:my.path.img+'not-like.png'   ,label:myOwn.messages.distinctFrom},
+                {value:'\u2205',img:my.path.img+'vacio.png'      ,label:myOwn.messages.empty},
+                {value:'>',     img:my.path.img+'mayor.png'      ,label:myOwn.messages.greaterThan},
+                {value:'>=',    img:my.path.img+'mayor-igual.png',label:myOwn.messages.greaterEqualThan},
+                {value:'<',     img:my.path.img+'menor.png'      ,label:myOwn.messages.lessThan},
+                {value:'<=',    img:my.path.img+'menor-igual.png',label:myOwn.messages.lessEqualThan},
+            ],{underElement:symbolFilter}).then(function(result){
+                filterImage=my.path.img+my.comparator.traductor[result]+'.png';
+                symbolFilter.style.backgroundImage='url('+filterImage+')';
+                depot.rowSymbols[fieldDef.name]=result;
+            });
+            event.preventDefault();
+        }
     });
     return th;
 };
