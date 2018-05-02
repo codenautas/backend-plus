@@ -422,7 +422,7 @@ myOwn.testKeepAlive = function testKeepAlive(){
     return my.ajaxPromise({
         parameters:[],
         method:'post',
-        action:'keep-alive',
+        action:'keep-alive.json',
         encoding:'plain'
     },{},{visiblyLogErrors:false}).then(function(){
         if(window.updateOnlineStatus){
