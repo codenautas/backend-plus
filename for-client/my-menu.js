@@ -107,8 +107,8 @@ myOwn.UriSearchToObject = function UriSearchToObject(locationSearch){
             var varName=pair.substr(0, eq);
             var value = decodeURIComponent(pair.substr(eq+1));
 			var paramDef=myOwn.UriSearchToObjectParams[varName];
-			if(paramDef && paramDef.encoding=='JSON'){
-				value = JSON.parse(value);
+			if(paramDef && paramDef.decode){
+				value = paramDef.decode(value);
 			}
             addrParams[varName] = value;
         }
@@ -120,8 +120,8 @@ function noChange(x){ return x; }
 
 myOwn.UriSearchToObjectParams={
 	i                :{ showInMenu:true , encode:(value,menu)=> (menu.parents||[]).concat(menu.name).join(',') },
-	ff               :{                   encode:x=>JSON.stringify(x) },
-	section          :{ showInMenu:true , encode:noChange             },
+	ff               :{                   encode:x=>JSON.stringify(x) , decode:x=>JSON.parse(x)  },
+	section          :{ showInMenu:true , encode:noChange             , decode:noChange          },
 	directUrl        :{ hide:true       },
 	selectedByDefault:{ hide:true       },
 	showParams       :{ hide:true       },
