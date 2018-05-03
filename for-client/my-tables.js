@@ -996,6 +996,9 @@ myOwn.dialogDownload = function dialogDownload(grid){
                         var excelValue=typeStore.typerFrom(fieldDef).toExcelValue(value);
                         var valueType=typeStore.typerFrom(fieldDef).toExcelType(value);
                         var cell={t:valueType,v:excelValue};
+                        if(fieldDef.typeName == 'interval'){
+                            cell.z='[h]:mm:ss'
+                        }
                         if(fieldDef.isPk){
                             cell.s={font:{bold:true}};
                         }else if(!fieldDef.allow || !fieldDef.allow.update){
