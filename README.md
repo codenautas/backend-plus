@@ -154,22 +154,29 @@ Process definition example:
 
 entry                        | usage
 -----------------------------|---------------
+server                       |
+.module-store                |
 install                      | (see Spanish)
-  dump                       | (see Spanish)
-    db.user                  | (see Spanish)
-    scripts.post-adapt       | (see Spanish)
+.dump                        | (see Spanish)
+..db.owner               | (see Spanish)
+..scripts.post-adapt     | (see Spanish)
+..scripts.parts-order    | (see Spanish)
 devel                        | (see Spanish)
-  delay                      | (see Spanish)
-  cache-content              | (see Spanish)
-  forceShowAsEditable        | (see Spanish)
+.delay                     | (see Spanish)
+.cache-content             | (see Spanish)
+.forceShowAsEditable       | (see Spanish)
 login                        | (see Spanish)
-  plus                       | (see Spanish)
-    allowHttpLogin           | (see Spanish)
-    store                    | (see Spanish)
-      module-name            | (see Spanish)
+.plus                      | (see Spanish)
+..allowHttpLogin         | (see Spanish)
 log                          | (see Spanish)
-  req                        | (see Spanish)
-  session                    | (see Spanish)
+.req                       | (see Spanish)
+.session                   | (see Spanish)
+client-setup                 | (see Spanish)
+.cursors                   | (see Spanish)
+.skin                      | (see Spanish)
+.menu                      | (see Spanish)
+.title                     | (see Spanish)
+.lang                      | (see Spanish)
 
 ```yaml
 install:

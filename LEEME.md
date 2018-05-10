@@ -256,74 +256,74 @@ Process definition example:
 entrada                      | uso
 -----------------------------|---------------
 server                       | opciones a nivel del servidor
-  .module-store              | nombre del módulo que guarda sesiones: file, memory (en modo devel guarda en disco cada tanto)
+.module-store                | nombre del módulo que guarda sesiones: file, memory (en modo devel guarda en disco cada tanto)
 install                      | opciones de instalación
-  .dump                      | opciones del dump de instalación
-    ..db.owner               | usuario dueño de la base de datos
-    ..scripts.post-adapt     | lista de nombres de archivos para adaptar la estructura de la base de datos
-    ..scripts.parts-order    | orden de las partes en que se genera el dump-db
+.dump                        | opciones del dump de instalación
+..db.owner                   | usuario dueño de la base de datos
+..scripts.post-adapt         | lista de nombres de archivos para adaptar la estructura de la base de datos
+..scripts.parts-order        | orden de las partes en que se genera el dump-db
 devel                        | conjunto de opciones para el ambiente de desarrollo y testing
-  .delay                     | tiempo de espera promedio adicional (para simular un servidor lento)
-  .cache-content             | hace caché de imágenes y archivos en general (si no está en modo "devel" siempre hace caché, no se puede apagar el caché fuera del modo devel)
-  .forceShowAsEditable       | fuerza mostrar las grillas como grillas editables para mostrar cómo el servidor impide la modificación
+.delay                       | tiempo de espera promedio adicional (para simular un servidor lento)
+.cache-content               | hace caché de imágenes y archivos en general (si no está en modo "devel" siempre hace caché, no se puede apagar el caché fuera del modo devel)
+.forceShowAsEditable         | fuerza mostrar las grillas como grillas editables para mostrar cómo el servidor impide la modificación
 login                        | opciones de login
-  .plus                      | opciones a pasar al módulo login-plus
-    ..allowHttpLogin         | si permite loguerse desde conexiones HTTP
-  .table                     | nombre de la tabla donde validar usuarios
-  .schema                    | esquema donde se encuentra la tabla de usuarios
-  .userFieldName             | nombre del campo que contiene el usuario
-  .passFieldName             | nombre del campo que contiene el md5(password+usuario)
-  .rolFieldName              | nombre del campo donde está el rol del usuario 
-  .infoFieldList             | array con los nombres de campo que van a al campo user
-  .activeClausule            | expresión booleana SQL que determina si el usuario está activo
-  .messages                  | mensajes a mostrar en la pantalla de login
-  .keepAlive                 | máxima duración logueado si solo se reciben mensajes keep-alive
+.plus                        | opciones a pasar al módulo login-plus
+..allowHttpLogin             | si permite loguerse desde conexiones HTTP
+.table                       | nombre de la tabla donde validar usuarios
+.schema                      | esquema donde se encuentra la tabla de usuarios
+.userFieldName               | nombre del campo que contiene el usuario
+.passFieldName               | nombre del campo que contiene el md5(password+usuario)
+.rolFieldName                | nombre del campo donde está el rol del usuario 
+.infoFieldList               | array con los nombres de campo que van a al campo user
+.activeClausule              | expresión booleana SQL que determina si el usuario está activo
+.messages                    | mensajes a mostrar en la pantalla de login
+.keepAlive                   | máxima duración logueado si solo se reciben mensajes keep-alive
 log                          | log por consola
-  .req                       | muestra cada requerimiento
-  .session                   | muestra info de las sesiones
+.req                         | muestra cada requerimiento
+.session                     | muestra info de las sesiones
 client-setup                 | opciones para el front-end
-  .cursors                   | (en preparación) dice si usa curores para mostrar dónde (con el cursor en qué registro) está cada usuario
-  .skin                      | nombre del skin
-  .menu                      | si usa los menúes integrados
-  .title                     | título de la pantalla
-  .lang                      | idioma (y locale) del frontend, por ahora "es" o "en"
+.cursors                     | (en preparación) dice si usa curores para mostrar dónde (con el cursor en qué registro) está cada usuario
+.skin                        | nombre del skin
+.menu                        | si usa los menúes integrados
+.title                       | título de la pantalla
+.lang                        | idioma (y locale) del frontend, por ahora "es" o "en"
 db                           | opciones de la base de datos
-  .motor                     | por ahora solo 'postgresql'
-  .database                  |
-  .user                      |
-  .password                  |
-  .port                      | 
-  .schema                    | esquema principal donde crear los objetos nuevos
-  .search_path               | array de nombres de esquemas, si no se especifica el search_path = [schema]  
-  .log-last-error            | true si se desea que se deje en un archivo la última sentencia SQL que contuvo error (solo funciona si config.devel está especficiada)
+.motor                       | por ahora solo 'postgresql'
+.database                    |
+.user                        |
+.password                    |
+.port                        | 
+.schema                      | esquema principal donde crear los objetos nuevos
+.search_path                 | array de nombres de esquemas, si no se especifica el search_path = [schema]  
+.log-last-error              | true si se desea que se deje en un archivo la última sentencia SQL que contuvo error (solo funciona si config.devel está especficiada)
 
 
 <!--lang:en--]
 entry                        | usage
 -----------------------------|---------------
 server                       |
-  .module-store              |
+.module-store                |
 install                      | (see Spanish)
-  .dump                      | (see Spanish)
-    ..db.owner               | (see Spanish)
-    ..scripts.post-adapt     | (see Spanish)
-    ..scripts.parts-order    | (see Spanish)
+.dump                        | (see Spanish)
+..db.owner               | (see Spanish)
+..scripts.post-adapt     | (see Spanish)
+..scripts.parts-order    | (see Spanish)
 devel                        | (see Spanish)
-  .delay                     | (see Spanish)
-  .cache-content             | (see Spanish)
-  .forceShowAsEditable       | (see Spanish)
+.delay                     | (see Spanish)
+.cache-content             | (see Spanish)
+.forceShowAsEditable       | (see Spanish)
 login                        | (see Spanish) 
-  .plus                      | (see Spanish) 
-    ..allowHttpLogin         | (see Spanish) 
+.plus                      | (see Spanish) 
+..allowHttpLogin         | (see Spanish) 
 log                          | (see Spanish) 
-  .req                       | (see Spanish) 
-  .session                   | (see Spanish) 
+.req                       | (see Spanish) 
+.session                   | (see Spanish) 
 client-setup                 | (see Spanish) 
-  .cursors                   | (see Spanish) 
-  .skin                      | (see Spanish) 
-  .menu                      | (see Spanish) 
-  .title                     | (see Spanish) 
-  .lang                      | (see Spanish) 
+.cursors                   | (see Spanish) 
+.skin                      | (see Spanish) 
+.menu                      | (see Spanish) 
+.title                     | (see Spanish) 
+.lang                      | (see Spanish) 
 
 [!--lang:*-->  
 ```yaml  
