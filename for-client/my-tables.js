@@ -45,6 +45,7 @@ myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     empty:'empty',
     equalTo:'equal to',
     exhibitedColumns:'Exhibited Columns',
+    filteredCompleteTable:'filtered complete table',
     hiddenColumns:'Hidden columns',
     confirmDeleteAll: "Do you want to delete these records?",
     deleteAllRecords: "delete all records",
@@ -97,6 +98,7 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     anotherUserChangedTheRow: "Otro usuario modificó el registro",
     equalTo:'igual a',
     exhibitedColumns:'Columnas que se muestran',
+    filteredCompleteTable:'tabla completa y filtrada',
     hiddenColumns:'Columnas ocultas',
     confirmDeleteAll: "¿Desea borrar estos registros?",
     deleteAllRecords: "borrar todos los registros",
@@ -902,6 +904,17 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
             });
         }});
     }
+    var urlFilteredCompleteTable='menu?w=table&table='+grid.def.name+'&fc='+JSON.stringify(
+        grid.connector.fixedFields.map(function(ff){
+            return {column:ff.fieldName, operator:'=', value:ff.value};
+        })
+    );
+    menuOptions.push({
+        img:my.path.img+'filtered-complete-table.png', 
+        label:my.messages.filteredCompleteTable, 
+        href:urlFilteredCompleteTable,
+        showPage:my.showPage,
+    });
     button.onclick=function(){
         miniMenuPromise(menuOptions,{
             underElement:button,

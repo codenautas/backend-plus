@@ -31,9 +31,16 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
 myOwn.wScreens.table = function(addrParams){
     setTimeout(function(){
         var layout = document.getElementById('main_layout');
-		var opts={};
+		var opts={tableDef:{}};
 		if(addrParams.ff){
-			opts.fixedFields=likeAr(addrParams.ff).map(function(value, key){ return {fieldName:key, value:value}; }).array();
+            if(addrParams.ff instanceof Array){
+                opts.fixedFields=addrParams.ff;
+            }else{
+                opts.fixedFields=likeAr(addrParams.ff).map(function(value, key){ return {fieldName:key, value:value}; }).array();
+            }
+		}
+		if(addrParams.fc){
+            opts.tableDef.filterColumns=addrParams.fc;
 		}
         my.tableGrid(addrParams.table||addrParams.name,layout, opts);
     },10);
@@ -120,6 +127,7 @@ function noChange(x){ return x; }
 
 myOwn.UriSearchToObjectParams={
 	i                :{ showInMenu:true , encode:(value,menu)=> (menu.parents||[]).concat(menu.name).join(',') },
+	fc               :{                   encode:x=>JSON.stringify(x) , decode:x=>JSON.parse(x)  },
 	ff               :{                   encode:x=>JSON.stringify(x) , decode:x=>JSON.parse(x)  },
 	section          :{ showInMenu:true , encode:noChange             , decode:noChange          },
 	directUrl        :{ hide:true       },
