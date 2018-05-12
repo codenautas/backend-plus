@@ -321,6 +321,18 @@ myOwn.TableGrid.prototype.hideColumnsViaCss = function hideColumnsViaCss(){
 }
 
 myOwn.TableGrid.prototype.displayPreLoadMessage = function displayPreLoadMessage(){
+    var div=html.div({class:'div-loading-over'}).create();
+    var rect=my.getRect(this.dom.main);
+    div.style.left  =rect.left  +'px';
+    div.style.top   =rect.top   +'px';
+    div.style.width =rect.width +'px';
+    div.style.heigth=rect.heigth+'px';
+    this.dom.main.appendChild(div);
+    div.textContent = my.messages.loading+'...';
+};
+
+myOwn.TableGrid.prototype.displayLoadingMessage = function displayLoadingMessage(){
+    this.dom.main.style.background='#EEE';
     this.dom.main.textContent = my.messages.loading+'...';
 };
 
@@ -380,6 +392,7 @@ myOwn.TableGrid.prototype.prepareAndDisplayGrid = function prepareAndDisplayGrid
     var structureRequest = grid.connector.getStructure().then(function(tableDef){
         grid.def = tableDef;
         grid.vertical = tableDef.layout.vertical;
+        grid.displayLoadingMessage();
         return grid.prepareGrid();
     });
     return grid.connector.getData().then(function(rows){
@@ -391,6 +404,7 @@ myOwn.TableGrid.prototype.prepareAndDisplayGrid = function prepareAndDisplayGrid
                 grid.createRowInsertElements();
             }
             grid.refreshAggregates();
+            grid.dom.main.style.background=null;
             return grid;
         });
     }).catch(function(err){
