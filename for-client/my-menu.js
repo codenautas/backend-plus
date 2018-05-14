@@ -42,6 +42,9 @@ myOwn.wScreens.table = function(addrParams){
 		if(addrParams.fc){
             opts.tableDef.filterColumns=addrParams.fc;
 		}
+		if(addrParams.pf){
+            opts.parameterFunctions=addrParams.pf;
+		}
         my.tableGrid(addrParams.table||addrParams.name,layout, opts);
     },10);
 }
@@ -129,6 +132,7 @@ myOwn.UriSearchToObjectParams={
 	i                :{ showInMenu:true , encode:(value,menu)=> (menu.parents||[]).concat(menu.name).join(',') },
 	fc               :{                   encode:x=>JSON.stringify(x) , decode:x=>JSON.parse(x)  },
 	ff               :{                   encode:x=>JSON.stringify(x) , decode:x=>JSON.parse(x)  },
+	pf               :{                   encode:x=>JSON.stringify(x) , decode:x=>JSON.parse(x)  },
 	section          :{ showInMenu:true , encode:noChange             , decode:noChange          },
 	directUrl        :{ hide:true       },
 	selectedByDefault:{ hide:true       },

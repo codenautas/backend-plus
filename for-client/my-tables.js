@@ -186,6 +186,7 @@ myOwn.TableConnector = function(context, opts){
             connector.fixedField[pair.fieldName] = pair.value;
         }
     });
+    connector.parameterFunctions=connector.opts.parameterFunctions||{};
 };
 
 myOwn.TableConnector.prototype.getStructure = function getStructure(){
@@ -206,7 +207,8 @@ myOwn.TableConnector.prototype.getData = function getData(){
     }
     return connector.my.ajax.table.data({
         table:connector.tableName,
-        fixedFields:connector.fixedFields
+        fixedFields:connector.fixedFields,
+        paramfun:connector.parameterFunctions||{}
     }).then(function(rows){
         return connector.whenStructureReady.then(function(){
             connector.getElementToDisplayCount().textContent=rows.length+' '+my.messages.displaying+'...';
@@ -1427,6 +1429,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             depot.primaryKeyValues = grid.def.primaryKey.map(function(fieldName){ 
                 return depot.row[fieldName]; 
             });
+            depot.tr.setAttribute('pk-values',JSON.stringify(depot.primaryKeyValues))
         }
         grid.def.fields.forEach(function(fieldDef){
             var td = depot.rowControls[fieldDef.name];
