@@ -1934,7 +1934,7 @@ myOwn.autoSetupFunctions.push(function autoSetupMyTables(){
     TypedControls.Expanders.unshift({
         whenType: function(typedControl){ 
             var typeInfo = typedControl.controledType.typeInfo;
-            return typeInfo.references;
+            return typeInfo.references && !typeInfo.skipReferenceLookup;
         },
         dialogInput:function(typedControl){
             var typeInfo = typedControl.controledType.typeInfo;
