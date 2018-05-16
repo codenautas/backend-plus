@@ -49,7 +49,6 @@ ProceduresExamples = [
             answer.push(json4all.stringify(parameters.date));
             answer.push(json4all.parse(json4all.stringify(parameters.date)));
             answer.push(json4all.parse(json4all.stringify(parameters.date)).isRealDate);
-            console.log('xxxxxxxxx va');
             console.log(answer);
             return answer;
         }
