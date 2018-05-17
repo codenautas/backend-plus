@@ -4,6 +4,8 @@
 /*global miniMenuPromise, dialogPromise, alertPromise, confirmPromise, promptPromise, simpleFormPromise */
 /*global Blob, document, CustomEvent, URL  */
 
+var whenMergeOverride=true;
+
 var Big = require('big.js');
 var bestGlobals = require('best-globals');
 var html = require('js-to-html').html;
@@ -1546,9 +1548,16 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     changeIoStatus(depot,'write-read-conflict', 
                         fieldName, 
                         myOwn.messages.anotherUserChangedTheRow+'. \n'+
-                        myOwn.messages.oldValue+': '+source[fieldName]+' \n'+
-                        myOwn.messages.actualValueInDB+': '+retrievedRow[fieldName]
+                        myOwn.messages.oldValue+': '+source[fieldName]+(
+                            whenMergeOverride?'':'\n'+myOwn.messages.actualValueInDB+': '+retrievedRow[fieldName]
+                        )
+                        // TODO: sería bueno agregar algúna opción de UNDO!
                     );
+                    if(whenMergeOverride){
+                        depot.row[fieldName] = retrievedRow[fieldName];
+                        depot.rowControls[fieldName].setTypedValue(retrievedRow[fieldName]);
+                        delete depot.rowPendingForUpdate[fieldName];
+                    }
                 }
             }else{
                 if(!sameValue(retrievedRow[fieldName], depot.row[fieldName])){
