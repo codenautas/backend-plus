@@ -3,7 +3,7 @@
 var expect = require('expect.js');
 
 var tableDefAdapt = require('../lib/table-def-adapt.js').bind({
-    db:{quoteObject:function(name){ return '"'+name+'"';}}
+    db:{quoteIdent:function(name){ return '"'+name+'"';}}
 });
 
 describe("table-def-adapt", function(){
