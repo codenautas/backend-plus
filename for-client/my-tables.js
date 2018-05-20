@@ -1368,6 +1368,10 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     grid.dom.main.appendChild(grid.dom.table);
 };
 
+myOwn.specialDefaultValue={
+    current_date:function(){ return bestGlobals.date.today(); }
+}
+
 myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElements(aboveDepot){
     var grid = this;
     var position;
@@ -1397,6 +1401,19 @@ myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElem
         if(!pair.range){
             depotForInsert.row[pair.fieldName] = pair.value;
             depotForInsert.rowPendingForUpdate[pair.fieldName] = pair.value;
+        }
+    });
+    grid.def.fields.forEach(function(fieldDef){
+        var value=null;
+        if('defaultValue' in fieldDef){
+            value=fieldDef.defaultValue;
+        }
+        if('specialDefaultValue' in fieldDef){
+            value=my.specialDefaultValue[fieldDef.specialDefaultValue]();
+        }
+        if(value!==null){
+            depotForInsert.row[fieldDef.name] = value;
+            depotForInsert.rowPendingForUpdate[fieldDef.name] = value;
         }
     });
     //TODO: mejorar la posición dentro del splice o concluir que no sirve el splice
