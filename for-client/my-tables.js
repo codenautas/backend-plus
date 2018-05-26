@@ -1934,9 +1934,10 @@ myOwn.getReference = function getReference(referenceName, forceRefresh){
                 return row[reference.tableDef.primaryKey[0]];
             };
             reference.getLabels = function getLabels(row, includePk){
-                return (includePk || !reference.tableDef.nameFields.length?
-                        this.tableDef.primaryKey:[]
-                       ).concat(reference.tableDef.nameFields).map(function(fieldName){
+                var lookupFields = reference.tableDef.lookupFields || reference.tableDef.nameFields;
+                return (includePk || !lookupFields.length?
+                    this.tableDef.primaryKey:[]
+                ).concat(lookupFields).map(function(fieldName){
                     return row[fieldName];
                 });
             };
