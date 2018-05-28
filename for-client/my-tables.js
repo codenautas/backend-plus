@@ -43,7 +43,7 @@ myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     allGWillDelete: "({$t} records will be deleted)",
     allRecordsDeleted: "all records where deleted",
     allTWillDelete: "(ALL {$t} records will be deleted)",
-    anotherUserChangedTheRow: "Another user changed the row",
+    anotherUserChangedTheRow: "The data was changed in the database",
     empty:'empty',
     equalTo:'equal to',
     exhibitedColumns:'Exhibited Columns',
@@ -97,7 +97,7 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     allGWillDelete: "(se borrarán {$t} registros)",
     allRecordsDeleted: "todos los registros fueron borrados",
     allTWillDelete: "(se borrarán todos los registros: {$t} registros)",
-    anotherUserChangedTheRow: "Otro usuario modificó el registro",
+    anotherUserChangedTheRow: "Hubo un cambio en la base de datos para este registro",
     equalTo:'igual a',
     exhibitedColumns:'Columnas que se muestran',
     filteredCompleteTable:'tabla completa y filtrada',
@@ -654,6 +654,24 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
     }
     td.addEventListener('update', function(){
         grid.refreshAggregates();
+        if(grid.def.specialValidator){
+            var specialMandatories=myOwn.validators[grid.def.specialValidator].getMandatoryMap(depot.row);
+            Array.prototype.forEach.call(tr.cells, function(cell){
+                var fieldName = cell.getAttribute("my-colname");
+                var specialMandatory=specialMandatories[fieldName];
+                if(cell.hasAttribute("my-special")){
+                    if(!specialMandatory){
+                        cell.removeAttribute("my-special");
+                    }else if(cell.getAttribute("my-special")!=specialMandatory){
+                        cell.setAttribute("my-special", specialMandatory);
+                    }
+                }else{
+                    if(specialMandatory){
+                        cell.setAttribute("my-special", specialMandatory);
+                    }
+                }
+            });
+        }
     })
     return td;
 };
@@ -1496,20 +1514,16 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 return Promise.resolve();
             }
             if(depot.status==='new'){
-                var cual=grid.def.fields.filter(function(fieldDef){
-                    return (fieldDef.nullable!==true && fieldDef.isPk || fieldDef.nullable===false) 
+                var specialMandatories=grid.def.specialValidator?myOwn.validators[grid.def.specialValidator].getMandatoryMap(depot.row):{};
+                var mandatoryOmitted=function(fieldDef){
+                    return (specialMandatories[fieldDef.name] || fieldDef.nullable!==true && fieldDef.isPk || fieldDef.nullable===false) 
                         && depot.row[fieldDef.name]==null 
                         && (grid.connector.fixedFields.find(function(pair){
                                 return !pair.range && pair.fieldName===fieldDef.name
                             })||{}).value == null
-                })
-                if(grid.def.fields.some(function(fieldDef){
-                    return (fieldDef.nullable!==true && fieldDef.isPk || fieldDef.nullable===false) 
-                        && depot.row[fieldDef.name]==null 
-                        && (grid.connector.fixedFields.find(function(pair){
-                                return !pair.range && pair.fieldName===fieldDef.name
-                            })||{}).value == null
-                })){
+                }
+                //var cual=grid.def.fields.filter(mandatoryOmitted)
+                if(grid.def.fields.some(mandatoryOmitted)){
                     return Promise.resolve(); // no grabo todavía
                 };
             }
@@ -2042,3 +2056,5 @@ myOwn.TableGrid.prototype.captureKeys = function captureKeys() {
         }
     });
 };
+
+myOwn.validators={}
