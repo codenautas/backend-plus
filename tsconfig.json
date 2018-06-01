@@ -6,6 +6,7 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
+        "typeRoots" : ["node_modules/@types", "node_modules/types.d.ts/modules"],
         "noFallthroughCasesInSwitch": true,
         "allowJs": true,
         "strict": true,
