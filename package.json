@@ -6,6 +6,7 @@
   "license": "MIT",
   "repository": "codenautas/backend-plus",
   "main": "lib/backend-plus.js",
+  "types": "lib/backend-plus.d.ts",
   "files": [
     "lib",
     "for-client",

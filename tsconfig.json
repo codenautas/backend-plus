@@ -11,10 +11,6 @@
         "strict": true,
         "strictFunctionTypes": true,
         "strictNullChecks": true,
-        "checkJs": true,
-        "typeRoots" : [
-            "./node_modules/@types",
-            "./node_modules/types.d.ts/modules"
-        ]
+        "checkJs": true
     }
 }
