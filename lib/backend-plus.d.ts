@@ -127,5 +127,5 @@ export class AppBackend{
     procedureDefCompleter(procedureDef:ProcedureDef):ProcedureDef
     tableDefAdapt(tableDef:TableDefinition, context:Context):TableDefinition
     pushApp(dirname:string):void
-    dumpDbSchemaPartial(partialTableStructures:{[k:string]:TableDefinition}, opts?:{complete?:boolean, skipEnance?:boolean}):
+    dumpDbSchemaPartial(partialTableStructures:{[k:string]:TableDefinition}, opts?:{complete?:boolean, skipEnance?:boolean}):Promise<any> //agregar el tipo correcto
 }
