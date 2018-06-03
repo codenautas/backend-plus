@@ -1,8 +1,9 @@
+import * as net from "net";
 import * as express from "express";
 import * as pg from "pg-promise-strict";
 
+export type Server=net.Server;
 export interface ProcedureDef{
-
 }
 export type Context={
     be:AppBackend, user:object, session:object, 
@@ -15,6 +16,9 @@ export type ProcedureContext=Context & {
 export type Request = express.Request & {
     user:{[key:string]:any}
     session:{[key:string]:any}
+    connection:{
+        remoteAddress:string
+    }
 }
 export interface Response extends express.Response{}
 export interface Express extends express.Express{}

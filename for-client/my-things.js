@@ -658,13 +658,16 @@ myOwn.captureKeys = function captureKeys() {
         if(evento.which==39 && !evento.shiftKey  && !evento.ctrlKey  && !evento.altKey  && !evento.metaKey){ // KeyRight
             var info=tableInfo(this.activeElement);
             if(info.table){
-                if(evento.ctrlKey || info.td.textContent=='' || (previousKey == 39 && previousPosition===getCaretPosition(info.td))){
+                if(evento.ctrlKey || info.td.textContent=='' || (previousKey == 39 && getCaretPosition(info.td)==info.td.textContent.lengths)){
                     goRight();
                     previousPosition=false;
                 }else{
                     previousPosition=getCaretPosition(info.td)
                 }
             }
+        }
+        if((evento.which==40 || evento.which==38)  && !evento.shiftKey  && !evento.ctrlKey  && !evento.altKey  && !evento.metaKey){ // KeyDown, KeyUp
+            var info=tableInfo(this.activeElement);
         }
         if((evento.which==40 || evento.which==38)  && !evento.shiftKey  && !evento.ctrlKey  && !evento.altKey  && !evento.metaKey){ // KeyDown, KeyUp
             var info=tableInfo(this.activeElement);
