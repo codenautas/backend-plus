@@ -594,30 +594,29 @@ function tableInfo(element){
     return info;
 }
 
-function getCaretPosition(editableDiv) {
-  // https://stackoverflow.com/questions/3972014/get-caret-position-in-contenteditable-div
-  var caretPos = 0,
-    sel, range;
-  if (window.getSelection) {
-    sel = window.getSelection();
-    if (sel.rangeCount) {
-      range = sel.getRangeAt(0);
-      if (editableDiv.contains(range.commonAncestorContainer)) {
-        caretPos = range.endOffset;
-      }
+function getCaretPosition(element) {
+    // https://stackoverflow.com/questions/4811822/get-a-ranges-start-and-end-offsets-relative-to-its-parent-container/4812022#4812022
+    var caretOffset = 0;
+    var doc = element.ownerDocument || element.document;
+    var win = doc.defaultView || doc.parentWindow;
+    var sel;
+    if (typeof win.getSelection != "undefined") {
+        sel = win.getSelection();
+        if (sel.rangeCount > 0) {
+            var range = win.getSelection().getRangeAt(0);
+            var preCaretRange = range.cloneRange();
+            preCaretRange.selectNodeContents(element);
+            preCaretRange.setEnd(range.endContainer, range.endOffset);
+            caretOffset = preCaretRange.toString().length;
+        }
+    } else if ( (sel = doc.selection) && sel.type != "Control") {
+        var textRange = sel.createRange();
+        var preCaretTextRange = doc.body.createTextRange();
+        preCaretTextRange.moveToElementText(element);
+        preCaretTextRange.setEndPoint("EndToEnd", textRange);
+        caretOffset = preCaretTextRange.text.length;
     }
-  } else if (document.selection && document.selection.createRange) {
-    range = document.selection.createRange();
-    if (range.parentElement() == editableDiv) {
-      var tempEl = document.createElement("span");
-      editableDiv.insertBefore(tempEl, editableDiv.firstChild);
-      var tempRange = range.duplicate();
-      tempRange.moveToElementText(tempEl);
-      tempRange.setEndPoint("EndToEnd", range);
-      caretPos = tempRange.text.length;
-    }
-  }
-  return caretPos;
+    return caretOffset;
 }
 
 myOwn.captureKeys = function captureKeys() {
@@ -640,6 +639,10 @@ myOwn.captureKeys = function captureKeys() {
                     }
                     if(my.beInteractive(info.tr.cells[newPos])){
                         info.tr.cells[newPos].focus();
+                        if(document.activeElement){
+                            var sel = window.getSelection()
+                            sel.collapse(document.activeElement,1);
+                        }
                         evento.preventDefault();
                     }
                 }
@@ -658,7 +661,7 @@ myOwn.captureKeys = function captureKeys() {
         if(evento.which==39 && !evento.shiftKey  && !evento.ctrlKey  && !evento.altKey  && !evento.metaKey){ // KeyRight
             var info=tableInfo(this.activeElement);
             if(info.table){
-                if(evento.ctrlKey || info.td.textContent=='' || (previousKey == 39 && getCaretPosition(info.td)==info.td.textContent.lengths)){
+                if(evento.ctrlKey || info.td.textContent=='' || (previousKey == 39 && getCaretPosition(info.td)==info.td.textContent.length)){
                     goRight();
                     previousPosition=false;
                 }else{
