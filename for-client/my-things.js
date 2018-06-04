@@ -641,7 +641,7 @@ myOwn.captureKeys = function captureKeys() {
                         info.tr.cells[newPos].focus();
                         if(document.activeElement){
                             var sel = window.getSelection()
-                            sel.collapse(document.activeElement,1);
+                            sel.collapse(document.activeElement,document.activeElement.childNodes.length);
                         }
                         evento.preventDefault();
                     }
