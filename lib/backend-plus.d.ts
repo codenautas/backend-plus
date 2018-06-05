@@ -10,7 +10,7 @@ export interface User {
     [key: string]: string
 }
 
-export type Context = {
+export interface Context {
     be: AppBackend, user: User, session: object,
     username: string, machineId: string,
     navigator: string
@@ -25,10 +25,8 @@ export type Request = express.Request & {
         remoteAddress: string
     }
 }
-export type ContextForDump = {
-    be: AppBackend,
-    forDump: boolean,
-    user: User
+export interface ContextForDump extends Context {
+    forDump: boolean
 }
 export interface Response extends express.Response { }
 export interface Express extends express.Express { }
@@ -74,10 +72,6 @@ export interface TableContext extends Context {
     puede: object
     superuser?: true
     forDump?: boolean
-    user: {
-        usuario: string
-        rol: string
-    }
 }
 export type PgKnownTypes = 'decimal' | 'text' | 'boolean' | 'integer' | 'date' | 'interval';
 export type FieldDefinition = EditableDbDefinition & {
@@ -88,6 +82,7 @@ export type FieldDefinition = EditableDbDefinition & {
     nullable?: boolean
     defaultValue?: any
     clientSide?: string
+    isPk?: boolean
 }
 export type EditableDbDefinition = {
     editable?: boolean
@@ -99,9 +94,9 @@ export type EditableDbDefinition = {
     }
 }
 export type FieldsForConnect = (string | { source: string, target: string })[]
-export type ForeignKey = { references: string, fields: FieldsForConnect, alias?: string }
+export type ForeignKey = { references: string, fields: FieldsForConnect, onDelete?: string, displayAllFields?: boolean, alias?: string }
 export type Constraint = { constraintType: 'check' | 'unique' | 'not null', expr?: string, fields?: string[], consName?: string }
-export type TableDefinition = EditableDbDefinition & {
+export type TableDefinition = EditableDbDefinition &{
     name: string
     elementName?: string
     tableName?: string
@@ -113,6 +108,8 @@ export type TableDefinition = EditableDbDefinition & {
         from?: string
         where?: string
         postCreateSqls?: string
+        skipEnance: true,
+        isReferable: true
         logicalDeletes?: {
             fieldName: string
             valueToDelete: string
@@ -122,13 +119,19 @@ export type TableDefinition = EditableDbDefinition & {
     foreignKeys?: ForeignKey[]
     softForeignKeys?: ForeignKey[]
     constraints?: Constraint[]
-    detailTables?: { table: string, fields: FieldsForConnect, abr: string, label?: string }[]
+    detailTables?: DetailTable[]
 }
+export interface DetailTable { table: string, fields: FieldsForConnect, abr: string, label?: string }
+export type TableDefinitionFunction = (context: ContextForDump) => TableDefinition;
 export type TableItemDef = string | { name: string } & ({ tableGenerator: (context: TableContext) => TableDefinition })
+interface TableDefinitions {
+    [k: string]: TableDefinition | TableDefinitionFunction
+}
 export class AppBackend {
     app: express.Express
-    tableStructures: { [key: string]: (context: ContextForDump) => any }
+    tableStructures: TableDefinitions
     db: typeof pg
+    config: any
     start(): Promise<void>
     getTables(): TableItemDef[]
     getContext(req: Request): Context
@@ -142,6 +145,6 @@ export class AppBackend {
     procedureDefCompleter(procedureDef: ProcedureDef): ProcedureDef
     tableDefAdapt(tableDef: TableDefinition, context: Context): TableDefinition
     pushApp(dirname: string): void
-    dumpDbSchemaPartial(partialTableStructures: { [k: string]: TableDefinition }, opts?: { complete?: boolean, skipEnance?: boolean }): Promise<any> //agregar el tipo correcto
+    dumpDbSchemaPartial(partialTableStructures: TableDefinitions, opts?: { complete?: boolean, skipEnance?: boolean }): Promise<any> //agregar el tipo correcto
     getContextForDump(): ContextForDump
 }
