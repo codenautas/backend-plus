@@ -108,8 +108,8 @@ export type TableDefinition = EditableDbDefinition &{
         from?: string
         where?: string
         postCreateSqls?: string
-        skipEnance: true,
-        isReferable: true
+        skipEnance?: boolean,
+        isReferable?: boolean
         logicalDeletes?: {
             fieldName: string
             valueToDelete: string
