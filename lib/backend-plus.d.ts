@@ -1,3 +1,5 @@
+declare module "backend-plus"{
+
 import * as net from "net";
 import * as express from "express";
 import * as pg from "pg-promise-strict";
@@ -32,7 +34,7 @@ export type Request = express.Request & {
 }
 export interface Response extends express.Response{}
 export interface Express extends express.Express{}
-export declare function require_resolve(moduleName:string):string
+export function require_resolve(moduleName:string):string
 // type MenuInfo = MenuInfoBase; // MenuInfoMenu | MenuInfoTable | MenuInfoProc;
 // types for Menu definitions
 export type MenuInfoBase={
@@ -147,6 +149,8 @@ export class AppBackend{
     procedureDefCompleter(procedureDef:ProcedureDef):ProcedureDef
     tableDefAdapt(tableDef:TableDefinition, context:Context):TableDefinition
     pushApp(dirname:string):void
-    dumpDbSchemaPartial(partialTableStructures:TableDefinitions, opts?:{complete?:boolean, skipEnance?:boolean}):Promise<any> //agregar el tipo correcto
+    dumpDbSchemaPartial(partialTableStructures:TableDefinitions, opts?:{complete?:boolean, skipEnance?:boolean}):Promise<{mainSql:string; enancePart:String}> 
     getContextForDump(): ContextForDump
+}
+
 }
