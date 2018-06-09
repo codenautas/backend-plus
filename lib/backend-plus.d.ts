@@ -5,7 +5,10 @@ import * as express from "express";
 import * as pg from "pg-promise-strict";
 
 export type Server=net.Server;
-export interface ProcedureDef{
+export type ProcedureDef={
+    action:string
+    parameters:{name:string, typeName:string, references?:string}[]
+    encode?:string
 }
 
 export interface User {
@@ -131,7 +134,12 @@ export type TableItemDef=string|{name:string}&({tableGenerator:(context:TableCon
 interface TableDefinitions {
     [k: string]: TableDefinition | TableDefinitionFunction
 }
+export type ClientSetup= {
+    procedures:ProcedureDef[]
+}
 export class AppBackend{
+    procedures:ProcedureDef[]
+    procedure:{ [key:string]:ProcedureDef }
     app:express.Express
     tableStructures: TableDefinitions
     db:typeof pg
@@ -151,6 +159,7 @@ export class AppBackend{
     pushApp(dirname:string):void
     dumpDbSchemaPartial(partialTableStructures:TableDefinitions, opts?:{complete?:boolean, skipEnance?:boolean}):Promise<{mainSql:string; enancePart:String}> 
     getContextForDump(): ContextForDump
+    getClientSetupForSendToFrontEnd(req:Request):ClientSetup
 }
 
 }

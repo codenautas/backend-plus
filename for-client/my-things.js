@@ -1,4 +1,15 @@
 "use strict";
+/// <reference path="../node_modules/types.d.ts/modules/typed-controls/index.d.ts" />
+//no/ <reference path="../node_modules/types.d.ts/modules/dialog-promise/index.d.ts" />
+/// <reference path="../node_modules/types.d.ts/modules/codenautas-umd/index.d.ts" />
+/* No sabemos cómo referenciar a los tipos escritos en mwOwn/index.d.ts */ 
+//NO/ <reference path="../node_modules/types.d.ts/modules/myOwn/index.d.ts" />
+/// <reference path="../node_modules/types.d.ts/modules/myOwn/in-myOwn.d.ts" />
+/// <reference path="./in-backend-plus.d.ts" />
+/// <amd-dependency path="../node_modules/types.d.ts/modules/typed-controls/index.d.ts" name="TypedControls" />
+/// <amd-dependency path="../node_modules/types.d.ts/modules/dialog-promise/index.d.ts" name="DialogPromise" />
+/// <amd-dependency path="../node_modules/types.d.ts/modules/type-store/index.d.ts" name="TypeStore" />
+
 /*jshint eqnull:true */
 /*jshint node:true */
 
@@ -14,6 +25,7 @@
     }else if(typeof define === 'function' && define.amd){
         define(factory);
     }else if(typeof exports === 'object'){
+        // @ts-ignore
         exports[root.globalModuleName] = factory();
     }else{
         root[root.globalModuleName] = factory();
@@ -25,6 +37,10 @@
 /*jshint -W004 */
 var myOwn = {};
 /*jshint +W004 */
+
+// var DialogPromise = require('dialog-promise');
+// var TypeStore = require('type-store');
+// var TypedControls = require('typed-controls');
 
 myOwn.messages={};
 myOwn.i18n={messages:{}};
@@ -55,6 +71,10 @@ var TypeStore=require('type-store');
 
 var JSON4all = require('json4all');
 
+/** @param {T} x
+ *  @returns {T}
+ *  @template {T}
+ */
 function id(x){return x;}
 
 myOwn.statusDivName = 'reconnection_div';
@@ -71,10 +91,11 @@ myOwn.autoSetupFunctions = [
             }).then(function(setup){
                 my.config = setup;
                 my.config.procedure=my.config.procedure||{};
-                my.config.procedures.forEach(function(procedureDef){
+                my.config.procedures.forEach(/** @param {bp.ProcedureDef} procedureDef */function(procedureDef){
                     my.config.procedure[procedureDef.action]=procedureDef;
                     var target;
-                    var lastName = null;
+                    /** @type {string} */
+                    var lastName;
                     procedureDef.parameter=procedureDef.parameter||{};
                     procedureDef.parameters.forEach(function(parameterDef){
                         procedureDef.parameter[parameterDef.name]=parameterDef;
