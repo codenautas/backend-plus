@@ -19,6 +19,8 @@ var coalesce = bestGlobals.coalesce;
 
 var MAX_SAFE_INTEGER = 9007199254740991;
 
+/** @param { {[key:string]:any} } a */
+/** @param { {[key:string]:any} } b */
 function sameMembers(a,b){
     for(var attr in a){
         if(a[attr]!==b[attr]) return false;
@@ -29,6 +31,8 @@ function sameMembers(a,b){
     return true;
 }
 
+/** @param {any} a */
+/** @param {any} b */
 function sameValue(a,b){
     return a==b ||
       a instanceof Date && b instanceof Date && a.getTime() == b.getTime() ||

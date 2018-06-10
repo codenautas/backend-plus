@@ -89,7 +89,8 @@ export type FieldDefinition = EditableDbDefinition & {
     nullable?:boolean
     defaultValue?:any
     clientSide?:string
-    isPk?: boolean
+    isName?:boolean
+    isPk?:number  /* internal: pos in the primaryKey array */
 }
 export type EditableDbDefinition = {
     editable?:boolean
