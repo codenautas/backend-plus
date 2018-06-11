@@ -99,7 +99,9 @@ function IDBX(request){
     })
 }
 
-window.IDBX = IDBX;
+if(typeof window != "undefined"){
+    window.IDBX = IDBX;
+}
 
 myOwn.statusDivName = 'reconnection_div';
 
