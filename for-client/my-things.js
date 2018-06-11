@@ -77,6 +77,30 @@ var JSON4all = require('json4all');
  */
 function id(x){return x;}
 
+/** @param {string} name 
+  * @param {number|undefined} version
+  * @returns {Promise<IDBDatabase>}
+  */
+function idbOpen(name, version){
+    /** @type {IDBRequest} */
+    return IDBX(indexedDB.open(name, version));
+}
+
+/** @param {IDBRequest} request */
+function IDBX(request){
+    return new Promise(function(resolve, reject){
+        request.onsuccess=function(event){
+            resolve(request.result);
+        }
+        request.onerror=function(reject){
+            alertPromise(request.error.message)
+            reject(request.error);
+        }
+    })
+}
+
+window.IDBX = IDBX;
+
 myOwn.statusDivName = 'reconnection_div';
 
 myOwn.autoSetupFunctions = [
@@ -121,30 +145,31 @@ myOwn.autoSetupFunctions = [
                 });
                 DialogPromise.path.img=my.path.img;
                 TypedControls.path.img=my.path.img;
-                if(window.require.definedModules.dexie){
-                    my.ldb = new window.require.definedModules.dexie("bp-buff");
+                if(my.config.config['grid-buffer']=='idbx'){
                     var initialStores={
                         $structures:'name',
                         $internals:'var'
                     };
-                    var initDb=function(){
-                        my.ldb.version(1).stores(initialStores);
-                        return my.ldb.$internals.get('version').then(function(versionInfo){
-                            if(!versionInfo){
-                                return my.ldb.$internals.put({
-                                    var:'version',
-                                    num:1, 
-                                    timestamp:new Date().toJSON(),
-                                    stores:initialStores
-                                });
-                            }
-                        })
-                    }
-                    return my.ldb.open().catch(function(){
-                        if(!my.ldb.$internals){
-                            return initDb();
+                    my.lblName="BP-buff-0.1.0";
+                    var requestDB=indexedDB.open(my.lblName);
+                    requestDB.onupgradeneeded = function(event){
+                        var db = requestDB.result;
+                        if(event.oldVersion<1){
+                            var store={};
+                            likeAr(initialStores).forEach(function(keyPath, tableName){
+                                store[tableName] = db.createObjectStore(tableName, {keyPath: keyPath});
+                            })
+                            store.$internals.put({
+                                var:'version',
+                                num:1, 
+                                timestamp:new Date().toJSON(),
+                                stores:initialStores
+                            });
                         }
-                    },initDb)
+                    }
+                    return IDBX(requestDB).then(function(db){
+                        my.ldb = db;
+                    }).catch(my.log);
                 }
             });
         };

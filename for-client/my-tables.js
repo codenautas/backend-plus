@@ -207,17 +207,30 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
     });
     if(my.ldb){
         structureFromBackend.then(function(tableDef){
-            my.ldb.table('$structures').put(tableDef);
-            if(!connector.localDef || JSON.stringify(tableDef.def)!=connector.localDef){
-                var infoStore='['+tableDef.primaryKey.join('+')+']';
-                return my.ldb.$internals.get('version').then(function(versionInfo){
-                    if(versionInfo.stores[connector.tableName]!=infoStore){
-                        versionInfo.stores[connector.tableName]=infoStore;
-                        versionInfo.num++;
+            IDBX(my.ldb.transaction('$structures',"readwrite").objectStore('$structures').put(tableDef));
+            if(!connector.localDef || JSON.stringify(tableDef)!=JSON.stringify(connector.localDef)){
+                var infoStore=tableDef.primaryKey;
+                return IDBX(
+                    my.ldb.transaction('$internals','readonly').objectStore('$internals').get('version')
+                ).then(function(versionInfo){
+                    if(JSON.stringify(versionInfo.stores[connector.tableName])!=JSON.stringify(infoStore)){
                         my.ldb.close();
-                        my.ldb.version(versionInfo.num).stores(versionInfo.stores);
-                        return my.ldb.open().then(function(){
-                            return my.ldb.$internals.put(versionInfo);
+                        versionInfo.num++;
+                        var request = indexedDB.open(my.lblName,versionInfo.num);
+                        request.onupgradeneeded = function(event){
+                            var db=request.result;
+                            if(versionInfo.stores[connector.tableName]){
+                                db.deleteObjectStore(connector.tableName);
+                            }
+                            db.createObjectStore(connector.tableName,{keyPath:infoStore})
+                        }
+                        return IDBX(request).then(function(db){
+                            my.ldb=db;
+                        }).then(function(){
+                            versionInfo.stores[connector.tableName]=infoStore;
+                            return IDBX(
+                                my.ldb.transaction('$internals',"readwrite").objectStore('$internals').put(versionInfo)
+                            )
                         })
                     }
                 }).then(function(){
@@ -228,8 +241,11 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
             }
             return connector.def;
         });
-        structureFromLocal = my.ldb.table('$structures').get({
-            name:connector.tableName
+        var structureFromLocal = IDBX(
+            my.ldb.transaction('$structures',"readwrite").objectStore('$structures').get(connector.tableName)
+        ).then(function(tableDef){
+            console.log(tableDef);
+            return tableDef;
         });
         connector.whenStructureReady = structureFromLocal.then(function(tableDef){
             if(!tableDef){ 
