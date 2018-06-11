@@ -121,6 +121,31 @@ myOwn.autoSetupFunctions = [
                 });
                 DialogPromise.path.img=my.path.img;
                 TypedControls.path.img=my.path.img;
+                if(window.require.definedModules.dexie){
+                    my.ldb = new window.require.definedModules.dexie("bp-buff");
+                    var initialStores={
+                        $structures:'name',
+                        $internals:'var'
+                    };
+                    var initDb=function(){
+                        my.ldb.version(1).stores(initialStores);
+                        return my.ldb.$internals.get('version').then(function(versionInfo){
+                            if(!versionInfo){
+                                return my.ldb.$internals.put({
+                                    var:'version',
+                                    num:1, 
+                                    timestamp:new Date().toJSON(),
+                                    stores:initialStores
+                                });
+                            }
+                        })
+                    }
+                    return my.ldb.open().catch(function(){
+                        if(!my.ldb.$internals){
+                            return initDb();
+                        }
+                    },initDb)
+                }
             });
         };
         my.captureKeys();
@@ -450,13 +475,15 @@ myOwn.testKeepAlive = function testKeepAlive(){
             updateOnlineStatus();
         }
         var lightServer = document.getElementById('light-server');
-        lightServer.src=skinUrl+'img/server-ok.png';
-        var speed=1000/(1+new Date().getTime()-startTime);
-        if(isNaN(lightServer.result.speed)){
-            lightServer.result.speed = speed; 
+        if(lightServer){
+            lightServer.src=skinUrl+'img/server-ok.png';
+            var speed=1000/(1+new Date().getTime()-startTime);
+            if(isNaN(lightServer.result.speed)){
+                lightServer.result.speed = speed; 
+            }
+            lightServer.result.speed = Math.ceil((lightServer.result.speed*7 + speed)/8); 
+            lightServer.title = lightServer.result.speed;
         }
-        lightServer.result.speed = Math.ceil((lightServer.result.speed*7 + speed)/8); 
-        lightServer.title = lightServer.result.speed;
     }).then(function(){
         if(element){
             element.textContent='ok';

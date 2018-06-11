@@ -1,6 +1,6 @@
 "use strict";
 
-require('lazy-some').bindToPrototypeIn(Array);
+// require('lazy-some').bindToPrototypeIn(Array);
 
 myOwn.wScreens={}
 
@@ -233,7 +233,7 @@ myOwn.replaceAddrParams = function replaceAddrParams(params){
 }
 
 myOwn.light = function light(name, onclick){
-    var skin=this.config.config.skin;
+    var skin=((this.config||{}).config||{}).skin;
     var skinUrl=(skin?skin+'/':'');
     var img = html.img({class:"light", id:'light-'+name, src:skinUrl+'img/'+name+'.png'}).create();
     img.result={};
@@ -248,7 +248,7 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
     var newMenuLine;
     var elements=[];
     var depth = parents.length;
-    var skin=my.config.config.skin;
+    var skin=((this.config||{}).config||{}).skin;
     var skinUrl=(skin?skin+'/':'');
     if(depth===0){
         elements.push(html.img({id: "main-logo", src: skinUrl+"img/logo.png"}));
@@ -374,14 +374,16 @@ window.addEventListener('load', function(){
 function updateOnlineStatus(){
     if(window.my){
         var networkLight=document.getElementById('light-network-signal');
-        var skin=my.config.config.skin;
+        var skin=((my.config||{}).config||{}).skin;
         var skinUrl=(skin?skin+'/':'');
-        if(window.navigator.onLine){
-            networkLight.src=skinUrl+'img/network-signal-ok.png';
-            networkLight.result.status=my.messages.onLine;
-        }else{
-            networkLight.src=skinUrl+'img/network-no-signal.png';
-            networkLight.result.status=my.messages.offLine;
+        if(networkLight){
+            if(window.navigator.onLine){
+                networkLight.src=skinUrl+'img/network-signal-ok.png';
+                networkLight.result.status=my.messages.onLine;
+            }else{
+                networkLight.src=skinUrl+'img/network-no-signal.png';
+                networkLight.result.status=my.messages.offLine;
+            }
         }
     }
 }

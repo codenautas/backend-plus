@@ -197,12 +197,50 @@ myOwn.TableConnector = function(context, opts){
 
 myOwn.TableConnector.prototype.getStructure = function getStructure(){
     var connector = this;
-    connector.whenStructureReady = this.my.ajax.table.structure({
+    var my = connector.my;
+    var structureFromLocal;
+    var structureFromBackend = my.ajax.table.structure({
         table:connector.tableName,
     }).then(function(tableDef){
         connector.def = changing(tableDef, connector.opts.tableDef||{});
         return connector.def;
     });
+    if(my.ldb){
+        structureFromBackend.then(function(tableDef){
+            my.ldb.table('$structures').put(tableDef);
+            if(!connector.localDef || JSON.stringify(tableDef.def)!=connector.localDef){
+                var infoStore='['+tableDef.primaryKey.join('+')+']';
+                return my.ldb.$internals.get('version').then(function(versionInfo){
+                    if(versionInfo.stores[connector.tableName]!=infoStore){
+                        versionInfo.stores[connector.tableName]=infoStore;
+                        versionInfo.num++;
+                        my.ldb.close();
+                        my.ldb.version(versionInfo.num).stores(versionInfo.stores);
+                        return my.ldb.open().then(function(){
+                            return my.ldb.$internals.put(versionInfo);
+                        })
+                    }
+                }).then(function(){
+                    if(connector.localDef){
+                        alertPromise('la tabla '+connector.tableName+' cambió de estructura. Debe Refrescar la página')
+                    }
+                })
+            }
+            return connector.def;
+        });
+        structureFromLocal = my.ldb.table('$structures').get({
+            name:connector.tableName
+        });
+        connector.whenStructureReady = structureFromLocal.then(function(tableDef){
+            if(!tableDef){ 
+                return structureFromBackend;
+            }
+            connector.localDef = connector.def = changing(tableDef, connector.opts.tableDef||{});
+            return connector.def;
+        });
+    }else{
+        connector.whenStructureReady = structureFromBackend;
+    }
     return connector.whenStructureReady;
 };
 
