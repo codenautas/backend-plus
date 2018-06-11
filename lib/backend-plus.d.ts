@@ -5,9 +5,23 @@ import * as express from "express";
 import * as pg from "pg-promise-strict";
 
 export type Server=net.Server;
-export type ProcedureDef={
-    action:string
-    parameters:{name:string, typeName:string, references?:string}[]
+
+export interface coreFunctionParameters{
+    [key:string]: any
+}
+export interface ProcedureParameter {
+    name: string
+    encoding?: string 
+    defaultValue?: any
+    typeName?: string
+    references?: string
+}
+export type CoreFunction = (context: ProcedureContext, parameters: coreFunctionParameters) => Promise<any>;
+
+export interface ProcedureDef {
+    action: string
+    parameters: ProcedureParameter[]
+    coreFunction: CoreFunction 
     encode?:string
 }
 
