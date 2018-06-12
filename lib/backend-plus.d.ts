@@ -142,6 +142,10 @@ export type TableDefinition = EditableDbDefinition & {
     softForeignKeys?:ForeignKey[]
     constraints?:Constraint[]
     detailTables?:DetailTable[]
+    offline:{
+        mode:boolean
+        details:null|string[]
+    }
 }
 export interface DetailTable { table: string, fields: FieldsForConnect, abr: string, label?: string }
 export type TableDefinitionFunction = (context: ContextForDump) => TableDefinition;
