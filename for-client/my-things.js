@@ -89,8 +89,14 @@ function idbOpen(name, version){
 /** @param {IDBRequest} request */
 function IDBX(request){
     return new Promise(function(resolve, reject){
-        request.onsuccess=function(event){
-            resolve(request.result);
+        if('onsuccess' in request){
+            request.onsuccess=function(event){
+                resolve(request.result);
+            }
+        }else{
+            request.oncomplete=function(event){
+                resolve(request.result);
+            }
         }
         request.onerror=function(reject){
             alertPromise(request.error.message)
