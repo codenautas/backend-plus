@@ -94,7 +94,7 @@ export interface TableContext extends Context{
     superuser?:true
     forDump?:boolean
 }
-export type PgKnownTypes='decimal'|'text'|'boolean'|'integer'|'date'|'interval';
+export type PgKnownTypes='decimal'|'text'|'boolean'|'integer'|'bigint'|'date'|'interval';
 export type FieldDefinition = EditableDbDefinition & {
     name:string
     typeName:PgKnownTypes
@@ -142,7 +142,7 @@ export type TableDefinition = EditableDbDefinition & {
     softForeignKeys?:ForeignKey[]
     constraints?:Constraint[]
     detailTables?:DetailTable[]
-    offline:{
+    offline?:{
         mode:boolean
         details:null|string[]
     }
@@ -176,7 +176,7 @@ export class AppBackend{
     procedureDefCompleter(procedureDef:ProcedureDef):ProcedureDef
     tableDefAdapt(tableDef:TableDefinition, context:Context):TableDefinition
     pushApp(dirname:string):void
-    dumpDbSchemaPartial(partialTableStructures:TableDefinitions, opts?:{complete?:boolean, skipEnance?:boolean}):Promise<{mainSql:string; enancePart:String}> 
+    dumpDbSchemaPartial(partialTableStructures:TableDefinitions, opts?:{complete?:boolean, skipEnance?:boolean}):Promise<{mainSql:string; enancePart:string}> 
     getContextForDump(): ContextForDump
     getClientSetupForSendToFrontEnd(req:Request):ClientSetup
 }
