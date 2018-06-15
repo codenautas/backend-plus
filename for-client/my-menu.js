@@ -286,6 +286,12 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
                     {underElement:this}
                 );
             }),
+            my.light('airplane', function(){
+                if(my.ldb && my.offline){
+                    my.offline.mode=!my.offline.mode;
+                    my.offlineModeRefresh();
+                }
+            })
         ]));
         elements.push(status);
     }
@@ -354,6 +360,21 @@ myOwn.informDetectedStatus = function informDetectedStatus(statusCode, logged) {
     }
 }
 
+myOwn.offlineModeRefresh = function offlineModeRefresh(){
+    var my=this;
+    /** @type {HTMLImageElement} */
+    // @ts-ignore
+    var imgLight = document.getElementById('light-airplane');
+    my.offline=my.offline||{};
+    var skin=((my.config||{}).config||{}).skin;
+    var skinUrl=(skin?skin+'/':'');
+    if(my.offline.mode){
+        imgLight.src=skinUrl+'img/airplane-on.png';
+    }else{
+        imgLight.src=skinUrl+'img/airplane-off.png';
+    }
+}
+
 window.addEventListener('popstate', function(){
     my.showPage();
 });
@@ -362,8 +383,12 @@ window.addEventListener('load', function(){
     window.my = myOwn;
     my.autoSetup().then(function(){
         my.showPage();
-    });
+    }).then(function(){
+        my.offlineModeRefresh();
+    })
     document.body.appendChild(html.div({id:'cached-images'},[
+        html.img({src:my.path.img+'airplain-off.png'}),
+        html.img({src:my.path.img+'airplain.png'}),
         html.img({src:my.path.img+'server.png'}),
         html.img({src:my.path.img+'network-signal.png'}),
         html.img({src:my.path.img+'server-error.png'}),
