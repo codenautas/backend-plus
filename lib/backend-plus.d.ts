@@ -42,15 +42,13 @@ export interface ContextForDump extends Context {
 export type ProcedureContext=Context & {
     client:pg.Client
 }
-export type Request = express.Request & {
+export interface Request extends express.Request {
     user:User
-    session:{[key:string]:any}
-    connection:{
-        remoteAddress:string
-    }
 }
-export interface Response extends express.Response{}
-export interface Express extends express.Express{}
+export {Response, Express} from "express";
+export interface ResponsePlus extends express.Response{}
+export interface ExpressPlus extends express.Express{}
+
 export function require_resolve(moduleName:string):string
 // type MenuInfo = MenuInfoBase; // MenuInfoMenu | MenuInfoTable | MenuInfoProc;
 // types for Menu definitions
@@ -150,7 +148,7 @@ export type TableDefinition = EditableDbDefinition & {
 export interface DetailTable { table: string, fields: FieldsForConnect, abr: string, label?: string }
 export type TableDefinitionFunction = (context: ContextForDump) => TableDefinition;
 export type TableItemDef=string|{name:string}&({tableGenerator:(context:TableContext)=>TableDefinition})
-interface TableDefinitions {
+export interface TableDefinitions {
     [k: string]: TableDefinition | TableDefinitionFunction
 }
 export type ClientSetup= {
@@ -159,7 +157,7 @@ export type ClientSetup= {
 export class AppBackend{
     procedures:ProcedureDef[]
     procedure:{ [key:string]:ProcedureDef }
-    app:express.Express
+    app:ExpressPlus
     tableStructures: TableDefinitions
     db:typeof pg
     config: any
@@ -167,7 +165,7 @@ export class AppBackend{
     getTables():TableItemDef[]
     getContext(req:Request):Context
     clientIncludes(req:Request, hideBEPlusInclusions?:boolean):ClientModuleDefinition[]
-    addSchrödingerServices(mainApp:express.Express, baseUrl:string):void
+    addSchrödingerServices(mainApp:ExpressPlus, baseUrl:string):void
     addLoggedServices():void
     getProcedures():Promise<ProcedureDef[]>
     getMenu(context?:Context):MenuDefinition
