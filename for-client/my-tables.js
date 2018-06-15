@@ -358,9 +358,11 @@ function upadteNumberOfRows(depot,grid){
 }
 
 myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
+    var my = this;
     var grid = new my.TableGrid({my: this}, mainElement);
     opts = opts || {};
-    grid.connector = new my.TableConnector({
+    var Connector = my.offline.mode?my.TableConnectorLocal:my.TableConnector;
+    grid.connector = new Connector({
         my:this, 
         tableName: tableName, 
         getElementToDisplayCount:function(){ return grid.dom.footInfo.displayTo; }
