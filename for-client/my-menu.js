@@ -371,7 +371,18 @@ myOwn.offlineModeRefresh = function offlineModeRefresh(){
     /** @type {HTMLImageElement} */
     // @ts-ignore
     var imgLight = document.getElementById('light-airplane');
-    my.offline=my.offline||{};
+    if(!('offline' in my)){
+        my.offline={};
+        Object.defineProperty(my.offline, 'mode', {
+            get:function(){
+                return localStorage.getItem(my.appName+'_offline_mode')=='offline';
+            },
+            set:function(offline){
+                return localStorage.setItem(my.appName+'_offline_mode', offline?'offline':'online');
+            }
+        })
+    }
+    
     var skin=((my.config||{}).config||{}).skin;
     var skinUrl=(skin?skin+'/':'');
     if(my.offline.mode){
