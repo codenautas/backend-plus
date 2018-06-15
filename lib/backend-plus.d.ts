@@ -46,8 +46,8 @@ export interface Request extends express.Request {
     user:User
 }
 export {Response, Express} from "express";
-export interface ResponseApp extends express.Response{}
-export interface ExpressApp extends express.Express{} // Esta alternativa rompe declaración de función emerge en apps hijas, por ej emergeAppVarCal
+export interface ResponsePlus extends express.Response{}
+export interface ExpressPlus extends express.Express{}
 
 export function require_resolve(moduleName:string):string
 // type MenuInfo = MenuInfoBase; // MenuInfoMenu | MenuInfoTable | MenuInfoProc;
@@ -157,7 +157,7 @@ export type ClientSetup= {
 export class AppBackend{
     procedures:ProcedureDef[]
     procedure:{ [key:string]:ProcedureDef }
-    app:ExpressApp
+    app:ExpressPlus
     tableStructures: TableDefinitions
     db:typeof pg
     config: any
@@ -165,7 +165,7 @@ export class AppBackend{
     getTables():TableItemDef[]
     getContext(req:Request):Context
     clientIncludes(req:Request, hideBEPlusInclusions?:boolean):ClientModuleDefinition[]
-    addSchrödingerServices(mainApp:ExpressApp, baseUrl:string):void
+    addSchrödingerServices(mainApp:ExpressPlus, baseUrl:string):void
     addLoggedServices():void
     getProcedures():Promise<ProcedureDef[]>
     getMenu(context?:Context):MenuDefinition
