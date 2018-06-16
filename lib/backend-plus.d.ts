@@ -141,8 +141,8 @@ export type TableDefinition = EditableDbDefinition & {
     constraints?:Constraint[]
     detailTables?:DetailTable[]
     offline?:{
-        mode:boolean
-        details:null|string[]
+        mode:'reference'|'master'|'detail'
+        details:string[]
     }
 }
 export interface DetailTable { table: string, fields: FieldsForConnect, abr: string, label?: string }
