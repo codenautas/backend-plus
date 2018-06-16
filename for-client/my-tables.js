@@ -881,7 +881,17 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
             tdMargin.colSpan = td.cellIndex+1;
             var tdGrid = newTr.insertCell(-1);
             tdGrid.colSpan = tr.cells.length-td.cellIndex;
-            tdGrid.style.maxWidth='inherit';
+            var divGrid = html.div().create();
+            tdGrid.appendChild(divGrid);
+            divGrid.style.maxWidth=td.parentNode.offsetWidth - td.offsetLeft + 'px';
+            divGrid.style.overflowX='visible';
+            tdGrid.className='my-detail-grid';
+            tdGrid.style.overflowX='visible';
+            tdGrid.parentNode.style.overflowX='visible';
+            tdGrid.parentNode.parentNode.style.overflowX='visible';
+            tdGrid.parentNode.parentNode.parentNode.style.overflowX='visible';
+            tdGrid.parentNode.parentNode.parentNode.parentNode.style.overflowX='visible';
+            divGrid.style.overflowY='visible';
             var fixedFields = detailTableDef.fields.map(function(pair){
                 var fieldCondition={fieldName: pair.target, value:depot.row[pair.source]}
                 if(pair.range){
@@ -890,7 +900,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
                 return fieldCondition;
             });
             if(!detailControl.table){
-                grid.my.tableGrid(detailTableDef.table, tdGrid, {fixedFields: fixedFields}).waitForReady(function(g){
+                grid.my.tableGrid(detailTableDef.table, divGrid, {fixedFields: fixedFields}).waitForReady(function(g){
                     detailControl.table=g.dom.table;
                     if(detailTableDef.refreshParent || grid.def.complexDef && detailTableDef.refreshParent!==false){
                         var refresh = function refresh(){
@@ -901,7 +911,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
                     }
                 });
             }else{
-                tdGrid.appendChild(detailControl.table);
+                divGrid.appendChild(detailControl.table);
             }
             detailControl.show = true;
             newTr.detailTableNameAndAbr=detailTableNameAndAbr;
