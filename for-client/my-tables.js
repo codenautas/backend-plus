@@ -1629,13 +1629,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         var grid = this;
         var forInsert = false; // not define how to detect
         var tr = depot;
-        if(!skipUpdateStatus){
-            depot.status = 'loaded';
-            depot.primaryKeyValues = grid.def.primaryKey.map(function(fieldName){ 
-                return depot.row[fieldName]; 
-            });
-            depot.tr.setAttribute('pk-values',JSON.stringify(depot.primaryKeyValues))
-        }
+        grid.setRowStyle(depot,depot.row, skipUpdateStatus);
         grid.def.fields.forEach(function(fieldDef){
             var td = depot.rowControls[fieldDef.name];
             var editable=grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
@@ -1713,16 +1707,26 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             grid.depotRefresh(depot,{updatedRow:result[0], sendedForUpdate:{}});
         })
     }
+    grid.setRowStyle = function setRowStyle(depot, row, skipUpdateStatus){
+        if(!skipUpdateStatus){
+            depot.status = 'loaded';
+            depot.primaryKeyValues = grid.def.primaryKey.map(function(fieldName){ 
+                return depot.row[fieldName]; 
+            });
+            depot.tr.setAttribute('pk-values',JSON.stringify(depot.primaryKeyValues))
+        }
+        if(row.$dirty){
+            var tdActions = depot.tr.querySelector('.grid-th-actions');
+            tdActions.style.backgroundImage='url('+my.path.img+'/not-sync.png)'
+            tdActions.style.backgroundSize='contain'
+            tdActions.style.backgroundRepeat='no-repeat'
+        }
+    }
     grid.depotRefresh = function depotRefresh(depot,result){
+        // ¡ATENCIÓN!: esta función no debe despleegar, llama a updateRowData, ahí se despliega
         upadteNumberOfRows(depot,grid);
         var retrievedRow = result.updatedRow;
         for(var fieldName in retrievedRow){
-            if(fieldName==='$dirty'){
-                var td = depot.tr.querySelector('.grid-th-actions');
-                td.style.backgroundImage='url('+my.path.img+'/not-sync.png)'
-                td.style.backgroundSize='contain'
-                td.style.backgroundRepeat='no-repeat'
-            }
             if(!grid.def.field[fieldName].clientSide){
                 var value = depot.rowControls[fieldName].getTypedValue();
                 if(!sameValue(depot.row[fieldName], value)){
