@@ -881,17 +881,11 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
             tdMargin.colSpan = td.cellIndex+1;
             var tdGrid = newTr.insertCell(-1);
             tdGrid.colSpan = tr.cells.length-td.cellIndex;
-            var divGrid = html.div().create();
-            tdGrid.appendChild(divGrid);
+            var divGrid = tdGrid;
             divGrid.style.maxWidth=td.parentNode.offsetWidth - td.offsetLeft + 'px';
             divGrid.style.overflowX='visible';
             tdGrid.className='my-detail-grid';
             tdGrid.style.overflowX='visible';
-            tdGrid.parentNode.style.overflowX='visible';
-            tdGrid.parentNode.parentNode.style.overflowX='visible';
-            tdGrid.parentNode.parentNode.parentNode.style.overflowX='visible';
-            tdGrid.parentNode.parentNode.parentNode.parentNode.style.overflowX='visible';
-            divGrid.style.overflowY='visible';
             var fixedFields = detailTableDef.fields.map(function(pair){
                 var fieldCondition={fieldName: pair.target, value:depot.row[pair.source]}
                 if(pair.range){
