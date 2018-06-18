@@ -404,12 +404,17 @@ myOwn.TableConnectorLocal.prototype.getData = function getData(){
         return new Promise(function(resolve,reject){
             var cursor = my.ldb.transaction([connector.tableName],'readonly').objectStore(connector.tableName).openCursor(IDBKeyRange.lowerBound(parentKey));
             var rows=[];
+            var contador=0;
             cursor.onsuccess=function(event){
                 var cursor = event.target.result;
-                if(cursor){
+                if(cursor && ! parentKey.find(function(value,i){
+                    return value != cursor.value[connector.def.primaryKey[i]]
+                })){
                     rows.push(cursor.value);
                     cursor.continue();
+                    contador++
                 }else{
+                    console.log('xxxxxxxxxxxxxxxx EL CONTADOR', contador)
                     resolve(rows);
                 }
             }
