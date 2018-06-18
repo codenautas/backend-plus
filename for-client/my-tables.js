@@ -393,8 +393,33 @@ myOwn.TableConnectorLocal.prototype.getData = function getData(){
         }
     }
     return connector.whenStructureReady.then(function(){
-        var tx = my.ldb.transaction([connector.tableName],'readonly').objectStore(connector.tableName).getAll();
-        return IDBX(tx);
+        var parentKey = [];
+        var filterValues = connector.fixedFields.slice();
+        var primaryKey = connector.def.primaryKey.slice();
+        var indexOfKey;
+        while(primaryKey.length && connector.fixedField[primaryKey[0]]){
+            var key=primaryKey.shift();
+            parentKey.push(connector.fixedField[key]);
+        }
+        return new Promise(function(resolve,reject){
+            var cursor = my.ldb.transaction([connector.tableName],'readonly').objectStore(connector.tableName).openCursor(IDBKeyRange.lowerBound(parentKey));
+            var rows=[];
+            cursor.onsuccess=function(event){
+                var cursor = event.target.result;
+                if(cursor){
+                    rows.push(cursor.value);
+                    cursor.continue();
+                }else{
+                    resolve(rows);
+                }
+            }
+        }).then(function(rows){
+            return rows.filter(function(row){
+                return !filterValues.find(function(pair){
+                    return row[pair.fieldName]!=pair.value
+                });
+            });
+        })
     }).then(function(rows){
         connector.getElementToDisplayCount().textContent=rows.length+' '+my.messages.displaying+'...';
         return bestGlobals.sleep(10).then(function(){

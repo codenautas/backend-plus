@@ -283,7 +283,7 @@ myOwn.fade = function fade(element, options){
         });
         var div=document.createElement('div');
         dummyTr.cells[1].appendChild(div);
-        div.style.height=(element.cells[0].offsetHeight-2)+'px';
+        div.style.height=Math.min(window.innerHeight*0.5, element.cells[0].offsetHeight-2)+'px';
         div.style.transition='height 0.6s ease';
         div.style.overflowY='hidden';
         parent.replaceChild(dummyTr, element);
