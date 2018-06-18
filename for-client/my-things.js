@@ -158,7 +158,7 @@ myOwn.autoSetupFunctions = [
                         $structures:'name',
                         $internals:'var'
                     };
-                    my.lblName="BP-buff-0.1.0";
+                    my.lblName="BP-buff-0.1.2";
                     var requestDB=indexedDB.open(my.lblName);
                     requestDB.onupgradeneeded = function(event){
                         var db = requestDB.result;

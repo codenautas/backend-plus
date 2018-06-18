@@ -212,10 +212,11 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
     });
     if(my.ldb){
         structureFromBackend.then(function(tableDef){
+            var promiseChain=Promise.resolve();
             IDBX(my.ldb.transaction('$structures',"readwrite").objectStore('$structures').put(tableDef));
             if(!connector.localDef || JSON.stringify(tableDef)!=JSON.stringify(connector.localDef)){
                 var infoStore=tableDef.primaryKey;
-                return IDBX(
+                promiseChain=IDBX(
                     my.ldb.transaction('$internals','readonly').objectStore('$internals').get('version')
                 ).then(function(versionInfo){
                     if(JSON.stringify(versionInfo.stores[connector.tableName])!=JSON.stringify(infoStore)){
@@ -245,19 +246,21 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
                 })
             }
             if(connector.def.offline.mode==='master'){
-                return Promise.all(connector.def.offline.details.map(function(tableName){
-                    return my.getStructureFromLocalDb(tableName).then(function(tableDef){
-                        if(!tableDef){
-                            var conn = new my.TableConnector({tableName, my});
-                            return conn.getStructure();
-                        }
-                    });
-                })).then(function(){
-                    return connector.def;
+                promiseChain = promiseChain.then(function(){
+                    return Promise.all(connector.def.offline.details.map(function(tableName){
+                        return my.getStructureFromLocalDb(tableName).then(function(tableDef){
+                            if(!tableDef){
+                                var conn = new my.TableConnector({tableName, my});
+                                return conn.getStructure();
+                            }
+                        });
+                    }));
                 })
-            }else{
-                return connector.def;
             }
+            promiseChain = promiseChain.then(function(){
+                return connector.def;
+            });
+            return promiseChain;
         });
         var structureFromLocal = my.getStructureFromLocalDb(connector.tableName);
         connector.whenStructureReady = structureFromLocal.then(function(tableDef){
@@ -1757,57 +1760,59 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         upadteNumberOfRows(depot,grid);
         var retrievedRow = result.updatedRow;
         for(var fieldName in retrievedRow){
-            if(!grid.def.field[fieldName].clientSide){
-                var value = depot.rowControls[fieldName].getTypedValue();
-                if(!sameValue(depot.row[fieldName], value)){
-                    if(grid.def.field[fieldName].allow.update){
-                        depot.rowPendingForUpdate[fieldName] = value;
+            if(!/^\$/.test(fieldName)){
+                if(!grid.def.field[fieldName].clientSide){
+                    var value = depot.rowControls[fieldName].getTypedValue();
+                    if(!sameValue(depot.row[fieldName], value)){
+                        if(grid.def.field[fieldName].allow.update){
+                            depot.rowPendingForUpdate[fieldName] = value;
+                        }
+                        depot.row[fieldName] = value;
                     }
-                    depot.row[fieldName] = value;
                 }
-            }
-            if(fieldName in depot.rowPendingForUpdate){
-                var source = fieldName in result.sendedForUpdate?result.sendedForUpdate:depot.retrievedRow;
-                if(sameValue(depot.rowPendingForUpdate[fieldName], retrievedRow[fieldName])){
-                    // ok, lo que viene coincide con lo pendiente
-                    delete depot.rowPendingForUpdate[fieldName];
-                    changeIoStatus(depot,'temporal-ok', fieldName);
-                    /*jshint loopfunc: true */
-                    setTimeout(function(fieldName){
-                        changeIoStatus(depot,'ok', fieldName);
-                    },3000,fieldName);
-                    /*jshint loopfunc: false */
-                }else if(sameValue(retrievedRow[fieldName], source[fieldName])){
-                    // ok, si bien lo que viene no coincide con lo pendiente que sigue pendiente, 
-                    // sí coincide con lo que estaba antes de mandar a grabar, 
-                    // entonces no hay conflicto el usuario sabe sobre qué está modificando
+                if(fieldName in depot.rowPendingForUpdate){
+                    var source = fieldName in result.sendedForUpdate?result.sendedForUpdate:depot.retrievedRow;
+                    if(sameValue(depot.rowPendingForUpdate[fieldName], retrievedRow[fieldName])){
+                        // ok, lo que viene coincide con lo pendiente
+                        delete depot.rowPendingForUpdate[fieldName];
+                        changeIoStatus(depot,'temporal-ok', fieldName);
+                        /*jshint loopfunc: true */
+                        setTimeout(function(fieldName){
+                            changeIoStatus(depot,'ok', fieldName);
+                        },3000,fieldName);
+                        /*jshint loopfunc: false */
+                    }else if(sameValue(retrievedRow[fieldName], source[fieldName])){
+                        // ok, si bien lo que viene no coincide con lo pendiente que sigue pendiente, 
+                        // sí coincide con lo que estaba antes de mandar a grabar, 
+                        // entonces no hay conflicto el usuario sabe sobre qué está modificando
+                    }else{
+                        // no coincide con lo pendiente ni con lo anterior, 
+                        // hay un conflicto con el conocimiento del usuario que modificó algo que estaba en otro estado
+                        changeIoStatus(depot,'write-read-conflict', 
+                            fieldName, 
+                            myOwn.messages.anotherUserChangedTheRow+'. \n'+
+                            myOwn.messages.oldValue+': '+source[fieldName]+(
+                                whenMergeOverride?'':'\n'+myOwn.messages.actualValueInDB+': '+retrievedRow[fieldName]
+                            )
+                            // TODO: sería bueno agregar algúna opción de UNDO!
+                        );
+                        if(whenMergeOverride){
+                            depot.row[fieldName] = retrievedRow[fieldName];
+                            depot.rowControls[fieldName].setTypedValue(retrievedRow[fieldName]);
+                            delete depot.rowPendingForUpdate[fieldName];
+                        }
+                    }
                 }else{
-                    // no coincide con lo pendiente ni con lo anterior, 
-                    // hay un conflicto con el conocimiento del usuario que modificó algo que estaba en otro estado
-                    changeIoStatus(depot,'write-read-conflict', 
-                        fieldName, 
-                        myOwn.messages.anotherUserChangedTheRow+'. \n'+
-                        myOwn.messages.oldValue+': '+source[fieldName]+(
-                            whenMergeOverride?'':'\n'+myOwn.messages.actualValueInDB+': '+retrievedRow[fieldName]
-                        )
-                        // TODO: sería bueno agregar algúna opción de UNDO!
-                    );
-                    if(whenMergeOverride){
+                    if(!sameValue(retrievedRow[fieldName], depot.row[fieldName])){
+                        changeIoStatus(depot,'background-change', fieldName);
                         depot.row[fieldName] = retrievedRow[fieldName];
                         depot.rowControls[fieldName].setTypedValue(retrievedRow[fieldName]);
-                        delete depot.rowPendingForUpdate[fieldName];
+                        /*jshint loopfunc: true */
+                        setTimeout(function(fieldName){
+                            changeIoStatus(depot,'ok', fieldName);
+                        },3000,fieldName);
+                        /*jshint loopfunc: false */
                     }
-                }
-            }else{
-                if(!sameValue(retrievedRow[fieldName], depot.row[fieldName])){
-                    changeIoStatus(depot,'background-change', fieldName);
-                    depot.row[fieldName] = retrievedRow[fieldName];
-                    depot.rowControls[fieldName].setTypedValue(retrievedRow[fieldName]);
-                    /*jshint loopfunc: true */
-                    setTimeout(function(fieldName){
-                        changeIoStatus(depot,'ok', fieldName);
-                    },3000,fieldName);
-                    /*jshint loopfunc: false */
                 }
             }
         }

@@ -141,7 +141,7 @@ export type TableDefinition = EditableDbDefinition & {
     constraints?:Constraint[]
     detailTables?:DetailTable[]
     offline?:{
-        mode:'reference'|'master'|'detail'
+        mode:'reference'|'master'|'detail' 
         details:string[]
     }
 }
