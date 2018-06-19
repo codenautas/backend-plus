@@ -98,7 +98,8 @@
     "node": ">= 8.5"
   },
   "scripts": {
-    "test": "mocha --reporter spec --bail  test/test-k*.js",
+    "test": "mocha --reporter spec --bail  test/test-*.js",
+    "test-karma": "mocha --reporter spec --bail  test/test-k*.js",
     "test-why": "node --expose-internals ./node_modules/mocha/bin/_mocha --reporter spec --bail  test/test*.js",
     "test-ci": "mocha --reporter spec --bail  test/test*.js",
     "test-good": "mocha --reporter spec --bail --check-leaks test/test*.js",

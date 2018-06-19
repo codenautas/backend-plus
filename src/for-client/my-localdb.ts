@@ -28,7 +28,7 @@ export class LocalDb{
             }
         }
 
-        var requestDB=indexedDB.open(my.ldbName);
+        var requestDB=indexedDB.open(this.name);
         requestDB.onupgradeneeded = function(event){
             var db = requestDB.result;
             if(event.oldVersion<1){
