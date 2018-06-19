@@ -158,8 +158,8 @@ myOwn.autoSetupFunctions = [
                         $structures:'name',
                         $internals:'var'
                     };
-                    my.lblName="BP-buff-0.1.2";
-                    var requestDB=indexedDB.open(my.lblName);
+                    my.ldbName=my.appName+my.clientVersion;
+                    var requestDB=indexedDB.open(my.ldbName);
                     requestDB.onupgradeneeded = function(event){
                         var db = requestDB.result;
                         if(event.oldVersion<1){

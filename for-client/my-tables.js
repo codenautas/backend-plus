@@ -222,7 +222,7 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
                     if(JSON.stringify(versionInfo.stores[connector.tableName])!=JSON.stringify(infoStore)){
                         my.ldb.close();
                         versionInfo.num++;
-                        var request = indexedDB.open(my.lblName,versionInfo.num);
+                        var request = indexedDB.open(my.ldbName,versionInfo.num);
                         request.onupgradeneeded = function(event){
                             var db=request.result;
                             if(versionInfo.stores[connector.tableName]){
@@ -246,16 +246,16 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
                 })
             }
             if(connector.def.offline.mode==='master'){
-                promiseChain = promiseChain.then(function(){
-                    return Promise.all(connector.def.offline.details.map(function(tableName){
+                connector.def.offline.details.forEach(function(tableName){
+                    promiseChain = promiseChain.then(function(){
                         return my.getStructureFromLocalDb(tableName).then(function(tableDef){
                             if(!tableDef){
                                 var conn = new my.TableConnector({tableName, my});
                                 return conn.getStructure();
                             }
                         });
-                    }));
-                })
+                    });
+                });
             }
             promiseChain = promiseChain.then(function(){
                 return connector.def;

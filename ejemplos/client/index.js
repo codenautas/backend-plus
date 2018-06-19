@@ -1,4 +1,4 @@
-"use script";
+"use strict";
 
 var html=jsToHtml.html;
 
