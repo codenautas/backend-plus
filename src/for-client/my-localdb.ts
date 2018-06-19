@@ -1,12 +1,67 @@
-import { TableDefinition } from "backend-plus";
+//import { TableDefinition } from "backend-plus";
 
 "use strict";
 /// <reference path="../node_modules/types.d.ts/modules/myOwn/in-myOwn.d.ts" />
 /// <reference path="../../lib/in-backend-plus.d.ts" />
 
-class LocalDb{
-    constructor(name:string){
-        // si no existe construye $internals y $structures
+export type Store = {[key:string]:string};
+
+export class LocalDb{
+    constructor(public name:string){
+        var initialStores:Store={
+            $structures:'name',
+            $internals:'var'
+        };
+        var requestDB=indexedDB.open(this.name);
+        requestDB.onupgradeneeded = function(event){
+            var db = requestDB.result;
+            if(event.oldVersion<1){
+                var store:Store={};
+                likeAr(initialStores).forEach(function(keyPath, tableName){
+                    store[tableName] = db.createObjectStore(tableName, {keyPath: keyPath});
+                })
+                store.$internals.put({
+                    var:'version',
+                    num:1, 
+                    timestamp:new Date().toJSON(),
+                    stores:initialStores
+                });
+            }
+        }
+
+        var requestDB=indexedDB.open(my.ldbName);
+        requestDB.onupgradeneeded = function(event){
+            var db = requestDB.result;
+            if(event.oldVersion<1){
+                var store={};
+                likeAr(initialStores).forEach(function(keyPath, tableName){
+                    store[tableName] = db.createObjectStore(tableName, {keyPath: keyPath});
+                })
+                store.$internals.put({
+                    var:'version',
+                    num:1, 
+                    timestamp:new Date().toJSON(),
+                    stores:initialStores
+                });
+            }
+        }
+    }
+    private async IDBX(request: IDBRequest){
+        return new Promise(function(resolve, reject){
+            if('onsuccess' in request){
+                request.onsuccess=function(event){
+                    resolve(request.result);
+                }
+            }else{
+                request.oncomplete=function(event){
+                    resolve(request.result);
+                }
+            }
+            request.onerror=function(reject){
+                alertPromise(request.error.message)
+                reject(request.error);
+            }
+        })
     }
     async registerStructure(stucture:TableDefinition):Promise<void>{
 

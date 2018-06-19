@@ -70,6 +70,7 @@ var jsYaml = require('js-yaml');
 var TypeStore=require('type-store');
 
 var JSON4all = require('json4all');
+var LocalDb = require('./my-localdb').LocalDb;
 
 /** @param {T} x
  *  @returns {T}
@@ -154,6 +155,7 @@ myOwn.autoSetupFunctions = [
                 DialogPromise.path.img=my.path.img;
                 TypedControls.path.img=my.path.img;
                 if(my.config.config['grid-buffer']=='idbx'){
+                    my.ldb = new LocalDb(my.appName+my.clientVersion);
                     var initialStores={
                         $structures:'name',
                         $internals:'var'

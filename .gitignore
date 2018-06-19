@@ -38,3 +38,7 @@ sessions/
 .vscode/launch.json
 
 package-lock.json
+
+for-client/*.d.ts
+for-client/*.map
+for-client/*localdb.js
