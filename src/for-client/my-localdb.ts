@@ -1,5 +1,4 @@
 //import { TableDefinition } from "backend-plus";
-
 "use strict";
 /// <reference path="../node_modules/types.d.ts/modules/myOwn/in-myOwn.d.ts" />
 /// <reference path="../../lib/in-backend-plus.d.ts" />
