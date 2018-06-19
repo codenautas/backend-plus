@@ -11,6 +11,9 @@ describe("local-db", function(){
     before(function(){
         ldb = new LocalDb("the-test-name");
     });
+    after(function(){
+        ldb.close();
+    });
     it("put and get structure", async function(){
         var tableDef={
             name:'this_name',
