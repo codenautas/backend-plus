@@ -179,6 +179,11 @@ myOwn.comparator={
     }
 };
 
+myOwn.getStructureFromLocalDb = function getStructureFromLocalDb(tableName){
+    var req=my.ldb.transaction(['$structures'],'readonly').objectStore('$structures').get(tableName);
+    return IDBX(req);
+}
+
 myOwn.TableConnector = function(context, opts){
     var connector = this;
     for(var attr in context){
@@ -207,16 +212,17 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
     });
     if(my.ldb){
         structureFromBackend.then(function(tableDef){
+            var promiseChain=Promise.resolve();
             IDBX(my.ldb.transaction('$structures',"readwrite").objectStore('$structures').put(tableDef));
             if(!connector.localDef || JSON.stringify(tableDef)!=JSON.stringify(connector.localDef)){
                 var infoStore=tableDef.primaryKey;
-                return IDBX(
+                promiseChain=IDBX(
                     my.ldb.transaction('$internals','readonly').objectStore('$internals').get('version')
                 ).then(function(versionInfo){
                     if(JSON.stringify(versionInfo.stores[connector.tableName])!=JSON.stringify(infoStore)){
                         my.ldb.close();
                         versionInfo.num++;
-                        var request = indexedDB.open(my.lblName,versionInfo.num);
+                        var request = indexedDB.open(my.ldbName,versionInfo.num);
                         request.onupgradeneeded = function(event){
                             var db=request.result;
                             if(versionInfo.stores[connector.tableName]){
@@ -239,14 +245,24 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
                     }
                 })
             }
-            return connector.def;
+            if(connector.def.offline.mode==='master'){
+                connector.def.offline.details.forEach(function(tableName){
+                    promiseChain = promiseChain.then(function(){
+                        return my.getStructureFromLocalDb(tableName).then(function(tableDef){
+                            if(!tableDef){
+                                var conn = new my.TableConnector({tableName, my});
+                                return conn.getStructure();
+                            }
+                        });
+                    });
+                });
+            }
+            promiseChain = promiseChain.then(function(){
+                return connector.def;
+            });
+            return promiseChain;
         });
-        var structureFromLocal = IDBX(
-            my.ldb.transaction('$structures',"readwrite").objectStore('$structures').get(connector.tableName)
-        ).then(function(tableDef){
-            console.log(tableDef);
-            return tableDef;
-        });
+        var structureFromLocal = my.getStructureFromLocalDb(connector.tableName);
         connector.whenStructureReady = structureFromLocal.then(function(tableDef){
             if(!tableDef){ 
                 return structureFromBackend;
@@ -334,6 +350,127 @@ myOwn.TableConnector.prototype.deleteEnter = function enterRecord(depot){
             primaryKeyValues:depot.primaryKeyValues
         })
     );
+};
+
+
+myOwn.TableConnectorDirect = myOwn.TableConnector;
+
+myOwn.TableConnectorLocal = function(context, opts){
+    var connector = this;
+    for(var attr in context){
+        connector[attr] = context[attr];
+    }
+    connector.opts = opts||{};
+    connector.fixedFields = connector.opts.fixedFields || [];
+    connector.fixedField = {};
+    connector.fixedFields.forEach(function(pair){
+        if(!pair.range){
+            connector.fixedField[pair.fieldName] = pair.value;
+        }
+    });
+    connector.parameterFunctions=connector.opts.parameterFunctions||{};
+};
+
+myOwn.TableConnectorLocal.prototype.getStructure = function getStructure(){
+    var connector = this;
+    connector.whenStructureReady = my.getStructureFromLocalDb(connector.tableName).then(function(tableDef){
+        if(!tableDef){ 
+            var err = new Error;
+            err.code='NO-STRUCTURE';
+            throw err;
+        }
+        connector.def = changing(tableDef, connector.opts.tableDef||{});
+        return connector.def;
+    })
+    return connector.whenStructureReady;
+};
+
+myOwn.TableConnectorLocal.prototype.getData = function getData(){
+    var connector = this;
+    if(((connector.opts||{}).tableDef||{}).forInsertOnlyMode){
+        return Promise.resolve([]);
+    }
+    if(connector.parameterFunctions){
+        for(var x in connector.parameterFunctions||{}){
+            throw new Error('no soportado parameterFunctions');
+        }
+    }
+    return connector.whenStructureReady.then(function(){
+        var parentKey = [];
+        var filterValues = connector.fixedFields.slice();
+        var primaryKey = connector.def.primaryKey.slice();
+        var indexOfKey;
+        while(primaryKey.length && connector.fixedField[primaryKey[0]]){
+            var key=primaryKey.shift();
+            parentKey.push(connector.fixedField[key]);
+        }
+        return new Promise(function(resolve,reject){
+            var cursor = my.ldb.transaction([connector.tableName],'readonly').objectStore(connector.tableName).openCursor(IDBKeyRange.lowerBound(parentKey));
+            var rows=[];
+            var contador=0;
+            cursor.onsuccess=function(event){
+                var cursor = event.target.result;
+                if(cursor && ! parentKey.find(function(value,i){
+                    return value != cursor.value[connector.def.primaryKey[i]]
+                })){
+                    rows.push(cursor.value);
+                    cursor.continue();
+                    contador++
+                }else{
+                    console.log('xxxxxxxxxxxxxxxx EL CONTADOR', contador)
+                    resolve(rows);
+                }
+            }
+        }).then(function(rows){
+            return rows.filter(function(row){
+                return !filterValues.find(function(pair){
+                    return row[pair.fieldName]!=pair.value
+                });
+            });
+        })
+    }).then(function(rows){
+        connector.getElementToDisplayCount().textContent=rows.length+' '+my.messages.displaying+'...';
+        return bestGlobals.sleep(10).then(function(){
+            connector.my.adaptData(connector.def, rows);
+            return rows;
+        });
+    }).catch(function(err){
+        connector.getElementToDisplayCount().appendChild(html.span({style:'color:red', title: err.message},' error').create());
+        throw err;
+    })
+};
+
+myOwn.TableConnectorLocal.prototype.deleteRecord = function deleteRecord(depot, opts){
+    return (depot.primaryKeyValues===false?
+        Promise.resolve():
+        db[depot.def.name].delete(depot.primaryKeyValues).then(function(){
+            depot.tr.dispatchEvent(new CustomEvent('deletedRowOk'));
+            var grid=depot.manager;
+            grid.dom.main.dispatchEvent(new CustomEvent('deletedRowOk'));
+        })
+    );
+};
+
+myOwn.TableConnectorLocal.prototype.saveRecord = function saveRecord(depot, opts){
+    var connector = this;
+    var sendedForUpdate = depot.my.cloneRow(depot.rowPendingForUpdate);
+    depot.row.$dirty=true;
+    var tx = my.ldb.transaction([connector.tableName],'readwrite');
+    var store=tx.objectStore(connector.tableName);
+    return IDBX(store.put(depot.row)).then(function(pk){
+        return IDBX(store.get(pk));
+    }).then(function(row){
+        return IDBX(tx).then(function(){
+            return {sendedForUpdate:sendedForUpdate, updatedRow:row};
+        })
+    });
+};
+
+myOwn.TableConnectorLocal.prototype.enterRecord = function enterRecord(depot){
+    return Promise.resolve();
+};
+myOwn.TableConnectorLocal.prototype.deleteEnter = function enterRecord(depot){
+    return Promise.resolve();
 };
 
 myOwn.TableGrid = function(context, mainElement){
@@ -777,7 +914,11 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
             tdMargin.colSpan = td.cellIndex+1;
             var tdGrid = newTr.insertCell(-1);
             tdGrid.colSpan = tr.cells.length-td.cellIndex;
-            tdGrid.style.maxWidth='inherit';
+            var divGrid = tdGrid;
+            divGrid.style.maxWidth=td.parentNode.offsetWidth - td.offsetLeft + 'px';
+            divGrid.style.overflowX='visible';
+            tdGrid.className='my-detail-grid';
+            tdGrid.style.overflowX='visible';
             var fixedFields = detailTableDef.fields.map(function(pair){
                 var fieldCondition={fieldName: pair.target, value:depot.row[pair.source]}
                 if(pair.range){
@@ -786,7 +927,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
                 return fieldCondition;
             });
             if(!detailControl.table){
-                grid.my.tableGrid(detailTableDef.table, tdGrid, {fixedFields: fixedFields}).waitForReady(function(g){
+                grid.my.tableGrid(detailTableDef.table, divGrid, {fixedFields: fixedFields}).waitForReady(function(g){
                     detailControl.table=g.dom.table;
                     if(detailTableDef.refreshParent || grid.def.complexDef && detailTableDef.refreshParent!==false){
                         var refresh = function refresh(){
@@ -797,7 +938,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
                     }
                 });
             }else{
-                tdGrid.appendChild(detailControl.table);
+                divGrid.appendChild(detailControl.table);
             }
             detailControl.show = true;
             newTr.detailTableNameAndAbr=detailTableNameAndAbr;
@@ -1521,13 +1662,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         var grid = this;
         var forInsert = false; // not define how to detect
         var tr = depot;
-        if(!skipUpdateStatus){
-            depot.status = 'loaded';
-            depot.primaryKeyValues = grid.def.primaryKey.map(function(fieldName){ 
-                return depot.row[fieldName]; 
-            });
-            depot.tr.setAttribute('pk-values',JSON.stringify(depot.primaryKeyValues))
-        }
+        grid.setRowStyle(depot,depot.row, skipUpdateStatus);
         grid.def.fields.forEach(function(fieldDef){
             var td = depot.rowControls[fieldDef.name];
             var editable=grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
@@ -1605,61 +1740,79 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             grid.depotRefresh(depot,{updatedRow:result[0], sendedForUpdate:{}});
         })
     }
+    grid.setRowStyle = function setRowStyle(depot, row, skipUpdateStatus){
+        if(!skipUpdateStatus){
+            depot.status = 'loaded';
+            depot.primaryKeyValues = grid.def.primaryKey.map(function(fieldName){ 
+                return depot.row[fieldName]; 
+            });
+            depot.tr.setAttribute('pk-values',JSON.stringify(depot.primaryKeyValues))
+        }
+        if(row.$dirty){
+            var tdActions = depot.tr.querySelector('.grid-th-actions');
+            tdActions.style.backgroundImage='url('+my.path.img+'/not-sync.png)'
+            tdActions.style.backgroundSize='contain'
+            tdActions.style.backgroundRepeat='no-repeat'
+        }
+    }
     grid.depotRefresh = function depotRefresh(depot,result){
+        // ¡ATENCIÓN!: esta función no debe despleegar, llama a updateRowData, ahí se despliega
         upadteNumberOfRows(depot,grid);
         var retrievedRow = result.updatedRow;
         for(var fieldName in retrievedRow){
-            if(!grid.def.field[fieldName].clientSide){
-                var value = depot.rowControls[fieldName].getTypedValue();
-                if(!sameValue(depot.row[fieldName], value)){
-                    if(grid.def.field[fieldName].allow.update){
-                        depot.rowPendingForUpdate[fieldName] = value;
+            if(!/^\$/.test(fieldName)){
+                if(!grid.def.field[fieldName].clientSide){
+                    var value = depot.rowControls[fieldName].getTypedValue();
+                    if(!sameValue(depot.row[fieldName], value)){
+                        if(grid.def.field[fieldName].allow.update){
+                            depot.rowPendingForUpdate[fieldName] = value;
+                        }
+                        depot.row[fieldName] = value;
                     }
-                    depot.row[fieldName] = value;
                 }
-            }
-            if(fieldName in depot.rowPendingForUpdate){
-                var source = fieldName in result.sendedForUpdate?result.sendedForUpdate:depot.retrievedRow;
-                if(sameValue(depot.rowPendingForUpdate[fieldName], retrievedRow[fieldName])){
-                    // ok, lo que viene coincide con lo pendiente
-                    delete depot.rowPendingForUpdate[fieldName];
-                    changeIoStatus(depot,'temporal-ok', fieldName);
-                    /*jshint loopfunc: true */
-                    setTimeout(function(fieldName){
-                        changeIoStatus(depot,'ok', fieldName);
-                    },3000,fieldName);
-                    /*jshint loopfunc: false */
-                }else if(sameValue(retrievedRow[fieldName], source[fieldName])){
-                    // ok, si bien lo que viene no coincide con lo pendiente que sigue pendiente, 
-                    // sí coincide con lo que estaba antes de mandar a grabar, 
-                    // entonces no hay conflicto el usuario sabe sobre qué está modificando
+                if(fieldName in depot.rowPendingForUpdate){
+                    var source = fieldName in result.sendedForUpdate?result.sendedForUpdate:depot.retrievedRow;
+                    if(sameValue(depot.rowPendingForUpdate[fieldName], retrievedRow[fieldName])){
+                        // ok, lo que viene coincide con lo pendiente
+                        delete depot.rowPendingForUpdate[fieldName];
+                        changeIoStatus(depot,'temporal-ok', fieldName);
+                        /*jshint loopfunc: true */
+                        setTimeout(function(fieldName){
+                            changeIoStatus(depot,'ok', fieldName);
+                        },3000,fieldName);
+                        /*jshint loopfunc: false */
+                    }else if(sameValue(retrievedRow[fieldName], source[fieldName])){
+                        // ok, si bien lo que viene no coincide con lo pendiente que sigue pendiente, 
+                        // sí coincide con lo que estaba antes de mandar a grabar, 
+                        // entonces no hay conflicto el usuario sabe sobre qué está modificando
+                    }else{
+                        // no coincide con lo pendiente ni con lo anterior, 
+                        // hay un conflicto con el conocimiento del usuario que modificó algo que estaba en otro estado
+                        changeIoStatus(depot,'write-read-conflict', 
+                            fieldName, 
+                            myOwn.messages.anotherUserChangedTheRow+'. \n'+
+                            myOwn.messages.oldValue+': '+source[fieldName]+(
+                                whenMergeOverride?'':'\n'+myOwn.messages.actualValueInDB+': '+retrievedRow[fieldName]
+                            )
+                            // TODO: sería bueno agregar algúna opción de UNDO!
+                        );
+                        if(whenMergeOverride){
+                            depot.row[fieldName] = retrievedRow[fieldName];
+                            depot.rowControls[fieldName].setTypedValue(retrievedRow[fieldName]);
+                            delete depot.rowPendingForUpdate[fieldName];
+                        }
+                    }
                 }else{
-                    // no coincide con lo pendiente ni con lo anterior, 
-                    // hay un conflicto con el conocimiento del usuario que modificó algo que estaba en otro estado
-                    changeIoStatus(depot,'write-read-conflict', 
-                        fieldName, 
-                        myOwn.messages.anotherUserChangedTheRow+'. \n'+
-                        myOwn.messages.oldValue+': '+source[fieldName]+(
-                            whenMergeOverride?'':'\n'+myOwn.messages.actualValueInDB+': '+retrievedRow[fieldName]
-                        )
-                        // TODO: sería bueno agregar algúna opción de UNDO!
-                    );
-                    if(whenMergeOverride){
+                    if(!sameValue(retrievedRow[fieldName], depot.row[fieldName])){
+                        changeIoStatus(depot,'background-change', fieldName);
                         depot.row[fieldName] = retrievedRow[fieldName];
                         depot.rowControls[fieldName].setTypedValue(retrievedRow[fieldName]);
-                        delete depot.rowPendingForUpdate[fieldName];
+                        /*jshint loopfunc: true */
+                        setTimeout(function(fieldName){
+                            changeIoStatus(depot,'ok', fieldName);
+                        },3000,fieldName);
+                        /*jshint loopfunc: false */
                     }
-                }
-            }else{
-                if(!sameValue(retrievedRow[fieldName], depot.row[fieldName])){
-                    changeIoStatus(depot,'background-change', fieldName);
-                    depot.row[fieldName] = retrievedRow[fieldName];
-                    depot.rowControls[fieldName].setTypedValue(retrievedRow[fieldName]);
-                    /*jshint loopfunc: true */
-                    setTimeout(function(fieldName){
-                        changeIoStatus(depot,'ok', fieldName);
-                    },3000,fieldName);
-                    /*jshint loopfunc: false */
                 }
             }
         }

@@ -6,28 +6,33 @@ gridColor = rgba(255,255,255,0.9)
 .my-grid caption
   background gridColor
 
-border-table()
+border-table-no-right()
   border-bottom 2px solid #997
   border-top    2px solid #997
   border-left   2px solid #997
-  border-right  2px solid #997
   margin 0px
   border-spacing 0px
   border-collapse collapse
+
+border-table()
+  border-table-no-right()
+  border-right  2px solid #997
   
 .my-grid
-  border-table()
+  border-table-no-right()
 
 nowrap()
   @media print
     white-space unset
   white-space pre
-  overflow hidden
   max-width 300px
   
 .my-grid td
   border-table()
   nowrap()
+
+.my-grid td[my-colname]
+  overflow hidden
 
 /*  
 .my-grid[my-orientation=vertical] td
@@ -45,6 +50,7 @@ nowrap()
 
 .my-grid tbody th
   nowrap()
+  overflow hidden
 
 .my-grid caption
   border-table()
@@ -135,6 +141,7 @@ nowrap()
 
 .my-grid td.autoFilter{
   nowrap()
+  overflow hidden
   white-space nowrap
   padding-left 16px
   background padding-box #CEF no-repeat
@@ -267,3 +274,7 @@ th.th-agg
     display none
   .my-grid th
     font-size 80%
+
+.my-grid td.my-detail-grid
+  overflow-x visible
+  border-right none 

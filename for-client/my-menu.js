@@ -290,6 +290,9 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
                 if(my.ldb && my.offline){
                     my.offline.mode=!my.offline.mode;
                     my.offlineModeRefresh();
+                    var actualHref=location.href;
+                    history.pushState(null, null, actualHref);
+                    my.showPage();
                 }
             })
         ]));
@@ -316,6 +319,9 @@ myOwn.displayMainMenu = function(addrParams){
     totalLayout.appendChild(html.div({id:'main_layout'}).create());
     setTimeout(function(){
         menu.realigns.reverse().forEach(function(realign){ if(realign){ realign(); }});
+    },10);
+    setTimeout(function(){
+        my.offlineModeRefresh();
     },10);
     return menu;
 };
@@ -365,7 +371,18 @@ myOwn.offlineModeRefresh = function offlineModeRefresh(){
     /** @type {HTMLImageElement} */
     // @ts-ignore
     var imgLight = document.getElementById('light-airplane');
-    my.offline=my.offline||{};
+    if(!('offline' in my)){
+        my.offline={};
+        Object.defineProperty(my.offline, 'mode', {
+            get:function(){
+                return localStorage.getItem(my.appName+my.clientVersion+'_offline_mode')=='offline';
+            },
+            set:function(offline){
+                return localStorage.setItem(my.appName+my.clientVersion+'_offline_mode', offline?'offline':'online');
+            }
+        })
+    }
+    
     var skin=((my.config||{}).config||{}).skin;
     var skinUrl=(skin?skin+'/':'');
     if(my.offline.mode){
@@ -383,12 +400,11 @@ window.addEventListener('load', function(){
     window.my = myOwn;
     my.autoSetup().then(function(){
         my.showPage();
-    }).then(function(){
-        my.offlineModeRefresh();
     })
     document.body.appendChild(html.div({id:'cached-images'},[
-        html.img({src:my.path.img+'airplain-off.png'}),
-        html.img({src:my.path.img+'airplain.png'}),
+        html.img({src:my.path.img+'airplane-on.png'}),
+        html.img({src:my.path.img+'airplane-off.png'}),
+        html.img({src:my.path.img+'airplane.png'}),
         html.img({src:my.path.img+'server.png'}),
         html.img({src:my.path.img+'network-signal.png'}),
         html.img({src:my.path.img+'server-error.png'}),

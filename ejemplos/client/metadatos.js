@@ -1,4 +1,4 @@
-"use script";
+"use stict";
 var html=jsToHtml.html;
 var coalesce = bestGlobals.coalesce;
 /*var fs = require('fs');

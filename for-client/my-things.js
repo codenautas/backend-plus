@@ -158,8 +158,8 @@ myOwn.autoSetupFunctions = [
                         $structures:'name',
                         $internals:'var'
                     };
-                    my.lblName="BP-buff-0.1.0";
-                    var requestDB=indexedDB.open(my.lblName);
+                    my.ldbName=my.appName+my.clientVersion;
+                    var requestDB=indexedDB.open(my.ldbName);
                     requestDB.onupgradeneeded = function(event){
                         var db = requestDB.result;
                         if(event.oldVersion<1){
@@ -283,8 +283,9 @@ myOwn.fade = function fade(element, options){
         });
         var div=document.createElement('div');
         dummyTr.cells[1].appendChild(div);
-        div.style.height=(element.cells[0].offsetHeight-2)+'px';
+        div.style.height=Math.min(window.innerHeight*0.5, element.cells[0].offsetHeight-2)+'px';
         div.style.transition='height 0.6s ease';
+        div.style.overflowY='hidden';
         parent.replaceChild(dummyTr, element);
         if(options.smooth.content){
             div.appendChild(options.smooth.content);
