@@ -100,7 +100,8 @@
     "server-test": "node test/run-simple-backend.js",
     "example-tables": "node examples/tables/server/server-tables.js --dir-x examples/tables",
     "example-fichas": "node examples/fichero/server/server-fichas.js",
-    "example-4test": "node examples/4test/server/server-4test.js"
+    "example-4test": "node examples/4test/server/server-4test.js",
+    "prepublish": "(tsc -p tsconfig-client.json || echo \"continue w/error\") && (tsc -p tsconfig-server.json  || echo \"continue w/error\")"
   },
   "qa-control": {
     "package-version": "0.3.0",

@@ -1,17 +1,21 @@
 {
     "compilerOptions": {
-        "lib":["es2017", "es2015", "dom"],
+        "declaration": true,
+        "outDir": "this-dir-must-not-be-created",
+        "sourceMap": true,
+        "moduleResolution": "node",
+        "lib":["es2015", "dom"],
+        "target": "es5",
+        "module": "umd",
+        "typeRoots" : ["node_modules/@types", "node_modules/types.d.ts/modules"],
         "noImplicitAny": true,
         "alwaysStrict": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
-        "typeRoots" : ["node_modules/@types", "node_modules/types.d.ts/modules"],
-        "noFallthroughCasesInSwitch": true,
-        "allowJs": true,
-        "strict": true,
-        "strictFunctionTypes": true,
-        "strictNullChecks": true,
-        "checkJs": true
-    }
+        "noFallthroughCasesInSwitch": true
+    },
+    "include":[
+        "src"
+    ]
 }

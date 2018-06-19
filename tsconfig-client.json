@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "outDir": "./for-client",
+        "allowJs": true,
+        "checkJs": true
+    },
+    "include":[
+        "src/for-client"
+    ],
+    "extends": "./tsconfig.json"
+}
