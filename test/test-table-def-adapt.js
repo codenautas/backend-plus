@@ -37,6 +37,7 @@ describe("table-def-adapt", function(){
             JSONFieldForOtherFields: false,
             "action": "all/defaults",
             "actionNamesList": [],
+            "adapted": 1,
             "alias": "the-table-name",
             "allow": {
               "delete": false,
@@ -62,6 +63,10 @@ describe("table-def-adapt", function(){
             },
             "name": "the-table-name",
             "nameFields": [],
+            "offline": {
+                "details": null,
+                "mode": false
+            },
             "softForeignKeys": [],
             "sql": {
               "fields": {},
