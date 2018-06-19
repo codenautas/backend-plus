@@ -4,8 +4,6 @@ import * as net from "net";
 import * as express from "express";
 import * as pg from "pg-promise-strict";
 
-export * from "net";
-
 export type Server=net.Server;
 
 export interface coreFunctionParameters{
