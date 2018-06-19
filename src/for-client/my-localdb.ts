@@ -1,40 +1,27 @@
 //import { TableDefinition } from "backend-plus";
 "use strict";
+/// <amd-dependency path="../../../node_modules/like-ar/like-ar.d.ts" name="likeAr"/>
+//x// <reference path="../../node_modules/like-ar/like-ar.d.ts" />
 /// <reference path="../node_modules/types.d.ts/modules/myOwn/in-myOwn.d.ts" />
 /// <reference path="../../lib/in-backend-plus.d.ts" />
 
 export type Store = {[key:string]:string};
 
 export class LocalDb{
+    private db:IDBDatabase;
     constructor(public name:string){
+        var ldb=this;
         var initialStores:Store={
             $structures:'name',
             $internals:'var'
         };
         var requestDB=indexedDB.open(this.name);
         requestDB.onupgradeneeded = function(event){
-            var db = requestDB.result;
+            ldb.db = requestDB.result;
             if(event.oldVersion<1){
                 var store:Store={};
                 likeAr(initialStores).forEach(function(keyPath, tableName){
-                    store[tableName] = db.createObjectStore(tableName, {keyPath: keyPath});
-                })
-                store.$internals.put({
-                    var:'version',
-                    num:1, 
-                    timestamp:new Date().toJSON(),
-                    stores:initialStores
-                });
-            }
-        }
-
-        var requestDB=indexedDB.open(this.name);
-        requestDB.onupgradeneeded = function(event){
-            var db = requestDB.result;
-            if(event.oldVersion<1){
-                var store={};
-                likeAr(initialStores).forEach(function(keyPath, tableName){
-                    store[tableName] = db.createObjectStore(tableName, {keyPath: keyPath});
+                    store[tableName] = ldb.db.createObjectStore(tableName, {keyPath: keyPath});
                 })
                 store.$internals.put({
                     var:'version',
@@ -62,11 +49,42 @@ export class LocalDb{
             }
         })
     }
-    async registerStructure(stucture:TableDefinition):Promise<void>{
-
+    async registerStructure(tableDef:TableDefinition):Promise<{new?:true, dataErased?:true, changed:boolean}>{
+        var ldb=this;
+        var result:{new?:true, dataErased?:true, changed:boolean}={};
+        var tx=ldb.db.transaction(['$structures','$internals'],"readwrite");
+        var oldValue = await this.IDBX(tx.objectStore('$structures').get(tableDef.name));
+        if(!oldValue){
+            result.new=true;
+        }
+        await ldb.IDBX(tx.objectStore('$structures').put(tableDef));
+        result.changed=JSON.stringify(tableDef)!=JSON.stringify(oldValue);
+        var infoStore=tableDef.primaryKey;
+        var versionInfo = await IDBX(tx.objectStore('$internals').get('version'))
+        if(JSON.stringify(versionInfo.stores[tableDef.tableName])!=JSON.stringify(infoStore)){
+            await ldb.IDBX(tx);
+            ldb.db.close();
+            versionInfo.num++;
+            var request = indexedDB.open(my.ldbName,versionInfo.num);
+            request.onupgradeneeded = function(event){
+                var db=request.result;
+                if(versionInfo.stores[connector.tableName]){
+                    db.deleteObjectStore(connector.tableName);
+                }
+                db.createObjectStore(connector.tableName,{keyPath:infoStore})
+            }
+            ldb.db = await ldb.IDBX(request);
+            versionInfo.stores[connector.tableName]=infoStore;
+            await ldb.IDBX(ldb.db.transaction('$internals',"readwrite").objectStore('$internals').put(versionInfo));
+        }else{
+            await ldb.IDBX(tx);
+        }
+        return result;
     }
     async getStructure(tableName:string):Promise<TableDefinition>{
-
+        var ldb=this;
+        var tableDef = await ldb.IDBX(ldb.db.transaction('$structures',"readwrite").objectStore('$structures').get(tableName));
+        return tableDef;
     }
     async getOneIfExists<T>(tableName:string, key:string[]):Promise<T|undefined>{
         var result = await this.getChild<T>(tableName, key);
