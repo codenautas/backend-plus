@@ -5,7 +5,7 @@
 /// <reference path="../node_modules/types.d.ts/modules/myOwn/in-myOwn.d.ts" />
 /// <reference path="../../lib/in-backend-plus.d.ts" />
 
-export type Store = {[key:string]:string};
+export type Store = {[key:string]:any};
 
 export class LocalDb{
     private db:IDBDatabase;
@@ -20,7 +20,7 @@ export class LocalDb{
             ldb.db = requestDB.result;
             if(event.oldVersion<1){
                 var store:Store={};
-                likeAr(initialStores).forEach(function(keyPath, tableName){
+                likeAr(initialStores).forEach(function(keyPath: string, tableName: string){
                     store[tableName] = ldb.db.createObjectStore(tableName, {keyPath: keyPath});
                 })
                 store.$internals.put({
@@ -51,7 +51,7 @@ export class LocalDb{
     }
     async registerStructure(tableDef:TableDefinition):Promise<{new?:true, dataErased?:true, changed:boolean}>{
         var ldb=this;
-        var result:{new?:true, dataErased?:true, changed:boolean}={};
+        var result:{new?:true, dataErased?:true, changed:boolean}={changed:null};
         var tx=ldb.db.transaction(['$structures','$internals'],"readwrite");
         var oldValue = await this.IDBX(tx.objectStore('$structures').get(tableDef.name));
         if(!oldValue){
@@ -60,21 +60,21 @@ export class LocalDb{
         await ldb.IDBX(tx.objectStore('$structures').put(tableDef));
         result.changed=JSON.stringify(tableDef)!=JSON.stringify(oldValue);
         var infoStore=tableDef.primaryKey;
-        var versionInfo = await IDBX(tx.objectStore('$internals').get('version'))
+        var versionInfo = await this.IDBX(tx.objectStore('$internals').get('version'))
         if(JSON.stringify(versionInfo.stores[tableDef.tableName])!=JSON.stringify(infoStore)){
             await ldb.IDBX(tx);
             ldb.db.close();
             versionInfo.num++;
-            var request = indexedDB.open(my.ldbName,versionInfo.num);
+            var request = indexedDB.open(this.name,versionInfo.num);
             request.onupgradeneeded = function(event){
                 var db=request.result;
-                if(versionInfo.stores[connector.tableName]){
-                    db.deleteObjectStore(connector.tableName);
+                if(versionInfo.stores[tableDef.tableName]){
+                    db.deleteObjectStore(tableDef.tableName);
                 }
-                db.createObjectStore(connector.tableName,{keyPath:infoStore})
+                db.createObjectStore(tableDef.tableName,{keyPath:infoStore})
             }
             ldb.db = await ldb.IDBX(request);
-            versionInfo.stores[connector.tableName]=infoStore;
+            versionInfo.stores[tableDef.tableName]=infoStore;
             await ldb.IDBX(ldb.db.transaction('$internals',"readwrite").objectStore('$internals').put(versionInfo));
         }else{
             await ldb.IDBX(tx);
@@ -101,10 +101,12 @@ export class LocalDb{
         return result;
     }
     async getChild<T>(tableName:string, parentKey:string[]):Promise<T[]>{
-
+        var ldb=this;
+        var result = await ldb.IDBX(ldb.db.transaction('$structures',"readonly").objectStore(tableName).get(parentKey));
+        return result;
     }
     async getAll<T>(tableName:string):Promise<T[]>{
-        return this.getChild([]);
+        return this.getChild(tableName,[]);
     }
     async putOne<T>(tableName:string, elements:T):Promise<T>{
 

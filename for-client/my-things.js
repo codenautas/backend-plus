@@ -155,31 +155,11 @@ myOwn.autoSetupFunctions = [
                 DialogPromise.path.img=my.path.img;
                 TypedControls.path.img=my.path.img;
                 if(my.config.config['grid-buffer']=='idbx'){
-                    my.ldb = new LocalDb(my.appName+my.clientVersion);
-                    var initialStores={
-                        $structures:'name',
-                        $internals:'var'
-                    };
-                    my.ldbName=my.appName+my.clientVersion;
-                    var requestDB=indexedDB.open(my.ldbName);
-                    requestDB.onupgradeneeded = function(event){
-                        var db = requestDB.result;
-                        if(event.oldVersion<1){
-                            var store={};
-                            likeAr(initialStores).forEach(function(keyPath, tableName){
-                                store[tableName] = db.createObjectStore(tableName, {keyPath: keyPath});
-                            })
-                            store.$internals.put({
-                                var:'version',
-                                num:1, 
-                                timestamp:new Date().toJSON(),
-                                stores:initialStores
-                            });
-                        }
+                    try{
+                        my.ldb = new LocalDb(my.appName+my.clientVersion);
+                    }catch(err){
+                        my.log(err);
                     }
-                    return IDBX(requestDB).then(function(db){
-                        my.ldb = db;
-                    }).catch(my.log);
                 }
             });
         };
