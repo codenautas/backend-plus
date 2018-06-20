@@ -21,10 +21,19 @@
                 "$tsc"
             ]
         },
+        {   
+            "identifier": "tsc-test", 
+            "label": "tsc-test", 
+            "type": "typescript",
+            "tsconfig": "tsconfig-test.json",
+            "problemMatcher": [
+                "$tsc"
+            ]
+        },
         {
             "identifier": "build-all",
             "label": "build-all",
-            "dependsOn": ["tsc-client", "tsc-server"]
+            "dependsOn": ["tsc-client", "tsc-server", "tsc-test"]
         }
     ]
 }

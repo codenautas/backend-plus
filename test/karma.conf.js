@@ -30,7 +30,7 @@ module.exports = function(config, preConfig) {
       'node_modules/self-explain/lib/self-explain.js',
       'node_modules/type-store/type-store.js',
       'for-client/my-localdb.js',
-      'test/karma/*.js'
+      'test/test-karma-*.js'
     ],
 
 
