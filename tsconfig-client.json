@@ -1,12 +1,13 @@
 {
     "compilerOptions": {
-        "outDir": "./for-client",
+        "outDir": ".",
         "target": "es2017",
         "allowJs": true,
         "checkJs": true
     },
     "include":[
-        "src/for-client"
+        "src/for-client", "src/test/test-karma-*"
     ],
+    "exclude":[],
     "extends": "./tsconfig.json"
 }
