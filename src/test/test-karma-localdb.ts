@@ -60,8 +60,8 @@ describe("local-db", function(){
         var mass:Quantity = {quantity: 'mass', preferedUnit:'g'};
         var quantities:Quantity[]=[
             mass,
-            {quantity:'volume', preferedUnit:'l'},
             {quantity:'time', preferedUnit:'s'},
+            {quantity:'volume', preferedUnit:'l'},
         ];
         before(async function(){
             await ldb.registerStructure(tableDef);
@@ -75,17 +75,17 @@ describe("local-db", function(){
         })
         it("get one", async function(){
             var volume = await ldb.getOne<Quantity>("phisical_quantities", ["volume"]);
-            compare(volume, quantities[1]);
+            compare(volume, quantities[2]);
         })
         it("get one if exists and exists", async function(){
             var time = await ldb.getOneIfExists<Quantity>("phisical_quantities", ["time"]);
-            compare(time, quantities[2]);
+            compare(time, quantities[1]);
         })
         it("get one if exists and do not exists", async function(){
             var undef = await ldb.getOneIfExists<Quantity>("phisical_quantities", ["fourth dimension"]);
             compare(undef, undefined);
         })
-        it.skip("get all",async function(){
+        it("get all",async function(){
             var all = await ldb.getAll<Quantity>("phisical_quantities");
             compare(all, quantities);
         })
@@ -105,6 +105,12 @@ describe("local-db", function(){
             {quantity:'volume', unit:'cm3'},
             {quantity:'volume', unit:'m3'},
         ]
+        var volumeUnitsSorted=[
+            {quantity:'volume', unit:'cm3'},
+            {quantity:'volume', unit:'l'},
+            {quantity:'volume', unit:'m3'},
+            {quantity:'volume', unit:'ml'},
+        ]
         var massUnits=[
             {quantity:'mass', unit:'g'},
             {quantity:'mass', unit:'kg'},
@@ -121,7 +127,7 @@ describe("local-db", function(){
         })
         it("get volume childs", async function(){
             var obtainedVolumes=await ldb.getChild<Units>("units", ["volume"]);
-            compare(obtainedVolumes, volumeUnits);
+            compare(obtainedVolumes, volumeUnitsSorted);
         })
         it("get mass childs", async function(){
             var obtainedMass=await ldb.getChild("units", ["mass"]);

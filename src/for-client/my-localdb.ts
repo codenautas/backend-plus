@@ -135,8 +135,26 @@ export class LocalDb{
     async getChild<T>(tableName:string, parentKey:Key):Promise<T[]>{
         var ldb=this;
         var db=await ldb.wait4db
-        var result = await ldb.IDBX<T[]>(db.transaction('$structures',"readonly").objectStore(tableName).get(parentKey));
-        return result;
+        var rows:T[]=[];
+        var cursor = db.transaction([tableName],'readonly').objectStore(tableName).openCursor(IDBKeyRange.lowerBound(parentKey));
+        return new Promise<T[]>(function(resolve, reject){
+            cursor.onsuccess=function(event){
+                // @ts-ignore target no conoce result en la definición de TS. Verificar dentro de un tiempo si TS mejoró
+                var cursor:IDBCursorWithValue = event.target.result;
+                if(cursor && ! parentKey.find(function(expectedValue,i){
+                    var storedValue = (cursor.key as any[])[i]
+                    return expectedValue != storedValue
+                })){
+                    rows.push(cursor.value);
+                    cursor.continue();
+                }else{
+                    resolve(rows);
+                }
+            }
+            cursor.onerror=function(){
+                reject(cursor.error);
+            }
+        });
     }
     async getAll<T>(tableName:string):Promise<T[]>{
         return this.getChild<T>(tableName,[]);
