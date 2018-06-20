@@ -12,11 +12,26 @@
 /// <reference path="lib/in-backend-plus.d.ts" />
 /// <reference path="lib/backend-plus.d.ts" />
 
+/****
+ * Atención en la implementación de este módulo se tiene en cuenta que según
+ * https://caniuse.com/#feat=indexeddb ocurren dos cosas trágicas:
+ *   1) en IE y EDGE no hay claves de tipo array
+ *   2) en iOS de 8 a 9.3 hay un error que no permite que en dos objetos distintos haya una misma Pk
+ * 
+ * más explicaciones en:
+ *   1) https://stackoverflow.com/questions/14283257/dataerror-when-creating-an-index-with-a-compound-key-in-ie-10
+ *   2) https://www.raymondcamden.com/2014/09/25/IndexedDB-on-iOS-8-Broken-Bad/
+ * 
+ * hay un test en:
+ *   a) https://codepen.io/cemerick/pen/Itymi
+ */
+
 import * as likeAr from "like-ar";
 
 export type Key = string[];
 export type Stores = {[key:string]:IDBObjectStore};
 export type StoreDefs = {[key:string]:Key|string};
+export type Record = {[key:string]:any};
 
 export interface TableDefinition{
     name:string
@@ -30,13 +45,24 @@ type VersionInfo = {
     stores:StoreDefs
 }
 
+type RegisterResult={new?:true, dataErased?:true, changed:boolean};
+
+type DetectFeatures={
+    needToUnwrapArrayKeys:boolean|null
+}
+
+export var detectedFeatures:DetectFeatures={
+    needToUnwrapArrayKeys:true || null
+}
+
 export class LocalDb{
     private wait4db:Promise<IDBDatabase>;
     constructor(public name:string){
         var ldb=this;
         var initialStores:StoreDefs={
             $structures:'name',
-            $internals:'var'
+            $internals:'var',
+            $detect:['detectKey'],
         };
         var initialVersionInfo:VersionInfo={
             var:'version',
@@ -53,6 +79,20 @@ export class LocalDb{
                     store[tableName] = db.createObjectStore(tableName, {keyPath: keyPath});
                 })
                 store.$internals.put(initialVersionInfo);
+            }
+            if(detectedFeatures.needToUnwrapArrayKeys==null){
+                var request = store.$detect.put({detectKey:'one'});
+                request.onsuccess=function(){
+                    var key=request.result;
+                    if(typeof key === "string"){
+                        detectedFeatures.needToUnwrapArrayKeys=true;
+                    }else{
+                        detectedFeatures.needToUnwrapArrayKeys=false;
+                    }
+                };
+                request.onerror=function(){
+                    detectedFeatures.needToUnwrapArrayKeys=true;
+                };
             }
         }
         ldb.wait4db = ldb.IDBX(requestDB);
@@ -77,21 +117,29 @@ export class LocalDb{
             }
         })
     }
-    async registerStructure(tableDef:TableDefinition):Promise<{new?:true, dataErased?:true, changed:boolean}>{
+    async registerStructure(tableDef:TableDefinition):Promise<RegisterResult>{
+        var wait4dbCurrent=this.wait4db;
+        var registerTask=this.registerStructureInside(tableDef, wait4dbCurrent);
+        this.wait4db = registerTask.then(result=>result.wait4db);
+        var result=await registerTask; 
+        return result.result;
+    }
+    private async registerStructureInside(tableDef:TableDefinition, wait4db:Promise<IDBDatabase>):Promise<{
+        wait4db:Promise<IDBDatabase>,
+        result:RegisterResult
+    }>{
         var ldb=this;
-        var db=await ldb.wait4db;
-        var result:{new?:true, dataErased?:true, changed:boolean}={changed:null};
-        var tx=db.transaction(['$structures','$internals'],"readwrite");
-        var oldValue = await this.IDBX(tx.objectStore('$structures').get(tableDef.name));
+        var db=await wait4db;
+        var result:{wait4db:Promise<IDBDatabase>,result:RegisterResult}={wait4db, result:{changed:null}};
+        var oldValue = await this.IDBX(db.transaction('$structures',"readonly").objectStore('$structures').get(tableDef.name));
         if(!oldValue){
-            result.new=true;
+            result.result.new=true;
         }
-        await ldb.IDBX(tx.objectStore('$structures').put(tableDef));
-        result.changed=JSON.stringify(tableDef)!=JSON.stringify(oldValue);
-        var infoStore=tableDef.primaryKey;
-        var versionInfo = await this.IDBX<VersionInfo>(tx.objectStore('$internals').get('version'))
+        await ldb.IDBX(db.transaction('$structures',"readwrite").objectStore('$structures').put(tableDef));
+        result.result.changed=JSON.stringify(tableDef)!=JSON.stringify(oldValue);
+        var infoStore=detectedFeatures.needToUnwrapArrayKeys?null:tableDef.primaryKey;
+        var versionInfo = await this.IDBX<VersionInfo>(db.transaction('$internals',"readwrite").objectStore('$internals').get('version'))
         if(JSON.stringify(versionInfo.stores[tableDef.name])!=JSON.stringify(infoStore)){
-            await ldb.IDBX(tx);
             db.close();
             versionInfo.num++;
             var requestDB = indexedDB.open(this.name,versionInfo.num);
@@ -100,14 +148,16 @@ export class LocalDb{
                 if(versionInfo.stores[tableDef.name]){
                     db.deleteObjectStore(tableDef.name);
                 }
-                db.createObjectStore(tableDef.name,{keyPath:infoStore})
+                if(infoStore!=null){
+                    db.createObjectStore(tableDef.name,{keyPath:infoStore})
+                }else{
+                    db.createObjectStore(tableDef.name)
+                }
             }
-            ldb.wait4db = ldb.IDBX(requestDB);
-            db = await ldb.wait4db;
+            result.wait4db = ldb.IDBX(requestDB);
+            db = await result.wait4db;
             versionInfo.stores[tableDef.name]=infoStore;
             await ldb.IDBX(db.transaction('$internals',"readwrite").objectStore('$internals').put(versionInfo));
-        }else{
-            await ldb.IDBX(tx);
         }
         return result;
     }
@@ -121,8 +171,17 @@ export class LocalDb{
     }
     async getOneIfExists<T>(tableName:string, key:Key):Promise<T|undefined>{
         var ldb=this;
-        var db=await ldb.wait4db
-        var result = await ldb.IDBX<T>(db.transaction(tableName,"readonly").objectStore(tableName).get(key));
+        var db=await ldb.wait4db;
+        var internalKey:Key|string;
+        if(detectedFeatures.needToUnwrapArrayKeys){
+            internalKey=tableName+JSON.stringify(key);
+        }else{
+            internalKey=key;
+        }
+        var tx=db.transaction(tableName,"readonly");
+        var store=tx.objectStore(tableName);
+        var request=store.get(internalKey);
+        var result = await ldb.IDBX<T>(db.transaction(tableName,"readonly").objectStore(tableName).get(internalKey));
         return result;
     }
     async getOne<T>(tableName:string, key:Key):Promise<T>{
@@ -136,15 +195,27 @@ export class LocalDb{
         var ldb=this;
         var db=await ldb.wait4db
         var rows:T[]=[];
-        var cursor = db.transaction([tableName],'readonly').objectStore(tableName).openCursor(IDBKeyRange.lowerBound(parentKey));
+        var internalKey:string|Key;
+        if(detectedFeatures.needToUnwrapArrayKeys){
+            internalKey=tableName+JSON.stringify(parentKey);
+            internalKey=internalKey.substr(0,internalKey.length-1);
+        }else{
+            internalKey=parentKey
+        }
+        var cursor = db.transaction([tableName],'readonly').objectStore(tableName).openCursor(IDBKeyRange.lowerBound(internalKey));
         return new Promise<T[]>(function(resolve, reject){
             cursor.onsuccess=function(event){
                 // @ts-ignore target no conoce result en la definición de TS. Verificar dentro de un tiempo si TS mejoró
                 var cursor:IDBCursorWithValue = event.target.result;
-                if(cursor && ! parentKey.find(function(expectedValue,i){
-                    var storedValue = (cursor.key as any[])[i]
-                    return expectedValue != storedValue
-                })){
+                if(cursor && (
+                    detectedFeatures.needToUnwrapArrayKeys ? 
+                        internalKey == cursor.key.slice(0,internalKey.length) : 
+                        ! parentKey.find(function(expectedValue,i){
+                            var storedValue = (cursor.key as any[])[i]
+                            return expectedValue != storedValue
+                        })
+                    )
+                ){
                     rows.push(cursor.value);
                     cursor.continue();
                 }else{
@@ -159,16 +230,23 @@ export class LocalDb{
     async getAll<T>(tableName:string):Promise<T[]>{
         return this.getChild<T>(tableName,[]);
     }
-    private async putOneAndGetIfNeeded<T>(tableName:string, element:T, needed:true):Promise<T>
-    private async putOneAndGetIfNeeded<T>(tableName:string, element:T, needed:false):Promise<void>
-    private async putOneAndGetIfNeeded<T>(tableName:string, element:T, needed:boolean):Promise<T|void>{
+    private async putOneAndGetIfNeeded<T extends Record>(tableName:string, element:T, needed:true):Promise<T>
+    private async putOneAndGetIfNeeded<T extends Record>(tableName:string, element:T, needed:false):Promise<void>
+    private async putOneAndGetIfNeeded<T extends Record>(tableName:string, element:T, needed:boolean):Promise<T|void>{
         var ldb=this;
         var db=await ldb.wait4db
-        var store=db.transaction(tableName,"readwrite").objectStore(tableName);
-        var key=await ldb.IDBX<Key>(store.put(element))
+        if(detectedFeatures.needToUnwrapArrayKeys){
+            var tableDef=await ldb.IDBX<TableDefinition>(db.transaction('$structures',"readwrite").objectStore('$structures').get(tableName));
+            var newKey=tableName+JSON.stringify(tableDef.primaryKey.map(function(name){
+                return element[name];
+            }));
+            var storeTask=db.transaction(tableName,"readwrite").objectStore(tableName).put(element,newKey);
+        }else{
+            var storeTask=db.transaction(tableName,"readwrite").objectStore(tableName).put(element);
+        }
+        var key=await ldb.IDBX<Key>(storeTask)
         if(needed){
-            var storedElement=await ldb.IDBX<T>(store.get(key))
-            return storedElement;
+            return await ldb.IDBX<T>(db.transaction(tableName,"readwrite").objectStore(tableName).get(key))
         }
     }
     async putOne<T>(tableName:string, element:T):Promise<T>{

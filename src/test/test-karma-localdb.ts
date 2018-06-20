@@ -16,7 +16,7 @@ function compare<T>(obtained:T, expected:T):boolean{
 describe("local-db", function(){
     var ldb:LocalDb;
     before(function(){
-        ldb = new LocalDb("the-test-name");
+        ldb = new LocalDb("the-test-name"+Math.random());
     });
     after(function(){
         ldb.close();
@@ -124,6 +124,10 @@ describe("local-db", function(){
         before("",async function(){
             await ldb.registerStructure(tableDef);
             await ldb.putMany("units", units);
+        })
+        it("get cm3", async function(){
+            var obtainedVolumes=await ldb.getOne<Units>("units", ["volume","cm3"]);
+            compare(obtainedVolumes, volumeUnits[2]);
         })
         it("get volume childs", async function(){
             var obtainedVolumes=await ldb.getChild<Units>("units", ["volume"]);
