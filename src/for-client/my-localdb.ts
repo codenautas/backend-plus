@@ -14,10 +14,11 @@
 
 import * as likeAr from "like-ar";
 
+export type Key = string|string[];
 export type Stores = {[key:string]:IDBObjectStore};
-export type StoreDefs = {[key:string]:string|string[]};
+export type StoreDefs = {[key:string]:Key};
 
-interface TableDefinition{
+export interface TableDefinition{
     name:string
     primaryKey:string[]
 } 
@@ -141,10 +142,16 @@ export class LocalDb{
     async getAll<T>(tableName:string):Promise<T[]>{
         return this.getChild<T>(tableName,[]);
     }
-    async putOne<T>(tableName:string, elements:T):Promise<T>{
-
+    async putOne<T>(tableName:string, element:T):Promise<T>{
+        var ldb=this;
+        var db=await ldb.wait4db
+        var store=db.transaction(tableName,"readwrite").objectStore(tableName);
+        var key=await ldb.IDBX<Key>(store.put(element))
+        var storedElement=await ldb.IDBX<T>(store.get(key))
+        return storedElement;
     }
     async putMany<T>(tableName:string, elements:T[]):Promise<void>{
+
 
     }
     async close():Promise<void>{
