@@ -14,9 +14,9 @@
 
 import * as likeAr from "like-ar";
 
-export type Key = string|string[];
+export type Key = string[];
 export type Stores = {[key:string]:IDBObjectStore};
-export type StoreDefs = {[key:string]:Key};
+export type StoreDefs = {[key:string]:Key|string};
 
 export interface TableDefinition{
     name:string
@@ -119,21 +119,20 @@ export class LocalDb{
         );
         return tableDef;
     }
-    async getOneIfExists<T>(tableName:string, key:string[]):Promise<T|undefined>{
-        var result = await this.getChild<T>(tableName, key);
-        if(result.length>1){
-            throw new Error("too many results");
-        }
-        return result[0];
+    async getOneIfExists<T>(tableName:string, key:Key):Promise<T|undefined>{
+        var ldb=this;
+        var db=await ldb.wait4db
+        var result = await ldb.IDBX<T>(db.transaction(tableName,"readonly").objectStore(tableName).get(key));
+        return result;
     }
-    async getOne<T>(tableName:string, key:string[]):Promise<T>{
+    async getOne<T>(tableName:string, key:Key):Promise<T>{
         var result = await this.getOneIfExists<T>(tableName, key);
         if(!result){
             throw new Error("no result");
         }
         return result;
     }
-    async getChild<T>(tableName:string, parentKey:string[]):Promise<T[]>{
+    async getChild<T>(tableName:string, parentKey:Key):Promise<T[]>{
         var ldb=this;
         var db=await ldb.wait4db
         var result = await ldb.IDBX<T[]>(db.transaction('$structures',"readonly").objectStore(tableName).get(parentKey));
@@ -142,17 +141,27 @@ export class LocalDb{
     async getAll<T>(tableName:string):Promise<T[]>{
         return this.getChild<T>(tableName,[]);
     }
-    async putOne<T>(tableName:string, element:T):Promise<T>{
+    private async putOneAndGetIfNeeded<T>(tableName:string, element:T, needed:true):Promise<T>
+    private async putOneAndGetIfNeeded<T>(tableName:string, element:T, needed:false):Promise<void>
+    private async putOneAndGetIfNeeded<T>(tableName:string, element:T, needed:boolean):Promise<T|void>{
         var ldb=this;
         var db=await ldb.wait4db
         var store=db.transaction(tableName,"readwrite").objectStore(tableName);
         var key=await ldb.IDBX<Key>(store.put(element))
-        var storedElement=await ldb.IDBX<T>(store.get(key))
-        return storedElement;
+        if(needed){
+            var storedElement=await ldb.IDBX<T>(store.get(key))
+            return storedElement;
+        }
+    }
+    async putOne<T>(tableName:string, element:T):Promise<T>{
+        return this.putOneAndGetIfNeeded(tableName, element, true);
     }
     async putMany<T>(tableName:string, elements:T[]):Promise<void>{
-
-
+        var i=0;
+        while(i<elements.length){
+            await this.putOneAndGetIfNeeded(tableName, elements[i], false);
+            i++;
+        }
     }
     async close():Promise<void>{
         var db=await this.wait4db;
