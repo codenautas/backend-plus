@@ -6,7 +6,7 @@
         "checkJs": true
     },
     "include":[
-        "src/for-client", "src/test/test-karma-*"
+        "src/for-client", "src/test/karma-test-*"
     ],
     "exclude":[],
     "extends": "./tsconfig.json"

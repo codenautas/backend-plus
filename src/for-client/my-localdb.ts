@@ -52,7 +52,7 @@ type DetectFeatures={
 }
 
 export var detectedFeatures:DetectFeatures={
-    needToUnwrapArrayKeys:true || null
+    needToUnwrapArrayKeys:null
 }
 
 export class LocalDb{
@@ -178,9 +178,6 @@ export class LocalDb{
         }else{
             internalKey=key;
         }
-        var tx=db.transaction(tableName,"readonly");
-        var store=tx.objectStore(tableName);
-        var request=store.get(internalKey);
         var result = await ldb.IDBX<T>(db.transaction(tableName,"readonly").objectStore(tableName).get(internalKey));
         return result;
     }
@@ -209,7 +206,7 @@ export class LocalDb{
                 var cursor:IDBCursorWithValue = event.target.result;
                 if(cursor && (
                     detectedFeatures.needToUnwrapArrayKeys ? 
-                        internalKey == cursor.key.slice(0,internalKey.length) : 
+                        internalKey == (cursor.key as string).slice(0,internalKey.length) : 
                         ! parentKey.find(function(expectedValue,i){
                             var storedValue = (cursor.key as any[])[i]
                             return expectedValue != storedValue

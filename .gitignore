@@ -42,4 +42,4 @@ package-lock.json
 for-client/*.d.ts
 for-client/*.map
 for-client/*localdb.js
-test/test-karma-*.*
+test/karma-test-*.*
