@@ -23,6 +23,7 @@ describe("local-db", function(){
     });
     describe("structures", function(){
         it("put and get structure", async function(){
+            this.timeout(5000);
             var tableDef={
                 name:'this_name',
                 fields:[
