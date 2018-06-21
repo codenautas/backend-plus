@@ -24,6 +24,14 @@
  * 
  * hay un test en:
  *   a) https://codepen.io/cemerick/pen/Itymi
+ * 
+ * workarround para contemplar IE, y iOS viejos:
+ *   1) se transforman las claves antes de usarlas en un string (JSON.stringify del array para el problema del IE)
+ *   2) se prefija el string con el nombre del objectStore (para que todas las claves sean distintas y no haya problemas con el iOS viejo)
+ * 
+ * detección
+ *   1) por ahora solo probamos la detección del problema del array de claves
+ *   2) TODO: Falta programar la detección del problema de iOS viejo, quizás haya que ser explícito, hay que probarlo con varios iPad
  */
 
 import * as likeAr from "like-ar";

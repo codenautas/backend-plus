@@ -154,6 +154,10 @@ export interface TableDefinitions {
 export type ClientSetup= {
     procedures:ProcedureDef[]
 }
+export type StartOptions={
+    readConfig?:{whenNotExist:'ignore'}, 
+    testing?:true
+}
 export class AppBackend{
     procedures:ProcedureDef[]
     procedure:{ [key:string]:ProcedureDef }
@@ -161,7 +165,7 @@ export class AppBackend{
     tableStructures: TableDefinitions
     db:typeof pg
     config: any
-    start():Promise<void>
+    start(StartOptions):Promise<void>
     getTables():TableItemDef[]
     getContext(req:Request):Context
     clientIncludes(req:Request, hideBEPlusInclusions?:boolean):ClientModuleDefinition[]
@@ -177,6 +181,7 @@ export class AppBackend{
     dumpDbSchemaPartial(partialTableStructures:TableDefinitions, opts?:{complete?:boolean, skipEnance?:boolean}):Promise<{mainSql:string; enancePart:string}> 
     getContextForDump(): ContextForDump
     getClientSetupForSendToFrontEnd(req:Request):ClientSetup
+    configList(): (object|string)[]
 }
 
 }

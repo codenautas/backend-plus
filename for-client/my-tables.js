@@ -180,8 +180,7 @@ myOwn.comparator={
 };
 
 myOwn.getStructureFromLocalDb = function getStructureFromLocalDb(tableName){
-    var req=my.ldb.transaction(['$structures'],'readonly').objectStore('$structures').get(tableName);
-    return IDBX(req);
+    return my.ldb.getStructure(tableName);
 }
 
 myOwn.TableConnector = function(context, opts){
@@ -212,43 +211,14 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
     });
     if(my.ldb){
         structureFromBackend.then(function(tableDef){
-            var promiseChain=Promise.resolve();
-            IDBX(my.ldb.transaction('$structures',"readwrite").objectStore('$structures').put(tableDef));
+            var promiseChain=my.ldb.registerStructure(tableDef);
             if(!connector.localDef || JSON.stringify(tableDef)!=JSON.stringify(connector.localDef)){
-                var infoStore=tableDef.primaryKey;
-                promiseChain=IDBX(
-                    my.ldb.transaction('$internals','readonly').objectStore('$internals').get('version')
-                ).then(function(versionInfo){
-                    if(JSON.stringify(versionInfo.stores[connector.tableName])!=JSON.stringify(infoStore)){
-                        my.ldb.close();
-                        versionInfo.num++;
-                        var request = indexedDB.open(my.ldbName,versionInfo.num);
-                        request.onupgradeneeded = function(event){
-                            var db=request.result;
-                            if(versionInfo.stores[connector.tableName]){
-                                db.deleteObjectStore(connector.tableName);
-                            }
-                            db.createObjectStore(connector.tableName,{keyPath:infoStore})
-                        }
-                        return IDBX(request).then(function(db){
-                            my.ldb=db;
-                        }).then(function(){
-                            versionInfo.stores[connector.tableName]=infoStore;
-                            return IDBX(
-                                my.ldb.transaction('$internals',"readwrite").objectStore('$internals').put(versionInfo)
-                            )
-                        })
-                    }
-                }).then(function(){
-                    if(connector.localDef){
-                        alertPromise('la tabla '+connector.tableName+' cambió de estructura. Debe Refrescar la página')
-                    }
-                })
+                alertPromise('la tabla '+connector.tableName+' cambió de estructura. Debe Refrescar la página')
             }
             if(connector.def.offline.mode==='master'){
                 connector.def.offline.details.forEach(function(tableName){
                     promiseChain = promiseChain.then(function(){
-                        return my.getStructureFromLocalDb(tableName).then(function(tableDef){
+                        return my.ldb.getStructure(tableName).then(function(tableDef){
                             if(!tableDef){
                                 var conn = new my.TableConnector({tableName, my});
                                 return conn.getStructure();
@@ -404,24 +374,7 @@ myOwn.TableConnectorLocal.prototype.getData = function getData(){
             var key=primaryKey.shift();
             parentKey.push(connector.fixedField[key]);
         }
-        return new Promise(function(resolve,reject){
-            var cursor = my.ldb.transaction([connector.tableName],'readonly').objectStore(connector.tableName).openCursor(IDBKeyRange.lowerBound(parentKey));
-            var rows=[];
-            var contador=0;
-            cursor.onsuccess=function(event){
-                var cursor = event.target.result;
-                if(cursor && ! parentKey.find(function(value,i){
-                    return value != cursor.value[connector.def.primaryKey[i]]
-                })){
-                    rows.push(cursor.value);
-                    cursor.continue();
-                    contador++
-                }else{
-                    console.log('xxxxxxxxxxxxxxxx EL CONTADOR', contador)
-                    resolve(rows);
-                }
-            }
-        }).then(function(rows){
+        return my.ldb.getChild(connector.def.name,parentKey).then(function(rows){
             return rows.filter(function(row){
                 return !filterValues.find(function(pair){
                     return row[pair.fieldName]!=pair.value
@@ -455,14 +408,8 @@ myOwn.TableConnectorLocal.prototype.saveRecord = function saveRecord(depot, opts
     var connector = this;
     var sendedForUpdate = depot.my.cloneRow(depot.rowPendingForUpdate);
     depot.row.$dirty=true;
-    var tx = my.ldb.transaction([connector.tableName],'readwrite');
-    var store=tx.objectStore(connector.tableName);
-    return IDBX(store.put(depot.row)).then(function(pk){
-        return IDBX(store.get(pk));
-    }).then(function(row){
-        return IDBX(tx).then(function(){
-            return {sendedForUpdate:sendedForUpdate, updatedRow:row};
-        })
+    return my.ldb.putOne(connector.tableName,depot.row).then(function(row){
+        return {sendedForUpdate:sendedForUpdate, updatedRow:row};
     });
 };
 
