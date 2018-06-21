@@ -165,7 +165,7 @@ export class AppBackend{
     tableStructures: TableDefinitions
     db:typeof pg
     config: any
-    start(StartOptions):Promise<void>
+    start(opts: StartOptions):Promise<void>
     getTables():TableItemDef[]
     getContext(req:Request):Context
     clientIncludes(req:Request, hideBEPlusInclusions?:boolean):ClientModuleDefinition[]
