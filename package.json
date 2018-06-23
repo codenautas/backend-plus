@@ -101,7 +101,7 @@
     "node": ">= 8.5"
   },
   "scripts": {
-    "test": "(npm run prepublish || echo \"continue w/error\") && mocha --reporter spec --bail  test/test-*.js",
+    "test": "(npm run prepublish || echo \"continue w/error\") && mocha --reporter spec --single-run --bail  test/test-*.js",
     "test-karma": "(npm run prepublish || echo \"continue w/error\") && mocha --reporter spec --bail  test/test-k*.js",
     "test-why": "node --expose-internals ./node_modules/mocha/bin/_mocha --reporter spec --bail  test/test*.js",
     "test-ci": "mocha --reporter spec --bail  test/test*.js",

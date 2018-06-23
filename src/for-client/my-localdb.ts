@@ -79,7 +79,7 @@ export class LocalDb{
             stores:initialStores
         }
         var requestDB=indexedDB.open(this.name);
-        requestDB.onupgradeneeded = function(event){
+        requestDB.onupgradeneeded = function(){
             var db = requestDB.result;
             if(!db.objectStoreNames.contains("$internals")){
                 likeAr(initialStores).forEach(function(keyPath: string, tableName: string){
