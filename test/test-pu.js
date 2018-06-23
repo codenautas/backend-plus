@@ -70,7 +70,7 @@ describe("interactive ",function(){
         var result = await page.$eval('[pk-values=\'["2","A"]\'] [my-colname="wf_code"]', td => td.textContent);
         discrepances.showAndThrow(result,'A');
     });
-    it.skip("open details in other tab", async function(){
+    it("open details in other tab", async function(){
         this.timeout(38000);
         await page.click('[menu-name=tables]');
         await page.click('[menu-name=simple]');
@@ -81,6 +81,15 @@ describe("interactive ",function(){
         await page.waitFor(500);
         var mustNotExists = await page.$('[pk-values=\'["2","A"]\'] td');
         discrepances.showAndThrow(mustNotExists,null);
+        var pages = await browser.pages();
+        var page2 = pages[pages.length-1];
+        console.log('xxxxxx',pages.length,pages,page2)
+        await page2.bringToFront();
+        console.log('xxxxxxx front')
+        await page2.$('[pk-values=\'["2","A"]\'] td');
+        console.log('xxxxxxx res',result)
+        var result = await page2.$eval('td[my-colname="wf_code"]', td => td.textContent);
+        discrepances.showAndThrow(result,'A');
     });
     it.skip("FUTURO LEJANO. inserts one record with fk data", async function(){
         // la idea de esta funcionalidad es poder ingresar un texto en el nombre en vez del código

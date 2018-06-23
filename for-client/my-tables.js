@@ -857,50 +857,50 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
         });
         menuRef.fixedFields=fixedFields;
         this.setForkeableHref(menuRef);
-        if(!event.ctrlKey){
-            var spansForSmooth = [iColumn+1, 999];
-            if(!detailControl.show){
-                detailControl.img.src=my.path.img+'detail-contract.png';
-                detailControl.img.alt="[-]";
-                detailControl.img.title=my.messages.lessDetails;
-                var newTr = grid.my.insertRow({under:tr,smooth:{height:70, spans:spansForSmooth}});
-                detailControl.tr = newTr;
-                var tdMargin = newTr.insertCell(-1);
-                tdMargin.colSpan = td.cellIndex+1;
-                var tdGrid = newTr.insertCell(-1);
-                tdGrid.colSpan = tr.cells.length-td.cellIndex;
-                var divGrid = tdGrid;
-                divGrid.style.maxWidth=td.parentNode.offsetWidth - td.offsetLeft + 'px';
-                divGrid.style.overflowX='visible';
-                tdGrid.className='my-detail-grid';
-                tdGrid.style.overflowX='visible';
-                if(!detailControl.table){
-                    grid.my.tableGrid(detailTableDef.table, divGrid, {fixedFields: fixedFields}).waitForReady(function(g){
-                        detailControl.table=g.dom.table;
-                        if(detailTableDef.refreshParent || grid.def.complexDef && detailTableDef.refreshParent!==false){
-                            var refresh = function refresh(){
-                                grid.retrieveRowAndRefresh(depot);
-                            }
-                            g.dom.main.addEventListener('deletedRowOk', refresh);
-                            g.dom.main.addEventListener('savedRowOk', refresh);
+        var spansForSmooth = [iColumn+1, 999];
+        if(!detailControl.show && !event.ctrlKey){
+            detailControl.img.src=my.path.img+'detail-contract.png';
+            detailControl.img.alt="[-]";
+            detailControl.img.title=my.messages.lessDetails;
+            var newTr = grid.my.insertRow({under:tr,smooth:{height:70, spans:spansForSmooth}});
+            detailControl.tr = newTr;
+            var tdMargin = newTr.insertCell(-1);
+            tdMargin.colSpan = td.cellIndex+1;
+            var tdGrid = newTr.insertCell(-1);
+            tdGrid.colSpan = tr.cells.length-td.cellIndex;
+            var divGrid = tdGrid;
+            divGrid.style.maxWidth=td.parentNode.offsetWidth - td.offsetLeft + 'px';
+            divGrid.style.overflowX='visible';
+            tdGrid.className='my-detail-grid';
+            tdGrid.style.overflowX='visible';
+            if(!detailControl.table){
+                grid.my.tableGrid(detailTableDef.table, divGrid, {fixedFields: fixedFields}).waitForReady(function(g){
+                    detailControl.table=g.dom.table;
+                    if(detailTableDef.refreshParent || grid.def.complexDef && detailTableDef.refreshParent!==false){
+                        var refresh = function refresh(){
+                            grid.retrieveRowAndRefresh(depot);
                         }
-                    });
-                }else{
-                    divGrid.appendChild(detailControl.table);
-                }
-                detailControl.show = true;
-                newTr.detailTableNameAndAbr=detailTableNameAndAbr;
-                newTr.isDetail=true;
-                depot.detailRows.push(newTr);
+                        g.dom.main.addEventListener('deletedRowOk', refresh);
+                        g.dom.main.addEventListener('savedRowOk', refresh);
+                    }
+                });
             }else{
-                detailControl.img.src=my.path.img+'detail-expand.png';
-                detailControl.img.alt="[+]";
-                detailControl.img.title=my.messages.details;
-                grid.my.fade(detailControl.tr, {smooth:{spans:spansForSmooth, content:detailControl.table}});
-                detailControl.show = false;
-                depot.detailRows = depot.detailRows.filter(function(tr){ return tr!==detailControl.tr;});
-                detailControl.tr = null;
+                divGrid.appendChild(detailControl.table);
             }
+            detailControl.show = true;
+            newTr.detailTableNameAndAbr=detailTableNameAndAbr;
+            newTr.isDetail=true;
+            depot.detailRows.push(newTr);
+        }else{
+            detailControl.img.src=my.path.img+'detail-expand.png';
+            detailControl.img.alt="[+]";
+            detailControl.img.title=my.messages.details;
+            grid.my.fade(detailControl.tr, {smooth:{spans:spansForSmooth, content:detailControl.table}});
+            detailControl.show = false;
+            depot.detailRows = depot.detailRows.filter(function(tr){ return tr!==detailControl.tr;});
+            detailControl.tr = null;
+        }
+        if(!event.ctrlKey){
             event.preventDefault();
         }
     };

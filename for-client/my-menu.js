@@ -226,7 +226,7 @@ myOwn.paramsToUriPart = function paramsToUriPart(params, inMenu){
 		if((paramDef.showInMenu || !inMenu) && !paramDef.hide || (params.showParams && params.showParams.includes(name))){
 			if(value!=null){
                 value=paramDef.encode(value, params);
-				return paramDef.varName+'='+encodeMinimalURIComponent(value);
+				return (paramDef.varName||name)+'='+encodeMinimalURIComponent(value);
 			}
 		}
     }).filter(function(expr){return expr;}).join('&');
