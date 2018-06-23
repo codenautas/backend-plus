@@ -846,7 +846,17 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
         alt:'DETAIL',
         title:my.messages.details
     }).create();
+    var menuRef={w:'table', table:detailTableDef.table};
     var buttononclick = function(event){
+        var fixedFields = detailTableDef.fields.map(function(pair){
+            var fieldCondition={fieldName: pair.target, value:depot.row[pair.source]}
+            if(pair.range){
+                fieldCondition.range=pair.range;
+            }
+            return fieldCondition;
+        });
+        menuRef.fixedFields=fixedFields;
+        this.setForkeableHref(menuRef);
         if(!event.ctrlKey){
             var spansForSmooth = [iColumn+1, 999];
             if(!detailControl.show){
@@ -864,13 +874,6 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
                 divGrid.style.overflowX='visible';
                 tdGrid.className='my-detail-grid';
                 tdGrid.style.overflowX='visible';
-                var fixedFields = detailTableDef.fields.map(function(pair){
-                    var fieldCondition={fieldName: pair.target, value:depot.row[pair.source]}
-                    if(pair.range){
-                        fieldCondition.range=pair.range;
-                    }
-                    return fieldCondition;
-                });
                 if(!detailControl.table){
                     grid.my.tableGrid(detailTableDef.table, divGrid, {fixedFields: fixedFields}).waitForReady(function(g){
                         detailControl.table=g.dom.table;
@@ -901,7 +904,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
             event.preventDefault();
         }
     };
-    var button = my.createForkeableButton({w:'table', table:detailTableDef.table, class:'table-button'},{label:detailControl.img,onclick:buttononclick});
+    var button = my.createForkeableButton(menuRef,{label:detailControl.img, onclick:buttononclick, class:'table-button'});
     button.setAttribute("skip-enter",true);
     // var button = html.button({class:'table-button', "skip-enter":true}, [detailControl.img]).create();
     var td = html.td({class:['grid-th','grid-th-details'], "my-relname":detailTableDef.table}, button).create();

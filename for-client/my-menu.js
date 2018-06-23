@@ -129,16 +129,17 @@ myOwn.UriSearchToObject = function UriSearchToObject(locationSearch){
 function noChange(x){ return x; }
 
 myOwn.UriSearchToObjectParams={
-	i                :{ showInMenu:true , encode:(value,menu)=> (menu.parents||[]).concat(menu.name).join(',') },
-	fc               :{                   encode:x=>JSON.stringify(x) , decode:x=>JSON.parse(x)  },
-	ff               :{                   encode:x=>JSON.stringify(x) , decode:x=>JSON.parse(x)  },
-	pf               :{                   encode:x=>JSON.stringify(x) , decode:x=>JSON.parse(x)  },
-	section          :{ showInMenu:true , encode:noChange             , decode:noChange          },
+	i                :{ showInMenu:true , encode:function(value,menu){ return (menu.parents||[]).concat(menu.name).join(',') }},
+	fc               :{                   encode:function(x){ return JSON.stringify(x); }, decode:x=>JSON.parse(x)  },
+	ff               :{                   encode:function(x){ return JSON.stringify(x); }, decode:x=>JSON.parse(x)  },
+	pf               :{                   encode:function(x){ return JSON.stringify(x); }, decode:x=>JSON.parse(x)  },
+	section          :{ showInMenu:true , encode:noChange                                , decode:noChange          },
 	directUrl        :{ hide:true       },
 	selectedByDefault:{ hide:true       },
 	showParams       :{ hide:true       },
     parents          :{ hide:true       },
-    button           :{ hide:true       }
+    button           :{ hide:true       },
+    fixedFields      :{ varName:'ff'    , encode:function(pairs){ return JSON.stringify(likeAr.toPlainObject(pairs, 'fieldName')); }}
 }
 
 myOwn.showPage = function showPage(pageDef){
@@ -185,7 +186,7 @@ myOwn.createForkeableButton = function createForkeableButton(menu, opts){
         opts = {label:opts};
     }
     var label=opts.label;
-    var button=html.a({"class": menu["class"]||"menu-item", "menu-type":menu.menuType||menu.w, "menu-name":menu.name||'noname'}, label || menu.label || menu.name).create();
+    var button=html.a({"class": opts["class"]||menu["class"]||"menu-item", "menu-type":menu.menuType||menu.w, "menu-name":menu.name||'noname'}, label || menu.label || menu.name).create();
     button.setForkeableHref = function setForkeableHref(menu){
         var href;
         if(!menu.w && menu.menuType){
@@ -221,11 +222,11 @@ function encodeMinimalURIComponent(text){
 
 myOwn.paramsToUriPart = function paramsToUriPart(params, inMenu){
     var paramStr=likeAr(params).map(function(value, name){
-		var paramDef=myOwn.UriSearchToObjectParams[name] || { encode:function(x){return x} };
+		var paramDef=myOwn.UriSearchToObjectParams[name] || { encode:function(x){return x}, varName:name };
 		if((paramDef.showInMenu || !inMenu) && !paramDef.hide || (params.showParams && params.showParams.includes(name))){
 			if(value!=null){
                 value=paramDef.encode(value, params);
-				return name+'='+encodeMinimalURIComponent(value);
+				return paramDef.varName+'='+encodeMinimalURIComponent(value);
 			}
 		}
     }).filter(function(expr){return expr;}).join('&');
