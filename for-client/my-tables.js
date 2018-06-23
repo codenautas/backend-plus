@@ -846,61 +846,66 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
         alt:'DETAIL',
         title:my.messages.details
     }).create();
-    var button = html.button({class:'table-button', "skip-enter":true}, [detailControl.img]).create();
+    var buttononclick = function(event){
+        if(!event.ctrlKey){
+            var spansForSmooth = [iColumn+1, 999];
+            if(!detailControl.show){
+                detailControl.img.src=my.path.img+'detail-contract.png';
+                detailControl.img.alt="[-]";
+                detailControl.img.title=my.messages.lessDetails;
+                var newTr = grid.my.insertRow({under:tr,smooth:{height:70, spans:spansForSmooth}});
+                detailControl.tr = newTr;
+                var tdMargin = newTr.insertCell(-1);
+                tdMargin.colSpan = td.cellIndex+1;
+                var tdGrid = newTr.insertCell(-1);
+                tdGrid.colSpan = tr.cells.length-td.cellIndex;
+                var divGrid = tdGrid;
+                divGrid.style.maxWidth=td.parentNode.offsetWidth - td.offsetLeft + 'px';
+                divGrid.style.overflowX='visible';
+                tdGrid.className='my-detail-grid';
+                tdGrid.style.overflowX='visible';
+                var fixedFields = detailTableDef.fields.map(function(pair){
+                    var fieldCondition={fieldName: pair.target, value:depot.row[pair.source]}
+                    if(pair.range){
+                        fieldCondition.range=pair.range;
+                    }
+                    return fieldCondition;
+                });
+                if(!detailControl.table){
+                    grid.my.tableGrid(detailTableDef.table, divGrid, {fixedFields: fixedFields}).waitForReady(function(g){
+                        detailControl.table=g.dom.table;
+                        if(detailTableDef.refreshParent || grid.def.complexDef && detailTableDef.refreshParent!==false){
+                            var refresh = function refresh(){
+                                grid.retrieveRowAndRefresh(depot);
+                            }
+                            g.dom.main.addEventListener('deletedRowOk', refresh);
+                            g.dom.main.addEventListener('savedRowOk', refresh);
+                        }
+                    });
+                }else{
+                    divGrid.appendChild(detailControl.table);
+                }
+                detailControl.show = true;
+                newTr.detailTableNameAndAbr=detailTableNameAndAbr;
+                newTr.isDetail=true;
+                depot.detailRows.push(newTr);
+            }else{
+                detailControl.img.src=my.path.img+'detail-expand.png';
+                detailControl.img.alt="[+]";
+                detailControl.img.title=my.messages.details;
+                grid.my.fade(detailControl.tr, {smooth:{spans:spansForSmooth, content:detailControl.table}});
+                detailControl.show = false;
+                depot.detailRows = depot.detailRows.filter(function(tr){ return tr!==detailControl.tr;});
+                detailControl.tr = null;
+            }
+            event.preventDefault();
+        }
+    };
+    var button = my.createForkeableButton({w:'table', table:detailTableDef.table, class:'table-button'},{label:detailControl.img,onclick:buttononclick});
+    button.setAttribute("skip-enter",true);
+    // var button = html.button({class:'table-button', "skip-enter":true}, [detailControl.img]).create();
     var td = html.td({class:['grid-th','grid-th-details'], "my-relname":detailTableDef.table}, button).create();
     depot.detailControls[detailTableNameAndAbr] = detailControl;
-    button.addEventListener('click',function(){
-        var spansForSmooth = [iColumn+1, 999];
-        if(!detailControl.show){
-            detailControl.img.src=my.path.img+'detail-contract.png';
-            detailControl.img.alt="[-]";
-            detailControl.img.title=my.messages.lessDetails;
-            var newTr = grid.my.insertRow({under:tr,smooth:{height:70, spans:spansForSmooth}});
-            detailControl.tr = newTr;
-            var tdMargin = newTr.insertCell(-1);
-            tdMargin.colSpan = td.cellIndex+1;
-            var tdGrid = newTr.insertCell(-1);
-            tdGrid.colSpan = tr.cells.length-td.cellIndex;
-            var divGrid = tdGrid;
-            divGrid.style.maxWidth=td.parentNode.offsetWidth - td.offsetLeft + 'px';
-            divGrid.style.overflowX='visible';
-            tdGrid.className='my-detail-grid';
-            tdGrid.style.overflowX='visible';
-            var fixedFields = detailTableDef.fields.map(function(pair){
-                var fieldCondition={fieldName: pair.target, value:depot.row[pair.source]}
-                if(pair.range){
-                    fieldCondition.range=pair.range;
-                }
-                return fieldCondition;
-            });
-            if(!detailControl.table){
-                grid.my.tableGrid(detailTableDef.table, divGrid, {fixedFields: fixedFields}).waitForReady(function(g){
-                    detailControl.table=g.dom.table;
-                    if(detailTableDef.refreshParent || grid.def.complexDef && detailTableDef.refreshParent!==false){
-                        var refresh = function refresh(){
-                            grid.retrieveRowAndRefresh(depot);
-                        }
-                        g.dom.main.addEventListener('deletedRowOk', refresh);
-                        g.dom.main.addEventListener('savedRowOk', refresh);
-                    }
-                });
-            }else{
-                divGrid.appendChild(detailControl.table);
-            }
-            detailControl.show = true;
-            newTr.detailTableNameAndAbr=detailTableNameAndAbr;
-            newTr.isDetail=true;
-            depot.detailRows.push(newTr);
-        }else{
-            detailControl.img.src=my.path.img+'detail-expand.png';
-            detailControl.img.alt="[+]";
-            detailControl.img.title=my.messages.details;
-            grid.my.fade(detailControl.tr, {smooth:{spans:spansForSmooth, content:detailControl.table}});
-            detailControl.show = false;
-            depot.detailRows = depot.detailRows.filter(function(tr){ return tr!==detailControl.tr;});
-            detailControl.tr = null;
-        }
-    });
     return td;
 };
 

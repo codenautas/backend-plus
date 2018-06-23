@@ -179,8 +179,12 @@ myOwn.showPage = function showPage(pageDef){
     }
 };
 
-myOwn.createForkeableButton = function createForkeableButton(menu, label){
+myOwn.createForkeableButton = function createForkeableButton(menu, opts){
     var my = this;
+    if(typeof opts==="string" || opts==null){
+        opts = {label:opts};
+    }
+    var label=opts.label;
     var button=html.a({"class": menu["class"]||"menu-item", "menu-type":menu.menuType||menu.w, "menu-name":menu.name||'noname'}, label || menu.label || menu.name).create();
     button.setForkeableHref = function setForkeableHref(menu){
         var href;
@@ -197,7 +201,7 @@ myOwn.createForkeableButton = function createForkeableButton(menu, label){
     }
     button.setForkeableHref(menu);
     menu.button = button;
-    button.onclick=function(event){
+    button.onclick=opts.onclick||function(event){
         if(!event.ctrlKey){
             history.pushState(null, null, this.href);
             my.showPage();
