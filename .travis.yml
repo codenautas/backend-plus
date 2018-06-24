@@ -4,15 +4,23 @@ node_js:
   - "10"
 matrix:
   fast_finish: true
-before_install: "rm .npmrc && npm install -g typescript"
-script: "npm run-script test-ci"
-after_script: "npm install coveralls@2.11.9 && cat ./coverage/lcov.info | coveralls"
 dist: trusty
 sudo: required
 addons:
   postgresql: "9.5"
+before_install:
+  - rm .npmrc
+  - npm install -g typescript
 before_script:
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
   - cp examples/4test/travis-config.yaml examples/4test/local-config.yaml
   - psql -c 'create user test_user password $$test_pass$$;' -U postgres
   - psql -c 'create database test_db owner test_user;' -U postgres
   - psql -U postgres -f test/populate_db.sql test_db
+script: "npm run-script test-ci"
+after_script: 
+  - cp ./coverage/Fire*/lcov.info ./coverage 
+  - ls -cal ./coverage 
+  - npm install coveralls@2.11.9 
+  - cat ./coverage/lcov.info | coveralls
