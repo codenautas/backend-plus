@@ -109,6 +109,9 @@ myOwn.UriSearchToObject = function UriSearchToObject(locationSearch){
     var parts=locationSearch.split('&');
     var addrParams={}
     parts.forEach(function(pair){
+        if(pair[0]==='#'){
+            pair=pair.substr(1);
+        }
         if(pair[0]==='?'){
             pair=pair.substr(1);
         }
@@ -145,7 +148,7 @@ myOwn.UriSearchToObjectParams={
 myOwn.showPage = function showPage(pageDef){
     my.prepareFloating3dots();
     my.prepareRulerToggle();
-    var addrParams=my.UriSearchToObject(location.search);
+    var addrParams=my.UriSearchToObject(location.hash||location.search);
     if(addrParams.i){
         addrParams.i=addrParams.i.split(',');
     }else{
@@ -180,6 +183,10 @@ myOwn.showPage = function showPage(pageDef){
     }
 };
 
+myOwn.menuName = 'menu';
+myOwn.menuSeparator = '#';
+Object.defineProperty(myOwn, 'menup', {get:function(){return this.menuName+this.menuSeparator; }});
+
 myOwn.createForkeableButton = function createForkeableButton(menu, opts){
     var my = this;
     if(typeof opts==="string" || opts==null){
@@ -191,12 +198,12 @@ myOwn.createForkeableButton = function createForkeableButton(menu, opts){
         var href;
         if(!menu.w && menu.menuType){
 			if(menu.directUrl){
-				href = 'menu?' + my.paramsToUriPart(changing({w:menu.menuType}, changing(menu,{menuType:null, label:null, button:null},changing.options({deletingValue:undefined}))));
+				href = my.menup + my.paramsToUriPart(changing({w:menu.menuType}, changing(menu,{menuType:null, label:null, button:null},changing.options({deletingValue:undefined}))));
 			}else{
-				href = 'menu?' + my.paramsToUriPart(changing({i:menu.name},menu),true);
+				href = my.menup + my.paramsToUriPart(changing({i:menu.name},menu),true);
 			}
         }else{
-            href = 'menu?' + my.paramsToUriPart(menu);
+            href = my.menup + my.paramsToUriPart(menu);
         }
         button.href = href;
     }
@@ -216,6 +223,7 @@ function encodeMinimalURIComponent(text){
     return text
         .replace(/=/g, '%3D')
         .replace(/\?/g, '%3F')
+        .replace(/\#/g, '%23')
         .replace(/&/g, '%26')
         .replace(/%/g, '%25');
 }
@@ -234,7 +242,8 @@ myOwn.paramsToUriPart = function paramsToUriPart(params, inMenu){
 }
 
 myOwn.replaceAddrParams = function replaceAddrParams(params){
-    history.replaceState(null, null, 'menu?'+my.paramsToUriPart(params));
+    var my=this;
+    history.replaceState(null, null, my.menup+my.paramsToUriPart(params));
 }
 
 myOwn.light = function light(name, onclick){
