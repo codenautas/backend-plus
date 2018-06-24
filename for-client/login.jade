@@ -18,7 +18,7 @@ html
           td.formlabel
             label(for="username")=msgs.login.username
           td.formtd
-            input(id="username", type="text", name="username", autofocus=true, placeholder=usernameLabel)
+            input(id="username", type="text", name="username", autofocus=true, placeholder=usernameLabel, autocomplete="username")
           td.logintableRightImg(rowspan=3)
             img.formImg#loginFormRightImg(src=skinUrl+'img/login-lock-icon.png')
         tr
@@ -28,7 +28,7 @@ html
           td.formlabel
             label(for="password")=msgs.login.password
           td.formtd    
-            input(id="password", type="password", name="password" placeholder=passwordLabel)
+            input(id="password", type="password", name="password", placeholder=passwordLabel, autocomplete="current-password")
         tr
           td.iconostd.buttonmargin
           td.formlabel.buttonmargin
