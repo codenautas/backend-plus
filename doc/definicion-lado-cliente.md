@@ -36,9 +36,17 @@ See spanish...
 
 Despliega una grilla de nombre `gridName` dentro del div `layoutElement` (borra lo que hubiere en ese elemento antes de desplegar).
 
-Opciones:
+Devuelve una Crilla
+
+Opciones de creación:
 opción               | uso
 ---------------------|-----
 `fixedFields`        | es la lista de campo/valor (en formato `{fieldName, value}`) que determinan el "filtro fijo" (que no se puede cambiar)
 `parameterFunctions` | es la lista de parámetros que recibe una grilla que utiliza una función para desplegarse
 `tableDef`           | es un complemento a la definición original de la tabla (se pueden cambiar cosas de la definición original)
+
+Grilla:
+
+miembro         | uso
+----------------|----
+refresh()       | refresca el contenido de la grilla
