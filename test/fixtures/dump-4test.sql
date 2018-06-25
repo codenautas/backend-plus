@@ -3,20 +3,22 @@ drop schema if exists "tst4" cascade;
 create schema "tst4";
 grant usage on schema "tst4" to "test_user";
 set search_path = "tst4";
+set client_encoding = 'UTF8';
 
 
---prepare.sql-- no prepare.sql
+--prepare.sql
+-- no prepare.sql
 
 
 create table "bitacora" (
-  "id" integer NOT NULL, 
-  "procedure_name" text NOT NULL, 
-  "parameters_definition" text NOT NULL, 
-  "parameters" text NOT NULL, 
-  "username" text NOT NULL, 
-  "machine_id" text NOT NULL, 
-  "navigator" text NOT NULL, 
-  "init_date" timestamp NOT NULL, 
+  "id" integer, 
+  "procedure_name" text, 
+  "parameters_definition" text, 
+  "parameters" text, 
+  "username" text, 
+  "machine_id" text, 
+  "navigator" text, 
+  "init_date" timestamp, 
   "end_date" timestamp, 
   "has_error" boolean, 
   "end_status" text
@@ -30,7 +32,7 @@ ALTER TABLE "bitacora" ALTER COLUMN "id" SET DEFAULT nextval('secuencia_bitacora
 GRANT USAGE, SELECT ON SEQUENCE "secuencia_bitacora" TO "test_user";
 
 create table "users" (
-  "username" text NOT NULL, 
+  "username" text, 
   "md5pass" text, 
   "active_until" date, 
   "locked_since" date, 
@@ -80,10 +82,50 @@ insert into "simple" ("simple_code", "simple_name") values
 
 
 -- ADAPTs
--- no adapt.sql
+set search_path = tst4;
+
+select setseed(0.123456789);
+
+insert into with_fk (simple_code,wf_code,wf_name) values ('2','A','único elemento');
+
+insert into with_fk (simple_code,wf_code,wf_name) 
+  select 1, num, 
+         case round(random()::decimal*7,0) 
+           when 1 then 'Hacer'
+           when 2 then 'Controlar'
+           when 3 then 'Verificar'
+           when 4 then 'Obtener'
+           when 5 then 'Suministrar'
+           when 6 then 'Revisar'
+           else 'Realizar'
+         end || ' ' || case round(random()::decimal*8,0) 
+           when 1 then 'el procedimiento'
+           when 2 then 'la serie de taeras'
+           when 3 then 'el plan'
+           when 4 then 'la lista'
+           when 5 then 'la planificación'
+           when 6 then 'la secuencia'
+           else 'el objetivo'
+         end || ' ' || case round(random()::decimal*9,0) 
+           when 1 then 'número '||num
+           when 2 then 'N '||num
+           when 3 then '#'||num
+           when 4 then to_char(num,'RM')
+           when 5 then 'N° '||num
+           else num::text
+         end
+    from generate_series(1,9000) num;
 
 
 -- conss
--- FKs
-alter table "with_fk" add constraint  "with_fk simple REL " foreign key ("simple_code") references "simple" ("simple_code")  on update cascade;
+alter table "bitacora" alter column "id" set not null;
+alter table "bitacora" alter column "procedure_name" set not null;
+alter table "bitacora" alter column "parameters_definition" set not null;
+alter table "bitacora" alter column "parameters" set not null;
+alter table "bitacora" alter column "username" set not null;
+alter table "bitacora" alter column "machine_id" set not null;
+alter table "bitacora" alter column "navigator" set not null;
+alter table "bitacora" alter column "init_date" set not null;
+alter table "users" alter column "username" set not null;-- FKs
+alter table "with_fk" add constraint  "with_fk simple REL" foreign key ("simple_code") references "simple" ("simple_code")  on update cascade;
 

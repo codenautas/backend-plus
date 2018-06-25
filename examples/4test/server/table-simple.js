@@ -9,6 +9,9 @@ module.exports = function(context){
             {name:'simple_code'          , typeName:'text', sequence:{name:'simpe_seq', firstValue:3}},
             {name:'simple_name'          , typeName:'text', isName: true          },
         ],
-        primaryKey:['simple_code']
+        primaryKey:['simple_code'],
+        detailTables:[
+            {table:'with_fk', fields:['simple_code'], abr:'W'}
+        ]
     },context);
 }

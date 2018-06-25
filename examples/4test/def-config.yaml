@@ -18,7 +18,7 @@ login:
   lockedClausule: current_timestamp>=locked_since
   plus:
     allowHttpLogin: true
-    chPassUrlPath: false
+    x-chPassUrlPath: false
     secret: simple secret cat
     loginForm:
       formTitle: example for test

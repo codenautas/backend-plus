@@ -79,28 +79,31 @@ export class LocalDb{
             stores:initialStores
         }
         var requestDB=indexedDB.open(this.name);
-        requestDB.onupgradeneeded = function(event){
+        requestDB.onupgradeneeded = function(){
             var db = requestDB.result;
-            if(event.oldVersion<1){
-                var store:Stores={};
+            if(!db.objectStoreNames.contains("$internals")){
                 likeAr(initialStores).forEach(function(keyPath: string, tableName: string){
-                    store[tableName] = db.createObjectStore(tableName, {keyPath: keyPath});
-                })
-                store.$internals.put(initialVersionInfo);
-            }
-            if(detectedFeatures.needToUnwrapArrayKeys==null){
-                var request = store.$detect.put({detectKey:'one'});
-                request.onsuccess=function(){
-                    var key=request.result;
-                    if(typeof key === "string"){
-                        detectedFeatures.needToUnwrapArrayKeys=true;
-                    }else{
-                        detectedFeatures.needToUnwrapArrayKeys=false;
+                    var store = db.createObjectStore(tableName, {keyPath: keyPath});
+                    if(detectedFeatures.needToUnwrapArrayKeys==null){
+                        if(tableName=='$detect'){
+                            var request = store.put({detectKey:'one'});
+                            request.onsuccess=function(){
+                                var key=request.result;
+                                if(typeof key === "string"){
+                                    detectedFeatures.needToUnwrapArrayKeys=true;
+                                }else{
+                                    detectedFeatures.needToUnwrapArrayKeys=false;
+                                }
+                            };
+                            request.onerror=function(){
+                                detectedFeatures.needToUnwrapArrayKeys=true;
+                            };
+                        }
+                        if(tableName=='$internals'){
+                            store.put(initialVersionInfo);
+                        }
                     }
-                };
-                request.onerror=function(){
-                    detectedFeatures.needToUnwrapArrayKeys=true;
-                };
+                })
             }
         }
         ldb.wait4db = ldb.IDBX(requestDB);
