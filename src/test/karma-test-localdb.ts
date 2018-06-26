@@ -20,7 +20,6 @@ before(function(){
     window.myOwn.config=window.myOwn.config||{};
     // @ts-ignore
     window.myOwn.config.useragent=new UserAgent().parse(window.navigator.userAgent);
-    console.log('window.myOwn.config.useragent',window.myOwn.config.useragent)
 })
 
 describe("local-db", function(){

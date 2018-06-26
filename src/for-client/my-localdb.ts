@@ -85,25 +85,35 @@ export class LocalDb{
                 likeAr(initialStores).forEach(function(keyPath: string, tableName: string){
                     var store = db.createObjectStore(tableName, {keyPath: keyPath});
                     if(detectedFeatures.needToUnwrapArrayKeys==null){
-                        if(tableName=='$detect'){
-                            var request = store.put({detectKey:'one'});
-                            request.onsuccess=function(){
-                                var key=request.result;
-                                if(typeof key === "string"){
-                                    detectedFeatures.needToUnwrapArrayKeys=true;
-                                }else{
-                                    detectedFeatures.needToUnwrapArrayKeys=false;
-                                }
-                            };
-                            request.onerror=function(){
-                                detectedFeatures.needToUnwrapArrayKeys=true;
-                            };
+                        try{
+                            var os: string = window.myOwn.config.useragent.os;
+                            var version: number = parseInt(window.myOwn.config.useragent.version.split('.')[0]);
+                        }catch(err){
+                            throw Error("unknowed OS or version");
                         }
-                        if(tableName=='$internals'){
-                            store.put(initialVersionInfo);
+                        if(os === 'OS X' && version < 11){
+                            detectedFeatures.needToUnwrapArrayKeys=true
+                        }else{
+                            if(tableName=='$detect'){
+                                var request = store.put({detectKey:'one'});
+                                request.onsuccess=function(){
+                                    var key=request.result;
+                                    if(typeof key === "string"){
+                                        detectedFeatures.needToUnwrapArrayKeys=true;
+                                    }else{
+                                        detectedFeatures.needToUnwrapArrayKeys=false;
+                                    }
+                                };
+                                request.onerror=function(){
+                                    detectedFeatures.needToUnwrapArrayKeys=true;
+                                };
+                            }
                         }
                     }
-                })
+                    if(tableName=='$internals'){
+                        store.put(initialVersionInfo);
+                    }
+            })
             }
         }
         ldb.wait4db = ldb.IDBX(requestDB);
@@ -204,6 +214,7 @@ export class LocalDb{
         var db=await ldb.wait4db
         var rows:T[]=[];
         var internalKey:string|Key;
+        
         if(detectedFeatures.needToUnwrapArrayKeys){
             internalKey=tableName+JSON.stringify(parentKey);
             internalKey=internalKey.substr(0,internalKey.length-1);
