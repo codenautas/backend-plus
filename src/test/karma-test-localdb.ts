@@ -13,6 +13,16 @@ function compare<T>(obtained:T, expected:T):boolean{
     return true;
 }
 
+before(function(){
+    // @ts-ignore
+    window.myOwn=window.myOwn||{};
+    // @ts-ignore
+    window.myOwn.config=window.myOwn.config||{};
+    // @ts-ignore
+    window.myOwn.config.useragent=new UserAgent().parse(window.navigator.userAgent);
+    console.log('window.myOwn.config.useragent',window.myOwn.config.useragent)
+})
+
 describe("local-db", function(){
     var ldb:LocalDb;
     before(function(){

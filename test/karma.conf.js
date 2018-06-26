@@ -29,6 +29,7 @@ module.exports = function(config, preConfig) {
       'node_modules/self-explain/dist/escodegen.browser.js',
       'node_modules/self-explain/lib/self-explain.js',
       'node_modules/type-store/type-store.js',
+      'node_modules/express-useragent/lib/express-useragent.js',
       'for-client/my-localdb.js',
       'test/karma-test-*.js'
     ],
