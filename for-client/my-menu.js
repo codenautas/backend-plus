@@ -77,6 +77,7 @@ myOwn.wScreens.procAux = {
         main_layout.appendChild(divResult);
         button.onclick=function(){
             button.disabled=true;
+            divResult.innerHTML="";
             mainAction(params,divResult).then(function(){
                 button.disabled=false;
             })

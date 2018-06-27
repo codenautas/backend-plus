@@ -827,7 +827,7 @@ myOwn.DetailColumnGrid = function DetailColumnGrid(opts){
 myOwn.DetailColumnGrid.prototype = Object.create(myOwn.ColumnGrid.prototype);
 
 myOwn.DetailColumnGrid.prototype.th = function th(){
-    var th=html.th({class:'grid-th-details', "my-defname":this.detailTableDef.table, title:this.detailTableDef.label},this.detailTableDef.abr);
+    var th=html.th({class:'grid-th-details', "my-defname":this.detailTableDef.table||this.detailTableDef.wScreen, title:this.detailTableDef.label},this.detailTableDef.abr);
     return th;
 };
 
@@ -873,19 +873,28 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
             divGrid.style.overflowX='visible';
             tdGrid.className='my-detail-grid';
             tdGrid.style.overflowX='visible';
-            if(!detailControl.table){
-                grid.my.tableGrid(detailTableDef.table, divGrid, {fixedFields: fixedFields}).waitForReady(function(g){
-                    detailControl.table=g.dom.table;
-                    if(detailTableDef.refreshParent || grid.def.complexDef && detailTableDef.refreshParent!==false){
-                        var refresh = function refresh(){
-                            grid.retrieveRowAndRefresh(depot);
-                        }
-                        g.dom.main.addEventListener('deletedRowOk', refresh);
-                        g.dom.main.addEventListener('savedRowOk', refresh);
+            if(!detailControl.divDetail){
+                if(detailTableDef.wScreen){
+                    var params=likeAr.toPlainObject(fixedFields,'fieldName','value');
+                    var wScreen=my.wScreens[detailTableDef.wScreen];
+                    if(!wScreen.parameters){
+                        alertPromise('error lack of parameters in wScreen '+detailTableDef.wScreen);
                     }
-                });
+                    wScreen.mainAction(params,divGrid);
+                }else{
+                    grid.my.tableGrid(detailTableDef.table, divGrid, {fixedFields: fixedFields}).waitForReady(function(g){
+                        detailControl.divDetail=g.dom.table;
+                        if(detailTableDef.refreshParent || grid.def.complexDef && detailTableDef.refreshParent!==false){
+                            var refresh = function refresh(){
+                                grid.retrieveRowAndRefresh(depot);
+                            }
+                            g.dom.main.addEventListener('deletedRowOk', refresh);
+                            g.dom.main.addEventListener('savedRowOk', refresh);
+                        }
+                    });
+                }
             }else{
-                divGrid.appendChild(detailControl.table);
+                divGrid.appendChild(detailControl.divDetail);
             }
             detailControl.show = true;
             newTr.detailTableNameAndAbr=detailTableNameAndAbr;
@@ -895,7 +904,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
             detailControl.img.src=my.path.img+'detail-expand.png';
             detailControl.img.alt="[+]";
             detailControl.img.title=my.messages.details;
-            grid.my.fade(detailControl.tr, {smooth:{spans:spansForSmooth, content:detailControl.table}});
+            grid.my.fade(detailControl.tr, {smooth:{spans:spansForSmooth, content:detailControl.divDetail}});
             detailControl.show = false;
             depot.detailRows = depot.detailRows.filter(function(tr){ return tr!==detailControl.tr;});
             detailControl.tr = null;
@@ -907,7 +916,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
     var button = my.createForkeableButton(menuRef,{label:detailControl.img, onclick:buttononclick, class:'table-button'});
     button.setAttribute("skip-enter",true);
     // var button = html.button({class:'table-button', "skip-enter":true}, [detailControl.img]).create();
-    var td = html.td({class:['grid-th','grid-th-details'], "my-relname":detailTableDef.table}, button).create();
+    var td = html.td({class:['grid-th','grid-th-details'], "my-relname":detailTableDef.table||detailTableDef.wScreen}, button).create();
     depot.detailControls[detailTableNameAndAbr] = detailControl;
     return td;
 };
