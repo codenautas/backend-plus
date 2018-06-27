@@ -49,45 +49,55 @@ myOwn.wScreens.table = function(addrParams){
     },10);
 }
 
+myOwn.wScreens.procAux = {
+    showParams:function(formDef, main_layout, addrParams, mainAction){
+        addrParams.up=addrParams.up||{};
+        var params=addrParams.up;
+        var button = html.button(my.messages.proced).create();
+        var divResult = html.div({class:formDef.resultClass||'result-pre'}).create();
+        main_layout.appendChild(html.table({class:"table-param-screen"},formDef.parameters.map(function(parameterDef){
+            var control = html.td({"typed-controls-direct-input":true}).create();
+            control.style.minWidth='200px';
+            control.style.backgroundColor='white';
+            TypedControls.adaptElement(control,changing({typeName:'text'}, parameterDef));
+            if(parameterDef.name in params){
+                control.setTypedValue(params[parameterDef.name]);
+            }else if('defaultValue' in parameterDef){
+                params[parameterDef.name] = parameterDef.defaultValue;
+                control.setTypedValue(parameterDef.defaultValue);
+            }
+            control.addEventListener('update', function(){
+                params[parameterDef.name] = control.getTypedValue();
+                myOwn.replaceAddrParams(addrParams);
+            });
+            return html.tr([ html.td(parameterDef.label||parameterDef.name),control]);
+        }).concat(
+            html.tr([html.td(), html.td([button])])
+        )).create());
+        main_layout.appendChild(divResult);
+        button.onclick=function(){
+            button.disabled=true;
+            mainAction(params,divResult).then(function(){
+                button.disabled=false;
+            })
+        }
+    },
+    mainAction:function(){
+    },
+}
+
 myOwn.wScreens.proc = function(addrParams){
     var procDef=my.config.procedures.find(function(proc){
         return proc.action == (addrParams.proc||addrParams.name);
     });
-    console.log('procDef');
-    console.log(addrParams);
-    console.log(procDef);
-    var params={};
-    var button = html.button(my.messages.proced).create();
-    var divResult = html.div({class:procDef.resultClass}).create();
-    main_layout.appendChild(html.table({class:"table-param-screen"},procDef.parameters.map(function(parameterDef){
-        var control = html.td({"typed-controls-direct-input":true}).create();
-        control.style.minWidth='200px';
-        control.style.backgroundColor='white';
-        TypedControls.adaptElement(control,changing({typeName:'text'}, parameterDef));
-        if('defaultValue' in parameterDef){
-            params[parameterDef.name] = parameterDef.defaultValue;
-            control.setTypedValue(parameterDef.defaultValue);
-        }
-        control.addEventListener('update', function(){
-            params[parameterDef.name] = control.getTypedValue();
-        });
-        return html.tr([ html.td(parameterDef.label||parameterDef.name),control]);
-    }).concat(
-        html.tr([html.td(), html.td([button])])
-    )).create());
-    main_layout.appendChild(divResult);
-    button.onclick=function(){
+    myOwn.wScreens.procAux.showParams(procDef, main_layout, addrParams, function(params,divResult){
         var my_ajax_actionFun = procDef.action.split('/').reduce(function(o, part){ return o[part]; },my.ajax);
-        console.log('x',params);
-        button.disabled=true;
-        my_ajax_actionFun(params).then(function(result){
+        return my_ajax_actionFun(params).then(function(result){
             my.wScreens.proc.result[procDef.resultOk](result,divResult);
         },function(err){
             my.wScreens.proc.result[procDef.resultErr](err,divResult);
-        }).then(function(){
-            button.disabled=false;
         });
-    }
+    });
 }
 
 myOwn.wScreens.proc.result={
@@ -135,6 +145,7 @@ myOwn.UriSearchToObjectParams={
 	i                :{ showInMenu:true , encode:function(value,menu){ return (menu.parents||[]).concat(menu.name).join(',') }},
 	fc               :{                   encode:function(x){ return JSON.stringify(x); }, decode:x=>JSON.parse(x)  },
 	ff               :{                   encode:function(x){ return JSON.stringify(x); }, decode:x=>JSON.parse(x)  },
+	up               :{                   encode:function(x){ return JSON.stringify(x); }, decode:x=>JSON.parse(x)  },
 	pf               :{                   encode:function(x){ return JSON.stringify(x); }, decode:x=>JSON.parse(x)  },
 	section          :{ showInMenu:true , encode:noChange                                , decode:noChange          },
 	directUrl        :{ hide:true       },
@@ -166,6 +177,14 @@ myOwn.showPage = function showPage(pageDef){
             var pageTitle = addrParams.pageTitle || addrParams.title || addrParams.name;
             document.title = pageTitle;
             my.wScreens[w].call(my, addrParams);
+        }else if(typeof my.wScreens[w] === 'object'){
+            var wScreen = my.wScreens[w];
+            if(wScreen.parameters){
+                my.wScreens.procAux.showParams({
+                    parameters:wScreen.parameters,
+                    resultClass:wScreen.resultClass
+                }, main_layout, addrParams, wScreen.mainAction);
+            }
         }
         var rightMenu = document.getElementById('right-menu-icon');
     }else{
@@ -220,7 +239,7 @@ myOwn.createForkeableButton = function createForkeableButton(menu, opts){
 };
 
 function encodeMinimalURIComponent(text){
-    return text
+    return (text+'')
         .replace(/=/g, '%3D')
         .replace(/\?/g, '%3F')
         .replace(/\#/g, '%23')
