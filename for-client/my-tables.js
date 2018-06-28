@@ -558,7 +558,7 @@ myOwn.TableGrid.prototype.prepareAndDisplayGrid = function prepareAndDisplayGrid
                     }
                     return grid;
                 }else{
-                    grid.dom.caption.style.backgroundColor='#F88';
+                    grid.dom.caption.style.backgroundColor='#F44';
                 }
             }
             grid.prepareDepots(rows);
@@ -690,6 +690,7 @@ myOwn.DataColumnGrid.prototype.th = function th(){
     var th=html.th(this.cellAttributes({class: "th-name"}),fieldDef.title).create();
     if(fieldDef.width){
         th.style.width=fieldDef.width+'px';
+        th.style.minWidth=fieldDef.width+'px';
     }
     th.addEventListener('click',function(mouseEvent){
         if(mouseEvent.altKey){
