@@ -545,6 +545,22 @@ myOwn.TableGrid.prototype.prepareAndDisplayGrid = function prepareAndDisplayGrid
     });
     return grid.connector.getData().then(function(rows){
         return structureRequest.then(function(){
+            if(grid.def.layout.errorList){
+                if(!rows.length){
+                    grid.dom.caption.textContent='no tiene: '+grid.dom.caption.textContent;
+                    grid.dom.caption.style.backgroundColor='green';
+                    grid.dom.table.tHead.style.display='none';
+                    if(grid.dom.table.tBodies[0]){
+                        grid.dom.table.tBodies[0].style.display='none';
+                    }
+                    if(grid.dom.table.tFoot){
+                        grid.dom.table.tFoot.style.display='none';
+                    }
+                    return grid;
+                }else{
+                    grid.dom.caption.style.backgroundColor='#F88';
+                }
+            }
             grid.prepareDepots(rows);
             grid.displayGrid();
             grid.updateSortArrow();
@@ -1510,9 +1526,10 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     grid.dom.footInfo = html.th({colspan:grid.columns.length, "is-processing":"1"}).create();
     createInfoColumnStructure(grid.dom.footInfo);
     grid.actualName = grid.def.name + (grid.connector.fixedFields.length ? '-' + JSON4all.stringify(grid.connector.fixedFields.map(function(pair){ return pair.value; })) : '')
+    grid.dom.caption=html.caption(grid.def.title).create();
     if(grid.vertical){
         grid.dom.table = html.table({"class":"my-grid", "my-table": grid.actualName},[
-            html.caption(grid.def.title),
+            grid.dom.caption,
             html.tbody(
                 grid.columns.map(function(column){ 
                     return html.tr([
@@ -1536,7 +1553,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
             footRows=[html.tr([html.th([buttonInsert]),grid.dom.footInfo])];
         }
         grid.dom.table = html.table({"class":"my-grid", "my-table": grid.actualName},[
-            html.caption(grid.def.title),
+            grid.dom.caption,
             html.thead([
                 html.tr([html.th(),grid.dom.headInfo]),
                 html.tr(grid.columns.map(function(column){ return column.th(); })),
