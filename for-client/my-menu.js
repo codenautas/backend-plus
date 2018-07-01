@@ -160,7 +160,15 @@ myOwn.UriSearchToObjectParams={
 myOwn.showPage = function showPage(pageDef){
     my.prepareFloating3dots();
     my.prepareRulerToggle();
-    var addrParams=my.UriSearchToObject(location.hash||location.search);
+    var newHash;
+    if(!location.hash){
+        newHash=sessionStorage.getItem('backend-plus-hash-redirect');
+        sessionStorage.removeItem('backend-plus-hash-redirect');
+        if(newHash){
+            history.replaceState(null, null, location.origin+location.pathname+location.search+newHash);
+        }
+    }
+    var addrParams=my.UriSearchToObject(location.hash||location.search||newHash||'');
     if(addrParams.i){
         addrParams.i=addrParams.i.split(',');
     }else{
