@@ -1,5 +1,5 @@
 doctype html
-html(lang="en")
+html(lang=lang)
   head
     link(rel='stylesheet', href=skinUrl+'css/chpass.css')
   body
@@ -13,14 +13,22 @@ html(lang="en")
             img.formImg(src=skinUrl+'img/chpass-icon.png')
         tr
           td.iconostd
+            label(for="username")
+              img.iconoslog(src=skinUrl+'img/iconousuario.png')
+          td.formlabel
+            label(for="username")=msgs.chpass.username
+          td.formtd
+            input(id="username", name="username", placeholder=msgs.chpass.username, autocomplete="username", value=username, disabled)
+          td.chpasstableRightImg(rowspan=4)
+            img.formImg#chpassFormRightImg(src=skinUrl+'img/chpass-icon.png')
+        tr
+          td.iconostd
             label(for="oldPassword")
               img.iconoslog(src=skinUrl+'img/iconoOldPasswd.png')
           td.formlabel
             label(for="oldPassword")=msgs.chpass.oldPassword
           td.formtd
             input(id="oldPassword", type="password", name="oldPassword", autofocus=true, placeholder=msgs.chpass.oldPassword, autocomplete="current-password")
-          td.chpasstableRightImg(rowspan=3)
-            img.formImg#chpassFormRightImg(src=skinUrl+'img/chpass-icon.png')
         tr
           td.iconostd
             label(for="newPassword")=newPassword
