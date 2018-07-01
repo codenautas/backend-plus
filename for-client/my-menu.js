@@ -229,8 +229,9 @@ myOwn.createForkeableButton = function createForkeableButton(menu, opts){
     }
     button.setForkeableHref(menu);
     menu.button = button;
+    button.onmousedown=opts.updateHrefBeforeClick||function(){};
     button.onclick=opts.onclick||function(event){
-        if(!event.ctrlKey){
+        if(!event.ctrlKey && event.button!=1){
             history.pushState(null, null, this.href);
             my.showPage();
             event.preventDefault();

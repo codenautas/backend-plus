@@ -913,6 +913,7 @@ myOwn.prepareRulerToggle = function prepareRulerToggle(){
         setTimeout(rePosition,100);
         window.addEventListener('scroll', rePosition);
         window.addEventListener('resize', rePosition);
+        var floatingStyle="position:relative; background-color:rgba(155,155,255,0.8) !important; background-clip: padding-box; outline:2px solid black;";
         var autoPosition=function(){
             var tables = document.querySelectorAll(".my-grid");
             if(tables){
@@ -925,7 +926,7 @@ myOwn.prepareRulerToggle = function prepareRulerToggle(){
                     if(!('previousDif' in autoStyleTop) || autoStyleTop.actualDif!=autoStyleTop.previousDif){
                         if(autoStyleTop.actualDif>0){
                             cssClausules.push(
-                                "[my-table=\""+myTableName.replace(/"/g,'\\"')+"\"] > thead > tr > th { position:relative; background-color:rgba(155,155,255,0.8); background-clip: padding-box; "+
+                                "[my-table=\""+myTableName.replace(/"/g,'\\"')+"\"] > thead > tr > th { "+floatingStyle+
                                 " top:"+(autoStyleTop.actualDif)+'px; '+
                                 "}"
                             );
@@ -947,7 +948,7 @@ myOwn.prepareRulerToggle = function prepareRulerToggle(){
                             if(autoStyleLeft.actualDif>0){
                                 cssClausules.push(
                                     cssSelectorB+
-                                    " { position:relative; background-color:rgba(155,155,255,0.8); background-clip: padding-box; "+
+                                    " { "+floatingStyle+
                                     " left:"+(autoStyleLeft.actualDif)+'px; '+
                                     "}"
                                 );

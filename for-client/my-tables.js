@@ -264,7 +264,10 @@ myOwn.TableConnector.prototype.getData = function getData(){
             return rows;
         });
     }).catch(function(err){
-        connector.getElementToDisplayCount().appendChild(html.span({style:'color:red', title: err.message},' error').create());
+        var elementToDisplayError=connector.getElementToDisplayCount()
+        if(elementToDisplayError){
+            elementToDisplayError.appendChild(html.span({style:'color:red', title: err.message},' error').create());
+        }
         throw err;
     });
 };
@@ -345,7 +348,7 @@ myOwn.TableConnectorLocal.prototype.getStructure = function getStructure(){
     var connector = this;
     connector.whenStructureReady = my.getStructureFromLocalDb(connector.tableName).then(function(tableDef){
         if(!tableDef){ 
-            var err = new Error;
+            var err = new Error();
             err.code='NO-STRUCTURE';
             throw err;
         }
@@ -864,18 +867,26 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
         title:my.messages.details
     }).create();
     var menuRef={w:'table', table:detailTableDef.table};
-    var buttononclick = function(event){
-        var fixedFields = detailTableDef.fields.map(function(pair){
+    var calculateFixedFields = function(){
+        return detailTableDef.fields.map(function(pair){
             var fieldCondition={fieldName: pair.target, value:depot.row[pair.source]}
             if(pair.range){
                 fieldCondition.range=pair.range;
             }
             return fieldCondition;
         });
+    }
+    var updateHrefBeforeClick = function(){
+        var fixedFields = calculateFixedFields();
+        menuRef.fixedFields=fixedFields;
+        this.setForkeableHref(menuRef);
+    }
+    var buttononclick = function(event){
+        var fixedFields = calculateFixedFields();
         menuRef.fixedFields=fixedFields;
         this.setForkeableHref(menuRef);
         var spansForSmooth = [iColumn+1, 999];
-        if(!detailControl.show && !event.ctrlKey){
+        if(!detailControl.show && !event.ctrlKey && event.button==1){
             detailControl.img.src=my.path.img+'detail-contract.png';
             detailControl.img.alt="[-]";
             detailControl.img.title=my.messages.lessDetails;
@@ -921,16 +932,18 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
             detailControl.img.src=my.path.img+'detail-expand.png';
             detailControl.img.alt="[+]";
             detailControl.img.title=my.messages.details;
-            grid.my.fade(detailControl.tr, {smooth:{spans:spansForSmooth, content:detailControl.divDetail}});
+            if(detailControl.tr){
+                grid.my.fade(detailControl.tr, {smooth:{spans:spansForSmooth, content:detailControl.divDetail}});
+                depot.detailRows = depot.detailRows.filter(function(tr){ return tr!==detailControl.tr;});
+            }
             detailControl.show = false;
-            depot.detailRows = depot.detailRows.filter(function(tr){ return tr!==detailControl.tr;});
             detailControl.tr = null;
         }
-        if(!event.ctrlKey){
+        if(!event.ctrlKey && event.button==1){
             event.preventDefault();
         }
     };
-    var button = my.createForkeableButton(menuRef,{label:detailControl.img, onclick:buttononclick, class:'table-button'});
+    var button = my.createForkeableButton(menuRef,{label:detailControl.img, onclick:buttononclick, updateHrefBeforeClick:updateHrefBeforeClick, class:'table-button'});
     button.setAttribute("skip-enter",true);
     // var button = html.button({class:'table-button', "skip-enter":true}, [detailControl.img]).create();
     var td = html.td({class:['grid-th','grid-th-details'], "my-relname":detailTableDef.table||detailTableDef.wScreen}, button).create();
