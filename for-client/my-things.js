@@ -115,6 +115,9 @@ myOwn.statusDivName = 'reconnection_div';
 myOwn.autoSetupFunctions = [
     function autoSetupMyThings(){
         var my = this;
+        if(!('server' in my)){
+            my.server = {connected: null, broadcaster:html.div({id:'server-status-broadcaster'}).create()}
+        }
         var readProcedureDefinitions = function readProcedureDefinitions(){
             return my.ajaxPromise({
                 action:'client-setup',
@@ -458,6 +461,10 @@ myOwn.ajaxPromise = function(procedureDef,data,opts){
                     my.informDetectedStatus('noNetwork');
                 }else if(!!err.originalError) {
                     my.informDetectedStatus('noServer');
+                    if(my.server.connected){
+                        my.server.connected = false
+                        my.server.broadcaster.dispatchEvent(new Event('noServer'));
+                    }
                 } else {
                     my.informDetectedStatus('logged', true);
                 }
@@ -493,6 +500,10 @@ myOwn.testKeepAlive = function testKeepAlive(){
         var lightServer = document.getElementById('light-server');
         if(lightServer){
             lightServer.src=skinUrl+'img/server-ok.png';
+            if(!my.server.connected){
+                my.server.connected = true;
+                my.server.broadcaster.dispatchEvent(new Event('serverConnected'));
+            }
             var speed=1000/(1+new Date().getTime()-startTime);
             if(isNaN(lightServer.result.speed)){
                 lightServer.result.speed = speed; 
