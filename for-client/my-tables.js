@@ -220,7 +220,7 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
                     promiseChain = promiseChain.then(function(){
                         return my.ldb.getStructure(tableName).then(function(tableDef){
                             if(!tableDef){
-                                var conn = new my.TableConnector({tableName, my});
+                                var conn = new my.TableConnector({tableName: tableName, my:my});
                                 return conn.getStructure();
                             }
                         });
