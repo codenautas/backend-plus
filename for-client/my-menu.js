@@ -6,6 +6,7 @@ myOwn.wScreens={}
 
 myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     chpass:'change password',
+    completed:'completed',
     exit:'exit',
     networkSignal1:'network $1',
     offLine:'off line',
@@ -14,10 +15,12 @@ myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     signIn:'sign in',
     speed1:'speed $1',
     user:'user',
+    viewProgress:'view progress',
 });
 
 myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     chpass:'cambiar clave',
+    completed:'finalizado',
     exit:'salir',
     networkSignal1:'estado de la red: $1',
     offLine:'fuera de línea',
@@ -26,6 +29,7 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     signIn:'login',
     speed1:'velocidad $1',
     user:'usuario',
+    viewProgress:'procesando',
 });
 
 myOwn.wScreens.table = function(addrParams){
@@ -57,6 +61,12 @@ myOwn.wScreens.procAux = {
         var params=addrParams.up;
         var button = html.button(my.messages.proced).create();
         var divResult = html.div({class:formDef.resultClass||'result-pre'}).create();
+        var id='progress'+Math.random();
+        var toggleProgress = html.input({type:'checkbox', id:id, checked:true, disabled:true}).create();
+        var labelProgress = html.label({for:id, id:id+'msg'},my.messages.viewProgress).create();
+        // var divToggleProgress = html.div([toggleProgress, labelProgress]).create();
+        var divProgress = html.div().create();
+        var divProgressOutside = html.div({class:'result-progress', style:'opacity:0'},[toggleProgress,labelProgress,divProgress]).create();
         main_layout.appendChild(html.table({class:"table-param-screen"},formDef.parameters.map(function(parameterDef){
             var control = html.td({"typed-controls-direct-input":true}).create();
             control.style.minWidth='200px';
@@ -77,11 +87,18 @@ myOwn.wScreens.procAux = {
             html.tr([html.td(), html.td([button])])
         )).create());
         main_layout.appendChild(divResult);
+        main_layout.appendChild(divProgressOutside);
         button.onclick=function(){
             button.disabled=true;
             divResult.innerHTML="";
-            mainAction(params,divResult).then(function(){
+            divProgress.innerHTML="";
+            divProgressOutside.style.opacity=0.77;
+            labelProgress.textContent='procesando';
+            mainAction(params,divResult,divProgress).then(function(resultOk){
                 button.disabled=false;
+                divProgressOutside.style.opacity=0.33;
+                toggleProgress.disabled=false;
+                labelProgress.textContent=resultOk?my.messages.completed:'error';
             })
         }
     },
@@ -93,12 +110,22 @@ myOwn.wScreens.proc = function(addrParams){
     var procDef=my.config.procedures.find(function(proc){
         return proc.action == (addrParams.proc||addrParams.name);
     });
-    myOwn.wScreens.procAux.showParams(procDef, main_layout, addrParams, function(params,divResult){
+    myOwn.wScreens.procAux.showParams(procDef, main_layout, addrParams, function(params,divResult,divProgress){
         var my_ajax_actionFun = procDef.action.split('/').reduce(function(o, part){ return o[part]; },my.ajax);
-        return my_ajax_actionFun(params).then(function(result){
+        var opts={};
+        if(procDef.progress!==false && divProgress){
+            opts.informProgress = function informProgress(progress){
+                if(progress.message){
+                    divProgress.appendChild(html.div({class:'my-progress'},progress.message).create());
+                }
+            }
+        }
+        return my_ajax_actionFun(params,opts).then(function(result){
             my.wScreens.proc.result[procDef.resultOk](result,divResult);
+            return true;
         },function(err){
             my.wScreens.proc.result[procDef.resultErr](err,divResult);
+            return false;
         });
     });
 }

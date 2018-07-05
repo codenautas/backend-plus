@@ -123,7 +123,8 @@ myOwn.autoSetupFunctions = [
                 action:'client-setup',
                 method:'get',
                 encoding:'JSON',
-                parameters:[]
+                parameters:[],
+                progress:false
             }).then(function(setup){
                 my.config = setup;
                 my.config.procedure=my.config.procedure||{};
@@ -415,7 +416,7 @@ myOwn.alertError = function(err){
     });
 }
 
-myOwn.ajaxPromise = function(procedureDef,data,opts){
+myOwn.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
     opts = opts || {};
     if(!('visiblyLogErrors' in opts)){
         opts.visiblyLogErrors=true;
@@ -439,12 +440,26 @@ myOwn.ajaxPromise = function(procedureDef,data,opts){
         if(data && data.files){
             params.files=data.files;
         }
+        var result=[];
+        var progress=procedureDef.progress!==false;
         return AjaxBestPromise[procedureDef.method]({
             multipart:procedureDef.files,
             url:procedureDef.action,
             data:params,
             uploading:opts.uploading
-        }).then(function(result){
+        }).onLine(function(line,ender){
+            if(progress){
+                if(line.substr(0,2)=='--'){
+                    progress=false;
+                }else if(opts.informProgress){
+                    var info=JSON.parse(line);
+                    opts.informProgress(info.progress);
+                }
+            }else{
+                result.push(line||ender);
+            }
+        }).then(function(){
+            result=result.join('');
             if(result && result[0]=="<" && result.match(/login/m)){
                 my.informDetectedStatus('notLogged');
                 throw changing(new Error(my.messages.notLogged),{displayed:true, isNotLoggedError:true});
@@ -492,7 +507,8 @@ myOwn.testKeepAlive = function testKeepAlive(){
         parameters:[],
         method:'post',
         action:'keep-alive.json',
-        encoding:'plain'
+        encoding:'plain',
+        progress:false
     },{},{visiblyLogErrors:false}).then(function(){
         if(window.updateOnlineStatus){
             updateOnlineStatus();

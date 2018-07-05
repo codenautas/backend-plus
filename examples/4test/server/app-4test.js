@@ -32,6 +32,9 @@ class AppExample extends backendPlus.AppBackend{
                 {menuType:'table', name:'simple'},
                 {menuType:'table', name:'with_fk'},
             ]},
+            {menuType:'menu', name:'procs', menuContent:[
+                {name:'get_notices', menuType:'proc'},
+            ]},
             {menuType:'menu', name:'config', menuContent:[
                 {name:'users', menuType:'table'},
             ]},
