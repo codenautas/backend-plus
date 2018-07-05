@@ -1,7 +1,7 @@
 "use strict";
 
 // require('lazy-some').bindToPrototypeIn(Array);
-
+var changing = require('best-globals').changing;
 myOwn.wScreens={}
 
 myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
@@ -144,10 +144,10 @@ function noChange(x){ return x; }
 
 myOwn.UriSearchToObjectParams={
 	i                :{ showInMenu:true , encode:function(value,menu){ return (menu.parents||[]).concat(menu.name).join(',') }},
-	fc               :{                   encode:function(x){ return JSON.stringify(x); }, decode:x=>JSON.parse(x)  },
-	ff               :{                   encode:function(x){ return JSON.stringify(x); }, decode:x=>JSON.parse(x)  },
-	up               :{                   encode:function(x){ return JSON.stringify(x); }, decode:x=>JSON.parse(x)  },
-	pf               :{                   encode:function(x){ return JSON.stringify(x); }, decode:x=>JSON.parse(x)  },
+	fc               :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return JSON.parse(x)}  },
+	ff               :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return JSON.parse(x)}  },
+	up               :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return JSON.parse(x)}  },
+	pf               :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return JSON.parse(x)}  },
 	section          :{ showInMenu:true , encode:noChange                                , decode:noChange          },
 	directUrl        :{ hide:true       },
 	selectedByDefault:{ hide:true       },
