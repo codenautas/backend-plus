@@ -886,7 +886,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
         menuRef.fixedFields=fixedFields;
         this.setForkeableHref(menuRef);
         var spansForSmooth = [iColumn+1, 999];
-        if(!detailControl.show && !event.ctrlKey && event.button==1){
+        if(!detailControl.show && !event.ctrlKey && event.button!=1){
             detailControl.img.src=my.path.img+'detail-contract.png';
             detailControl.img.alt="[-]";
             detailControl.img.title=my.messages.lessDetails;
@@ -939,7 +939,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
             detailControl.show = false;
             detailControl.tr = null;
         }
-        if(!event.ctrlKey && event.button==1){
+        if(!event.ctrlKey && event.button!=1){
             event.preventDefault();
         }
     };

@@ -45,6 +45,8 @@ myOwn.wScreens.table = function(addrParams){
 		if(addrParams.pf){
             opts.parameterFunctions=addrParams.pf;
 		}
+        var pageTitle = addrParams.label || addrParams.name || addrParams.table || my.config.config.title;
+        document.title = pageTitle;
         my.tableGrid(addrParams.table||addrParams.name,layout, opts);
     },10);
 }
@@ -182,9 +184,9 @@ myOwn.showPage = function showPage(pageDef){
             addrParams = changing(menu.selectedItem, addrParams);
             w=menu.selectedItem.menuType;
         }
+        var pageTitle = addrParams.pageTitle || addrParams.title || addrParams.name || my.config.config.title;
+        document.title = pageTitle;
         if(typeof my.wScreens[w] === 'function'){
-            var pageTitle = addrParams.pageTitle || addrParams.title || addrParams.name;
-            document.title = pageTitle;
             my.wScreens[w].call(my, addrParams);
         }else if(typeof my.wScreens[w] === 'object'){
             var wScreen = my.wScreens[w];
