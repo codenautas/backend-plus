@@ -1106,7 +1106,8 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     return message;
                 },
                 showWithMiniMenu,
-                messages
+                messages,
+                grid
             )
         );
     }
@@ -1317,16 +1318,27 @@ myOwn.dialogUpload = function dialogUpload(ajaxPath, ajaxParams, ajaxPrepareResu
         }
         var buttonFile=html.input(fileAttr).create();
         var buttonConfirmImport=html.input({class:'import-button',type:'button', value:changing(my.messages, messages).import}).create();
+        var laodingIndicator=html.div({class:'indicator'},' ').create();
+        var loadingBar=html.div({class:'progress-bar', style:'width:400px; height:8px;'},[laodingIndicator]).create();
+        var divProgress=html.div({class:'result-progress', style:'width:400px; height:40px;'}).create();
         var progressIndicator=html.div({class:'indicator'},' ').create();
         var progressBar=html.div({class:'progress-bar', style:'width:400px; height:8px;'},[progressIndicator]).create();
-        var uploadingProgress=function(progress){
-            if(progress.lengthComputable){
-                progressIndicator.style.width=progress.loaded*100/progress.total+'%';
-                progressIndicator.title=Math.round(progress.loaded*100/progress.total)+'%';
-            }else{
-                progressIndicator.style.backgroundColor='#D4D';
-                progressIndicator.title='N/D %';
+        var displayProgressBar = function displayProgressBar(progress, progressIndicator){
+            if(progress.loaded){
+                if(progress.lengthComputable){
+                    progressIndicator.style.width=progress.loaded*100/progress.total+'%';
+                    progressIndicator.title=Math.round(progress.loaded*100/progress.total)+'%';
+                }else{
+                    progressIndicator.style.backgroundColor='#D4D';
+                    progressIndicator.title='N/D %';
+                }
             }
+        }
+        var uploadingProgress=function(progress){
+            displayProgressBar(progress, laodingIndicator);
+        };
+        var informProgress=function(progress){
+            displayProgressBar(progress, progressIndicator);
         };
         buttonConfirmImport.addEventListener('click', function(){
             var files = buttonFile.files;
@@ -1335,7 +1347,7 @@ myOwn.dialogUpload = function dialogUpload(ajaxPath, ajaxParams, ajaxPrepareResu
             bestGlobals.sleep(100).then(function(){
                 return my.ajax[ajaxPath[0]][ajaxPath[1]](changing(ajaxParams, {
                     files:files
-                }),{uploading:uploadingProgress});
+                }),{uploading:uploadingProgress, divProgress:divProgress, informProgress:informProgress});
             }).then(ajaxPrepareResultFun).then(this.dialogPromiseDone,this.dialogPromiseDone);
         });
         simpleFormPromise({elementsList:[
@@ -1344,6 +1356,8 @@ myOwn.dialogUpload = function dialogUpload(ajaxPath, ajaxParams, ajaxPrepareResu
             html.br().create(),
             buttonConfirmImport,
             html.br().create(),
+            loadingBar,
+            divProgress,
             progressBar,
         ]}).then(function(message){
             return Promise.all([

@@ -448,10 +448,7 @@ myOwn.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
         var progress=procedureDef.progress!==false;
         var divProgress;
         var onClose=function(){}
-        if(opts.divProgress){
-            divProgress=opts.divProgress;
-        }
-        opts.informProgress = opts.informProgress || function informProgress(progressInfo){
+        var defaultInformProgress = function defaultInformProgress(progressInfo){
             if(progressInfo.message){
                 if(!divProgress){
                     var idAutoClose='id-auto-close-'+Math.random();
@@ -489,6 +486,23 @@ myOwn.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
                 );
             }
         }
+        var informProgress;
+        if(opts.divProgress){
+            divProgress=opts.divProgress;
+            if(opts.informProgress){
+                informProgress = function(progress){
+                    if(progress.message){
+                        defaultInformProgress(progress)
+                    }else{
+                        opts.informProgress(progress)
+                    }
+                }
+            }else{
+                informProgress = defaultInformProgress;
+            }
+        }else{
+            informProgress = opts.informProgress || defaultInformProgress;
+        }
         var controlLoggedIn = function controlLoggedIn(result){
             if(result && result[0]=="<" && result.match(/login/m)){
                 my.informDetectedStatus('notLogged');
@@ -508,7 +522,7 @@ myOwn.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
                     progress=false;
                 }else{
                     var info=JSON.parse(line);
-                    opts.informProgress(info.progress);
+                    informProgress(info.progress);
                 }
             }else{
                 result.push(line||ender);
