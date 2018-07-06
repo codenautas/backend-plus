@@ -113,9 +113,9 @@ myOwn.wScreens.proc = function(addrParams){
     myOwn.wScreens.procAux.showParams(procDef, main_layout, addrParams, function(params,divResult,divProgress){
         var my_ajax_actionFun = procDef.action.split('/').reduce(function(o, part){ return o[part]; },my.ajax);
         var opts={};
-        ////////////// if(procDef.progress!==false && divProgress){
-        //////////////     opts.divProgress = divProgress;
-        ////////////// }
+        if(procDef.progress!==false && divProgress){
+            opts.divProgress = divProgress;
+        }
         return my_ajax_actionFun(params,opts).then(function(result){
             my.wScreens.proc.result[procDef.resultOk](result,divResult);
             return true;

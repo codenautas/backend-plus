@@ -46,6 +46,7 @@ myOwn.messages={};
 myOwn.i18n={messages:{}};
 
 myOwn.i18n.messages.en = {
+    autoCloseWhenEnds: "auto close when ends",
     Cancel   : "Cancel",
     notLogged: "Not logged in",
     noServer : "The server is inaccessible",
@@ -55,6 +56,7 @@ myOwn.i18n.messages.en = {
 };
 
 myOwn.i18n.messages.es = {
+    autoCloseWhenEnds: "cerrar la ventana al terminar",
     Cancel   : "Cancelar",
     notLogged: "Sin sesión activa",
     noServer : "No se puede acceder al servidor",
@@ -447,12 +449,23 @@ myOwn.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
         var divProgress;
         var onClose=function(){}
         if(opts.divProgress){
-            divProgress=opt.divProgress;
+            divProgress=opts.divProgress;
         }
         opts.informProgress = opts.informProgress || function informProgress(progressInfo){
             if(progressInfo.message){
                 if(!divProgress){
-                    var divButton=html.div({style:'height:40px'},my.messages.viewProgress).create();
+                    var idAutoClose='id-auto-close-'+Math.random();
+                    var checkAutoClose=html.input({type:'checkbox', id:idAutoClose, checked:myOwn.ajaxPromise.autoClose}).create();
+                    var divButton=html.div({style:'height:40px'},[
+                        my.messages.viewProgress,
+                        html.div([
+                            checkAutoClose,
+                            html.label({for:idAutoClose}, my.messages.autoCloseWhenEnds),
+                        ])
+                    ]).create();
+                    checkAutoClose.addEventListener('change',function(){
+                        myOwn.ajaxPromise.autoClose=checkAutoClose.checked;
+                    });
                     divProgress=html.div({class:'result-progress',style:'height:200px; width:300px'}).create();
                     simpleFormPromise({elementsList:[divButton,divProgress]});
                     onClose=function(){
@@ -460,23 +473,14 @@ myOwn.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
                         var stopCountDown=html.button(my.messages.stopCountDown).create();
                         divButton.innerHTML="";
                         divButton.appendChild(closeButton);
-                        divButton.appendChild(stopCountDown);
                         closeButton.onclick=function(){
                             divButton.dialogPromiseDone();
                         }
-                        stopCountDown.onclick=function(){
-                            counter=0;
+                        if(myOwn.ajaxPromise.autoClose){
+                            setTimeout(function(){
+                                divButton.dialogPromiseDone();
+                            },3000);
                         }
-                        var counter=10;
-                        setInterval(function(){
-                            if(counter){
-                                counter--;
-                                closeButton.textContent=DialogPromise.messages.Ok+' '+counter;
-                                if(counter==0){
-                                    divButton.dialogPromiseDone();
-                                }
-                            }
-                        },1000);
                     }
                 }
                 divProgress.insertBefore(
@@ -540,6 +544,8 @@ myOwn.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
         });
     });
 };
+
+myOwn.ajaxPromise.autoClose=true;
 
 myOwn.testKeepAlive = function testKeepAlive(){
     var my = this;
