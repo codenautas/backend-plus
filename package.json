@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for typed controls",
-  "version": "0.23.10",
+  "version": "0.23.11",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -56,7 +56,7 @@
     "like-ar": "~0.2.7",
     "login-plus": "~1.5.0",
     "mini-tools": "~1.0.2",
-    "pg-promise-strict": "~0.4.12",
+    "pg-promise-strict": "~0.4.13",
     "regexplicit": "~0.1.3",
     "require-bro": "~0.1.11",
     "self-explain": "~0.10.17",

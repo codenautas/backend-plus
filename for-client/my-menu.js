@@ -114,9 +114,9 @@ myOwn.wScreens.proc = function(addrParams){
         var my_ajax_actionFun = procDef.action.split('/').reduce(function(o, part){ return o[part]; },my.ajax);
         var opts={};
         if(procDef.progress!==false && divProgress){
-            opts.informProgress = function informProgress(progress){
-                if(progress.message){
-                    divProgress.appendChild(html.div({class:'my-progress'},progress.message).create());
+            opts.informProgress = function informProgress(progressInfo){
+                if(progressInfo.message){
+                    divProgress.appendChild(html.div({class:'my-progress'},progressInfo.message).create());
                 }
             }
         }
