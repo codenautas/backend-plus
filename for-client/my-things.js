@@ -50,7 +50,8 @@ myOwn.i18n.messages.en = {
     notLogged: "Not logged in",
     noServer : "The server is inaccessible",
     noNetwork: "Not connected to the network",
-    reLogin  : "Sign in"
+    reLogin  : "Sign in",
+    stopCountDown: "stop count down"
 };
 
 myOwn.i18n.messages.es = {
@@ -59,6 +60,7 @@ myOwn.i18n.messages.es = {
     noServer : "No se puede acceder al servidor",
     noNetwork: "No se detecta conexión de red",
     reLogin  : "Iniciar sesión",
+    stopCountDown: "detener la cuenta regresiva"
 };
 
 var bestGlobals = require('best-globals');
@@ -442,16 +444,65 @@ myOwn.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
         }
         var result=[];
         var progress=procedureDef.progress!==false;
+        var divProgress;
+        var onClose=function(){}
+        if(opts.divProgress){
+            divProgress=opt.divProgress;
+        }
+        opts.informProgress = opts.informProgress || function informProgress(progressInfo){
+            if(progressInfo.message){
+                if(!divProgress){
+                    var divButton=html.div({style:'height:40px'},my.messages.viewProgress).create();
+                    divProgress=html.div({class:'result-progress',style:'height:200px; width:300px'}).create();
+                    simpleFormPromise({elementsList:[divButton,divProgress]});
+                    onClose=function(){
+                        var closeButton=html.button(DialogPromise.messages.Ok).create();
+                        var stopCountDown=html.button(my.messages.stopCountDown).create();
+                        divButton.innerHTML="";
+                        divButton.appendChild(closeButton);
+                        divButton.appendChild(stopCountDown);
+                        closeButton.onclick=function(){
+                            divButton.dialogPromiseDone();
+                        }
+                        stopCountDown.onclick=function(){
+                            counter=0;
+                        }
+                        var counter=10;
+                        setInterval(function(){
+                            if(counter){
+                                counter--;
+                                closeButton.textContent=DialogPromise.messages.Ok+' '+counter;
+                                if(counter==0){
+                                    divButton.dialogPromiseDone();
+                                }
+                            }
+                        },1000);
+                    }
+                }
+                divProgress.insertBefore(
+                    html.div({class:'my-progress'},progressInfo.message).create(),
+                    divProgress.childNodes[0]
+                );
+            }
+        }
+        var controlLoggedIn = function controlLoggedIn(result){
+            if(result && result[0]=="<" && result.match(/login/m)){
+                my.informDetectedStatus('notLogged');
+                throw changing(new Error(my.messages.notLogged),{displayed:true, isNotLoggedError:true});
+            }
+            my.informDetectedStatus('logged', true);
+        }
         return AjaxBestPromise[procedureDef.method]({
             multipart:procedureDef.files,
             url:procedureDef.action,
             data:params,
             uploading:opts.uploading
         }).onLine(function(line,ender){
+            controlLoggedIn(line);
             if(progress){
                 if(line.substr(0,2)=='--'){
                     progress=false;
-                }else if(opts.informProgress){
+                }else{
                     var info=JSON.parse(line);
                     opts.informProgress(info.progress);
                 }
@@ -459,14 +510,12 @@ myOwn.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
                 result.push(line||ender);
             }
         }).then(function(){
+            onClose();
             result=result.join('');
-            if(result && result[0]=="<" && result.match(/login/m)){
-                my.informDetectedStatus('notLogged');
-                throw changing(new Error(my.messages.notLogged),{displayed:true, isNotLoggedError:true});
-            }
-            my.informDetectedStatus('logged', true);
+            controlLoggedIn(result);
             return my.encoders[procedureDef.encoding].parse(result);
         }).catch(function(err){
+            onClose();
             if(opts.launcher){
                 opts.launcher.setAttribute('my-working','error');
                 opts.launcher.title='err';
