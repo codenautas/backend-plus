@@ -168,6 +168,7 @@ export class AppBackend{
     start(opts?: StartOptions):Promise<void>
     getTables():TableItemDef[]
     getContext(req:Request):Context
+    postConfig(...params: any[]):any
     clientIncludes(req:Request, hideBEPlusInclusions?:boolean):ClientModuleDefinition[]
     addSchrödingerServices(mainApp:ExpressPlus, baseUrl:string):void
     addLoggedServices():void
