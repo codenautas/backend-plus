@@ -31,3 +31,18 @@ insert into with_fk (simple_code,wf_code,wf_name)
            else num::text
          end
     from generate_series(1,9000) num;
+
+create or replace function get_notices(p_cuantas integer, p_valor text) returns text 
+  language plpgsql
+as
+$BODY$
+declare
+  i integer;
+begin
+  for i in 1..p_cuantas loop
+    perform pg_sleep(1);
+    raise notice 'esperando % %',i,p_valor;
+  end loop;
+  return p_valor; 
+end;
+$BODY$;

@@ -115,12 +115,16 @@ myOwn.statusDivName = 'reconnection_div';
 myOwn.autoSetupFunctions = [
     function autoSetupMyThings(){
         var my = this;
+        if(!('server' in my)){
+            my.server = {connected: null, broadcaster:html.div({id:'server-status-broadcaster'}).create()}
+        }
         var readProcedureDefinitions = function readProcedureDefinitions(){
             return my.ajaxPromise({
                 action:'client-setup',
                 method:'get',
                 encoding:'JSON',
-                parameters:[]
+                parameters:[],
+                progress:false
             }).then(function(setup){
                 my.config = setup;
                 my.config.procedure=my.config.procedure||{};
@@ -412,7 +416,7 @@ myOwn.alertError = function(err){
     });
 }
 
-myOwn.ajaxPromise = function(procedureDef,data,opts){
+myOwn.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
     opts = opts || {};
     if(!('visiblyLogErrors' in opts)){
         opts.visiblyLogErrors=true;
@@ -436,12 +440,26 @@ myOwn.ajaxPromise = function(procedureDef,data,opts){
         if(data && data.files){
             params.files=data.files;
         }
+        var result=[];
+        var progress=procedureDef.progress!==false;
         return AjaxBestPromise[procedureDef.method]({
             multipart:procedureDef.files,
             url:procedureDef.action,
             data:params,
             uploading:opts.uploading
-        }).then(function(result){
+        }).onLine(function(line,ender){
+            if(progress){
+                if(line.substr(0,2)=='--'){
+                    progress=false;
+                }else if(opts.informProgress){
+                    var info=JSON.parse(line);
+                    opts.informProgress(info.progress);
+                }
+            }else{
+                result.push(line||ender);
+            }
+        }).then(function(){
+            result=result.join('');
             if(result && result[0]=="<" && result.match(/login/m)){
                 my.informDetectedStatus('notLogged');
                 throw changing(new Error(my.messages.notLogged),{displayed:true, isNotLoggedError:true});
@@ -458,6 +476,10 @@ myOwn.ajaxPromise = function(procedureDef,data,opts){
                     my.informDetectedStatus('noNetwork');
                 }else if(!!err.originalError) {
                     my.informDetectedStatus('noServer');
+                    if(my.server.connected){
+                        my.server.connected = false
+                        my.server.broadcaster.dispatchEvent(new Event('noServer'));
+                    }
                 } else {
                     my.informDetectedStatus('logged', true);
                 }
@@ -485,7 +507,8 @@ myOwn.testKeepAlive = function testKeepAlive(){
         parameters:[],
         method:'post',
         action:'keep-alive.json',
-        encoding:'plain'
+        encoding:'plain',
+        progress:false
     },{},{visiblyLogErrors:false}).then(function(){
         if(window.updateOnlineStatus){
             updateOnlineStatus();
@@ -493,6 +516,10 @@ myOwn.testKeepAlive = function testKeepAlive(){
         var lightServer = document.getElementById('light-server');
         if(lightServer){
             lightServer.src=skinUrl+'img/server-ok.png';
+            if(!my.server.connected){
+                my.server.connected = true;
+                my.server.broadcaster.dispatchEvent(new Event('serverConnected'));
+            }
             var speed=1000/(1+new Date().getTime()-startTime);
             if(isNaN(lightServer.result.speed)){
                 lightServer.result.speed = speed; 
