@@ -1030,10 +1030,12 @@ myOwn.prepareRulerToggle = function prepareRulerToggle(){
                     var rect = my.getRect(table.tHead?table.tHead.rows[0]:table);
                     var cssClausules=[];
                     autoStyleTop.actualDif=my.autoRuler && window.scrollY-rect.top;
+                    // var cssSelectorPrefix="[my-table=\""+myTableName.replace(/"/g,'\\"')+"\"] > ";
+                    var cssSelectorPrefix="[my-table="+JSON.stringify(myTableName)+"] > ";
                     if(!('previousDif' in autoStyleTop) || autoStyleTop.actualDif!=autoStyleTop.previousDif){
                         if(autoStyleTop.actualDif>0){
                             cssClausules.push(
-                                "[my-table=\""+myTableName.replace(/"/g,'\\"')+"\"] > thead > tr > th { "+floatingStyle+
+                                cssSelectorPrefix + "thead > tr > th { "+floatingStyle+
                                 " top:"+(autoStyleTop.actualDif)+'px; '+
                                 "}"
                             );
@@ -1042,8 +1044,8 @@ myOwn.prepareRulerToggle = function prepareRulerToggle(){
                         autoStyleTop.innerHTML=cssClausules.join('\n');
                     }
                     var autoStyleLeft = my.inlineCss("css-my-table-"+myTableName+"-left");
-                    var cssSelectorH = "[my-table=\""+myTableName.replace(/"/g,'\\"')+"\"] > thead > tr > [my-fixed2left-column]";
-                    var cssSelectorB = "[my-table=\""+myTableName.replace(/"/g,'\\"')+"\"] > tbody > tr > [my-fixed2left-column]";
+                    var cssSelectorH = cssSelectorPrefix + "thead > tr > [my-fixed2left-column]";
+                    var cssSelectorB = cssSelectorPrefix + "tbody > tr > [my-fixed2left-column]";
                     var firstCell=Array.prototype.slice.call(table.querySelectorAll(cssSelectorH),0,100).find(function(cell){
                         return cell.scrollWidth>4;
                     });
