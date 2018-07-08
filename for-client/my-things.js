@@ -190,6 +190,17 @@ myOwn.autoSetupFunctions = [
         });
         TypeStore.options.doNotCopyNonCopyables=true;
         TypeStore.options.doNotOutputNonCopyables=true;
+        if(!('offline' in my)){
+            my.offline={};
+            Object.defineProperty(my.offline, 'mode', {
+                get:function(){
+                    return localStorage.getItem(my.appName+my.clientVersion+'_offline_mode')=='offline';
+                },
+                set:function(offline){
+                    return localStorage.setItem(my.appName+my.clientVersion+'_offline_mode', offline?'offline':'online');
+                }
+            })
+        }
         return readProcedureDefinitions();
     }
 ];
