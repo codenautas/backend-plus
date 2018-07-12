@@ -238,7 +238,12 @@ myOwn.showPage = function showPage(pageDef){
 
 myOwn.menuName = 'menu';
 myOwn.menuSeparator = '#';
-Object.defineProperty(myOwn, 'menup', {get:function(){return this.menuName+this.menuSeparator; }});
+Object.defineProperty(myOwn, 'menup', {
+    get:function(){
+        var menuName = my.offline.mode?'ext':this.menuName;
+        return menuName+this.menuSeparator; 
+    }
+});
 
 myOwn.createForkeableButton = function createForkeableButton(menu, opts){
     var my = this;
@@ -321,7 +326,8 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
     if(depth===0){
         elements.push(html.img({id: "main-logo", src: skinUrl+"img/logo.png"}));
     }
-    elements = elements.concat(menu.map(function(menuItem){
+    var myMenu = my.offline.mode?menu.filter(function(menuItem){return menuItem.showInOfflineMode === true;}):menu;
+    elements = elements.concat(myMenu.map(function(menuItem){
         menuItem.parents = parents;
         var button = my.createForkeableButton(menuItem);
         if(menuItem.visible === false){
@@ -359,7 +365,10 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
                     my.offline.mode=!my.offline.mode;
                     my.offlineModeRefresh();
                     var actualHref=location.href;
-                    history.pushState(null, null, actualHref);
+                    var hrefSplit = actualHref.split(my.menuSeparator)
+                    var newHref = my.offline.mode?'ext':my.menuName;
+                    newHref = (hrefSplit.length > 1)?newHref+my.menuSeparator+hrefSplit[1]:newHref;
+                    history.pushState(null, null, newHref);
                     my.showPage();
                 }
             })
