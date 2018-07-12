@@ -369,6 +369,9 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
                     var newHref = my.offline.mode?'ext':my.menuName;
                     newHref = (hrefSplit.length > 1)?newHref+my.menuSeparator+hrefSplit[1]:newHref;
                     history.pushState(null, null, newHref);
+                    if(my.offline.mode){
+                        location.reload();
+                    }
                     my.showPage();
                 }
             })
