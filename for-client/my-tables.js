@@ -1093,17 +1093,20 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                 },
                 function(result){
                     var message='';
-                    if(result.uploaded.inserted==1){
-                        message+=my.messages.oneRowInserted;
-                    }else if(result.uploaded.inserted>1){
-                        message+=my.messages.xRowsInserted.replace('{$x}',result.uploaded.inserted);;
+                    if(result.uploaded){
+                        if(result.uploaded.inserted==1){
+                            message+=my.messages.oneRowInserted;
+                        }else if(result.uploaded.inserted>1){
+                            message+=my.messages.xRowsInserted.replace('{$x}',result.uploaded.inserted);;
+                        }
+                        if(result.uploaded.updated==1){
+                            message+=my.messages.oneRowUpdated;
+                        }else if(result.uploaded.updated>1){
+                            message+=my.messages.xRowsUpdated.replace('{$x}',result.uploaded.updated);;
+                        }
+                        return message;
                     }
-                    if(result.uploaded.updated==1){
-                        message+=my.messages.oneRowUpdated;
-                    }else if(result.uploaded.updated>1){
-                        message+=my.messages.xRowsUpdated.replace('{$x}',result.uploaded.updated);;
-                    }
-                    return message;
+                    return result.message || '';
                 },
                 showWithMiniMenu,
                 messages,
@@ -1345,12 +1348,19 @@ myOwn.dialogUpload = function dialogUpload(ajaxPath, ajaxParams, ajaxPrepareResu
         };
         buttonConfirmImport.addEventListener('click', function(){
             var files = buttonFile.files;
-            buttonConfirmImport.value='cargando...';
+            buttonConfirmImport.value=my.messages.loading+'...';
             buttonConfirmImport.disabled=true;
+            var eButton=function(result){
+                buttonConfirmImport.disabled=false;
+                if(result instanceof Error){
+                    throw result;
+                }
+                return result;
+            }
             bestGlobals.sleep(100).then(function(){
                 return my.ajax[ajaxPath[0]][ajaxPath[1]](changing(ajaxParams, {
                     files:files
-                }),{uploading:uploadingProgress, informProgress:informProgress});
+                }),{uploading:uploadingProgress, informProgress:informProgress}).then(eButton,eButton);
             }).then(ajaxPrepareResultFun).then(this.dialogPromiseDone,this.dialogPromiseDone);
         });
         simpleFormPromise({elementsList:[
