@@ -1320,7 +1320,7 @@ myOwn.dialogUpload = function dialogUpload(ajaxPath, ajaxParams, ajaxPrepareResu
         var buttonConfirmImport=html.input({class:'import-button',type:'button', value:changing(my.messages, messages).import}).create();
         var laodingIndicator=html.div({class:'indicator'},' ').create();
         var loadingBar=html.div({class:'progress-bar', style:'width:400px; height:8px;'},[laodingIndicator]).create();
-        var divProgress=html.div({class:'result-progress', style:'width:400px; height:40px;'}).create();
+        var divProgress=html.div({class:'result-progress', style:'width:400px; height:20px; margin:0px;'}).create();
         var progressIndicator=html.div({class:'indicator'},' ').create();
         var progressBar=html.div({class:'progress-bar', style:'width:400px; height:8px;'},[progressIndicator]).create();
         var displayProgressBar = function displayProgressBar(progress, progressIndicator){
@@ -1332,6 +1332,9 @@ myOwn.dialogUpload = function dialogUpload(ajaxPath, ajaxParams, ajaxPrepareResu
                     progressIndicator.style.backgroundColor='#D4D';
                     progressIndicator.title='N/D %';
                 }
+            }
+            if(progress.message){
+                divProgress.textContent=progress.message;
             }
         }
         var uploadingProgress=function(progress){
@@ -1347,7 +1350,7 @@ myOwn.dialogUpload = function dialogUpload(ajaxPath, ajaxParams, ajaxPrepareResu
             bestGlobals.sleep(100).then(function(){
                 return my.ajax[ajaxPath[0]][ajaxPath[1]](changing(ajaxParams, {
                     files:files
-                }),{uploading:uploadingProgress, divProgress:divProgress, informProgress:informProgress});
+                }),{uploading:uploadingProgress, informProgress:informProgress});
             }).then(ajaxPrepareResultFun).then(this.dialogPromiseDone,this.dialogPromiseDone);
         });
         simpleFormPromise({elementsList:[

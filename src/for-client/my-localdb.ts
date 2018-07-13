@@ -86,7 +86,9 @@ export class LocalDb{
                     var store = db.createObjectStore(tableName, {keyPath: keyPath});
                     if(detectedFeatures.needToUnwrapArrayKeys==null){
                         try{
+                            // @ts-ignore
                             var os: string = window.myOwn.config.useragent.os;
+                            // @ts-ignore
                             var version: number = parseInt(window.myOwn.config.useragent.version.split('.')[0]);
                         }catch(err){
                             throw Error("unknowed OS or version");
