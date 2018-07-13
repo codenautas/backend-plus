@@ -362,17 +362,21 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
             }),
             my.light('airplane', function(){
                 if(my.ldb && my.offline){
-                    my.offline.mode=!my.offline.mode;
-                    my.offlineModeRefresh();
-                    var actualHref=location.href;
-                    var hrefSplit = actualHref.split(my.menuSeparator)
-                    var newHref = my.offline.mode?'ext':my.menuName;
-                    newHref = (hrefSplit.length > 1)?newHref+my.menuSeparator+hrefSplit[1]:newHref;
-                    history.pushState(null, null, newHref);
-                    if(my.offline.mode){
-                        location.reload();
+                    if(my.offline.mode && !my.server.connected){
+                        throw new Error("No es posible salir del modo avión sin conexión al servidor");
+                    }else{
+                        my.offline.mode=!my.offline.mode;
+                        my.offlineModeRefresh();
+                        var actualHref=location.href;
+                        var hrefSplit = actualHref.split(my.menuSeparator)
+                        var newHref = my.offline.mode?'ext':my.menuName;
+                        newHref = (hrefSplit.length > 1)?newHref+my.menuSeparator+hrefSplit[1]:newHref;
+                        history.pushState(null, null, newHref);
+                        if(my.offline.mode){
+                            location.reload();
+                        }
+                        my.showPage();
                     }
-                    my.showPage();
                 }
             })
         ]));
