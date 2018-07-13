@@ -367,11 +367,7 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
                     }else{
                         my.offline.mode=!my.offline.mode;
                         my.offlineModeRefresh();
-                        var actualHref=location.href;
-                        var hrefSplit = actualHref.split(my.menuSeparator)
-                        var newHref = my.offline.mode?'ext':my.menuName;
-                        newHref = (hrefSplit.length > 1)?newHref+my.menuSeparator+hrefSplit[1]:newHref;
-                        history.pushState(null, null, newHref);
+                        my.setOnlineOfflineUrl();
                         if(my.offline.mode){
                             location.reload();
                         }
@@ -450,6 +446,14 @@ myOwn.informDetectedStatus = function informDetectedStatus(statusCode, logged) {
     }
 }
 
+myOwn.setOnlineOfflineUrl = function setOnlineOfflineUrl(){
+    var actualHref=location.href;
+    var hrefSplit = actualHref.split(my.menuSeparator)
+    var newHref = my.offline.mode?'ext':my.menuName;
+    newHref = (hrefSplit.length > 1)?newHref+my.menuSeparator+hrefSplit[1]:newHref;
+    history.pushState(null, null, newHref);
+}
+
 myOwn.offlineModeRefresh = function offlineModeRefresh(){
     var my=this;
     /** @type {HTMLImageElement} */
@@ -471,6 +475,7 @@ window.addEventListener('popstate', function(){
 window.addEventListener('load', function(){
     window.my = myOwn;
     my.autoSetup().then(function(){
+        my.setOnlineOfflineUrl();
         my.showPage();
     })
     document.body.appendChild(html.div({id:'cached-images'},[
