@@ -373,13 +373,10 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
                         newHref = (hrefSplit.length > 1)?newHref+my.menuSeparator+hrefSplit[1]:newHref;
                         history.pushState(null, null, newHref);
                         if(my.offline.mode){
-                            //REVISAR
-                            //Traer caché sin reiniciar página
-                            //location.reload();
+                            location.reload();
                         }
                         my.showPage();
                     }
-                    
                 }
             })
         ]));
