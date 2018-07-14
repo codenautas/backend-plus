@@ -51,6 +51,7 @@ myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     empty:'empty',
     equalTo:'equal to',
     exhibitedColumns:'Exhibited Columns',
+    filterAdd:'add line to filter (line OR line)',
     filteredCompleteTable:'filtered complete table',
     hiddenColumns:'Hidden columns',
     confirmDeleteAll: "Do you want to delete these records?",
@@ -74,6 +75,8 @@ myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     lessDetails: "hide details",
     lessEqualThan:'less equal than',
     loading: "loading",
+    notEmpty:'not empty',
+    notSimilarTo:'not similar to',
     numberExportedRows:"Rows exported",
     oldValue: "old value",
     oneRowInserted: "one row inserted.",
@@ -104,6 +107,7 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     anotherUserChangedTheRow: "Hubo un cambio en la base de datos para este registro",
     equalTo:'igual a',
     exhibitedColumns:'Columnas que se muestran',
+    filterAdd:'otro renglón en el filtro (se mostrarán renglones que cumplan alguna de las líneas del filtro)',
     filteredCompleteTable:'tabla completa y filtrada',
     hiddenColumns:'Columnas ocultas',
     confirmDeleteAll: "¿Desea borrar estos registros?",
@@ -128,6 +132,8 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     lessDetails: "dejar de mostrar los detalles asocialdos al registro",
     lessEqualThan:'menor igual que',
     loading: "cargando",
+    notEmpty:'no vacío',
+    notSimilarTo:'no contiene',
     numberExportedRows:"Filas exportadas",
     oldValue: "valor anterior",
     oneRowInserted: "un registro insertado.",
@@ -161,10 +167,12 @@ myOwn.comparator={
     '!~':function(valueToCheck,condition){return condition==null || !RegExp(escapeRegExp(condition.toString()),'i').test(valueToCheck);},
     '/R/i':function(valueToCheck,condition){return condition==null || RegExp(condition,'i').test(valueToCheck);},
     '\u2205':function(valueToCheck,condition){return valueToCheck == null;},//\u2205 = conjunto vacío
+    '!=\u2205':function(valueToCheck,condition){return valueToCheck != null;},//\u2205 = conjunto vacío
     '>':function(valueToCheck,condition){return (valueToCheck>condition); },
     '>=':function(valueToCheck,condition){return (valueToCheck>=condition); },
     '<':function(valueToCheck,condition){return (valueToCheck<condition); },
     '<=':function(valueToCheck,condition){return (valueToCheck<=condition); },
+    '!=':function(valueToCheck,condition){return valueToCheck != condition;},
     'not-an-operator':function(valueToCheck,condition){ return 'Operator does not exist'; },
     'traductor':{
         '=':'igual',
@@ -172,10 +180,12 @@ myOwn.comparator={
         '!~':'not-like',
         '/R/i':'expresion-regular',
         '\u2205':'vacio',
+        '!=\u2205':'not-empty',
         '>':'mayor',
         '>=':'mayor-igual',
         '<':'menor',
-        '<=':'menor-igual'
+        '<=':'menor-igual',
+        '!=':'not-equal'
     }
 };
 
@@ -620,7 +630,6 @@ myOwn.ActionColumnGrid.prototype.thFilter = function thFilter(depot){
     var grid = this.grid;
     buttonFilter.addEventListener('click',function(){
         grid.updateFilterInfo(' (F) ');
-        grid.view.filter=depot;
         grid.displayBody();
     });
     return html.th([buttonFilter]);
@@ -740,12 +749,14 @@ myOwn.DataColumnGrid.prototype.thFilter = function thFilter(depot, iColumn){
             miniMenuPromise([
                 {value:'=',     img:my.path.img+'igual.png'      ,label:myOwn.messages.equalTo},
                 {value:'~',     img:my.path.img+'parecido.png'   ,label:myOwn.messages.similarTo},
-                {value:'!~',    img:my.path.img+'not-like.png'   ,label:myOwn.messages.distinctFrom},
+                {value:'!~',    img:my.path.img+'not-like.png'   ,label:myOwn.messages.notSimilarTo},
                 {value:'\u2205',img:my.path.img+'vacio.png'      ,label:myOwn.messages.empty},
+                {value:'!=\u2205',img:my.path.img+'not-empty.png',label:myOwn.messages.notEmpty},
                 {value:'>',     img:my.path.img+'mayor.png'      ,label:myOwn.messages.greaterThan},
                 {value:'>=',    img:my.path.img+'mayor-igual.png',label:myOwn.messages.greaterEqualThan},
                 {value:'<',     img:my.path.img+'menor.png'      ,label:myOwn.messages.lessThan},
                 {value:'<=',    img:my.path.img+'menor-igual.png',label:myOwn.messages.lessEqualThan},
+                {value:'!=',    img:my.path.img+'not-equal.png'  ,label:myOwn.messages.distinctFrom},
             ],{underElement:symbolFilter}).then(function(result){
                 filterImage=my.path.img+my.comparator.traductor[result]+'.png';
                 symbolFilter.style.backgroundImage='url('+filterImage+')';
@@ -1452,6 +1463,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     grid.hideColumnsViaCss();
     var buttonInsert;
     var buttonCreateFilter;
+    var buttonCreateFilterAdd;
     var buttonDestroyFilter;
     var buttonOrientation;
     var buttonMenu;
@@ -1487,7 +1499,17 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
             })
         ]).create();
         buttonCreateFilter.addEventListener('click', function(){
-            grid.createRowFilter(0);
+            grid.view.filter=[grid.createRowFilter(0,[])];
+        });
+        buttonCreateFilterAdd=html.button({class:'table-button', 'when-filter':'yes'}, [
+            html.img({
+                src:my.path.img+'filter-line-add.png',
+                alt:'FIL',
+                title:my.messages.filterAdd
+            })
+        ]).create();
+        buttonCreateFilterAdd.addEventListener('click', function(){
+            grid.view.filter.push(grid.createRowFilter(1,[]));
         });
         buttonDestroyFilter=html.button({class:'table-button', 'when-filter':'yes'}, [
             html.img({
@@ -1499,7 +1521,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         buttonDestroyFilter.addEventListener('click', function(){
             grid.destroyRowFilter(0);
             grid.updateFilterInfo('');
-            grid.view.filter=false;
+            grid.view.filter=[];
             grid.displayBody();
         });
     }
@@ -1527,7 +1549,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     grid.columns=[new my.ActionColumnGrid({
         grid:grid, 
         actions:[
-            /*buttonInsert,*//*buttonSaveMode,*/buttonCreateFilter,buttonDestroyFilter,
+            /*buttonInsert,*//*buttonSaveMode,*/buttonCreateFilter,buttonCreateFilterAdd,buttonDestroyFilter,
             buttonOrientation,
             buttonMenu,
         ],
@@ -1899,16 +1921,17 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         return depot;
     };
     grid.destroyRowFilter = function destroyRowFilter(){
-        var tr=grid.hasFilterRow;
-        grid.dom.table.setAttribute('has-filter',0);
-        grid.dom.table.tHead.removeChild(tr);
+        (grid.hasFilterRow||[]).forEach(function(tr){
+            grid.dom.table.setAttribute('has-filter',0);
+            grid.dom.table.tHead.removeChild(tr);
+        });
         delete grid.hasFilterRow;
     };
     grid.dom.table.setAttribute('has-filter',0);
-    grid.createRowFilter = function createRowFilter(){
+    grid.createRowFilter = function createRowFilter(otherRow, filterColumns){
         var grid = this;
-        if(grid.hasFilterRow){
-            return true;
+        if(!otherRow && grid.hasFilterRow){
+            // return true;
         }
         grid.sizesForFilters=Array.prototype.map.call(grid.dom.table.rows[0].cells,function(cell){
             return cell.offsetWidth;
@@ -1925,14 +1948,22 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             isFilterPending:false,
             tr: tr
         };
-        grid.def.filterColumns.forEach(function(filterColumn){
-            depot.row[filterColumn.column]=filterColumn.value;
-            depot.rowSymbols[filterColumn.column]=filterColumn.operator;
-        });
+        if(!grid.hasFilterRow){
+            grid.hasFilterRow=[];
+        }
+        if(filterColumns){
+            filterColumns.forEach(function(filterColumn){
+                depot.row[filterColumn.column]=filterColumn.value;
+                depot.rowSymbols[filterColumn.column]=filterColumn.operator;
+            });
+        }
         var tr=html.tr({'class':'filter-line'}, grid.columns.map(function(column, iColumn){
             return column.thFilter(depot, iColumn);
+        }).filter(function(th,iColumn){
+           return iColumn || !grid.hasFilterRow.length;
         })).create();
-        grid.hasFilterRow=tr;
+        grid.hasFilterRow.push(tr);
+        grid.hasFilterRow[0].cells[0].rowSpan=grid.hasFilterRow.length;
         grid.dom.table.setAttribute('has-filter',1);
         if(grid.dom.table.tHead){ //TODO: el filtro para verticales debe organizarse sin tr
             grid.dom.table.tHead.appendChild(tr);
@@ -1942,19 +1973,27 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
     grid.displayBody=function displayBody(){
         var grid = this;
         var depotsToDisplay;
-        var filterData = grid.view.filter;
-        if(filterData){
+        var filterRows = grid.view.filter;
+        if(filterRows && filterRows.length){
             depotsToDisplay = grid.depots.filter(function(depot,i){
-                var partialOk=true;
-                for(var column in depot.row){
-                    if(filterData.rowSymbols[column] && my.comparator[filterData.rowSymbols[column]]){
-                        var isSatisfied=my.comparator[filterData.rowSymbols[column]](depot.row[column],filterData.row[column]);
-                        if(!isSatisfied){
-                            partialOk=false;
+                var iFilter=0;
+                while(iFilter<filterRows.length){
+                    var filterData=filterRows[iFilter];
+                    var partialOk=true;
+                    for(var column in depot.row){
+                        if(filterData.rowSymbols[column] && my.comparator[filterData.rowSymbols[column]]){
+                            var isSatisfied=my.comparator[filterData.rowSymbols[column]](depot.row[column],filterData.row[column]);
+                            if(!isSatisfied){
+                                partialOk=false;
+                            }
                         }
                     }
+                    if(partialOk){
+                        return true;
+                    }
+                    iFilter++;
                 }
-                return partialOk;
+                return false;
             });
         }else{
             depotsToDisplay = grid.depots;
@@ -2032,11 +2071,14 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         grid.depotsToDisplay=depotsToDisplay;
         grid.displayRows(0, linesToDisplay);
     };
-    grid.displayBody();
     if(grid.def.filterColumns.length){
-        grid.view.filter=grid.createRowFilter(0);
-        grid.displayBody();
+        var filterRows=grid.def.filterColumns[0] instanceof Array?grid.def.filterColumns:[grid.def.filterColumns];
+        grid.view.filter=[];
+        filterRows.forEach(function(filterColumns,iRow){
+            grid.view.filter.push(grid.createRowFilter(iRow,filterColumns));
+        });
     }
+    grid.displayBody();
 };
 
 myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot){
