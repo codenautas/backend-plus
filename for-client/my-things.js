@@ -123,14 +123,24 @@ myOwn.autoSetupFunctions = [
             my.server = {connected: null, broadcaster:html.div({id:'server-status-broadcaster'}).create()}
         }
         var readProcedureDefinitions = function readProcedureDefinitions(){
-            return my.ajaxPromise({
-                action:'client-setup',
-                method:'get',
-                encoding:'JSON',
-                parameters:[],
-                progress:false
-            }).then(function(setup){
+            var promise;
+            if(!my.offline.mode){
+                promise = my.ajaxPromise({
+                    action:'client-setup',
+                    method:'get',
+                    encoding:'JSON',
+                    parameters:[],
+                    progress:false
+                })
+            }else{
+                promise = Promise.resolve(
+                    JSON.parse(localStorage.getItem('setup'))
+                );
+            }
+            return promise.then(function(setup){
+                localStorage.setItem('setup', JSON.stringify(setup));
                 my.config = setup;
+            }).then(function(){
                 my.config.procedure=my.config.procedure||{};
                 my.config.procedures.forEach(/** @param {bp.ProcedureDef} procedureDef */function(procedureDef){
                     my.config.procedure[procedureDef.action]=procedureDef;

@@ -363,7 +363,7 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
             my.light('airplane', function(){
                 if(my.ldb && my.offline){
                     if(my.offline.mode && !my.server.connected){
-                        throw new Error("No es posible salir del modo avión sin conexión al servidor");
+                        alertPromise("No es posible salir del modo avión sin conexión al servidor");
                     }else{
                         my.offline.mode=!my.offline.mode;
                         my.offlineModeRefresh();
