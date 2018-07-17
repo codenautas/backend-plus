@@ -111,6 +111,9 @@ export type EditableDbDefinition = {
         insert?:boolean
         delete?:boolean
         select?:boolean
+        deleteAll?: boolean
+        import?: boolean
+        export?: boolean
     }
 }
 export type FieldsForConnect = (string | {source:string, target:string})[]
