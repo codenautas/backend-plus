@@ -219,6 +219,21 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
         connector.def = changing(tableDef, connector.opts.tableDef||{});
         return connector.def;
     });
+    var getStructureFromForeignKeys = function getStructureFromForeignKeys(connector, promiseChain){
+        connector.def.foreignKeys.forEach(function(foreignKey){
+            promiseChain = promiseChain.then(function(){
+                return my.ldb.getStructure(foreignKey.references).then(function(tableDef){
+                    if(!tableDef){
+                        var conn = new my.TableConnector({tableName: foreignKey.references, my:my});
+                        conn.getStructure();
+                        return conn.getData().then(function(rows){
+                            my.ldb.putMany(foreignKey.references, rows);
+                        });
+                    }
+                });
+            });
+        });
+    }
     if(my.ldb){
         structureFromBackend.then(function(tableDef){
             var promiseChain=my.ldb.registerStructure(tableDef);
@@ -235,8 +250,10 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
                             }
                         });
                     });
+                    getStructureFromForeignKeys(connector, promiseChain);
                 });
             }
+            getStructureFromForeignKeys(connector, promiseChain);
             promiseChain = promiseChain.then(function(){
                 return connector.def;
             });
@@ -267,16 +284,20 @@ myOwn.TableConnector.prototype.getData = function getData(){
         paramfun:connector.parameterFunctions||{}
     }).then(function(rows){
         return connector.whenStructureReady.then(function(){
-            connector.getElementToDisplayCount().textContent=rows.length+' '+my.messages.displaying+'...';
+            if(connector.getElementToDisplayCount){
+                connector.getElementToDisplayCount().textContent=rows.length+' '+my.messages.displaying+'...';
+            }
             return bestGlobals.sleep(10);
         }).then(function(){
             connector.my.adaptData(connector.def, rows);
             return rows;
         });
     }).catch(function(err){
-        var elementToDisplayError=connector.getElementToDisplayCount()
-        if(elementToDisplayError){
-            elementToDisplayError.appendChild(html.span({style:'color:red', title: err.message},' error').create());
+        if(connector.getElementToDisplayCount){
+            var elementToDisplayError=connector.getElementToDisplayCount()
+            if(elementToDisplayError){
+                elementToDisplayError.appendChild(html.span({style:'color:red', title: err.message},' error').create());
+            }
         }
         throw err;
     });
@@ -2212,7 +2233,8 @@ myOwn.getReference = function getReference(referenceName, forceRefresh){
     var reference={};
     if(!my.references[referenceName]){
         var dummyElement = html.div().create();
-        var connector=new my.TableConnector({
+        var Connector = my.offline.mode?my.TableConnectorLocal:my.TableConnector; 
+        var connector=new Connector({
             my:my, 
             tableName: referenceName, 
             getElementToDisplayCount:function(){ return dummyElement; }
