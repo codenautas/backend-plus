@@ -1146,7 +1146,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
             )
         );
     }
-    if(grid.def.allow.delete){
+    if(grid.def.allow.delete || grid.def.allow.deleteAll){
         menuOptions.push({img:my.path.img+'delete-all-rows.png', value:true, label:my.messages.deleteAllRecords, doneFun:function(){
             return confirmPromise(my.messages.confirmDeleteAll+(
                 grid.depotsToDisplay.length<grid.depots.length?my.messages.xOverTWillDelete:(
