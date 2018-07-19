@@ -219,21 +219,6 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
         connector.def = changing(tableDef, connector.opts.tableDef||{});
         return connector.def;
     });
-    var getStructureFromForeignKeys = function getStructureFromForeignKeys(connector, promiseChain){
-        connector.def.foreignKeys.forEach(function(foreignKey){
-            promiseChain = promiseChain.then(function(){
-                return my.ldb.getStructure(foreignKey.references).then(function(tableDef){
-                    if(!tableDef){
-                        var conn = new my.TableConnector({tableName: foreignKey.references, my:my});
-                        conn.getStructure();
-                        return conn.getData().then(function(rows){
-                            my.ldb.putMany(foreignKey.references, rows);
-                        });
-                    }
-                });
-            });
-        });
-    }
     if(my.ldb){
         structureFromBackend.then(function(tableDef){
             var promiseChain=my.ldb.registerStructure(tableDef);
@@ -250,10 +235,18 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
                             }
                         });
                     });
-                    getStructureFromForeignKeys(connector, promiseChain);
                 });
             }
-            getStructureFromForeignKeys(connector, promiseChain);
+            connector.def.foreignKeys.forEach(function(foreignKey){
+                promiseChain = promiseChain.then(function(){
+                    return my.ldb.getStructure(foreignKey.references).then(function(tableDef){
+                        if(!tableDef){
+                            var conn = new my.TableConnector({tableName: foreignKey.references, my:my});
+                            return conn.getStructure();
+                        }
+                    });
+                });
+            });
             promiseChain = promiseChain.then(function(){
                 return connector.def;
             });
@@ -2223,6 +2216,33 @@ myOwn.clientSides={
                     });
                 }
             }, true);
+        }
+    },
+    $lock:{
+        update:true,
+        prepare:function(depot, fieldName){
+            depot.rowControls[fieldName].addEventListener('update',function(){
+                var control = this;
+                var valor = control.getTypedValue();
+                if((valor=='B' || valor=='⚿') && "no estaba lockeado"){
+                    control.setTypedValue('⌚');
+                    my.ajax.table["lock-record"]({
+                        table:depot.def.name,
+                        primaryKeyValues:depot.primaryKeyValues
+                    }).then(function(result){
+                        var tables=[depot.def.name].concat(depot.def.offline.details)
+                        var promiseChain=Promise.resolve();
+                        tables.forEach(function(name,i){
+                            promiseChain=promiseChain.then(function(){
+                                my.ldb.putMany(name,result.data[i]);
+                            })
+                        })
+                        return promiseChain;
+                    }).then(function(){
+                        control.setTypedValue('⚿');
+                    })
+                }
+            })
         }
     }
 };

@@ -221,21 +221,21 @@ export class LocalDb{
             internalKey=tableName+JSON.stringify(parentKey);
             internalKey=internalKey.substr(0,internalKey.length-1);
         }else{
-            internalKey=parentKey
+            internalKey=parentKey?parentKey:'';
         }
-        var cursor = db.transaction([tableName],'readonly').objectStore(tableName).openCursor(IDBKeyRange.lowerBound(internalKey));
+        var cursor = db.transaction([tableName],'readonly').objectStore(tableName).openCursor(parentKey==null?null:IDBKeyRange.lowerBound(internalKey));
         return new Promise<T[]>(function(resolve, reject){
             cursor.onsuccess=function(event){
                 // @ts-ignore target no conoce result en la definición de TS. Verificar dentro de un tiempo si TS mejoró
                 var cursor:IDBCursorWithValue = event.target.result;
-                if(cursor && (
+                if(cursor && ((parentKey == null) || (
                     detectedFeatures.needToUnwrapArrayKeys ? 
                         internalKey == (cursor.key as string).slice(0,internalKey.length) : 
                         ! parentKey.find(function(expectedValue,i){
                             var storedValue = (cursor.key as any[])[i]
                             return expectedValue != storedValue
                         })
-                    )
+                    ))
                 ){
                     rows.push(cursor.value);
                     cursor.continue();
@@ -249,7 +249,7 @@ export class LocalDb{
         });
     }
     async getAll<T>(tableName:string):Promise<T[]>{
-        return this.getChild<T>(tableName,[]);
+        return this.getChild<T>(tableName,tableName[0]=='$'?null:[]);
     }
     private async putOneAndGetIfNeeded<T extends Record>(tableName:string, element:T, needed:true):Promise<T>
     private async putOneAndGetIfNeeded<T extends Record>(tableName:string, element:T, needed:false):Promise<void>
