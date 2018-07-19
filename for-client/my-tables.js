@@ -219,21 +219,6 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
         connector.def = changing(tableDef, connector.opts.tableDef||{});
         return connector.def;
     });
-    var getStructureFromForeignKeys = function getStructureFromForeignKeys(connector, promiseChain){
-        connector.def.foreignKeys.forEach(function(foreignKey){
-            promiseChain = promiseChain.then(function(){
-                return my.ldb.getStructure(foreignKey.references).then(function(tableDef){
-                    if(!tableDef){
-                        var conn = new my.TableConnector({tableName: foreignKey.references, my:my});
-                        conn.getStructure();
-                        return conn.getData().then(function(rows){
-                            my.ldb.putMany(foreignKey.references, rows);
-                        });
-                    }
-                });
-            });
-        });
-    }
     if(my.ldb){
         structureFromBackend.then(function(tableDef){
             var promiseChain=my.ldb.registerStructure(tableDef);
@@ -250,10 +235,18 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
                             }
                         });
                     });
-                    getStructureFromForeignKeys(connector, promiseChain);
                 });
             }
-            getStructureFromForeignKeys(connector, promiseChain);
+            connector.def.foreignKeys.forEach(function(foreignKey){
+                promiseChain = promiseChain.then(function(){
+                    return my.ldb.getStructure(foreignKey.references).then(function(tableDef){
+                        if(!tableDef){
+                            var conn = new my.TableConnector({tableName: foreignKey.references, my:my});
+                            return conn.getStructure();
+                        }
+                    });
+                });
+            });
             promiseChain = promiseChain.then(function(){
                 return connector.def;
             });

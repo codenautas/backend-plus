@@ -57,6 +57,25 @@ describe("local-db", function(){
             var newTableDef = await ldb.getStructure(tableDef.name);
             compare(tableDef, newTableDef);
         });
+        it("put another structure", async function(){
+            this.timeout(10000);
+            var tableDef={
+                name:'other_name',
+                fields:[
+                    {name: 'pk2', typeName:'text'}
+                ],
+                primaryKey:['pk2']
+            };
+            await ldb.registerStructure(tableDef);
+            var newTableDef = await ldb.getStructure(tableDef.name);
+            compare(tableDef, newTableDef);
+        });
+        it("get all structures", async function(){
+            var tableDef1 = await ldb.getStructure('other_name');
+            var tableDef2 = await ldb.getStructure('this_name');
+            var tableDefs = await ldb.getAll("$structures");
+            compare([tableDef1, tableDef2], tableDefs);
+        });
     });
     describe("data", function(){
         type Quantity = {
