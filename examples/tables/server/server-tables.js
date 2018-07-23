@@ -12,6 +12,56 @@ class AppExample extends backendPlus.AppBackend{
         this.internalData={
             filterAtomicNumberForIsotopes:3
         }
+        this.setStaticConfig(`
+server:
+  port: 3033
+  kill-9:
+    pid: 1234
+  skins:
+    "":
+      local-path: client/
+    confort:
+      local-path: node_modules/backend-skins/dist/
+    confort-bis:
+      local-path: node_modules/backend-skins/dist/
+    confort-dark:
+      local-path: node_modules/backend-skins/dist/
+db:
+  motor: postgresql
+  host: localhost
+  database: beplus_example_db
+  schema: ext
+  user: beplus_example_user
+login:
+  table: users
+  userFieldName: username
+  passFieldName: md5pass
+  rolFieldName: rol
+  infoFieldList: [username, rol]
+  activeClausule: current_timestamp<=active_until
+  lockedClausule: current_timestamp>=locked_since
+  plus:
+    allowHttpLogin: true
+    chPassUrlPath: false
+    loginForm:
+      formTitle: example tables
+      formImg: unlogged/tables-lock.png
+    x-loginPagePath: false
+install:
+  dump:
+    scripts:
+      post-adapt: 
+      - ../examples/tables/install/data_db.sql
+    skip-content: true
+client-setup:
+  cursors: true
+  skin: confort-dark
+  formTitle: example-tables
+  menu: true
+  title: periodic table
+logo: 
+  path: client/img        
+`)
     }
     get rootPath(){ return Path.resolve(__dirname,'..'); }
     addLoggedServices(){

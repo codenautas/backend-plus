@@ -15,3 +15,8 @@ server:
   skins:
     confort:
       local-path: ../backend-skins/dist/
+  kill-9:
+    master-pass: 3920192
+db:
+  port: 5435
+  password: beplus_example_3948812bdz
