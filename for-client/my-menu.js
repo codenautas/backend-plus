@@ -380,6 +380,7 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
                                     fkToStoreData = fkToStoreData.concat(fkToStoreSearch)
                                 });
                             });
+                            var promiseArray = [];
                             promiseChain = promiseChain.then(function(){
                                 fkToStoreData.forEach(function(fk){
                                     var conn = new my.TableConnector({tableName: fk.references, my:my});
@@ -388,12 +389,17 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
                                     });
                                     promiseChain = promiseChain.then(function(){
                                         return conn.getData().then(function(rows){
-                                            my.ldb.putMany(fk.references, rows);
+                                            promiseArray.push(
+                                                Promise.resolve(my.ldb.putMany(fk.references, rows))
+                                            );
                                         });
                                     })
                                 });
                                 promiseChain = promiseChain.then(function(){
-                                    location.reload();
+                                    Promise.all(promiseArray).then(function(){
+                                        location.reload();
+                                    })
+                                    
                                 });
                             });
                         }else{
