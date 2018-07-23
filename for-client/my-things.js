@@ -950,7 +950,9 @@ myOwn.captureKeys = function captureKeys() {
                 var no_me_voy_a_colgar=2000;
                 while(este && this.activeElement===enfoco && no_me_voy_a_colgar--){
                     este=proximo_elemento_que_sea(este,isInteracive);
-                    este.focus();
+                    if(este){
+                        este.focus();
+                    }
                 }
                 if(este){
                     evento.preventDefault();

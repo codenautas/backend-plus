@@ -171,7 +171,7 @@ myOwn.UriSearchToObjectParams={
 	i                :{ showInMenu:true , encode:function(value,menu){ return (menu.parents||[]).concat(menu.name).join(',') }},
 	fc               :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return JSON.parse(x)}  },
 	ff               :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return JSON.parse(x)}  },
-	up               :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return JSON.parse(x)}  },
+	up               :{                   encode:function(x){ return json4all.stringify(x); }, decode:function(x){ return json4all.parse(x)}  },
 	pf               :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return JSON.parse(x)}  },
 	section          :{ showInMenu:true , encode:noChange                                , decode:noChange          },
 	directUrl        :{ hide:true       },
@@ -207,19 +207,29 @@ myOwn.showPage = function showPage(pageDef){
             addrParams = changing(menu.selectedItem, addrParams);
             w=menu.selectedItem.menuType;
         }
-        var pageTitle = addrParams.pageTitle || addrParams.title || addrParams.name || my.config.config.title;
-        document.title = pageTitle;
+        var wScreen;
         if(typeof my.wScreens[w] === 'function'){
-            my.wScreens[w].call(my, addrParams);
+            wScreen={
+                mainFunction:my.wScreens[w]
+            };
         }else if(typeof my.wScreens[w] === 'object'){
-            var wScreen = my.wScreens[w];
+            wScreen = my.wScreens[w];
             if(wScreen.parameters){
-                my.wScreens.procAux.showParams({
-                    parameters:wScreen.parameters,
-                    resultClass:wScreen.resultClass
-                }, main_layout, addrParams, wScreen.mainAction);
+                wScreen.mainFunction=wScreen.mainFunction||function(addrParams){
+                    my.wScreens.procAux.showParams({
+                        parameters:wScreen.parameters,
+                        resultClass:wScreen.resultClass
+                    }, main_layout, addrParams, wScreen.mainAction);
+                }
+            }
+        }else{
+            wScreen={
+                mainFunction:function(){}
             }
         }
+        var pageTitle = wScreen.pageTitle || addrParams.pageTitle || addrParams.title || addrParams.name || my.config.config.title;
+        document.title = pageTitle;
+        wScreen.mainFunction.call(my, addrParams);
         var rightMenu = document.getElementById('right-menu-icon');
     }else{
         var rightMenu = html.span({id: "right-menu"}, [
@@ -316,9 +326,7 @@ myOwn.light = function light(name, onclick){
 
 myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
     var my = this;
-    var next = false;
     var selectedItem = null;
-    var newMenuLine;
     var elements=[];
     var depth = parents.length;
     var skin=((this.config||{}).config||{}).skin;
@@ -329,7 +337,12 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
     var myMenu = my.offline.mode?menu.filter(function(menuItem){return menuItem.showInOfflineMode === true;}):menu;
     elements = elements.concat(myMenu.map(function(menuItem){
         menuItem.parents = parents;
-        var button = my.createForkeableButton(menuItem);
+        var wScreen=my.wScreens[menuItem.menuType]||{}
+        var opts={}
+        if(wScreen.getMenuLabel){
+            opts.label=wScreen.getMenuLabel();
+        }
+        var button = my.createForkeableButton(menuItem, opts);
         if(menuItem.visible === false){
             button.style = 'display:none'
         }
