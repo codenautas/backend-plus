@@ -2226,21 +2226,36 @@ myOwn.clientSides={
                 var valor = control.getTypedValue();
                 if((valor=='B' || valor=='⚿') && "no estaba lockeado"){
                     control.setTypedValue('⌚');
-                    my.ajax.table["lock-record"]({
-                        table:depot.def.name,
-                        primaryKeyValues:depot.primaryKeyValues,
-                        token:''
-                    }).then(function(result){
-                        var tables=[depot.def.name].concat(depot.def.offline.details)
-                        var promiseChain=Promise.resolve();
-                        tables.forEach(function(name,i){
-                            promiseChain=promiseChain.then(function(){
-                                my.ldb.putMany(name,result.data[i]);
-                            })
+                    var tokenPromise = Promise.resolve();
+                    var token = localStorage.getItem('token');
+                    if(!token){
+                        tokenPromise.then(function(){
+                            return my.ajax.token.get({
+                                useragent:my.config.useragent,
+                                username: my.config.username
+                            }).then(function(result){
+                                token = result.token;
+                                localStorage.setItem('token', result.token);
+                            });
                         })
-                        return promiseChain;
-                    }).then(function(){
-                        control.setTypedValue('⚿');
+                    }
+                    tokenPromise.then(function(){
+                        my.ajax.table["lock-record"]({
+                            table:depot.def.name,
+                            primaryKeyValues:depot.primaryKeyValues,
+                            token:token
+                        }).then(function(result){
+                            var tables=[depot.def.name].concat(depot.def.offline.details)
+                            var promiseChain=Promise.resolve();
+                            tables.forEach(function(name,i){
+                                promiseChain=promiseChain.then(function(){
+                                    my.ldb.putMany(name,result.data[i]);
+                                })
+                            })
+                            return promiseChain;
+                        }).then(function(){
+                            control.setTypedValue('⚿');
+                        })
                     })
                 }
             })
