@@ -1804,7 +1804,10 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             depot.primaryKeyValues = grid.def.primaryKey.map(function(fieldName){ 
                 return depot.row[fieldName]; 
             });
-            depot.tr.setAttribute('pk-values',JSON.stringify(depot.primaryKeyValues))
+            depot.tr.setAttribute('pk-values',JSON.stringify(depot.primaryKeyValues));
+            grid.def.layout.styleColumns.forEach(function(fieldName){ 
+                depot.tr.setAttribute('column-'+fieldName,JSON.stringify(depot.row[fieldName]));
+            });
         }
         if(row.$dirty){
             var tdActions = depot.tr.querySelector('.grid-th-actions');

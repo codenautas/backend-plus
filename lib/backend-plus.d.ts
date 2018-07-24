@@ -77,11 +77,11 @@ export type MenuInfoProc={
 } & MenuInfoMinimo;
 export interface ClientModuleDefinition{
     type:'js'|'css'
-    module?:string
-    src?:string
-    path?:string
-    modPath?:string
-    file?:string
+    module?:string // module where to search in node_modules (node_modules/module/modPath/file) to serve
+    modPath?:string // path inside module where to find file to serve
+    src?:string  // full path where browser search file (path/file)
+    path?:string // browser path where the file is
+    file?:string // filename in browser and server
 }
 export type MenuInfo = MenuInfoMenu | MenuInfoTable | MenuInfoProc;
 // type MenuDefinition = {menu:Readonly<MenuInfoBase[]>}
