@@ -2231,7 +2231,8 @@ myOwn.clientSides={
                     control.setTypedValue('⌚');
                     my.ajax.table["lock-record"]({
                         table:depot.def.name,
-                        primaryKeyValues:depot.primaryKeyValues
+                        primaryKeyValues:depot.primaryKeyValues,
+                        token:''
                     }).then(function(result){
                         var tables=[depot.def.name].concat(depot.def.offline.details)
                         var promiseChain=Promise.resolve();
