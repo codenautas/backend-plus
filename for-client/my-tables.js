@@ -1646,7 +1646,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
 };
 
 myOwn.specialDefaultValue={
-    current_date:function(){ return bestGlobals.date.today(); }
+    current_date:function(){ return myOwn.config.currentDate||bestGlobals.date.today(); }
 }
 
 myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElements(aboveDepot){
