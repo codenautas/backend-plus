@@ -137,6 +137,9 @@ export type TableDefinition = EditableDbDefinition & {
             fieldName:string
             valueToDelete:string
         }
+        activeRecord?:{
+            fieldName:string
+        }
         tableName?:string
     }
     foreignKeys?:ForeignKey[]

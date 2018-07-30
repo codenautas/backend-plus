@@ -2276,12 +2276,19 @@ myOwn.getReference = function getReference(referenceName, forceRefresh){
         var connector=new Connector({
             my:my, 
             tableName: referenceName, 
-            getElementToDisplayCount:function(){ return dummyElement; }
+            getElementToDisplayCount:function(){ return dummyElement; },
+            activeOnly: true
         });
         connector.getStructure();
         var dataReady=connector.getData().then(function(rows){
-            reference.rows=rows;
+            reference.Allrows=rows;
             reference.tableDef=connector.def;
+            if(reference.tableDef.activeRecords){
+                rows = rows.filter(function(row){
+                    return row[reference.tableDef.activeRecords.fieldName];
+                });
+            }
+            reference.rows=rows;
             reference.getValue = function getValue(row){
                 return row[reference.tableDef.primaryKey[0]];
             };
