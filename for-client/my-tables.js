@@ -652,6 +652,7 @@ myOwn.ActionColumnGrid.prototype.thFilter = function thFilter(depot){
 myOwn.ActionColumnGrid.prototype.td = function td(depot){
     var grid = this.grid;
     var thActions=html.th({class:['grid-th','grid-th-actions']}).create();
+    thActions.rowSpan = 1 + this.grid.def.layout.extraRows;
     var actionNamesList = ['insert','delete','vertical-edit'].concat(grid.def.actionNamesList);
     if(!grid.def.forInsertOnlyMode){
         actionNamesList.forEach(function(actionName){
@@ -803,6 +804,7 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
     var forInsert = false; // TODO: Verificar que esto está en desuso
     var directInput=grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
     var td = html.td(this.cellAttributes({"typed-controls-direct-input":directInput})).create();
+    td.rowSpan = td.rowSpan + fieldDef.extraRow;
     if(fieldDef.typeName=='number'){
         throw new Error("There's a field in the table defined as Number (Number type is deprecated)");
     }
@@ -1897,6 +1899,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             }:false});
         }
         depot.tr = tr;
+        depot.extraRows=[];
         grid.columns.forEach(function(column, iColumn){
             tr.appendChild(column.td(depot, iColumn, tr, saveRow));
             if(grid.vertical){ 
@@ -1919,6 +1922,13 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     });
                 }
             });
+        }
+        if(grid.def.layout.extraRows > 0){
+            for(var i = 0; i < grid.def.layout.extraRows; i++){
+                var tr = html.tr({class:'extra-row'}, [html.td().create()]).create();
+                depot.extraRows.push(tr);
+                tbody.appendChild(tr);
+            }
         }
         if(iRow===-1){
             depot.detailRows.forEach(function(detailTr){
