@@ -1605,7 +1605,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     grid.dom.footInfo = html.th({colspan:grid.columns.length, "is-processing":"1"}).create();
     createInfoColumnStructure(grid.dom.footInfo);
     grid.actualName = grid.def.name + (grid.connector.fixedFields.length ? '-' + JSON4all.stringify(grid.connector.fixedFields.map(function(pair){ return pair.value; })) : '')
-    grid.dom.caption=html.caption(grid.def.title).create();
+    grid.dom.caption=html.caption({class: 'grid-caption'}, grid.def.title).create();
     if(grid.vertical){
         grid.dom.table = html.table({"class":"my-grid", "my-table": grid.actualName},[
             grid.dom.caption,
@@ -1626,15 +1626,15 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         if(grid.modes.withAggregateRow){
             footRows=[
                 html.tr(grid.columns.map(function(column){ return column.thAgg(); })),
-                html.tr([html.th(),grid.dom.footInfo])
+                html.tr([html.th({class: 'foot-info-empty-col'}),grid.dom.footInfo])
             ];
         }else{
-            footRows=[html.tr([html.th([buttonInsert]),grid.dom.footInfo])];
+            footRows=[html.tr([html.th({class: 'foot-info-insert-col'}, [buttonInsert]),grid.dom.footInfo])];
         }
         grid.dom.table = html.table({"class":"my-grid", "my-table": grid.actualName},[
             grid.dom.caption,
             html.thead([
-                html.tr([html.th(),grid.dom.headInfo]),
+                html.tr({class: 'head-info-row'}, [html.th({class: 'head-info-empty-col'}),grid.dom.headInfo]),
                 html.tr(grid.columns.map(function(column){ return column.th(); })),
                 grid.modes.withColumnDetails?html.tr(grid.columns.map(function(column){ return column.thDetail(); })):null,
             ]),
