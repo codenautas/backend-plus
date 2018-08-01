@@ -57,6 +57,7 @@ myOwn.wScreens.table = function(addrParams){
 
 myOwn.wScreens.procAux = {
     showParams:function(formDef, main_layout, addrParams, mainAction){
+        addrParams.autoproced = addrParams.autoproced || false
         addrParams.up=addrParams.up||{};
         var params=addrParams.up;
         var button = html.button(my.messages.proced).create();
@@ -88,7 +89,7 @@ myOwn.wScreens.procAux = {
         )).create());
         main_layout.appendChild(divResult);
         main_layout.appendChild(divProgressOutside);
-        button.onclick=function(){
+        var proced = function proced(){
             button.disabled=true;
             divResult.innerHTML="";
             divProgress.innerHTML="";
@@ -100,6 +101,12 @@ myOwn.wScreens.procAux = {
                 toggleProgress.disabled=false;
                 labelProgress.textContent=resultOk?my.messages.completed:'error';
             })
+        }
+        button.onclick=function(){
+            proced();
+        }
+        if(addrParams.autoproced){
+            proced();
         }
     },
     mainAction:function(){
