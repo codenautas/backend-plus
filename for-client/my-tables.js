@@ -1688,7 +1688,7 @@ myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElem
             value=fieldDef.defaultValue;
         }
         if('specialDefaultValue' in fieldDef){
-            value=my.specialDefaultValue[fieldDef.specialDefaultValue]();
+            value=my.specialDefaultValue[fieldDef.specialDefaultValue](fieldDef.name, depot);
         }
         if(value!==null){
             depotForInsert.row[fieldDef.name] = value;
