@@ -522,7 +522,14 @@ myOwn.offlineModeRefresh = function offlineModeRefresh(){
 }
 
 window.addEventListener('popstate', function(){
-    my.showPage();
+    if(!my.config){
+        my.autoSetup().then(function(){
+            my.setOnlineOfflineUrl();
+            my.showPage();
+        })
+    }else{
+        my.showPage();
+    }
 });
 
 window.addEventListener('load', function(){

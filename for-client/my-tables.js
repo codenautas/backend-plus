@@ -803,18 +803,26 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
     var fieldDef = this.fieldDef;
     var forInsert = false; // TODO: Verificar que esto está en desuso
     var directInput=grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
-    var td = html.td(this.cellAttributes({"typed-controls-direct-input":directInput})).create();
+    var control;
+    var td;
+    if(fieldDef.mobileInputType && my.mobileMode){
+        control = html.input({type:fieldDef.mobileInputType, class:'bp-input'}).create();
+        td = html.td(this.cellAttributes({}),[control]).create();
+    }else{
+        control = td = html.td(this.cellAttributes({"typed-controls-direct-input":directInput})).create();
+    }
+    // td.clientControl = clientControl;
     td.rowSpan = td.rowSpan + fieldDef.extraRow;
     if(fieldDef.typeName=='number'){
         throw new Error("There's a field in the table defined as Number (Number type is deprecated)");
     }
-    TypedControls.adaptElement(td, fieldDef);
-    depot.rowControls[fieldDef.name] = td;
+    TypedControls.adaptElement(control, fieldDef);
+    depot.rowControls[fieldDef.name] = control;
     if(depot.row[fieldDef.name]!=null){
-        td.setTypedValue(depot.row[fieldDef.name]);
+        control.setTypedValue(depot.row[fieldDef.name]);
     }
     if(!fieldDef.clientSide || fieldDef.serverSide){
-        td.addEventListener('update',function(){
+        control.addEventListener('update',function(){
             var value = this.getTypedValue();
             if(!sameValue(value,depot.row[fieldDef.name])){
                 this.setAttribute('io-status', 'pending');
@@ -843,7 +851,7 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
             }
         });
     }
-    td.addEventListener('update', function(){
+    control.addEventListener('update', function(){
         grid.refreshAggregates();
         if(grid.def.specialValidator){
             var specialMandatories=myOwn.validators[grid.def.specialValidator].getMandatoryMap(depot.row);
