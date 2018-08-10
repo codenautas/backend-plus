@@ -806,7 +806,11 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
     var control;
     var td;
     if(fieldDef.mobileInputType && my.mobileMode){
-        control = html.input({type:fieldDef.mobileInputType, class:'bp-input'}).create();
+        var inputAttrs = {type:'text'};
+        if(fieldDef.mobileInputType=='number'){
+            inputAttrs.pattern = "[0-9]*";
+        }
+        control = html.input(changing({class:'bp-input'},inputAttrs)).create();
         td = html.td(this.cellAttributes({}),[control]).create();
     }else{
         control = td = html.td(this.cellAttributes({"typed-controls-direct-input":directInput})).create();
