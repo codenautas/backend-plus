@@ -1470,7 +1470,7 @@ myOwn.TableGrid.prototype.refreshAggregates = function refreshAggregates(){
         })
     });
     grid.def.fields.forEach(function(fieldDef){
-        if(fieldDef.aggregate){
+        if(fieldDef.aggregate && grid.dom.aggregate[fieldDef.name]){
             grid.dom.aggregate[fieldDef.name].setTypedValue(aggData[fieldDef.name].result());
         }
     })

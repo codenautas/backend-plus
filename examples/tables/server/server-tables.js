@@ -89,6 +89,7 @@ class AppExample extends backendPlus.AppBackend{
                 {menuType:'table', name:'pgroups' , label:'groups'  },
                 {menuType:'table', name:'isotopes', label:'isotopes'},
                 {menuType:'table', name:'new_element', label:'new element'},
+                {menuType:'only_element', name:'only_element', label:'only element'},
                 {menuType:'table', name:'new_isotopes', label:'new isotopes'},
                 {menuType:'proc' , name:'count/without-isotopes', label:'count'},
             ]},

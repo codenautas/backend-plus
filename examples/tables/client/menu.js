@@ -28,6 +28,27 @@ myOwn.wScreens["demo-screen"] = function(addrParams){
     },10);
 }
 
+myOwn.wScreens.only_element={
+    parameters:[
+        {name:'atomic_number', typeName:'integer', references:'ptable'}
+    ],
+    mainAction:function(params,divResult,divProgress){
+        var my=myOwn;
+        var opts={tableDef:{layout:{vertical:true}}}
+        if(params.atomic_number==null){
+            opts.fixedFields=[{fieldName:'atomic_number', value:null}];
+        }else{
+            opts.fixedFields=[{fieldName:'atomic_number', value:params.atomic_number}];
+        }
+        var grid=my.tableGrid('ptable',divResult,opts);
+        return grid.waitForReady().then(function(){
+            if(params.atomic_number==null){
+                grid.createRowInsertElements();
+            }
+        })
+    }
+}
+
 myOwn.tableAction.showImg={
     img: my.path.img+'picture.png',
     alt: 'img',
