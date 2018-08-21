@@ -397,30 +397,27 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
                                             return !tableDef.primaryKey.includes(field.source)
                                         })
                                     });
-                                    fkToStoreData = fkToStoreData.concat(fkToStoreSearch)
+                                    fkToStoreData = fkToStoreData.concat(fkToStoreSearch);
                                 });
                             });
                             var promiseArray = [];
                             promiseChain = promiseChain.then(function(){
-                                fkToStoreData.forEach(function(fk){
+                                return fkToStoreData.forEach(function(fk){
                                     var conn = new my.TableConnector({tableName: fk.references, my:my});
-                                    promiseChain = promiseChain.then(function(){
-                                        return conn.getStructure();
-                                    });
-                                    promiseChain = promiseChain.then(function(){
-                                        return conn.getData().then(function(rows){
-                                            promiseArray.push(
-                                                Promise.resolve(my.ldb.putMany(fk.references, rows))
-                                            );
-                                        });
-                                    })
+                                    conn.getStructure()
+                                    promiseArray.push(
+                                        Promise.resolve().then(function(){
+                                            return conn.getData().then(function(rows){
+                                                return my.ldb.putMany(fk.references, rows)
+                                            })
+                                        })
+                                    );
                                 });
-                                promiseChain = promiseChain.then(function(){
-                                    Promise.all(promiseArray).then(function(){
-                                        location.reload();
-                                    })
-                                    
-                                });
+                            });
+                            promiseChain = promiseChain.then(function(){
+                                Promise.all(promiseArray).then(function(){
+                                    location.reload();
+                                })
                             });
                         }else{
                             my.showPage();
