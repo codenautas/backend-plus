@@ -223,7 +223,7 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
         structureFromBackend.then(function(tableDef){
             var promiseChain=my.ldb.registerStructure(tableDef);
             if(!connector.localDef || JSON.stringify(tableDef)!=JSON.stringify(connector.localDef)){
-                alertPromise('la tabla '+connector.tableName+' cambió de estructura. Debe Refrescar la página')
+                //alertPromise('la tabla '+connector.tableName+' cambió de estructura. Debe Refrescar la página')
             }
             if(connector.def.offline.mode==='master'){
                 connector.def.offline.details.forEach(function(tableName){
