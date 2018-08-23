@@ -2254,7 +2254,7 @@ myOwn.clientSides={
                     var tokenPromise = Promise.resolve();
                     var token = localStorage.getItem('token');
                     if(!token){
-                        tokenPromise.then(function(){
+                        tokenPromise = tokenPromise.then(function(){
                             return my.ajax.token.get({
                                 useragent:my.config.useragent,
                                 username: my.config.username
@@ -2264,22 +2264,23 @@ myOwn.clientSides={
                             });
                         })
                     }
-                    tokenPromise.then(function(){
+                    tokenPromise = tokenPromise.then(function(){
+                        var promiseArray = [];
                         my.ajax.table["lock-record"]({
                             table:depot.def.name,
                             primaryKeyValues:depot.primaryKeyValues,
                             token:token
                         }).then(function(result){
                             var tables=[depot.def.name].concat(depot.def.offline.details)
-                            var promiseChain=Promise.resolve();
-                            tables.forEach(function(name,i){
-                                promiseChain=promiseChain.then(function(){
-                                    my.ldb.putMany(name,result.data[i]);
-                                })
-                            })
-                            return promiseChain;
+                            return tables.forEach(function(name,i){
+                                promiseArray.push(
+                                    my.ldb.putMany(name,result.data[i])
+                                );
+                            });
                         }).then(function(){
-                            control.setTypedValue('⚿');
+                            Promise.all(promiseArray).then(function(){
+                                control.setTypedValue('⚿');
+                            })
                         })
                     })
                 }
