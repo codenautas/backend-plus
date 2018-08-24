@@ -259,7 +259,7 @@ export class LocalDb{
     private async putOneAndGetIfNeeded<T extends Record>(tableName:string, element:T, needed:boolean):Promise<T|void>{
         var ldb=this;
         var db=await ldb.wait4db
-        var tableDef=await ldb.IDBX<TableDefinition>(db.transaction('$structures',"readwrite").objectStore('$structures').get(tableName));
+        var tableDef=await ldb.getStructure(tableName);
         var createPromiseForFK = function createPromiseForFK(fk:ForeignKey){
             return Promise.resolve().then(async function(){
                 var fkTableDef=await ldb.getStructure(fk.references);
@@ -268,11 +268,16 @@ export class LocalDb{
                     fk.fields.forEach(function(field:{source:string,target:string}){
                         pk.push(element[field.source]);
                     })
-                    var fkRecord:any = await ldb.getOneIfExists(fk.references, pk);
-                    if(fkRecord){
-                        fk.displayFields.forEach(function(field){
-                            element[fk.alias + '__' + field] = fkRecord[field];
-                        })
+                    var isFKCompleteInSource = fk.fields.filter(function(field:{source:string,target:string}){
+                        return element[field.source] == null
+                    }).length == 0
+                    if(isFKCompleteInSource){
+                        var fkRecord:any = await ldb.getOneIfExists(fk.references, pk);
+                        if(fkRecord){
+                            fk.displayFields.forEach(function(field){
+                                element[fk.alias + '__' + field] = fkRecord[field];
+                            })
+                        }
                     }
                 }
             })
