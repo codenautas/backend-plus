@@ -268,10 +268,12 @@ export class LocalDb{
                     fk.fields.forEach(function(field:{source:string,target:string}){
                         pk.push(element[field.source]);
                     })
-                    var fkRecord:any = await ldb.getOne(fk.references, pk);
-                    fk.displayFields.forEach(function(field){
-                        element[fk.alias + '__' + field] = fkRecord[field];
-                    })
+                    var fkRecord:any = await ldb.getOneIfExists(fk.references, pk);
+                    if(fkRecord){
+                        fk.displayFields.forEach(function(field){
+                            element[fk.alias + '__' + field] = fkRecord[field];
+                        })
+                    }
                 }
             })
         }
