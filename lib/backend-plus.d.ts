@@ -117,7 +117,7 @@ export type EditableDbDefinition = {
     }
 }
 export type FieldsForConnect = (string | {source:string, target:string})[]
-export type ForeignKey = {references:string, fields:FieldsForConnect, onDelete?: string, displayAllFields?: boolean, alias?:string}
+export type ForeignKey = {references:string, fields:FieldsForConnect, onDelete?: string, displayAllFields?: boolean, alias?:string, displayFields:string[]}
 export type Constraint = {constraintType:'check'|'unique'|'not null', expr?:string, fields?:string[], consName?:string}
 export type TableDefinition = EditableDbDefinition & {
     name:string

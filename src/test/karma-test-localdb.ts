@@ -6,6 +6,7 @@
 /// <reference path="../../src/for-client/my-localdb.ts" />
 
 import {LocalDb, TableDefinition} from "../for-client/my-localdb";
+import {changing} from "best-globals";
 import "mocha";
 
 function compare<T>(obtained:T, expected:T):boolean{
@@ -165,6 +166,66 @@ describe("local-db", function(){
         it("get mass childs", async function(){
             var obtainedMass=await ldb.getChild("units", ["mass"]);
             compare(obtainedMass, massUnits);
+        })
+    })
+    describe("foreignKeys",function(){
+        type Product = {
+            product:string,
+            name:string,
+            price:number,
+            quantity_number: number,
+            quantity: string,
+            unit: string,
+            units__description: string
+        }
+        type Units = {
+            quantity:string,
+            unit:string,
+            description: string,
+        }
+        var unitsTableDef:TableDefinition={
+            name:'units',
+            primaryKey:['quantity', 'unit']
+        }
+        var productsTableDef:TableDefinition={
+            name:'products',
+            primaryKey:['product'],
+            foreignKeys: [{references:'units', fields:[{source:'quantity', target:'quantity'}, {source:'unit', target:'unit'}], displayFields:['description'], alias:'units'}]
+        }
+        var volumeUnits:Units[]=[
+            {quantity:'volume', unit:'ml', description:'millilitre'},
+            {quantity:'volume', unit:'l', description:'litre'},
+            {quantity:'volume', unit:'cm3', description:'cubic centimetre'},
+            {quantity:'volume', unit:'m3', description:'cubic metre'},
+        ]
+        var massUnits:Units[]=[
+            {quantity:'mass', unit:'g', description:'gram'},
+            {quantity:'mass', unit:'kg', description:'kilogram'},
+            {quantity:'mass', unit:'mg', description:'milligram'},
+        ]
+        var timeUnits:Units[]=[
+            {quantity:'time', unit:'s', description:'second'},
+            {quantity:'time', unit:'m', description:'minute'},
+            {quantity:'time', unit:'h', description:'hour'},
+        ]
+
+        var products:Product[]=[
+            {product:'P11111', name: 'Gaseosa', price:35.50, quantity_number: 750, quantity: 'volume', unit: 'cm3', units__description: 'cubic centimetre'},
+            {product:'P22222', name: 'Naranjas', price:25, quantity_number: 1, quantity: 'mass', unit: 'kg', units__description: 'kilogram'},
+            {product:'P33333', name: 'Pelicula', price:150, quantity_number: 1.5, quantity: 'time', unit: 'h', units__description: 'hour'},
+        ]
+        var units=volumeUnits.concat(massUnits).concat(timeUnits);
+        before("",async function(){
+            await ldb.registerStructure(unitsTableDef);
+            await ldb.registerStructure(productsTableDef);
+            await ldb.putMany("units", units);
+            await ldb.putMany("products", products);
+        })
+        it("get product and change unit", async function(){
+            var myProduct=await ldb.getOne<Product>("products", ["P11111"]);
+            myProduct.unit = 'ml';
+            var myChangedProduct = await ldb.putOne("products", myProduct);
+            compare(myChangedProduct, changing(products[0],{unit:'ml', units__description:'millilitre'}));
         })
     })
 });

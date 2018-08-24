@@ -35,6 +35,7 @@
  */
 
 import * as likeAr from "like-ar";
+import { ForeignKey } from "backend-plus";
 
 export type Key = string[];
 export type Stores = {[key:string]:IDBObjectStore};
@@ -44,6 +45,8 @@ export type Record = {[key:string]:any};
 export interface TableDefinition{
     name:string
     primaryKey:string[]
+    foreignKeys?:ForeignKey[]
+    softForeignKeys?:ForeignKey[]
 } 
 
 type VersionInfo = {
@@ -256,19 +259,49 @@ export class LocalDb{
     private async putOneAndGetIfNeeded<T extends Record>(tableName:string, element:T, needed:boolean):Promise<T|void>{
         var ldb=this;
         var db=await ldb.wait4db
-        if(detectedFeatures.needToUnwrapArrayKeys){
-            var tableDef=await ldb.IDBX<TableDefinition>(db.transaction('$structures',"readwrite").objectStore('$structures').get(tableName));
-            var newKey=tableName+JSON.stringify(tableDef.primaryKey.map(function(name){
-                return element[name];
-            }));
-            var storeTask=db.transaction(tableName,"readwrite").objectStore(tableName).put(element,newKey);
-        }else{
-            var storeTask=db.transaction(tableName,"readwrite").objectStore(tableName).put(element);
+        var tableDef=await ldb.IDBX<TableDefinition>(db.transaction('$structures',"readwrite").objectStore('$structures').get(tableName));
+        var createPromiseForFK = function createPromiseForFK(fk:ForeignKey){
+            return Promise.resolve().then(async function(){
+                var fkTableDef=await ldb.getStructure(fk.references);
+                if(fkTableDef){
+                    var pk:string[] = [];
+                    fk.fields.forEach(function(field:{source:string,target:string}){
+                        pk.push(element[field.source]);
+                    })
+                    var fkRecord:any = await ldb.getOne(fk.references, pk);
+                    fk.displayFields.forEach(function(field){
+                        element[fk.alias + '__' + field] = fkRecord[field];
+                    })
+                }
+            })
         }
-        var key=await ldb.IDBX<Key>(storeTask)
-        if(needed){
-            return await ldb.IDBX<T>(db.transaction(tableName,"readwrite").objectStore(tableName).get(key))
+        var promisesArray: Promise<void>[] = [];
+        if(tableDef.foreignKeys){
+            tableDef.foreignKeys.forEach(async function(fk){
+                promisesArray.push(createPromiseForFK(fk));
+            });
         }
+        if(tableDef.softForeignKeys){
+            tableDef.softForeignKeys.forEach(async function(fk){
+                promisesArray.push(createPromiseForFK(fk));
+            });
+        }
+        return Promise.all(promisesArray).then(async function(){
+            if(detectedFeatures.needToUnwrapArrayKeys){
+                var newKey=tableName+JSON.stringify(tableDef.primaryKey.map(function(name){
+                    return element[name];
+                }));
+                var storeTask=db.transaction(tableName,"readwrite").objectStore(tableName).put(element,newKey);
+            }else{
+                var storeTask=db.transaction(tableName,"readwrite").objectStore(tableName).put(element);
+            }
+            if(needed){
+                var key=await ldb.IDBX<Key>(storeTask)
+                return await ldb.IDBX<T>(db.transaction(tableName,"readwrite").objectStore(tableName).get(key))
+            }else{
+                return null;
+            }
+        });
     }
     async putOne<T>(tableName:string, element:T):Promise<T>{
         return this.putOneAndGetIfNeeded(tableName, element, true);
