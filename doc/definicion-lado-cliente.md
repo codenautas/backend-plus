@@ -9,7 +9,7 @@ Javscript, css, ts y demás incluidos desde el cliente
 
 <!--lang:en--]
 
-# Module definition
+# Client side definition
 
 js, css, ts, and others
 
