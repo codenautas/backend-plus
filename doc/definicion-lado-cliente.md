@@ -1,12 +1,17 @@
-<!--multilang v0 es:definicion-tablas.md en:table-definitions.md -->
+<!--multilang v0 es:definicion-modulos.md en:client-side-definitions.md -->
 
 <!--lang:es-->
 
 # Definición del lado del cliente
 
+Javscript, css, ts y demás incluidos desde el cliente
+
+
 <!--lang:en--]
 
-# Tables definition
+# Module definition
+
+js, css, ts, and others
 
 [!--lang:*-->
 
@@ -19,34 +24,37 @@ también disponible en:
 
 <!--lang:es-->
 
-Del lado del cliente se heredan grillas (de las definiciones de las tablas), 
-menúes (de las definiciones de los menúes) y formularios para invocar procesos (ídem).
-
-Además se pueden agregar comprtamiento visual utilizando esta API.
+Se define así:
 
 <!--lang:en--]
 
-See spanish...
+Like this:
 
 [!--lang:*-->
 
-## my.tableGrid(gridName, layoutElement [,opts])
+## clientIncludes
 
 <!--lang:es-->
 
-Despliega una grilla de nombre `gridName` dentro del div `layoutElement` (borra lo que hubiere en ese elemento antes de desplegar).
+`clientIncludes` es una función que debe devolver una lista de objetos con estos atributos:
 
-Devuelve una Crilla
+(en este contexto pedir es del lado del cliente y entregar o servir es del lado del servidor en el servicio que ofrece y buscar es en el sistema de archivos del servidor, _deducida_ significa que es la variable que al final se quiere, esta se deduce de otras cuando no está)
 
-Opciones de creación:
-opción               | uso
----------------------|-----
-`fixedFields`        | es la lista de campo/valor (en formato `{fieldName, value}`) que determinan el "filtro fijo" (que no se puede cambiar)
-`parameterFunctions` | es la lista de parámetros que recibe una grilla que utiliza una función para desplegarse
-`tableDef`           | es un complemento a la definición original de la tabla (se pueden cambiar cosas de la definición original)
+propiedad         | tipo | predeterminado        | uso
+------------------|------|-----------------------|----------------------------------------------------------------------------------------------
+type              | T    | _oblilgatorio_        | 'js', 'css'
+src               | T    | path or 'lib' + file or module.main | lo que se pide del lado del cliente
+modPath           | T    |                       | modificación del path donde ir a buscar el archivo para entregar
+file              | T    |                       | nombre del archivo que se pide y que se entrega
+path              | T    | 'lib'                 | es en qué carpeta lo querés servir
+ts                | T    |                       | especifica el path que se tiene que habilitar para servir el .ts asociado al javascript
 
-Grilla:
+### casos
+  * type, module: cuando todo se puede deducir del package.json del módulo a través del "main"
+  * type, module, modPath, file: cuando el archivo que se necesita está en un módulo pero no es el "main" del módulo ni está en la carpeta por defecto. 
 
-miembro         | uso
-----------------|----
-refresh()       | refresca el contenido de la grilla
+<!--lang:en--]
+
+see spanish
+
+[!--lang:*-->
