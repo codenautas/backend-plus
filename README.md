@@ -39,6 +39,13 @@ It's a framework for developing web applications based on PostgreSQL database. I
 
 ### [table definitions](doc/table-definitions.md)
 
+
+
+### [module definitions](doc/module-definitions.md)
+
+
+### [client side definitions](doc/client-side-definitions.md)
+
 ### Menus definition
 
 menuType | use

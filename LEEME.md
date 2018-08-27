@@ -71,6 +71,15 @@ It's a framework for developing web applications based on PostgreSQL database. I
 
 ### [table definitions](doc/table-definitions.md)
 
+
+<!--lang:es-->
+
+### [Definición de modulos](doc/definicion-modulos.md)
+
+<!--lang:en--]
+
+### [module definitions](doc/module-definitions.md)
+
 <!--lang:es-->
 
 ### [Definición del lado del cliente](doc/definicion-lado-cliente.md)
