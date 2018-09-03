@@ -59,7 +59,7 @@ type VersionInfo = {
 type RegisterResult={new?:true, dataErased?:true, changed:boolean};
 
 type DetectFeatures={
-    needToUnwrapArrayKeys:boolean|null
+    needToUnwrapArrayKeys:boolean
 }
 
 export var detectedFeatures:DetectFeatures={
@@ -68,6 +68,7 @@ export var detectedFeatures:DetectFeatures={
 
 export class LocalDb{
     private wait4db:Promise<IDBDatabase>;
+    private wait4detectedFeatures:Promise<DetectFeatures>;
     constructor(public name:string){
         var ldb=this;
         var initialStores:StoreDefs={
@@ -87,38 +88,13 @@ export class LocalDb{
             if(!db.objectStoreNames.contains("$internals")){
                 likeAr(initialStores).forEach(function(keyPath: string, tableName: string){
                     var store = db.createObjectStore(tableName, {keyPath: keyPath});
-                    if(detectedFeatures.needToUnwrapArrayKeys==null){
-                        try{
-                            // @ts-ignore
-                            var os: string = window.myOwn.config.useragent.os;
-                            // @ts-ignore
-                            var version: number = parseInt(window.myOwn.config.useragent.version.split('.')[0]);
-                        }catch(err){
-                            throw Error("unknowed OS or version");
-                        }
-                        if(os === 'OS X' && version < 11){
-                            detectedFeatures.needToUnwrapArrayKeys=true
-                        }else{
-                            if(tableName=='$detect'){
-                                var request = store.put({detectKey:'one'});
-                                request.onsuccess=function(){
-                                    var key=request.result;
-                                    if(typeof key === "string"){
-                                        detectedFeatures.needToUnwrapArrayKeys=true;
-                                    }else{
-                                        detectedFeatures.needToUnwrapArrayKeys=false;
-                                    }
-                                };
-                                request.onerror=function(){
-                                    detectedFeatures.needToUnwrapArrayKeys=true;
-                                };
-                            }
-                        }
-                    }
                     if(tableName=='$internals'){
                         store.put(initialVersionInfo);
                     }
-            })
+                    if(tableName=='$detect'){
+                        ldb.wait4detectedFeatures = ldb.detectFeatures(store);
+                    }
+                })
             }
         }
         ldb.wait4db = ldb.IDBX(requestDB);
@@ -138,7 +114,7 @@ export class LocalDb{
                 }
             }
             request.onerror=function(){
-                alertPromise(request.error.message);
+                alertPromise(request.error.message || request.error.name);
                 reject(request.error);
             }
         })
@@ -149,6 +125,37 @@ export class LocalDb{
         this.wait4db = registerTask.then(result=>result.wait4db);
         var result=await registerTask; 
         return result.result;
+    }
+    async detectFeatures(store:IDBObjectStore):Promise<DetectFeatures>{
+        return new Promise<DetectFeatures>((resolve) => {
+            try{
+                // @ts-ignore
+                var os: string = window.myOwn.config.useragent.os;
+                // @ts-ignore
+                var version: number = parseInt(window.myOwn.config.useragent.version.split('.')[0]);
+            }catch(err){
+                throw Error("unknowed OS or version");
+            }
+            if(os === 'OS X' && version < 11){
+                detectedFeatures.needToUnwrapArrayKeys=true
+                resolve (detectedFeatures)
+            }else{
+                var request = store.put({detectKey:'one'});
+                request.onsuccess=function(){
+                    var key=request.result;
+                    if(typeof key === "string"){
+                        detectedFeatures.needToUnwrapArrayKeys=true;
+                    }else{
+                        detectedFeatures.needToUnwrapArrayKeys=false;
+                    }
+                    resolve (detectedFeatures)
+                };
+                request.onerror=function(){
+                    detectedFeatures.needToUnwrapArrayKeys=true;
+                    resolve (detectedFeatures)
+                };
+            }
+        });
     }
     private async registerStructureInside(tableDef:TableDefinition, wait4db:Promise<IDBDatabase>):Promise<{
         wait4db:Promise<IDBDatabase>,
@@ -163,6 +170,11 @@ export class LocalDb{
         }
         await ldb.IDBX(db.transaction('$structures',"readwrite").objectStore('$structures').put(tableDef));
         result.result.changed=JSON.stringify(tableDef)!=JSON.stringify(oldValue);
+        var detectedFeatures;
+        if(!ldb.wait4detectedFeatures){
+            ldb.wait4detectedFeatures = ldb.detectFeatures(db.transaction('$detect',"readwrite").objectStore('$detect'));
+        }
+        detectedFeatures = await ldb.wait4detectedFeatures;
         var infoStore=detectedFeatures.needToUnwrapArrayKeys?null:tableDef.primaryKey;
         var versionInfo = await this.IDBX<VersionInfo>(db.transaction('$internals',"readwrite").objectStore('$internals').get('version'))
         if(JSON.stringify(versionInfo.stores[tableDef.name])!=JSON.stringify(infoStore)){
