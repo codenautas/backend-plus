@@ -584,8 +584,6 @@ myOwn.ajaxPromise.autoClose=true;
 
 myOwn.testKeepAlive = function testKeepAlive(){
     var my = this;
-    var skin=(this.config||{}).skin;
-    var skinUrl=(skin?skin+'/':'');
     var element = document.getElementById('keep-alive-signal') || my.debugging && document.body.appendChild(html.div({id:'keep-alive-signal'}).create());
     if(element){
         element.textContent='t';
@@ -605,7 +603,7 @@ myOwn.testKeepAlive = function testKeepAlive(){
         }
         var lightServer = document.getElementById('light-server');
         if(lightServer){
-            lightServer.src=skinUrl+'img/server-ok.png';
+            lightServer.src=my.path.img+'server-ok.png';
             if(!my.server.connected){
                 my.server.connected = true;
                 my.server.broadcaster.dispatchEvent(new Event('serverConnected'));

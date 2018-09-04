@@ -510,11 +510,10 @@ myOwn.offlineModeRefresh = function offlineModeRefresh(){
     // @ts-ignore
     var imgLight = document.getElementById('light-airplane');
     var skin=((my.config||{}).config||{}).skin;
-    var skinUrl=(skin?skin+'/':'');
     if(my.offline.mode){
-        imgLight.src=skinUrl+'img/airplane-on.png';
+        imgLight.src=my.path.img+'airplane-on.png';
     }else{
-        imgLight.src=skinUrl+'img/airplane-off.png';
+        imgLight.src=my.path.img+'airplane-off.png';
     }
 }
 
@@ -550,13 +549,12 @@ function updateOnlineStatus(){
     if(window.my){
         var networkLight=document.getElementById('light-network-signal');
         var skin=((my.config||{}).config||{}).skin;
-        var skinUrl=(skin?skin+'/':'');
         if(networkLight){
             if(window.navigator.onLine){
-                networkLight.src=skinUrl+'img/network-signal-ok.png';
+                networkLight.src=my.path.img+'network-signal-ok.png';
                 networkLight.result.status=my.messages.onLine;
             }else{
-                networkLight.src=skinUrl+'img/network-no-signal.png';
+                networkLight.src=my.path.img+'network-no-signal.png';
                 networkLight.result.status=my.messages.offLine;
             }
         }
