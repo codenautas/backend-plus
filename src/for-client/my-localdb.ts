@@ -170,11 +170,10 @@ export class LocalDb{
         }
         await ldb.IDBX(db.transaction('$structures',"readwrite").objectStore('$structures').put(tableDef));
         result.result.changed=JSON.stringify(tableDef)!=JSON.stringify(oldValue);
-        var detectedFeatures;
         if(!ldb.wait4detectedFeatures){
             ldb.wait4detectedFeatures = ldb.detectFeatures(db.transaction('$detect',"readwrite").objectStore('$detect'));
         }
-        detectedFeatures = await ldb.wait4detectedFeatures;
+        await ldb.wait4detectedFeatures;
         var infoStore=detectedFeatures.needToUnwrapArrayKeys?null:tableDef.primaryKey;
         var versionInfo = await this.IDBX<VersionInfo>(db.transaction('$internals',"readwrite").objectStore('$internals').get('version'))
         if(JSON.stringify(versionInfo.stores[tableDef.name])!=JSON.stringify(infoStore)){
@@ -201,7 +200,11 @@ export class LocalDb{
     }
     async getStructure(tableName:string):Promise<TableDefinition>{
         var ldb=this;
-        var db=await ldb.wait4db
+        var db=await ldb.wait4db;
+        if(!ldb.wait4detectedFeatures){
+            ldb.wait4detectedFeatures = ldb.detectFeatures(db.transaction('$detect',"readwrite").objectStore('$detect'));
+        }
+        await ldb.wait4detectedFeatures;
         var tableDef = await ldb.IDBX<TableDefinition>(
             db.transaction('$structures',"readwrite").objectStore('$structures').get(tableName)
         );
