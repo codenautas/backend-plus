@@ -1587,7 +1587,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     })].concat(
         grid.def.detailTables.map(function(detailTableDef){ return new my.DetailColumnGrid({grid:grid, detailTableDef:detailTableDef}); })
     ).concat(
-        grid.def.fields.map(function(fieldDef){ return new my.DataColumnGrid({grid:grid, fieldDef:fieldDef}); })
+        grid.def.fields.filter(function(fieldDef){return fieldDef.visible}).map(function(fieldDef){ return new my.DataColumnGrid({grid:grid, fieldDef:fieldDef}); })
     // ).concat(
     //     [new my.SpecialColumnGrid({class:"empty-right-column"})]
     );
