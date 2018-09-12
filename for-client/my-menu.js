@@ -390,32 +390,42 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
                         my.setOnlineOfflineUrl();
                         if(my.offline.mode){
                             var fkToStoreData = [];
+                            var promiseArray1 = []
                             var promiseChain = my.ldb.getAll('$structures').then(function(tablesDef){
                                 tablesDef.forEach(function(tableDef){
-                                    var fkToStoreSearch = tableDef.foreignKeys.filter(function(fk){
-                                        return fk.fields.find(function(field){
-                                            return !tableDef.primaryKey.includes(field.source)
-                                        })
-                                    });
-                                    fkToStoreData = fkToStoreData.concat(fkToStoreSearch);
-                                });
-                            });
-                            var promiseArray = [];
-                            promiseChain = promiseChain.then(function(){
-                                return fkToStoreData.forEach(function(fk){
-                                    var conn = new my.TableConnector({tableName: fk.references, my:my});
-                                    conn.getStructure()
-                                    promiseArray.push(
-                                        Promise.resolve().then(function(){
-                                            return conn.getData().then(function(rows){
-                                                return my.ldb.putMany(fk.references, rows)
-                                            })
+                                    promiseArray1.push(
+                                        my.ldb.isEmpty(tableDef.name).then(function(isEmpty){
+                                            if(!isEmpty){
+                                                var fkToStoreSearch = tableDef.foreignKeys.filter(function(fk){
+                                                    return fk.fields.find(function(field){
+                                                        return !tableDef.primaryKey.includes(field.source)
+                                                    })
+                                                });
+                                                fkToStoreData = fkToStoreData.concat(fkToStoreSearch);
+                                            }
                                         })
                                     );
                                 });
                             });
+                            var promiseArray2 = [];
                             promiseChain = promiseChain.then(function(){
-                                Promise.all(promiseArray).then(function(){
+                                return Promise.all(promiseArray1).then(function(){
+                                    console.log("fkToStoreData: ", fkToStoreData)
+                                    return fkToStoreData.forEach(function(fk){
+                                        var conn = new my.TableConnector({tableName: fk.references, my:my});
+                                        conn.getStructure()
+                                        promiseArray2.push(
+                                            Promise.resolve().then(function(){
+                                                return conn.getData().then(function(rows){
+                                                    return my.ldb.putMany(fk.references, rows)
+                                                })
+                                            })
+                                        );
+                                    });
+                                });
+                            });
+                            promiseChain = promiseChain.then(function(){
+                                Promise.all(promiseArray2).then(function(){
                                     location.reload();
                                 })
                             });

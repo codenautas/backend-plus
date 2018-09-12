@@ -1735,7 +1735,9 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         var forInsert = false; // not define how to detect
         var tr = depot;
         grid.setRowStyle(depot,depot.row, skipUpdateStatus);
-        grid.def.fields.forEach(function(fieldDef){
+        grid.def.fields.filter(function(fieldDef){
+            return fieldDef.visible;
+        }).forEach(function(fieldDef){
             var td = depot.rowControls[fieldDef.name];
             var editable=grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
             td.disable(!editable);
@@ -1912,7 +1914,9 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         }
         depot.tr = tr;
         depot.extraRows=[];
-        grid.columns.forEach(function(column, iColumn){
+        grid.columns.filter(function(column){
+            return column.fieldDef?column.fieldDef.visible:true
+        }).forEach(function(column, iColumn){
             tr.appendChild(column.td(depot, iColumn, tr, saveRow));
             if(grid.vertical){ 
                 tr = tr.nextSibling;

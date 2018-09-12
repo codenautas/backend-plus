@@ -45,6 +45,17 @@ describe("local-db", function(){
             var newTableDef = await ldb.getStructure(tableDef.name);
             compare(tableDef, newTableDef);
         });
+        it("check empty structure", async function(){
+            var tableDef={
+                name:'this_name',
+                fields:[
+                    {name: 'pk1', typeName:'text'}
+                ],
+                primaryKey:['pk1']
+            };
+            var count:boolean = await ldb.isEmpty(tableDef.name);
+            compare(true, count);
+        });
         it("reput and get structure", async function(){
             var tableDef={
                 name:'this_name',
@@ -103,6 +114,10 @@ describe("local-db", function(){
         it("put many", async function(){
             await ldb.putMany("phisical_quantities", quantities.slice(1));
         })
+        it("check empty structure", async function(){
+            var count:boolean = await ldb.isEmpty("phisical_quantities");
+            compare(false, count);
+        });
         it("get one", async function(){
             var volume = await ldb.getOne<Quantity>("phisical_quantities", ["volume"]);
             compare(volume, quantities[2]);

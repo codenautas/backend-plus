@@ -269,6 +269,12 @@ export class LocalDb{
     async getAll<T>(tableName:string):Promise<T[]>{
         return this.getChild<T>(tableName,tableName[0]=='$'?null:[]);
     }
+    async isEmpty(tableName:string):Promise<boolean>{
+        var ldb=this;
+        var db=await ldb.wait4db;
+        var count:number = await ldb.IDBX<number>(db.transaction(tableName,"readonly").objectStore(tableName).count());
+        return count == 0;
+    }
     private async putOneAndGetIfNeeded<T extends Record>(tableName:string, element:T, needed:true):Promise<T>
     private async putOneAndGetIfNeeded<T extends Record>(tableName:string, element:T, needed:false):Promise<void>
     private async putOneAndGetIfNeeded<T extends Record>(tableName:string, element:T, needed:boolean):Promise<T|void>{
