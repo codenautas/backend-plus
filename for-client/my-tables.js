@@ -1899,6 +1899,11 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         grid.dom.main.dispatchEvent(new CustomEvent('savedRowOk'));
         grid.refreshAggregates();
     }
+    grid.createExtraRow = function createExtraRow(depot, tbody){
+        var tr = html.tr({class:'extra-row'}, [html.td().create()]).create();
+        depot.extraRows.push(tr);
+        tbody.appendChild(tr);
+    }
     grid.createRowElements = function createRowElements(iRow, depot){
         var grid = this;
         var forInsert = iRow>=0;
@@ -1941,9 +1946,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         }
         if(grid.def.layout.extraRows > 0){
             for(var i = 0; i < grid.def.layout.extraRows; i++){
-                var tr = html.tr({class:'extra-row'}, [html.td().create()]).create();
-                depot.extraRows.push(tr);
-                tbody.appendChild(tr);
+                grid.createExtraRow(depot, tbody);
             }
         }
         if(iRow===-1){
