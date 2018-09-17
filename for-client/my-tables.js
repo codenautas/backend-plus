@@ -1837,7 +1837,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         upadteNumberOfRows(depot,grid);
         var retrievedRow = result.updatedRow;
         for(var fieldName in retrievedRow){
-            if(!/^\$/.test(fieldName)){
+            if(!/^\$/.test(fieldName) && depot.def.field[fieldName].visible){
                 if(!grid.def.field[fieldName].clientSide){
                     var value = depot.rowControls[fieldName].getTypedValue();
                     if(!sameValue(depot.row[fieldName], value)){
