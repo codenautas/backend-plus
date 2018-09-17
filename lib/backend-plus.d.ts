@@ -189,6 +189,8 @@ export class AppBackend{
     getContextForDump(): ContextForDump
     getClientSetupForSendToFrontEnd(req:Request):ClientSetup
     configList(): (object|string)[]
+    configStaticConfig():void
+    setStaticConfig(defConfigYamlString:string):void
 }
 
 }
