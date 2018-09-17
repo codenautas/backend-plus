@@ -851,7 +851,7 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
                         })
                     })
                 }
-                grid.updateRowData(depot,true); // revisualiza aunque no haya grabado
+                //grid.updateRowData(depot,true); // revisualiza aunque no haya grabado
             }
         });
     }
