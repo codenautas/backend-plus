@@ -1739,7 +1739,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             return fieldDef.visible;
         }).forEach(function(fieldDef){
             var td = depot.rowControls[fieldDef.name];
-            var editable=grid.connector.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
+            var editable=grid.connector.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update && grid.connector.def.field[fieldDef.name].allow.update);
             td.disable(!editable);
             if(fieldDef.clientSide){
                 if(!td.clientSidePrepared){
