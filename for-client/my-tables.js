@@ -1837,14 +1837,16 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         upadteNumberOfRows(depot,grid);
         var retrievedRow = result.updatedRow;
         for(var fieldName in retrievedRow){
-            if(!/^\$/.test(fieldName) && depot.def.field[fieldName].visible){
+            if(!/^\$/.test(fieldName)){
                 if(!grid.def.field[fieldName].clientSide){
-                    var value = depot.rowControls[fieldName].getTypedValue();
-                    if(!sameValue(depot.row[fieldName], value)){
-                        if(grid.def.field[fieldName].allow.update){
-                            depot.rowPendingForUpdate[fieldName] = value;
+                    if(depot.rowControls[fieldName]){
+                        var value = depot.rowControls[fieldName].getTypedValue();
+                        if(!sameValue(depot.row[fieldName], value)){
+                            if(grid.def.field[fieldName].allow.update){
+                                depot.rowPendingForUpdate[fieldName] = value;
+                            }
+                            depot.row[fieldName] = value;
                         }
-                        depot.row[fieldName] = value;
                     }
                 }
                 if(fieldName in depot.rowPendingForUpdate){
@@ -1875,20 +1877,24 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                         );
                         if(whenMergeOverride){
                             depot.row[fieldName] = retrievedRow[fieldName];
-                            depot.rowControls[fieldName].setTypedValue(retrievedRow[fieldName]);
+                            if(depot.rowControls[fieldName]){
+                                depot.rowControls[fieldName].setTypedValue(retrievedRow[fieldName]);
+                            }
                             delete depot.rowPendingForUpdate[fieldName];
                         }
                     }
                 }else{
                     if(!sameValue(retrievedRow[fieldName], depot.row[fieldName])){
-                        changeIoStatus(depot,'background-change', fieldName);
                         depot.row[fieldName] = retrievedRow[fieldName];
-                        depot.rowControls[fieldName].setTypedValue(retrievedRow[fieldName]);
-                        /*jshint loopfunc: true */
-                        setTimeout(function(fieldName){
-                            changeIoStatus(depot,'ok', fieldName);
-                        },3000,fieldName);
-                        /*jshint loopfunc: false */
+                        if(depot.rowControls[fieldName]){
+                            changeIoStatus(depot,'background-change', fieldName);
+                            depot.rowControls[fieldName].setTypedValue(retrievedRow[fieldName]);
+                            /*jshint loopfunc: true */
+                            setTimeout(function(fieldName){
+                                changeIoStatus(depot,'ok', fieldName);
+                            },3000,fieldName);
+                            /*jshint loopfunc: false */
+                        }
                     }
                 }
             }
