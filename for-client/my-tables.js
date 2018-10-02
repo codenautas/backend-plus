@@ -1764,12 +1764,14 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             objectWithFieldsOrListOfFieldNames instanceof Array?objectWithFieldsOrListOfFieldNames:Object.keys(objectWithFieldsOrListOfFieldNames)
         );
         fieldNames.forEach(function(name){ 
-            var td=depot.rowControls[name];
-            td.setAttribute('io-status', newStatus); 
-            if(title){
-                td.title=title;
-            }else{
-                td.title='';
+            if(depot.rowControls[name]){
+                var td=depot.rowControls[name];
+                td.setAttribute('io-status', newStatus); 
+                if(title){
+                    td.title=title;
+                }else{
+                    td.title='';
+                }
             }
         });
     };
