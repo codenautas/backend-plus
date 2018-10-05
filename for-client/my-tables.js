@@ -221,7 +221,7 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
     });
     if(my.ldb){
         structureFromBackend.then(function(tableDef){
-            var promiseChain=my.ldb.registerStructure(tableDef);
+            var promiseChain=my.ldb.registerStructure(changing(tableDef, connector.opts.tableDef||{}));
             if(!connector.localDef || JSON.stringify(tableDef)!=JSON.stringify(connector.localDef)){
                 //alertPromise('la tabla '+connector.tableName+' cambió de estructura. Debe Refrescar la página')
             }
@@ -1700,7 +1700,9 @@ myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElem
             value=fieldDef.defaultValue;
         }
         if('specialDefaultValue' in fieldDef){
-            value=my.specialDefaultValue[fieldDef.specialDefaultValue](fieldDef.name, depot);
+            //********************* REVISAR PORQUE ESTABA LA LÍNEA COMENTADA*************
+            //value=my.specialDefaultValue[fieldDef.specialDefaultValue](fieldDef.name, depot);
+            value=my.specialDefaultValue[fieldDef.specialDefaultValue](fieldDef.name, aboveDepot);
         }
         if(value!==null){
             depotForInsert.row[fieldDef.name] = value;
@@ -1764,12 +1766,14 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             objectWithFieldsOrListOfFieldNames instanceof Array?objectWithFieldsOrListOfFieldNames:Object.keys(objectWithFieldsOrListOfFieldNames)
         );
         fieldNames.forEach(function(name){ 
-            var td=depot.rowControls[name];
-            td.setAttribute('io-status', newStatus); 
-            if(title){
-                td.title=title;
-            }else{
-                td.title='';
+            if(depot.rowControls[name]){
+                var td=depot.rowControls[name];
+                td.setAttribute('io-status', newStatus); 
+                if(title){
+                    td.title=title;
+                }else{
+                    td.title='';
+                }
             }
         });
     };
