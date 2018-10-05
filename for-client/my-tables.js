@@ -2052,6 +2052,9 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         }
         if(grid.view.sortColumns.length>0){
             depotsToDisplay.sort(function(depot1, depot2){ 
+                grid.view.sortColumns.forEach(function(orderColumn){
+                    orderColumn.func=myOwn.sortMethods[grid.def.field[orderColumn.column].sortMethod||'default'];
+                })
                 return bestGlobals.compareForOrder(grid.view.sortColumns)(depot1.row, depot2.row);
             });
         }
@@ -2440,3 +2443,8 @@ myOwn.TableGrid.prototype.captureKeys = function captureKeys() {
 };
 
 myOwn.validators={}
+
+myOwn.sortMethods={
+    'charbychar':bestGlobals.forOrder.Native,
+    'default':bestGlobals.forOrder,
+}
