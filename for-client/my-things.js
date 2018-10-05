@@ -543,6 +543,15 @@ myOwn.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
                     progress=false;
                 }else{
                     var info=JSON.parse(line);
+                    if(info.error){
+                        var err = new Error(info.error.message);
+                        likeAr(info.error).forEach(function(value, name){
+                            if(name!='message'){
+                                err[name]=value;
+                            }
+                        })
+                        throw err;
+                    }
                     informProgress(info.progress);
                 }
             }else{
