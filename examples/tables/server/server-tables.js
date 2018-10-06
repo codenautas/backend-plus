@@ -64,7 +64,7 @@ class AppExample extends backendPlus.AppBackend{
             title: periodic table
           logo: 
             path: client/img        
-        `)
+        `);
     }
     get rootPath(){ return Path.resolve(__dirname,'..'); }
     addLoggedServices(){
