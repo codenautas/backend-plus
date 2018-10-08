@@ -654,8 +654,11 @@ myOwn.ActionColumnGrid.prototype.td = function td(depot){
     var thActions=html.th({class:['grid-th','grid-th-actions']}).create();
     thActions.rowSpan = 1 + this.grid.def.layout.extraRows;
     var actionNamesList = ['insert','delete','vertical-edit'].concat(grid.def.actionNamesList);
-    if(!grid.def.forInsertOnlyMode){
-        actionNamesList.forEach(function(actionName){
+        if(!grid.def.forInsertOnlyMode || grid.def.actionNamesListForInsertOnlyMode){
+            if(grid.def.forInsertOnlyMode && grid.def.actionNamesListForInsertOnlyMode){
+                actionNamesList = grid.def.actionNamesListForInsertOnlyMode;
+            }
+            actionNamesList.forEach(function(actionName){
             var actionDef = my.tableAction[actionName];
             if(grid.def.allow[actionName]){
                 var buttonAction=html.button({class:'table-button', "skip-enter":true}, [
