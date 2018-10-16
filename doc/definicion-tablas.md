@@ -55,6 +55,7 @@ filterColumns     | [O]  | `[]`                  | lista de objetos de la forma 
 registerImports   | [O]  | (registerImportsDef)  | lista de objetos. Configura opciones para guardar la definicion de los "otros" campos al importar un archivo (*para que funcione **debe existir un campo seteado como "defaultForOtherFields"** (ver fieldDef)*)
 sortColumns       | [O]  | `[]`                  | ordenamiento predeterminado
 detailTables      | [O]  | `[]`                  | lista de tablas que permitirán desplegar subgrillas (estilo maestro/detalle)
+functionDef       | O    | `null`                | definición de SQL paramétrico o funcional 
 
 ejemplos lista       | formato elemento
 ---------------------|--------------------------------------
@@ -101,6 +102,7 @@ filterColumns     | [O]  | `[]`                  | (see Spanish)
 registerImports   | [O]  | (registerImportsDef)  | Object list. It is uset to configure how "others" fields are stored when any person imports a file (*it works* **__only if you set to true one field with "defaultForOtherFields"__** *(see fieldDef)*)
 sortColumns       | [O]  | `[]`                  | default order
 detailTables      | [O]  | `[]`                  | master/detail subgrids based in other tables
+functionDef       | O    | `null`                | functional SQL or parametric definition
 
 list examples    | element format
 -----------------|--------------------------------------
@@ -233,6 +235,27 @@ lastUpload          | T    | null            | Timestamp of last import (can be 
 
 
 Null fields can be undefined in "registerImports.inTable". Not Null fields are required and must respect restrictions. If you don't define optatives properties (Which can be null), information not will be registered although you defines them in "registerImporst.inTable".
+
+[!--lang:*-->
+
+## functionDef
+
+<!--lang:es-->
+
+Llamamos SQL paramétrico cuando la propiedad `from` está definidia tiene parámetros `$1`, `$2`, etc.
+Y Llamamos que la tabla es funcional cuando el `tableName` es el nombre de una función que devuelve un `recordset`.
+
+propiedad  | tipo               | uso
+-----------|--------------------|-----
+parameters | [{name, typeName}] | 
+
+
+<!--lang:en--]
+
+property   | type               | usage
+-----------|--------------------|-----
+parameters | [{name, typeName}] | 
+
 
 [!--lang:*-->
 

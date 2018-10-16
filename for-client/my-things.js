@@ -1100,6 +1100,77 @@ myOwn.prepareRulerToggle = function prepareRulerToggle(){
     }
 }
 
+/*
+        var proced = function proced(){
+            button.disabled=true;
+            divResult.innerHTML="";
+            divProgress.innerHTML="";
+            divProgressOutside.style.opacity=0.77;
+            labelProgress.textContent='procesando';
+            mainAction(params,divResult,divProgress).then(function(resultOk){
+                button.disabled=false;
+                divProgressOutside.style.opacity=0.33;
+                toggleProgress.disabled=false;
+                labelProgress.textContent=resultOk?my.messages.completed:'error';
+            })
+        }
+        button.onclick=function(){
+            proced();
+        }
+
+        buttonConfirmImport.addEventListener('click', function(){
+            var files = buttonFile.files;
+            buttonConfirmImport.value=my.messages.loading+'...';
+            buttonConfirmImport.disabled=true;
+            var eButton=function(result){
+                buttonConfirmImport.disabled=false;
+                if(result instanceof Error){
+                    throw result;
+                }
+                return result;
+            }
+            bestGlobals.sleep(100).then(function(){
+                return my.ajax[ajaxPath[0]][ajaxPath[1]](changing(ajaxParams, {
+                    files:files
+                }),{uploading:uploadingProgress, informProgress:informProgress}).then(eButton,eButton);
+            }).then(ajaxPrepareResultFun).then(this.dialogPromiseDone,this.dialogPromiseDone);
+        });
+
+*/
+
+myOwn.createSmartButton = function createSmartButton(opts){
+    var button=opts.button || html.button(opts.buttonProperties||{}, opts.buttonContent||opts.buttonLabel).create();
+    Object.defineProperty(button, 'smartState', {
+        get:function(){ return this.getAttribute('smart-button'); },
+        set:function(value){ 
+            this.disabled=value!='active';
+            this.setAttribute('smart-button',value); 
+        }
+    })
+    button.smartState=opts.initialState||'unkown';
+    button.onclick=function(){
+        this.smartState='working';
+        opts.mainFun().then(function(result){
+            this.smartState='unknown';
+            (opts.okFun(result)||function(result){
+                this.smartState='active';
+                return alertPromise(result,{reject:false});
+            })(result);
+        },function(err){
+            this.smartState='error';
+            (opts.errorFun(err)||function(err){
+                this.smartState='active';
+                return alertPromise(err.message,{reject:false});
+            })(err);
+        })
+    };
+    if(opts.insideElement){
+        opts.insideElement.appendChild(button);
+    }
+    return button;
+};
+
+
 return myOwn;
 
 });

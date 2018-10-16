@@ -180,6 +180,7 @@ myOwn.UriSearchToObjectParams={
 	ff               :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return JSON.parse(x)}  },
 	up               :{                   encode:function(x){ return json4all.stringify(x); }, decode:function(x){ return json4all.parse(x)}  },
 	pf               :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return JSON.parse(x)}  },
+	today            :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return bestGlobals.date.iso((x+'').substr(0,10))}  },
 	section          :{ showInMenu:true , encode:noChange                                , decode:noChange          },
 	directUrl        :{ hide:true       },
 	selectedByDefault:{ hide:true       },
@@ -187,6 +188,13 @@ myOwn.UriSearchToObjectParams={
     parents          :{ hide:true       },
     button           :{ hide:true       },
     fixedFields      :{ varName:'ff'    , encode:function(pairs){ return JSON.stringify(likeAr.toPlainObject(pairs, 'fieldName')); }}
+}
+
+myOwn.preDisplayPage = function preDisplayPage(addrParams, wScreen){
+    var my = this;
+    var pageTitle = wScreen.pageTitle || addrParams.pageTitle || addrParams.title || addrParams.name || my.config.config.title;
+    document.title = pageTitle;
+
 }
 
 myOwn.showPage = function showPage(pageDef){
@@ -234,8 +242,7 @@ myOwn.showPage = function showPage(pageDef){
                 mainFunction:function(){}
             }
         }
-        var pageTitle = wScreen.pageTitle || addrParams.pageTitle || addrParams.title || addrParams.name || my.config.config.title;
-        document.title = pageTitle;
+        my.preDisplayPage(addrParams, wScreen);
         wScreen.mainFunction.call(my, addrParams);
         var rightMenu = document.getElementById('right-menu-icon');
     }else{
