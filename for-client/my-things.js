@@ -1149,17 +1149,18 @@ myOwn.createSmartButton = function createSmartButton(opts){
     })
     button.smartState=opts.initialState||'unkown';
     button.onclick=function(){
-        this.smartState='working';
+        var button=this;
+        button.smartState='working';
         opts.mainFun().then(function(result){
-            this.smartState='unknown';
-            (opts.okFun(result)||function(result){
-                this.smartState='active';
+            button.smartState='unknown';
+            (opts.okFun||function(result){
+                button.smartState='active';
                 return alertPromise(result,{reject:false});
             })(result);
         },function(err){
-            this.smartState='error';
-            (opts.errorFun(err)||function(err){
-                this.smartState='active';
+            button.smartState='error';
+            (opts.errorFun||function(err){
+                button.smartState='active';
                 return alertPromise(err.message,{reject:false});
             })(err);
         })
