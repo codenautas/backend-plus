@@ -304,6 +304,7 @@ myOwn.TableConnector.prototype.deleteRecord = function deleteRecord(depot, opts)
             primaryKeyValues:depot.primaryKeyValues,
             launcher:opts.launcher
         }).then(function(){
+            depot._isDeleted=true;
             depot.tr.dispatchEvent(new CustomEvent('deletedRowOk'));
             var grid=depot.manager;
             grid.dom.main.dispatchEvent(new CustomEvent('deletedRowOk'));
@@ -424,6 +425,7 @@ myOwn.TableConnectorLocal.prototype.deleteRecord = function deleteRecord(depot, 
     return (depot.primaryKeyValues===false?
         Promise.resolve():
         db[depot.def.name].delete(depot.primaryKeyValues).then(function(){
+            depot._isDeleted=true;
             depot.tr.dispatchEvent(new CustomEvent('deletedRowOk'));
             var grid=depot.manager;
             grid.dom.main.dispatchEvent(new CustomEvent('deletedRowOk'));
