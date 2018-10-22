@@ -840,23 +840,47 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
                 if(grid.modes.saveByField){
                     saveRow(depot,{visiblyLogErrors:false});
                 }
+                var promiseArray = [];
                 if(fieldDef.references){
-                    var reference = my.getReference(fieldDef.references);
-                    reference.dataReady.then(function(rows){
-                        var referencedValue;
-                        grid.def.fields.forEach(function(field){
-                            if(field.referencedAlias && field.referencedAlias==fieldDef.references){
-                                referencedValue=rows.find(function(row){
-                                    return depot.row[fieldDef.name]==row[fieldDef.name];
-                                })||{};
-                                var lookupValue=coalesce(referencedValue[field.referencedName],null);
-                                depot.row[field.name]=lookupValue;
-                                depot.rowControls[field.name].setTypedValue(lookupValue);
-                            }
+                    //busco FKs que tengan referencien a la tabla, que tengan como source a fieldDef y tengan displayFields
+                    grid.def.foreignKeys.filter(function(fkDef){
+                        return fkDef.references == fieldDef.references && 
+                        fkDef.fields.find(function(field){
+                            return field.source == fieldDef.name
+                        }) &&
+                        fkDef.displayFields.length
+                    }).forEach(function(fkDef){
+                        var fixedFields = fkDef.fields.map(function(field){
+                            return {fieldName: field.target, value: depot.row[field.source]};
                         })
-                    })
+                        var dummyElement = html.div().create();
+                        var Connector = my.offline.mode?my.TableConnectorLocal:my.TableConnector;
+                        var myConnector = new Connector({
+                            my:my, 
+                            tableName: fieldDef.references,
+                            getElementToDisplayCount:function(){ return dummyElement }
+                        }, {fixedFields: fixedFields});
+                        myConnector.getStructure();
+                        //cargo registro y actualizo displayFields
+                        promiseArray.push(
+                            myConnector.getData().then(function(data){
+                                var referencedRow = data[0];
+                                fkDef.displayFields.forEach(function(displayFieldName){
+                                    var lookupValue=referencedRow[displayFieldName];
+                                    var fieldName = fkDef.alias + '__' + displayFieldName;
+                                    depot.row[fieldName]=lookupValue;
+                                    if(depot.rowControls[fieldName]){
+                                        depot.rowControls[fieldName].setTypedValue(lookupValue);
+                                    }
+                                })
+                                
+                            })
+                        )
+                    });
                 }
-                //grid.updateRowData(depot,true); // revisualiza aunque no haya grabado
+                Promise.all(promiseArray).then(function(){
+                    grid.updateRowData(depot,true);
+                });
             }
         });
     }
