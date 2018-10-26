@@ -866,7 +866,7 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
                             myConnector.getData().then(function(data){
                                 var referencedRow = data[0];
                                 fkDef.displayFields.forEach(function(displayFieldName){
-                                    var lookupValue=referencedRow[displayFieldName];
+                                    var lookupValue=referencedRow?referencedRow[displayFieldName]:null;
                                     var fieldName = fkDef.alias + '__' + displayFieldName;
                                     depot.row[fieldName]=lookupValue;
                                     if(depot.rowControls[fieldName]){
