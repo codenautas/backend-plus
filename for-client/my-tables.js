@@ -491,9 +491,9 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
 
 myOwn.TableGrid.prototype.hideColumnsViaCss = function hideColumnsViaCss(){
     var grid = this;
-    var autoStyle = my.inlineCss('bp-hidden-columns-'+grid.def.name);
+    var autoStyle = my.inlineCss('bp-hidden-columns-'+(grid.def.gridAlias || grid.def.name));
     autoStyle.innerHTML = grid.view.hiddenColumns.map(function(columnName){
-        return "[my-table|='"+grid.def.name+"'] [my-colname='"+columnName+"'] {display:none}";
+        return "[my-table|='"+(grid.def.gridAlias || grid.def.name)+"'] [my-colname='"+columnName+"'] {display:none}";
     }).join('\n');
 }
 
@@ -1645,7 +1645,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     createInfoColumnStructure(grid.dom.headInfo);
     grid.dom.footInfo = html.th({colspan:grid.columns.length, "is-processing":"1"}).create();
     createInfoColumnStructure(grid.dom.footInfo);
-    grid.actualName = grid.def.name + (grid.connector.fixedFields.length ? '-' + JSON4all.stringify(grid.connector.fixedFields.map(function(pair){ return pair.value; })) : '')
+    grid.actualName = (grid.def.gridAlias || grid.def.name) + (grid.connector.fixedFields.length ? '-' + JSON4all.stringify(grid.connector.fixedFields.map(function(pair){ return pair.value; })) : '')
     grid.dom.caption=html.caption({class: 'grid-caption'}, grid.def.title).create();
     if(grid.vertical){
         grid.dom.table = html.table({"class":"my-grid", "my-table": grid.actualName},[
