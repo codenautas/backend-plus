@@ -21,6 +21,10 @@
     {
       "name": "Emilio Platzer",
       "email": "emilioplatzer@gmail.com"
+    },
+    {
+      "name": "Manuel De la Penna",
+      "email": "manueldelapenna@gmail.com"
     }
   ],
   "dependencies": {

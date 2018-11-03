@@ -27,7 +27,7 @@ describe("interactive ",function(){
         await client.executeSqlScript('test/fixtures/dump-4test.sql');
         // console.log('base abierta y limpia');
         await server.start();
-        browser = await puppeteer.launch(process.env.TRAVIS?null:{headless: process.env.TRAVIS || !config.test["view-chrome"], slowMo: 50});
+        browser = await puppeteer.launch(process.env.TRAVIS?{}:{headless: process.env.TRAVIS || !config.test["view-chrome"], slowMo: 50});
         page = await browser.newPage();
         page.on('console', msg => { 
             console.log('console.'+msg.type(), msg.text()) 
