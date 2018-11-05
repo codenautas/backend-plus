@@ -143,7 +143,8 @@ typeName              | T    |                | tipo
 title                 | T    | `name`         | título para la grilla cuando no se quiere el name
 inTable               | L    | true           | si pertenece físicamente a la tabla y por lo tanto entra en el dump.
 sequence              | [O]  | (sequenceDef)  | determina si el campo tendria un valor auto-incremental
-defaultValue          | T    | por defecto no hay valor por defecto | Valor por defecto
+defaultValue          | T    |                | Valor predeterminado
+defaultDbValue        | T    |                | Expresión del valor predeterminado a nivel de la base de datos, no se ve en las tablas
 defaultForOtherFields | B    | false          | establece si el campo (que debe definirse como "text") se utiliza para guardar un JSON con los "otros" campos cuando se importa un archivo (*para que funcione **debe configurarse "registerImports"** (ver tableDef)*)
 
 <!--lang:en--]
@@ -156,6 +157,8 @@ typeName              | T    |               | data type
 title                 | T    | `name`        | title in the grid if you don't want to use name property default value
 inTable               | L    | true          | determine if field belongs physically to the table and the dump.
 sequence              | [O]  | (sequenceDef) | determine if field will have auto-incremental value.
+defaultValue          | T    |               | default value
+defaultDbValue        | T    |               | db level default value expression
 defaultForOtherFields | B    | false         | determines if field (must to be defined as "text") is used to save a JSON with other fields when any person imports a file (*it works* **__only if you configures "registerImports"__** *(see tableDef)*)
 
 [!--lang:*-->

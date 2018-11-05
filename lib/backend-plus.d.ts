@@ -92,7 +92,8 @@ export interface TableContext extends Context{
     superuser?:true
     forDump?:boolean
 }
-export type PgKnownTypes='decimal'|'text'|'boolean'|'integer'|'bigint'|'date'|'interval';
+export type PgKnownTypes='decimal'|'text'|'boolean'|'integer'|'bigint'|'date'|'interval'|'timestamp';
+export type PgKnownDbValues='current_timestamp'|'current_user'|'session_user';
 export type FieldDefinition = EditableDbDefinition & {
     name:string
     typeName:PgKnownTypes
@@ -100,6 +101,7 @@ export type FieldDefinition = EditableDbDefinition & {
     title?:string
     nullable?:boolean
     defaultValue?:any
+    defaultDbValue?:PgKnownDbValues
     clientSide?:string
     isName?:boolean
     isPk?:number  /* internal: pos in the primaryKey array */
@@ -164,18 +166,24 @@ export type StartOptions={
     readConfig?:{whenNotExist:'ignore'}, 
     testing?:true
 }
+export type TableDefinitionsGetters = {
+    [key:string]: (context:TableContext) => TableDefinition
+}
 export class AppBackend{
     procedures:ProcedureDef[]
     procedure:{ [key:string]:ProcedureDef }
     app:ExpressPlus
+    getTableDefinition: TableDefinitionsGetters
     tableStructures: TableDefinitions
     db:typeof pg
     config: any
     start(opts?: StartOptions):Promise<void>
     getTables():TableItemDef[]
+    prepareGetTables():void
+    appendToTableDefinition(tableName:string, appenderFunction:(tableDef:TableDefinition, context?:TableContext)=>void):void
     getContext(req:Request):Context
     postConfig(...params: any[]):any
-    clientIncludes(req:Request, hideBEPlusInclusions?:boolean):ClientModuleDefinition[]
+    clientIncludes(req:Request|null, hideBEPlusInclusions?:boolean):ClientModuleDefinition[]
     addSchrödingerServices(mainApp:ExpressPlus, baseUrl:string):void
     addLoggedServices():void
     getProcedures():Promise<ProcedureDef[]>
