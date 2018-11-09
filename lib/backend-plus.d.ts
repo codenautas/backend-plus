@@ -92,7 +92,7 @@ export interface TableContext extends Context{
     superuser?:true
     forDump?:boolean
 }
-export type PgKnownTypes='decimal'|'text'|'boolean'|'integer'|'bigint'|'date'|'interval'|'timestamp';
+export type PgKnownTypes='decimal'|'text'|'boolean'|'integer'|'bigint'|'date'|'interval'|'timestamp'|'jsonb';
 export type PgKnownDbValues='current_timestamp'|'current_user'|'session_user';
 export type FieldDefinition = EditableDbDefinition & {
     name:string
