@@ -185,6 +185,7 @@ export class AppBackend{
     postConfig(...params: any[]):any
     clientIncludes(req:Request|null, hideBEPlusInclusions?:boolean):ClientModuleDefinition[]
     addSchrödingerServices(mainApp:ExpressPlus, baseUrl:string):void
+    addUnloggedServices(mainApp:ExpressPlus, baseUrl:string):void
     addLoggedServices():void
     getProcedures():Promise<ProcedureDef[]>
     getMenu(context?:Context):MenuDefinition
