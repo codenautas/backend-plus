@@ -1481,6 +1481,17 @@ myOwn.TableAggregates.sum.prototype = Object.create(myOwn.TableAggregates.avg.pr
 myOwn.TableAggregates.avg.prototype.result=function result(){
     return this.sum;
 }
+myOwn.TableAggregates.count=function(){
+    this.n=0;
+};
+myOwn.TableAggregates.count.prototype.acum=function acum(value){
+    if(value!=null){
+        this.n++;
+    }
+}
+myOwn.TableAggregates.count.prototype.result=function result(){
+    return this.n;
+}
 
 myOwn.TableGrid.prototype.refreshAggregates = function refreshAggregates(){
     var grid = this;
@@ -1911,7 +1922,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                         if(whenMergeOverride){
                             depot.row[fieldName] = retrievedRow[fieldName];
                             if(depot.rowControls[fieldName]){
-                                depot.rowControls[fieldName].setTypedValue(retrievedRow[fieldName]);
+                                //**VERIFICAR**//  depot.rowControls[fieldName].setTypedValue(retrievedRow[fieldName]);
                             }
                             delete depot.rowPendingForUpdate[fieldName];
                         }
@@ -1921,7 +1932,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                         depot.row[fieldName] = retrievedRow[fieldName];
                         if(depot.rowControls[fieldName]){
                             changeIoStatus(depot,'background-change', fieldName);
-                            depot.rowControls[fieldName].setTypedValue(retrievedRow[fieldName]);
+                            //**VERIFICAR**// */ depot.rowControls[fieldName].setTypedValue(retrievedRow[fieldName]);
                             /*jshint loopfunc: true */
                             setTimeout(function(fieldName){
                                 changeIoStatus(depot,'ok', fieldName);
