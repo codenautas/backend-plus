@@ -1426,7 +1426,12 @@ myOwn.dialogUpload = function dialogUpload(ajaxPath, ajaxParams, ajaxPrepareResu
                 return result;
             }
             bestGlobals.sleep(100).then(function(){
-                return my.ajax[ajaxPath[0]][ajaxPath[1]](changing(ajaxParams, {
+                var fun=typeof ajaxPath=="string"?my.ajax[ajaxPath]:(
+                    ajaxPath.reduce(function(acum, name){
+                        return acum[name];
+                    },my.ajax)
+                );
+                return fun(changing(ajaxParams, {
                     files:files
                 }),{uploading:uploadingProgress, informProgress:informProgress}).then(eButton,eButton);
             }).then(ajaxPrepareResultFun).then(this.dialogPromiseDone,this.dialogPromiseDone);

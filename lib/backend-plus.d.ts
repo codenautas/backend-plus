@@ -94,6 +94,12 @@ export interface TableContext extends Context{
 }
 export type PgKnownTypes='decimal'|'text'|'boolean'|'integer'|'bigint'|'date'|'interval'|'timestamp'|'jsonb';
 export type PgKnownDbValues='current_timestamp'|'current_user'|'session_user';
+export type SequenceDefinition = {
+    name:string
+    firstValue:number
+    prefix:string /* Prefix for the generated value */
+}
+export type ExportMetadataDefinition={ /* TODO: define */ }
 export type FieldDefinition = EditableDbDefinition & {
     name:string
     typeName:PgKnownTypes
@@ -102,9 +108,26 @@ export type FieldDefinition = EditableDbDefinition & {
     nullable?:boolean
     defaultValue?:any
     defaultDbValue?:PgKnownDbValues
-    clientSide?:string
+    clientSide?:string         /* keyof: myOwn.clientSides */
     isName?:boolean
-    isPk?:number  /* internal: pos in the primaryKey array */
+    isPk?:number               /* internal: pos in the primaryKey array */
+    serverSide?:boolean        /* default:!clientSide if the value is retrived from the database */
+    inTable?:boolean           /* default:!clientSide && !sql.fields[...].expr. Is a real fisical field in the table */
+    /* sizeByte?:number  deprecated size in bytes for numbers */
+    allowEmtpyText?:boolean    /* if a text field accepts '' as a valid value */
+    sequence?:SequenceDefinition
+    mobileInputType?:string     
+    extraRow?:number
+    inexactNumber?:number      /* default:depends on typeName  if = means abs(x-v)<espilon
+    /* ------------ For client: -------------- */
+    visible?:boolean
+    width?:number              /* Width in pixels for the grid */
+    references?:string         /* table name */ 
+    referencesField?:string  
+    aggregate?:string          /* keyof myOwn.TableAggregates */
+    specialDefaultValue?:string /* keyof myOwn.specialDefaultValues
+    defaultForOtherFields?:boolean   /* the field that stores the "other fields" of a flexible imported table */
+    exportMetadata?:ExportMetadataDefinition 
 }
 export type EditableDbDefinition = {
     editable?:boolean
@@ -119,7 +142,16 @@ export type EditableDbDefinition = {
     }
 }
 export type FieldsForConnect = (string | {source:string, target:string})[]
-export type ForeignKey = {references:string, fields:FieldsForConnect, onDelete?: string, displayAllFields?: boolean, alias?:string, displayFields?:string[]}
+export type ForeignKey = {
+    references:string, 
+    fields:FieldsForConnect, 
+    onDelete?: string, 
+    displayAllFields?: boolean, 
+    alias?:string, 
+    displayFields?:string[], 
+    consName?:string, 
+    initiallyDeferred?:boolean
+}
 export type Constraint = {constraintType:'check'|'unique'|'not null', expr?:string, fields?:string[], consName?:string}
 export type TableDefinition = EditableDbDefinition & {
     name:string
