@@ -82,6 +82,10 @@ export interface ClientModuleDefinition{
     src?:string  // full path where browser search file (path/file)
     path?:string // browser path where the file is
     file?:string // filename in browser and server
+    ts?:{
+        url:string
+        path:string
+    }
 }
 export type MenuInfo = MenuInfoMenu | MenuInfoTable | MenuInfoProc;
 // type MenuDefinition = {menu:Readonly<MenuInfoBase[]>}
@@ -97,7 +101,7 @@ export type PgKnownDbValues='current_timestamp'|'current_user'|'session_user';
 export type SequenceDefinition = {
     name:string
     firstValue:number
-    prefix:string /* Prefix for the generated value */
+    prefix?:string /* Prefix for the generated value */
 }
 export type ExportMetadataDefinition={ /* TODO: define */ }
 export type FieldDefinition = EditableDbDefinition & {
