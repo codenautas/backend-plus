@@ -1395,6 +1395,9 @@ myOwn.dialogUpload = function dialogUpload(ajaxPath, ajaxParams, ajaxPrepareResu
         var progressIndicator=html.div({class:'indicator'},' ').create();
         var progressBar=html.div({class:'progress-bar', style:'width:400px; height:8px;'},[progressIndicator]).create();
         var displayProgressBar = function displayProgressBar(progress, progressIndicator){
+            if(!progress){
+                return;
+            }
             if(progress.loaded){
                 if(progress.lengthComputable){
                     progressIndicator.style.width=progress.loaded*100/progress.total+'%';
