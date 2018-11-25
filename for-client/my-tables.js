@@ -2411,7 +2411,7 @@ myOwn.getReference = function getReference(referenceName, forceRefresh){
 
 myOwn.autoSetupFunctions.push(function autoSetupMyTables(){
     var my=this;
-    TypedControls.showLupa=false;
+    // TypedControls.showLupa=false;
     TypedControls.Expanders.unshift({
         whenType: function(typedControl){ 
             var typeInfo = typedControl.controledType.typeInfo;

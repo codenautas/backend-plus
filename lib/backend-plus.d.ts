@@ -36,7 +36,7 @@ export interface Context {
 }
 
 export interface ContextForDump extends Context {
-    forDump: boolean
+    forDump?:boolean
 }
 
 export type ProcedureContext=Context & {
@@ -193,7 +193,7 @@ export interface DetailTable { table: string, fields: FieldsForConnect, abr: str
 export type TableDefinitionFunction = (context: ContextForDump) => TableDefinition;
 export type TableItemDef=string|{name:string}&({tableGenerator:(context:TableContext)=>TableDefinition})
 export interface TableDefinitions {
-    [k: string]: TableDefinition | TableDefinitionFunction
+    [k: string]: TableDefinitionFunction
 }
 export type ClientSetup= {
     procedures:ProcedureDef[]
