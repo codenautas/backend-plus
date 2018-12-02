@@ -213,7 +213,7 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
     var connector = this;
     var my = connector.my;
     var structureFromLocal;
-    var structureFromBackend = my.ajax.table.structure({
+    var structureFromBackend = my.ajax.table_structure({
         table:connector.tableName,
     }).then(function(tableDef){
         connector.def = changing(tableDef, connector.opts.tableDef||{});
@@ -271,7 +271,7 @@ myOwn.TableConnector.prototype.getData = function getData(){
     if(((connector.opts||{}).tableDef||{}).forInsertOnlyMode){
         return Promise.resolve([]);
     }
-    return connector.my.ajax.table.data({
+    return connector.my.ajax.table_data({
         table:connector.tableName,
         fixedFields:connector.fixedFields,
         paramfun:connector.parameterFunctions||{}
@@ -299,7 +299,7 @@ myOwn.TableConnector.prototype.getData = function getData(){
 myOwn.TableConnector.prototype.deleteRecord = function deleteRecord(depot, opts){
     return (depot.primaryKeyValues===false?
         Promise.resolve():
-        depot.my.ajax.table['delete-record']({
+        depot.my.ajax.table_record_delete({
             table:depot.def.name, 
             primaryKeyValues:depot.primaryKeyValues,
             launcher:opts.launcher
@@ -318,7 +318,7 @@ myOwn.cloneRow = function cloneRow(row){
 
 myOwn.TableConnector.prototype.saveRecord = function saveRecord(depot, opts){
     var sendedForUpdate = depot.my.cloneRow(depot.rowPendingForUpdate);
-    return depot.my.ajax.table['save-record']({
+    return depot.my.ajax.table_record_save({
         table: depot.def.name,
         primaryKeyValues: depot.primaryKeyValues,
         newRow: depot.rowPendingForUpdate,
@@ -331,19 +331,19 @@ myOwn.TableConnector.prototype.saveRecord = function saveRecord(depot, opts){
     });
 };
 
-myOwn.TableConnector.prototype.enterRecord = function enterRecord(depot){
+myOwn.TableConnector.prototype.recordEnter = function recordEnter(depot){
     return (!this.my.config.cursor || depot.primaryKeyValues===false?
         Promise.resolve():
-        depot.my.ajax.table['enter-record']({
+        depot.my.ajax.table_record_enter({
             table:depot.def.name, 
             primaryKeyValues:depot.primaryKeyValues
         })
     );
 };
-myOwn.TableConnector.prototype.deleteEnter = function enterRecord(depot){
+myOwn.TableConnector.prototype.recordLeave = function recordLeave(depot){
     return (!this.my.config.cursor || depot.primaryKeyValues===false?
         Promise.resolve():
-        depot.my.ajax.table['delete-enter']({
+        depot.my.ajax.table_record_leave({
             table:depot.def.name, 
             primaryKeyValues:depot.primaryKeyValues
         })
@@ -442,10 +442,10 @@ myOwn.TableConnectorLocal.prototype.saveRecord = function saveRecord(depot, opts
     });
 };
 
-myOwn.TableConnectorLocal.prototype.enterRecord = function enterRecord(depot){
+myOwn.TableConnectorLocal.prototype.recordEnter = function recordEnter(depot){
     return Promise.resolve();
 };
-myOwn.TableConnectorLocal.prototype.deleteEnter = function enterRecord(depot){
+myOwn.TableConnectorLocal.prototype.recordLeave = function recordLeave(depot){
     return Promise.resolve();
 };
 
@@ -1190,7 +1190,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                 )
             ).replace('{$x}',grid.depotsToDisplay.length).replace('{$t}',grid.depots.length)
             ).then(function(){
-                return my.ajax.table['delete-many-records']({
+                return my.ajax.table_records_delete({
                     table:grid.def.name,
                     rowsToDelete:grid.depotsToDisplay.map(function(depot){
                         return depot.row;
@@ -1857,7 +1857,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
     };
     grid.retrieveRowAndRefresh = function retrieveRowAndRefresh(depot){
         // var sendedForUpdate = depot.my.cloneRow(depot.rowPendingForUpdate);
-        return my.ajax.table.data({
+        return my.ajax.table_data({
             table:depot.def.name,
             fixedFields:grid.def.primaryKey.map(function(fieldName, i){ 
                 return {fieldName:fieldName, value:depot.primaryKeyValues[i]};
@@ -1988,7 +1988,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         if(!grid.vertical){ 
             tr.addEventListener('focusout', function(event){
                 if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
-                    depot.connector.deleteEnter(depot).then(function(result){
+                    depot.connector.recordLeave(depot).then(function(result){
                     });
                     if(Object.keys(depot.rowPendingForUpdate).length){
                         saveRow(depot);
@@ -1997,7 +1997,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             });
             tr.addEventListener('focusin',function(event){
                 if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
-                    return depot.connector.enterRecord(depot).then(function(result){
+                    return depot.connector.recordEnter(depot).then(function(result){
                     });
                 }
             });
@@ -2298,7 +2298,7 @@ myOwn.clientSides={
                     td.setAttribute('io-status','updating');
                     depot.row[fieldName] = newPass;
                     var my=depot.manager.my;
-                    my.ajax.admin.chpass({
+                    my.ajax.admin_chpass({
                         user:depot.row[depot.manager.def.primaryKey[depot.manager.def.primaryKey.length-1]],
                         newpass:newPass
                     }).then(function(){
@@ -2326,7 +2326,7 @@ myOwn.clientSides={
                     var token = localStorage.getItem('token');
                     if(!token){
                         tokenPromise = tokenPromise.then(function(){
-                            return my.ajax.token.get({
+                            return my.ajax.token_get({
                                 useragent:my.config.useragent,
                                 username: my.config.username
                             }).then(function(result){
@@ -2337,7 +2337,7 @@ myOwn.clientSides={
                     }
                     tokenPromise = tokenPromise.then(function(){
                         var promiseArray = [];
-                        my.ajax.table["lock-record"]({
+                        my.ajax.table_record_lock({
                             table:depot.def.name,
                             primaryKeyValues:depot.primaryKeyValues,
                             token:token

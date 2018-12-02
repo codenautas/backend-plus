@@ -71,7 +71,7 @@ Integrating example:
                 {menuType:'table', name:'ptable'  , label:'elements'},
                 {menuType:'table', name:'pgroups' , label:'groups'  },
                 {menuType:'table', name:'isotopes', label:'isotopes'},
-                {menuType:'proc' , name:'count/without-isotopes', label:'count'}
+                {menuType:'proc' , name:'count_without_isotopes', label:'count'}
             ]},
             {menuType:'table', name:'images', table:'element_images'},
             {menuType:'menu', name:'test', menuContent:[
@@ -126,7 +126,7 @@ Process definition example:
 
 ```js
     {
-        action:'count/without-isotopes',
+        action:'count_without_isotopes',
         bitacora:{
                    error:true,
                    always:true,

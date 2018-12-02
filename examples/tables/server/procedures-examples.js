@@ -18,7 +18,7 @@ ProceduresExamples = [
         }
     },
     {
-        action:'count/without-isotopes',
+        action:'count_without_isotopes',
         parameters:[
             {name:'first_atomic_number', defaultValue:10, typeName:'integer', references:'ptable'},
             {name:'last_atomic_number' , defaultValue:99, typeName:'integer', references:'ptable'},
@@ -37,7 +37,7 @@ ProceduresExamples = [
         }
     },
     {
-        action:'example/date',
+        action:'example_date',
         parameters:[
             {name:'date', typeName:'date'},
         ],
@@ -54,7 +54,7 @@ ProceduresExamples = [
         }
     },
     {
-        action:'bitacora/prueba',
+        action:'bitacora_prueba',
         parameters:[
             {name:'first_atomic_number', defaultValue:10, typeName:'integer', references:'ptable'},
             {name:'last_atomic_number' , defaultValue:99, typeName:'integer', references:'ptable'},
@@ -74,7 +74,7 @@ ProceduresExamples = [
         }
     },
     {
-        action:'bitacora/prueba-error',
+        action:'bitacora_prueba_error',
         parameters:[
             {name:'first_atomic_number', defaultValue:10, typeName:'integer', references:'ptable'},
             {name:'last_atomic_number' , defaultValue:99, typeName:'integer', references:'ptable'},

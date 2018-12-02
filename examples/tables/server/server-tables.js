@@ -84,26 +84,26 @@ class AppExample extends backendPlus.AppBackend{
     }
     getMenu(context){
         return {menu:[
-            {menuType:'menu', name:'periodic table', menuContent:[
+            {menuType:'menu', name:'periodic_table', menuContent:[
                 {menuType:'table', name:'ptable'  , label:'elements'},
                 {menuType:'table', name:'pgroups' , label:'groups'  },
                 {menuType:'table', name:'isotopes', label:'isotopes'},
                 {menuType:'table', name:'new_element', label:'new element'},
                 {menuType:'only_element', name:'only_element', label:'only element'},
                 {menuType:'table', name:'new_isotopes', label:'new isotopes'},
-                {menuType:'proc' , name:'count/without-isotopes', label:'count'},
+                {menuType:'proc' , name:'count_without_isotopes', label:'count'},
             ]},
             {menuType:'table', name:'images', table:'element_images'},
             {menuType:'menu', name:'test', menuContent:[
                 {menuType:'table', name:'bigint'},
-                {menuType:'proc', name:'example/date'},
+                {menuType:'proc', name:'example_date'},
 				{menuType:'table', table:'ptable', name:'ptable-actinide' , label:'actinide elements' , ff:{group:'Actinide' }},
 				{menuType:'table', table:'ptable', name:'ptable-metalloid', label:'metalloid elements', ff:{group:'Metalloid'}, showParams:["ff"], selectedByDefault:true, directUrl:true}
             ]},
             {menuType:'menu', name:'bitacora', menuContent:[
                 {menuType:'table', name:'bitacora'},
-                {menuType:'proc' , name:'bitacora/prueba', label:'prueba bitacora'},
-                {menuType:'proc' , name:'bitacora/prueba-error', label:'prueba bitacora c/error'}
+                {menuType:'proc' , name:'bitacora_prueba', label:'prueba bitacora'},
+                {menuType:'proc' , name:'bitacora_prueba_error', label:'prueba bitacora c/error'}
             ]},
             {menuType:'menu', name:'config', menuContent:[
                 {name:'users', menuType:'table'},

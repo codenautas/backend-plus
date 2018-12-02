@@ -83,7 +83,7 @@ myOwn.wScreens.procAux = {
                 params[parameterDef.name] = control.getTypedValue();
                 myOwn.replaceAddrParams(addrParams);
             });
-            return html.tr([ html.td(parameterDef.label||parameterDef.name),control]);
+            return html.tr([ html.td(parameterDef.label||parameterDef.name.replace(/_/g,' ')),control]);
         }).concat(
             html.tr([html.td(), html.td([button])])
         )).create());
@@ -275,7 +275,7 @@ myOwn.createForkeableButton = function createForkeableButton(menu, opts){
         opts = {label:opts};
     }
     var label=opts.label;
-    var button=html.a({"class": opts["class"]||menu["class"]||"menu-item", "menu-type":menu.menuType||menu.w, "menu-name":menu.name||'noname'}, label || menu.label || menu.name).create();
+    var button=html.a({"class": opts["class"]||menu["class"]||"menu-item", "menu-type":menu.menuType||menu.w, "menu-name":menu.name||'noname'}, label || menu.label || menu.name.replace(/_/g,' ')).create();
     button.setForkeableHref = function setForkeableHref(menu){
         var href;
         if(!menu.w && menu.menuType){

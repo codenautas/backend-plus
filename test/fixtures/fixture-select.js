@@ -1,12 +1,12 @@
 [{
-    action: 'table/data',
+    action: 'table_data',
     parameters: {table: 'employees', fixedFields:[]},
     expected: [
         {id_type: 'card',id: 123456,first_name: 'Bob' ,last_name: 'Smith',birth_date: null,salary: null },
         {id_type: "card",id: 654213,first_name: "Mary",last_name: "Gomez",birth_date: null,salary: null },
     ]
 },{
-    action: 'table/save-record',
+    action: 'table_record_save',
     parameters: {
         table: 'employees',
         primaryKeyValues: ['card',123456],
@@ -21,7 +21,7 @@
 },{
     skip: !true,
     name: 'update dates',
-    action: 'table/save-record',
+    action: 'table_record_save',
     parameters: {
         table: 'employees',
         primaryKeyValues: ['passport',123456],
@@ -42,7 +42,7 @@
     },
     expectedError: /algo/,
 },{
-    action: 'table/save-record',
+    action: 'table_record_save',
     parameters: {
         table: 'conjson',
         primaryKeyValues: [1, {uno:'dos', tres:'cuatro'}],
