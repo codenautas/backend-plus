@@ -215,6 +215,7 @@ myOwn.showPage = function showPage(pageDef){
         addrParams.i=[];
     }
     var totalLayout=document.getElementById('total-layout');
+    var rightMenu;
     if(totalLayout.getAttribute('menu-type')!='hidden'){
         var menu = my.displayMainMenu(addrParams);
         var w=addrParams.w;
@@ -244,9 +245,9 @@ myOwn.showPage = function showPage(pageDef){
         }
         my.preDisplayPage(addrParams, wScreen);
         wScreen.mainFunction.call(my, addrParams);
-        var rightMenu = document.getElementById('right-menu-icon');
+        rightMenu = document.getElementById('right-menu-icon');
     }else{
-        var rightMenu = html.span({id: "right-menu"}, [
+        rightMenu = html.span({id: "right-menu"}, [
             html.img({class: "right-menu", src: my.path.img+"three-dot-menu.png",id: "right-menu-icon"}),
         ]).create();
         rightMenu.style.position='fixed';
@@ -304,7 +305,7 @@ myOwn.createForkeableButton = function createForkeableButton(menu, opts){
 
 function encodeMinimalURIComponent(text){
     return (text+'')
-        .replace(/=/g, '%3D')
+        .replace(/\=/g, '%3D')
         .replace(/\?/g, '%3F')
         .replace(/\#/g, '%23')
         .replace(/&/g, '%26')
