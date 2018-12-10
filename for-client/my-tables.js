@@ -474,17 +474,30 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
     var my = this;
     var grid = new my.TableGrid({my: this}, mainElement);
     opts = opts || {};
+    grid.detailingForUrl=opts.detailingForUrl;
+    grid.detailingPath=opts.detailingPath;
     var Connector = my.offline.mode?my.TableConnectorLocal:my.TableConnector;
     grid.connector = new Connector({
         my:this, 
         tableName: tableName, 
         getElementToDisplayCount:function(){ return grid.dom.footInfo.displayTo; }
     }, opts);
-    var preparing = grid.prepareAndDisplayGrid();
+    var preparing = grid.prepareAndDisplayGrid().then(function(){
+        if(opts.detailing){
+            grid.depots.forEach(function(depot){
+                var goIntoDetail=opts.detailing["="+depot.lastsPrimaryKeyValues]||opts.detailing["*"];
+                if(goIntoDetail){
+                    likeAr(goIntoDetail).forEach(function(detailing, actionName){
+                        depot.detailControls[actionName].displayDetailGrid({detailing:detailing});
+                    })
+                }
+            })
+        }
+    });
     grid.waitForReady = function waitForReady(fun){
         return preparing.then(function(){
             return grid;
-        }).then(fun||function(){});
+        }).then(fun||function(){}).then(function(){ return grid; });
     };
     return grid;
 };
@@ -915,6 +928,18 @@ myOwn.DetailColumnGrid = function DetailColumnGrid(opts){
 myOwn.DetailColumnGrid.prototype = Object.create(myOwn.ColumnGrid.prototype);
 
 myOwn.DetailColumnGrid.prototype.th = function th(){
+    var grid = this.grid;
+    var detailTableDef = this.detailTableDef;
+    grid.detailNames = grid.detailNames || {};
+    var detailName = detailTableDef.table;
+    if(grid.detailNames[detailName]){
+        detailName = detailTableDef.table+' '+detailTableDef.abr;
+        if(grid.detailNames[detailName]){
+            detailName = likeAr(grid.detailNames[detailName]).array().length;
+        }
+    }
+    grid.detailNames[detailName]={};
+    this.detailName=detailName;
     var th=html.th({class:'grid-th-details', "my-defname":this.detailTableDef.table||this.detailTableDef.wScreen, title:this.detailTableDef.label},this.detailTableDef.abr);
     return th;
 };
@@ -922,7 +947,7 @@ myOwn.DetailColumnGrid.prototype.th = function th(){
 myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
     var grid = this.grid;
     var detailTableDef = this.detailTableDef;
-    var detailTableNameAndAbr = detailTableDef.table+' '+detailTableDef.abr;
+    var detailTableNameAndAbr = this.detailName;
     var detailControl = depot.detailControls[detailTableNameAndAbr] || { show:false };
     if(detailTableDef.condition){
         if(!my.conditions[detailTableDef.condition](depot)){
@@ -949,10 +974,21 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
         menuRef.fixedFields=fixedFields;
         this.setForkeableHref(menuRef);
     }
-    var buttononclick = function(event){
+    var buttonClick=function(event){
         var fixedFields = calculateFixedFields();
         menuRef.fixedFields=fixedFields;
         this.setForkeableHref(menuRef);
+        if(!event.ctrlKey && event.button!=1){
+            event.preventDefault();
+        }
+        detailControl.displayDetailGrid({fixedFields:fixedFields, detailing:{}},event);    
+    }
+    detailControl.displayDetailGrid = function(opts,event){
+        event=event||{};
+        if(!('fixedFields' in opts)){
+            opts.fixedFields = calculateFixedFields();
+        }
+        var fixedFields = opts.fixedFields;
         var spansForSmooth = [iColumn+1, 999];
         if(!detailControl.show && !event.ctrlKey && event.button!=1){
             detailControl.img.src=my.path.img+'detail-contract.png';
@@ -978,7 +1014,12 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
                     }
                     wScreen.mainAction(params,divGrid);
                 }else{
-                    grid.my.tableGrid(detailTableDef.table, divGrid, {fixedFields: fixedFields}).waitForReady(function(g){
+                    grid.my.tableGrid(detailTableDef.table, divGrid, {
+                        fixedFields: fixedFields, 
+                        detailing:opts.detailing, 
+                        detailingForUrl:grid.detailingForUrl,
+                        detailingPath:grid.detailingPath.concat(depot.lastsPrimaryKeyValues),
+                    }).waitForReady(function(g){
                         detailControl.divDetail=g.dom.table;
                         if(detailTableDef.refreshParent || grid.def.complexDef && detailTableDef.refreshParent!==false){
                             var refresh = function refresh(){
@@ -996,6 +1037,8 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
             newTr.detailTableNameAndAbr=detailTableNameAndAbr;
             newTr.isDetail=true;
             depot.detailRows.push(newTr);
+            // opts.detailing[depot.lastsPrimaryKeyValues]=opts.detailing[depot.lastsPrimaryKeyValues]||{};
+            // opts.detailing[depot.lastsPrimaryKeyValues][detailTableNameAndAbr]={};
         }else{
             detailControl.img.src=my.path.img+'detail-expand.png';
             detailControl.img.alt="[+]";
@@ -1006,12 +1049,12 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
             }
             detailControl.show = false;
             detailControl.tr = null;
+            // opts.detailing[depot.lastsPrimaryKeyValues]=opts.detailing[depot.lastsPrimaryKeyValues]||{};
+            // delete opts.detailing[depot.lastsPrimaryKeyValues][detailTableNameAndAbr];
         }
-        if(!event.ctrlKey && event.button!=1){
-            event.preventDefault();
-        }
+        console.log('details', opts.detailing, grid.detailingForUrl, grid.detailingPath)
     };
-    var button = my.createForkeableButton(menuRef,{label:detailControl.img, onclick:buttononclick, updateHrefBeforeClick:updateHrefBeforeClick, class:'table-button'});
+    var button = my.createForkeableButton(menuRef,{label:detailControl.img, onclick:buttonClick, updateHrefBeforeClick:updateHrefBeforeClick, class:'table-button'});
     button.setAttribute("skip-enter",true);
     // var button = html.button({class:'table-button', "skip-enter":true}, [detailControl.img]).create();
     var td = html.td({class:['grid-th','grid-th-details'], "my-relname":detailTableDef.table||detailTableDef.wScreen}, button).create();
@@ -1872,6 +1915,17 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             depot.primaryKeyValues = grid.def.primaryKey.map(function(fieldName){ 
                 return depot.row[fieldName]; 
             });
+            depot.lastsPrimaryKeyValues = depot.primaryKeyValues.slice(0);
+            var i=0;
+            while(i<grid.def.primaryKey.length && depot.connector.fixedField[grid.def.primaryKey[i]]){
+                depot.lastsPrimaryKeyValues.shift();
+                i++;
+            }
+            if(depot.lastsPrimaryKeyValues.length==1){
+                depot.lastsPrimaryKeyValues=depot.lastsPrimaryKeyValues[0];
+            }else{
+                depot.lastsPrimaryKeyValues=JSON.stringify(depot.lastsPrimaryKeyValues);
+            }
             depot.tr.setAttribute('pk-values',JSON.stringify(depot.primaryKeyValues));
             grid.def.layout.styleColumns.forEach(function(fieldName){ 
                 depot.tr.setAttribute('column-'+fieldName,JSON.stringify(depot.row[fieldName]));
@@ -2050,7 +2104,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             row: {},
             rowSymbols: {},
             isFilterPending:false,
-            tr: tr
+            tr: tr,
         };
         if(!grid.hasFilterRow){
             grid.hasFilterRow=[];

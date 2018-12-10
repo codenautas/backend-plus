@@ -49,9 +49,14 @@ myOwn.wScreens.table = function(addrParams){
 		if(addrParams.pf){
             opts.parameterFunctions=addrParams.pf;
 		}
+        if(addrParams.detailing){
+            opts.detailing=addrParams.detailing;
+        }
+        opts.detailingForUrl=opts.detailing||{};
+        opts.detailingPath = [];
         var pageTitle = addrParams.label || addrParams.name || addrParams.table || my.config.config.title;
         document.title = pageTitle;
-        my.tableGrid(addrParams.table||addrParams.name,layout, opts);
+        var grid = my.tableGrid(addrParams.table||addrParams.name,layout, opts);
     },10);
 }
 
@@ -187,7 +192,8 @@ myOwn.UriSearchToObjectParams={
 	showParams       :{ hide:true       },
     parents          :{ hide:true       },
     button           :{ hide:true       },
-    fixedFields      :{ varName:'ff'    , encode:function(pairs){ return JSON.stringify(likeAr.toPlainObject(pairs, 'fieldName')); }}
+    fixedFields      :{ varName:'ff'    , encode:function(pairs){ return JSON.stringify(likeAr.toPlainObject(pairs, 'fieldName')); }},
+	detailing        :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return JSON.parse(x)}  },
 }
 
 myOwn.preDisplayPage = function preDisplayPage(addrParams, wScreen){
