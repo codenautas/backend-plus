@@ -56,6 +56,7 @@ registerImports   | [O]  | (registerImportsDef)  | lista de objetos. Configura o
 sortColumns       | [O]  | `[]`                  | ordenamiento predeterminado
 detailTables      | [O]  | `[]`                  | lista de tablas que permitirán desplegar subgrillas (estilo maestro/detalle)
 functionDef       | O    | `null`                | definición de SQL paramétrico o funcional 
+lookupFields      | [T]  | `[f.isName]`          | lista de los nombres de campo que se muestran al desplegar la lista deplegable para elegir
 
 ejemplos lista       | formato elemento
 ---------------------|--------------------------------------
@@ -103,6 +104,7 @@ registerImports   | [O]  | (registerImportsDef)  | Object list. It is uset to co
 sortColumns       | [O]  | `[]`                  | default order
 detailTables      | [O]  | `[]`                  | master/detail subgrids based in other tables
 functionDef       | O    | `null`                | functional SQL or parametric definition
+lookupFields      | [T]  | `[f.isName]`          | lookup fieldnames
 
 list examples    | element format
 -----------------|--------------------------------------
@@ -160,6 +162,36 @@ sequence              | [O]  | (sequenceDef) | determine if field will have auto
 defaultValue          | T    |               | default value
 defaultDbValue        | T    |               | db level default value expression
 defaultForOtherFields | B    | false         | determines if field (must to be defined as "text") is used to save a JSON with other fields when any person imports a file (*it works* **__only if you configures "registerImports"__** *(see tableDef)*)
+
+[!--lang:*-->
+
+## foreignKey/softForeignKey
+
+<!--lang:es-->
+
+propiedad             | tipo | predeterminado | uso
+----------------------|------|----------------|-------------------
+references            | T    |                | nombre de la tabla
+fields                | [O]  |                | lista de nombres de campos para el join (o `{source:name, target:name}` si los nombres son distintos)
+alias                 | T    | `references`   | alias para el join, es necesario cuando hay dos `foreignKeys` que referencian a la misma tabla.
+displayFields         | [T]  | [`references.isName`] | lista de nombres  de campos de la tabla referida que deben mostrarse en la grilla de esta tabla. En caso de que no se especifiquen se toman los campos marcados con `isName`
+displayAllFields      | B    | false          | si se deben mostrar todos los campos de la tabla referida
+onDelete              | T    |                | que hacer si hay un borrado (valor posible: `'cascade'`).
+consName              | T    |                | nombre de la constraint generada
+initiallyDeferred     | B    | false          | si se calcula al final la constraint
+
+<!--lang:en--]
+
+property              | type | default value | use
+----------------------|------|---------------|-------------------
+references            | T    |                | see spanish 
+fields                | [O]  |                | see spanish
+alias                 | T    | `references`   | see spanish
+displayFields         | [T]  | [`references.isName`] | see spanish
+displayAllFields      | B    | false          | see spanish
+onDelete              | T    |                | see spanish
+consName              | T    |                | see spanish
+initiallyDeferred     | B    | false          | see spanish
 
 [!--lang:*-->
 
