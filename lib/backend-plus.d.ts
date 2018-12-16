@@ -6,9 +6,11 @@ import * as pg from "pg-promise-strict";
 
 export type Server=net.Server;
 
-export interface coreFunctionParameters{
+export interface CoreFunctionParameters{
     [key:string]: any
 }
+export type coreFunctionParameters=CoreFunctionParameters; // deprecated. Typo
+
 export interface ProcedureParameter {
     name: string
     encoding?: string 
@@ -16,13 +18,23 @@ export interface ProcedureParameter {
     typeName?: string
     references?: string
 }
-export type CoreFunction = (context: ProcedureContext, parameters: coreFunctionParameters) => Promise<any>;
+export type UploadedFileInfo={
+    originalFilename: string
+    path: string
+
+}
+export type CoreFunction = ((context: ProcedureContext, parameters: CoreFunctionParameters) => Promise<any>)
+                         | ((context: ProcedureContext, parameters: CoreFunctionParameters, files?:UploadedFileInfo[]) => Promise<any>);
 
 export interface ProcedureDef {
     action: string
     parameters: ProcedureParameter[]
     coreFunction: CoreFunction 
     encode?:string
+    multipart?:true
+    progress?:true
+    files?:{count?:number}
+    roles?:string[]
 }
 
 export interface User {

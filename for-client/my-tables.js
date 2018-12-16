@@ -732,7 +732,7 @@ myOwn.DataColumnGrid.prototype.cellAttributes = function cellAttributes(specific
 myOwn.DataColumnGrid.prototype.th = function th(){
     var fieldDef = this.fieldDef;
     var grid = this.grid;
-    var th=html.th(this.cellAttributes({class: "th-name"}),fieldDef.title).create();
+    var th=html.th(this.cellAttributes({class: "th-name", title:fieldDef.description||''}),fieldDef.title).create();
     if(fieldDef.width){
         th.style.width=fieldDef.width+'px';
         th.style.minWidth=fieldDef.width+'px';
@@ -802,8 +802,8 @@ myOwn.DataColumnGrid.prototype.thFilter = function thFilter(depot, iColumn){
 };
 
 myOwn.DataColumnGrid.prototype.thDetail = function thDetail(){
-    var grid=this.grid;
-    return html.th(this.cellAttributes({class:"th-detail"}), (this.fieldDef||{}).label);
+    var fieldDef = this.fieldDef||{};
+    return html.th(this.cellAttributes({class:"th-detail", title:fieldDef.description||''}), fieldDef.label);
 };
 
 myOwn.DataColumnGrid.prototype.thAgg = function thAgg(){
