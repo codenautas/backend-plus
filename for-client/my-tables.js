@@ -2466,70 +2466,72 @@ myOwn.getReference = function getReference(referenceName, forceRefresh){
 myOwn.autoSetupFunctions.push(function autoSetupMyTables(){
     var my=this;
     // TypedControls.showLupa=false;
-    TypedControls.Expanders.unshift({
-        whenType: function(typedControl){ 
-            var typeInfo = typedControl.controledType.typeInfo;
-            return typeInfo.references && !typeInfo.skipReferenceLookup;
-        },
-        dialogInput:function(typedControl){
-            var typeInfo = typedControl.controledType.typeInfo;
-            var canceled;
-            var reference = my.getReference(typeInfo.references);
-            var dataReady = reference.dataReady;
-            var timeoutWaiting=setTimeout(function(){
-                timeoutWaiting=null;
-                dialogPromise(function(dialogWindow, closeWindow){
-                    var cancelButton=html.button({class:'my-cancel'}, my.messages.Cancel).create();
-                    cancelButton.onclick=function(){
-                        closeWindow('cancel');
-                        closeWindow=null;
-                    };
-                    dialogWindow.appendChild(html.div([
-                        html.div(my.messages.loading+'...'),
-                        html.img({class:'hamster-gif', src:my.path.img+'hamster.gif'}),
-                        html.div([cancelButton])
-                    ]).create());
-                    dataReady.then(function(){
-                        if(closeWindow){
-                            closeWindow('ready');
-                        }
-                    });
-                },{
-                    underElement:typedControl,
-                    reject:false,
-                    withCloseButton:false
-                }).then(function(value){
-                    canceled = value=='cancel';
-                });
-            },250);
-            dataReady.then(function(){
-                if(timeoutWaiting){
-                    clearTimeout(timeoutWaiting);
-                }
-            });
-            return dataReady.then(function(rows){
-                if(canceled){
-                    return Promise.reject();
-                }
-                var opts=rows.map(function(row){
-                    return {
-                        value:reference.getValue(row),
-                        labels:reference.getLabels(row,true)
-                    };
-                });
-                if(typeInfo.nullable){
-                    opts.push({value:null, labels:['',TypedControls.messages.Null]});
-                }
-                return miniMenuPromise(opts,{
-                    underElement:typedControl,
-                    withCloseButton:true,
-                }).then(function(value){
-                    typedControl.setTypedValue(value, true);
-                });
-            });
-        }
-    });
+    TypedControls.Expanders.unshift();
 });
+
+myOwn.ExpanderReferences={
+    whenType: function(typedControl){ 
+        var typeInfo = typedControl.controledType.typeInfo;
+        return typeInfo.references && !typeInfo.skipReferenceLookup;
+    },
+    dialogInput:function(typedControl){
+        var typeInfo = typedControl.controledType.typeInfo;
+        var canceled;
+        var reference = my.getReference(typeInfo.references);
+        var dataReady = reference.dataReady;
+        var timeoutWaiting=setTimeout(function(){
+            timeoutWaiting=null;
+            dialogPromise(function(dialogWindow, closeWindow){
+                var cancelButton=html.button({class:'my-cancel'}, my.messages.Cancel).create();
+                cancelButton.onclick=function(){
+                    closeWindow('cancel');
+                    closeWindow=null;
+                };
+                dialogWindow.appendChild(html.div([
+                    html.div(my.messages.loading+'...'),
+                    html.img({class:'hamster-gif', src:my.path.img+'hamster.gif'}),
+                    html.div([cancelButton])
+                ]).create());
+                dataReady.then(function(){
+                    if(closeWindow){
+                        closeWindow('ready');
+                    }
+                });
+            },{
+                underElement:typedControl,
+                reject:false,
+                withCloseButton:false
+            }).then(function(value){
+                canceled = value=='cancel';
+            });
+        },250);
+        dataReady.then(function(){
+            if(timeoutWaiting){
+                clearTimeout(timeoutWaiting);
+            }
+        });
+        return dataReady.then(function(rows){
+            if(canceled){
+                return Promise.reject();
+            }
+            var opts=rows.map(function(row){
+                return {
+                    value:reference.getValue(row),
+                    labels:reference.getLabels(row,true)
+                };
+            });
+            if(typeInfo.nullable){
+                opts.push({value:null, labels:['',TypedControls.messages.Null]});
+            }
+            return miniMenuPromise(opts,{
+                underElement:typedControl,
+                withCloseButton:true,
+            }).then(function(value){
+                typedControl.setTypedValue(value, true);
+            });
+        });
+    }
+}
 
 myOwn.TableGrid.prototype.captureKeys = function captureKeys() {
     document.addEventListener('keypress', function(evento){

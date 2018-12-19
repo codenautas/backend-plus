@@ -445,6 +445,7 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
                             });
                         }else{
                             my.showPage();
+                            location.reload();
                         }
                     }
                 }
