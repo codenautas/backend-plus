@@ -403,11 +403,17 @@ myOwn.TableConnectorLocal.prototype.getData = function getData(){
             parentKey.push(connector.fixedField[key]);
         }
         return my.ldb.getChild(connector.def.name,parentKey).then(function(rows){
-            return rows.filter(function(row){
+            var result = rows.filter(function(row){
                 return !filterValues.find(function(pair){
                     return row[pair.fieldName]!=pair.value
                 });
             });
+            if(connector.def.sortColumns){
+                return result.sort(function(a,b){
+                    return bestGlobals.compareForOrder(connector.def.sortColumns)(a,b);
+                })
+            }
+            return result;
         })
     }).then(function(rows){
         connector.getElementToDisplayCount().textContent=rows.length+' '+my.messages.displaying+'...';
