@@ -2380,7 +2380,7 @@ myOwn.clientSides={
             depot.rowControls[fieldName].addEventListener('update',function(){
                 var control = this;
                 var valor = control.getTypedValue();
-                if((valor=='B' || valor=='⚿') && "no estaba lockeado"){
+                if((valor=='B' || valor=='🔑') && "no estaba lockeado"){
                     control.setTypedValue('⌚');
                     var tokenPromise = Promise.resolve();
                     var token = localStorage.getItem('token');
@@ -2410,7 +2410,7 @@ myOwn.clientSides={
                             });
                         }).then(function(){
                             Promise.all(promiseArray).then(function(){
-                                control.setTypedValue('⚿');
+                                control.setTypedValue('🔑');
                             })
                         })
                     })
