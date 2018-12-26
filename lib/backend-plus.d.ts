@@ -144,6 +144,7 @@ export type FieldDefinition = EditableDbDefinition & {
     specialDefaultValue?:string /* keyof myOwn.specialDefaultValues
     defaultForOtherFields?:boolean   /* the field that stores the "other fields" of a flexible imported table */
     exportMetadata?:ExportMetadataDefinition 
+    description?:string
 }
 export type EditableDbDefinition = {
     editable?:boolean

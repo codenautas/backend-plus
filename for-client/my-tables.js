@@ -491,7 +491,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
     var preparing = grid.prepareAndDisplayGrid().then(function(){
         if(opts.detailing){
             grid.depots.forEach(function(depot){
-                var goIntoDetail=opts.detailing["="+depot.lastsPrimaryKeyValues]||opts.detailing["*"];
+                var goIntoDetail=opts.detailing[(/^\w/.test(depot.lastsPrimaryKeyValues)?"":"=")+depot.lastsPrimaryKeyValues]||opts.detailing["*"];
                 if(goIntoDetail){
                     likeAr(goIntoDetail).forEach(function(detailing, actionName){
                         depot.detailControls[actionName].displayDetailGrid({detailing:detailing});
