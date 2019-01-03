@@ -126,4 +126,24 @@ class AppExample extends backendPlus.AppBackend{
     }
 }
 
-new AppExample().start();
+var bestGlobals = require('best-globals');
+var pgPromiseStrict = require('pg-promise-strict');
+var fs = require('fs-extra');
+
+new AppExample().start().then(function(){
+
+
+// 
+new AppEngh().start().then(function(){
+    var logWaiter=Promise.resolve(); // para mandar todo en orden
+    pgPromiseStrict.log = function logAll(message, type){
+        if(bestGlobals.datetime.now()<=bestGlobals.datetime.iso('2019-01-02 11:00:00')){
+            logWaiter= logWaiter.then(function(){
+                if(type || "quiero ver también los resultados"){
+                    fs.appendFile('./local-log-all.sql','--* '+type+'\n'+message+'\n');
+                }
+            })
+        }
+    }
+})
+
