@@ -134,6 +134,11 @@ describe("local-db", function(){
             var all = await ldb.getAll<Quantity>("phisical_quantities");
             compare(all, quantities);
         })
+        it("clear all",async function(){
+            await ldb.clear("phisical_quantities");
+            var all = await ldb.getAll<Quantity>("phisical_quantities");
+            compare(all, []);
+        })
     });
     describe("childs",function(){
         type Units = {

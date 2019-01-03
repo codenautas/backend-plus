@@ -350,4 +350,10 @@ export class LocalDb{
             )
         }();
     }
+
+    async clear(tableName:string):Promise<void>{
+        var ldb=this;
+        var db=await ldb.wait4db;
+        await ldb.IDBX(db.transaction(tableName,"readwrite").objectStore(tableName).clear());
+    }
 }
