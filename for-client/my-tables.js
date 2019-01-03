@@ -1203,7 +1203,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
         var messages = {};
         menuOptions.push(
             myOwn.dialogUpload(
-                ['table','upload'], 
+                'table_upload', 
                 {
                     table:grid.def.name, 
                     prefilledFields:grid.connector.fixedFields,
