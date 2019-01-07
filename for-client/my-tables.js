@@ -209,7 +209,7 @@ myOwn.TableConnector = function(context, opts){
     connector.parameterFunctions=connector.opts.parameterFunctions||{};
 };
 
-myOwn.TableConnector.prototype.getStructure = function getStructure(){
+myOwn.TableConnector.prototype.getStructure = function getStructure(waitForFreshStructure){
     var connector = this;
     var my = connector.my;
     var structureFromLocal;
@@ -220,7 +220,7 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
         return connector.def;
     });
     if(my.ldb){
-        structureFromBackend.then(function(tableDef){
+        var canContinue = structureFromBackend.then(function(tableDef){
             var promiseChain=my.ldb.registerStructure(changing(tableDef, connector.opts.tableDef||{}));
             if(!connector.localDef || JSON.stringify(tableDef)!=JSON.stringify(connector.localDef)){
                 //alertPromise('la tabla '+connector.tableName+' cambió de estructura. Debe Refrescar la página')
@@ -252,14 +252,18 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(){
             });
             return promiseChain;
         });
-        var structureFromLocal = my.getStructureFromLocalDb(connector.tableName);
-        connector.whenStructureReady = structureFromLocal.then(function(tableDef){
+        if(!waitForFreshStructure){
+            canContinue = Promise.resolve();
+        }
+        connector.whenStructureReady = canContinue.then(function(){
+            return my.getStructureFromLocalDb(connector.tableName);
+        }).then(function(tableDef){
             if(!tableDef){ 
                 return structureFromBackend;
             }
             connector.localDef = connector.def = changing(tableDef, connector.opts.tableDef||{});
             return connector.def;
-        });
+        })
     }else{
         connector.whenStructureReady = structureFromBackend;
     }
@@ -2400,7 +2404,8 @@ myOwn.clientSides={
                         my.ajax.table_record_lock({
                             table:depot.def.name,
                             primaryKeyValues:depot.primaryKeyValues,
-                            token:token
+                            token:token,
+                            softLock: false
                         }).then(function(result){
                             var tables=[depot.def.name].concat(depot.def.offline.details)
                             return tables.forEach(function(name,i){

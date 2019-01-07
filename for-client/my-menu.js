@@ -521,7 +521,6 @@ myOwn.changeOfflineMode = function changeOfflineMode(){
         var promiseArray2 = [];
         promiseChain = promiseChain.then(function(){
             return Promise.all(promiseArray1).then(function(){
-                console.log("fkToStoreData: ", fkToStoreData)
                 return fkToStoreData.forEach(function(fk){
                     var conn = new my.TableConnector({tableName: fk.references, my:my});
                     conn.getStructure()

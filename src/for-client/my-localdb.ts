@@ -335,11 +335,28 @@ export class LocalDb{
         return this.putOneAndGetIfNeeded(tableName, element, true);
     }
     async putMany<T>(tableName:string, elements:T[]):Promise<void>{
-        var i=0;
-        while(i<elements.length){
-            await this.putOneAndGetIfNeeded(tableName, elements[i], false);
-            i++;
-        }
+        var ldb=this;
+        var db=await ldb.wait4db
+        var tableDef=await ldb.getStructure(tableName);
+        
+        var transaction=db.transaction(tableName,"readwrite");
+        var objectStore=transaction.objectStore(tableName);
+        var promiseChain = Promise.resolve();
+        elements.forEach(function(element){
+            promiseChain=promiseChain.then(async function(){
+                var storeTask;
+                if(detectedFeatures.needToUnwrapArrayKeys){
+                    var newKey=tableName+JSON.stringify(tableDef.primaryKey.map(function(name){
+                        return element[name];
+                    }));
+                    storeTask = objectStore.put(element,newKey);
+                }else{
+                    storeTask = objectStore.put(element);
+                }
+                await ldb.IDBX<Key>(storeTask);
+            })
+        })
+        await promiseChain;
     }
     async close():Promise<void>{
         var db=await this.wait4db;
