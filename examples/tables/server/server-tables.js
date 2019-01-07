@@ -126,4 +126,8 @@ class AppExample extends backendPlus.AppBackend{
     }
 }
 
+var bestGlobals = require('best-globals');
+var pgPromiseStrict = require('pg-promise-strict');
+var fs = require('fs-extra');
+
 new AppExample().start();

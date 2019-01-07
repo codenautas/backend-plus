@@ -298,6 +298,12 @@ login                        | opciones de login
 log                          | log por consola
 .req                         | muestra cada requerimiento
 .session                     | muestra info de las sesiones
+.serve-contet                | si debe loguear todo lo que se sirve con `serve-content`
+.db                          | logs de la conexión de base de datos
+..last-error                 | si debe loguear siempre el último error (se guarda en `last-pg-error-local.sql`)
+..until                      | si debe loguear cada sentencia SQL ejecutada. En `until` debe especificar cuánto tiempo desde el arranque (ej: '1m30s') o hasta que día y hora (ej: '2018-01-20 10:30')
+..on-demand                  | si se puede reiniciar el logueo de todos los SQL ejecutados con `URLbase/--log-db`
+..results                    | si incluye en el log de todos los SQL los resultados
 client-setup                 | opciones para el front-end
 .cursors                     | (en preparación) dice si usa curores para mostrar dónde (con el cursor en qué registro) está cada usuario
 .skin                        | nombre del skin
