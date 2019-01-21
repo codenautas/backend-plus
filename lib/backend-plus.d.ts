@@ -42,8 +42,11 @@ export interface User {
 }
 
 export interface Context {
-    be:AppBackend, user:User, session:object, 
-    username:string, machineId:string, 
+    be:AppBackend, 
+    user:User, 
+    session:object, 
+    username:string, 
+    machineId:string, 
     navigator:string
 }
 
@@ -52,7 +55,8 @@ export interface ContextForDump extends Context {
 }
 
 export type ProcedureContext=Context & {
-    client:pg.Client
+    client:pg.Client,
+    doing:string
 }
 export interface Request extends express.Request {
     user:User
@@ -226,6 +230,7 @@ export class AppBackend{
     tableStructures: TableDefinitions
     db:typeof pg
     config: any
+    rootPath: string
     start(opts?: StartOptions):Promise<void>
     getTables():TableItemDef[]
     prepareGetTables():void
