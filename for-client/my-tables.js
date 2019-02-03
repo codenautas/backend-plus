@@ -2476,16 +2476,16 @@ myOwn.getReference = function getReference(referenceName, forceRefresh){
 
 myOwn.autoSetupFunctions.push(function autoSetupMyTables(){
     var my=this;
-    // TypedControls.showLupa=false;
-    TypedControls.Expanders.unshift();
+    TypedControls.Expanders.unshift(myOwn.ExpanderReferences);
 });
 
 myOwn.ExpanderReferences={
+    autoExpand:true,
     whenType: function(typedControl){ 
         var typeInfo = typedControl.controledType.typeInfo;
         return typeInfo.references && !typeInfo.skipReferenceLookup;
     },
-    dialogInput:function(typedControl){
+    dialogInput:function(typedControl, opts){
         var typeInfo = typedControl.controledType.typeInfo;
         var canceled;
         var reference = my.getReference(typeInfo.references);
@@ -2525,18 +2525,22 @@ myOwn.ExpanderReferences={
             if(canceled){
                 return Promise.reject();
             }
-            var opts=rows.map(function(row){
+            var menu=rows.map(function(row){
                 return {
                     value:reference.getValue(row),
                     labels:reference.getLabels(row,true)
                 };
             });
             if(typeInfo.nullable){
-                opts.push({value:null, labels:['',TypedControls.messages.Null]});
+                menu.push({value:null, labels:['',TypedControls.messages.Null]});
             }
-            return miniMenuPromise(opts,{
+            return miniMenuPromise(menu,{
                 underElement:typedControl,
                 withCloseButton:true,
+                initialSearch:(opts||{}),
+                whenReady:function(){
+                    typedControl.displayingExpander=null;
+                }
             }).then(function(value){
                 typedControl.setTypedValue(value, true);
             });
