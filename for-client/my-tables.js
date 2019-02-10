@@ -550,7 +550,8 @@ myOwn.TableGrid.prototype.createDepotFromRow = function createDepotFromRow(row, 
         primaryKeyValues:false,
         status: status||'preparing',
         detailControls:{},
-        detailRows:[]
+        detailRows:[],
+        actionButton:{}
     };
     return depot;
 };
@@ -693,6 +694,7 @@ myOwn.ActionColumnGrid.prototype.td = function td(depot){
                 buttonAction.addEventListener('click', function(){
                     actionDef.actionRow(depot, {launcher:buttonAction});
                 });
+                depot.actionButton[actionName]=buttonAction;
             }
         });
     }
@@ -2122,6 +2124,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             rowSymbols: {},
             isFilterPending:false,
             tr: tr,
+            actionButton:{}
         };
         if(!grid.hasFilterRow){
             grid.hasFilterRow=[];
