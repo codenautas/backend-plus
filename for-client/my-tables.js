@@ -830,7 +830,8 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
     var grid = this.grid;
     var fieldDef = this.fieldDef;
     var forInsert = false; // TODO: Verificar que esto está en desuso
-    var directInput=grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
+    var enabledInput=grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
+    var directInput=true;
     var control;
     var td;
     if(fieldDef.mobileInputType && my.mobileMode){
@@ -849,6 +850,9 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
         throw new Error("There's a field in the table defined as Number (Number type is deprecated)");
     }
     TypedControls.adaptElement(control, fieldDef);
+    if(!enabledInput){
+        control.disable(true);
+    }
     depot.rowControls[fieldDef.name] = control;
     if(depot.row[fieldDef.name]!=null){
         control.setTypedValue(depot.row[fieldDef.name]);
@@ -1861,6 +1865,9 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 }
             }
         });
+        if(grid.def.clientSide){
+            grid.my.clientSides[grid.def.clientSide].update(depot);
+        }
     };
     var changeIoStatus = function changeIoStatus(depot,newStatus, objectWithFieldsOrListOfFieldNames, title){
         var fieldNames=typeof objectWithFieldsOrListOfFieldNames === "string"?[objectWithFieldsOrListOfFieldNames]:(
