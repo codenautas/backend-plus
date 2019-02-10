@@ -1034,7 +1034,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
                         fixedFields: fixedFields, 
                         detailing:opts.detailing, 
                         detailingForUrl:grid.detailingForUrl,
-                        detailingPath:grid.detailingPath.concat(depot.lastsPrimaryKeyValues),
+                        detailingPath:(grid.detailingPath||[]).concat(depot.lastsPrimaryKeyValues),
                     }).waitForReady(function(g){
                         detailControl.divDetail=g.dom.table;
                         if(detailTableDef.refreshParent || grid.def.complexDef && detailTableDef.refreshParent!==false){
