@@ -120,6 +120,7 @@ export class LocalDb{
         })
     }
     async registerStructure(tableDef:TableDefinition):Promise<RegisterResult>{
+        var ldb = this;
         var wait4dbCurrent=this.wait4db;
         var registerTask=this.registerStructureInside(tableDef, wait4dbCurrent);
         this.wait4db = registerTask.then(result=>result.wait4db);
@@ -175,7 +176,7 @@ export class LocalDb{
         }
         await ldb.wait4detectedFeatures;
         var infoStore=detectedFeatures.needToUnwrapArrayKeys?null:tableDef.primaryKey;
-        var versionInfo = await this.IDBX<VersionInfo>(db.transaction('$internals',"readwrite").objectStore('$internals').get('version'))
+        var versionInfo = await this.IDBX<VersionInfo>(db.transaction('$internals',"readonly").objectStore('$internals').get('version'))
         if(JSON.stringify(versionInfo.stores[tableDef.name])!=JSON.stringify(infoStore)){
             db.close();
             versionInfo.num++;
@@ -206,9 +207,13 @@ export class LocalDb{
         }
         await ldb.wait4detectedFeatures;
         var tableDef = await ldb.IDBX<TableDefinition>(
-            db.transaction('$structures',"readwrite").objectStore('$structures').get(tableName)
+            db.transaction('$structures',"readonly").objectStore('$structures').get(tableName)
         );
         return tableDef;
+    }
+    async existsStructure(tableName:string):Promise<boolean>{
+        var tableDef = await this.getStructure(tableName);
+        return tableDef?true:false;
     }
     async getOneIfExists<T>(tableName:string, key:Key):Promise<T|undefined>{
         var ldb=this;
@@ -325,7 +330,7 @@ export class LocalDb{
             }
             if(needed){
                 var key=await ldb.IDBX<Key>(storeTask)
-                return await ldb.IDBX<T>(db.transaction(tableName,"readwrite").objectStore(tableName).get(key))
+                return await ldb.IDBX<T>(db.transaction(tableName,"readonly").objectStore(tableName).get(key))
             }else{
                 return null;
             }
@@ -361,16 +366,65 @@ export class LocalDb{
     async close():Promise<void>{
         var db=await this.wait4db;
         db.close();
-        this.wait4db=async function():Promise<IDBDatabase>{
-            return Promise.reject(
-                new Error("the database is closed")
-            )
-        }();
+        this.wait4db={
+            then:function(){
+                throw new Error("the database is closed")
+            },
+            catch:function(){
+                throw new Error("the database is closed")
+            }
+        }
     }
 
     async clear(tableName:string):Promise<void>{
         var ldb=this;
         var db=await ldb.wait4db;
         await ldb.IDBX(db.transaction(tableName,"readwrite").objectStore(tableName).clear());
+    }
+}
+
+export class LocalDbTransaction {
+    private oneByOneChain:Promise<any>=Promise.resolve();
+    constructor(public localDbName: string){
+        this.oneByOneChain = Promise.resolve();
+    }
+    async inTransaction<T>(callback:(ldb:LocalDb)=>Promise<T>):Promise<T>{
+        var name=this.localDbName;
+        this.oneByOneChain = this.oneByOneChain.then(async function(){
+            var ldb = new LocalDb(name);
+            async function closeLdb(err:Error):Promise<never>;
+            async function closeLdb():Promise<void>;
+            async function closeLdb(previousError?:Error):Promise<void|never>{
+                try{
+                    await ldb.close();
+                    if(previousError){
+                        // @ts-ignore 
+                        previousError.ldbWasClosed=true;
+                    }
+                }catch(errClose){
+                    if(previousError){
+                        // @ts-ignore 
+                        previousError.ldbWasNotClosedBecause=errClose;
+                    }else{
+                        throw errClose;
+                    }
+                }
+            }
+            try{
+                var result=await callback(ldb);
+            }catch(err){
+                await closeLdb(err);
+                throw err;
+            }
+            await closeLdb();
+            return result;
+    });
+        return this.oneByOneChain;
+    }
+    getBindedInTransaction<T>():(callback:(ldb:LocalDb)=>Promise<T>)=>Promise<T>{
+        var this4bind = this;
+        return function(ldb){
+            return this4bind.inTransaction(ldb);
+        }
     }
 }

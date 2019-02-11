@@ -74,7 +74,7 @@ var jsYaml = require('js-yaml');
 var TypeStore=require('type-store');
 
 var JSON4all = require('json4all');
-var LocalDb = require('./my-localdb').LocalDb;
+var LocalDbTransaction = require('./my-localdb').LocalDbTransaction;
 
 /** @param {T} x
  *  @returns {T}
@@ -174,7 +174,9 @@ myOwn.autoSetupFunctions = [
                 TypedControls.path.img=my.path.img;
                 if(my.config.config['grid-buffer']=='idbx'){
                     try{
-                        my.ldb = new LocalDb(my.appName+my.clientVersion);
+                        // my.ldb = new LocalDb(my.appName+my.clientVersion);
+                        /** @type {(callback:(ldb:any)=>Promise<T>)=>Promise<T>} */
+                        my.inLdb = new LocalDbTransaction(my.appName+my.clientVersion).getBindedInTransaction();
                     }catch(err){
                         my.log(err);
                     }

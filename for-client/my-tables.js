@@ -190,7 +190,9 @@ myOwn.comparator={
 };
 
 myOwn.getStructureFromLocalDb = function getStructureFromLocalDb(tableName){
-    return my.ldb.getStructure(tableName);
+    return my.inLdb(function(ldb){
+        return ldb.getStructure(tableName);
+    });
 }
 
 myOwn.TableConnector = function(context, opts){
@@ -209,50 +211,61 @@ myOwn.TableConnector = function(context, opts){
     connector.parameterFunctions=connector.opts.parameterFunctions||{};
 };
 
-myOwn.TableConnector.prototype.getStructure = function getStructure(waitForFreshStructure){
+myOwn.TableConnector.prototype.getStructure = function getStructure(opts){
+    var opts = changing({
+        registerInLocalDB: false, 
+        waitForFreshStructure: false 
+    }, opts || {});
     var connector = this;
     var my = connector.my;
-    var structureFromLocal;
-    var structureFromBackend = my.ajax.table_structure({
-        table:connector.tableName,
-    }).then(function(tableDef){
-        connector.def = changing(tableDef, connector.opts.tableDef||{});
-        return connector.def;
-    });
-    if(my.ldb){
+    var getStructureFromBackend = function getStructureFromBackend(tableName){
+        return my.ajax.table_structure({
+            table:tableName,
+        }).then(function(tableDef){
+            connector.def = changing(tableDef, connector.opts.tableDef||{});
+            return connector.def;
+        });
+    }
+    var structureFromBackend = getStructureFromBackend(connector.tableName);
+    if(my.inLdb && opts.registerInLocalDB){
         var canContinue = structureFromBackend.then(function(tableDef){
-            var promiseChain=my.ldb.registerStructure(changing(tableDef, connector.opts.tableDef||{}));
-            if(!connector.localDef || JSON.stringify(tableDef)!=JSON.stringify(connector.localDef)){
-                //alertPromise('la tabla '+connector.tableName+' cambió de estructura. Debe Refrescar la página')
-            }
-            if(connector.def.offline.mode==='master'){
-                connector.def.offline.details.forEach(function(tableName){
+            return my.inLdb(function(ldb){
+                var structureToRegister=changing(tableDef, connector.opts.tableDef||{});
+                var promiseChain=ldb.registerStructure(structureToRegister);
+                /*if(!connector.localDef || JSON.stringify(tableDef)!=JSON.stringify(connector.localDef)){
+                    alertPromise('la tabla '+connector.tableName+' cambió de estructura. Debe Refrescar la página')
+                }*/
+                if(connector.def.offline.mode==='master'){
+                    connector.def.offline.details.forEach(function(tableName){
+                        promiseChain = promiseChain.then(function(){
+                            return ldb.getStructure(tableName).then(function(tableDef){
+                                if(!tableDef){
+                                    return getStructureFromBackend(tableName).then(function(tableDef){
+                                        return ldb.registerStructure(tableDef);
+                                    });
+                                }
+                            });
+                        });
+                    });
+                }
+                connector.def.foreignKeys.forEach(function(foreignKey){
                     promiseChain = promiseChain.then(function(){
-                        return my.ldb.getStructure(tableName).then(function(tableDef){
+                        return ldb.getStructure(foreignKey.references).then(function(tableDef){
                             if(!tableDef){
-                                var conn = new my.TableConnector({tableName: tableName, my:my});
-                                return conn.getStructure();
+                                return getStructureFromBackend(foreignKey.references).then(function(tableDef){
+                                    return ldb.registerStructure(tableDef);
+                                });
                             }
                         });
                     });
                 });
-            }
-            connector.def.foreignKeys.forEach(function(foreignKey){
                 promiseChain = promiseChain.then(function(){
-                    return my.ldb.getStructure(foreignKey.references).then(function(tableDef){
-                        if(!tableDef){
-                            var conn = new my.TableConnector({tableName: foreignKey.references, my:my});
-                            return conn.getStructure();
-                        }
-                    });
+                    return connector.def;
                 });
+                return promiseChain;
             });
-            promiseChain = promiseChain.then(function(){
-                return connector.def;
-            });
-            return promiseChain;
         });
-        if(!waitForFreshStructure){
+        if(opts.waitForFreshStructure){
             canContinue = Promise.resolve();
         }
         connector.whenStructureReady = canContinue.then(function(){
@@ -406,18 +419,20 @@ myOwn.TableConnectorLocal.prototype.getData = function getData(){
             var key=primaryKey.shift();
             parentKey.push(connector.fixedField[key]);
         }
-        return my.ldb.getChild(connector.def.name,parentKey).then(function(rows){
-            var result = rows.filter(function(row){
-                return !filterValues.find(function(pair){
-                    return row[pair.fieldName]!=pair.value
+        return my.inLdb(function(ldb){
+            return ldb.getChild(connector.def.name,parentKey).then(function(rows){
+                var result = rows.filter(function(row){
+                    return !filterValues.find(function(pair){
+                        return row[pair.fieldName]!=pair.value
+                    });
                 });
-            });
-            if(connector.def.sortColumns){
-                return result.sort(function(a,b){
-                    return bestGlobals.compareForOrder(connector.def.sortColumns)(a,b);
-                })
-            }
-            return result;
+                if(connector.def.sortColumns){
+                    return result.sort(function(a,b){
+                        return bestGlobals.compareForOrder(connector.def.sortColumns)(a,b);
+                    })
+                }
+                return result;
+            })
         })
     }).then(function(rows){
         connector.getElementToDisplayCount().textContent=rows.length+' '+my.messages.displaying+'...';
@@ -447,8 +462,10 @@ myOwn.TableConnectorLocal.prototype.saveRecord = function saveRecord(depot, opts
     var connector = this;
     var sendedForUpdate = depot.my.cloneRow(depot.rowPendingForUpdate);
     depot.row.$dirty=true;
-    return my.ldb.putOne(connector.tableName,depot.row).then(function(row){
-        return {sendedForUpdate:sendedForUpdate, updatedRow:row};
+    return my.inLdb(function(ldb){
+        return ldb.putOne(connector.tableName,depot.row).then(function(row){
+            return {sendedForUpdate:sendedForUpdate, updatedRow:row};
+        });
     });
 };
 
@@ -2400,22 +2417,23 @@ myOwn.clientSides={
                         })
                     }
                     tokenPromise = tokenPromise.then(function(){
-                        var promiseArray = [];
                         my.ajax.table_record_lock({
                             table:depot.def.name,
                             primaryKeyValues:depot.primaryKeyValues,
                             token:token,
                             softLock: false
                         }).then(function(result){
-                            var tables=[depot.def.name].concat(depot.def.offline.details)
-                            return tables.forEach(function(name,i){
-                                promiseArray.push(
-                                    my.ldb.putMany(name,result.data[i])
-                                );
-                            });
-                        }).then(function(){
-                            Promise.all(promiseArray).then(function(){
-                                control.setTypedValue('🔑');
+                            return my.inLdb(function(ldb){
+                                var promiseArray = [];
+                                var tables=[depot.def.name].concat(depot.def.offline.details)
+                                tables.forEach(function(name,i){
+                                    promiseArray.push(
+                                        ldb.putMany(name,result.data[i])
+                                    );
+                                })
+                                return Promise.all(promiseArray).then(function(){
+                                    control.setTypedValue('🔑');
+                                })
                             })
                         })
                     })
