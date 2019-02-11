@@ -205,6 +205,7 @@ export type TableDefinition = EditableDbDefinition & {
         mode:'reference'|'master'|'detail' 
         details:string[]
     }
+    clientSide?:string         /* keyof: myOwn.clientSides */
 }
 export interface DetailTable { table: string, fields: FieldsForConnect, abr: string, label?: string }
 export type TableDefinitionFunction = (context: ContextForDump) => TableDefinition;
