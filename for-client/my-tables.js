@@ -1934,7 +1934,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             });
         });
     };
-    grid.retrieveRowAndRefresh = function retrieveRowAndRefresh(depot){
+    grid.retrieveRowAndRefresh = function retrieveRowAndRefresh(depot, opts){
         // var sendedForUpdate = depot.my.cloneRow(depot.rowPendingForUpdate);
         return my.ajax.table_data({
             table:depot.def.name,
@@ -1942,7 +1942,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 return {fieldName:fieldName, value:depot.primaryKeyValues[i]};
             })
         }).then(function(result){
-            grid.depotRefresh(depot,{updatedRow:result[0], sendedForUpdate:{}});
+            grid.depotRefresh(depot,{updatedRow:result[0], sendedForUpdate:{}}, opts);
         })
     }
     grid.setRowStyle = function setRowStyle(depot, row, skipUpdateStatus){
@@ -1974,8 +1974,9 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             tdActions.style.backgroundRepeat='no-repeat'
         }
     }
-    grid.depotRefresh = function depotRefresh(depot,result){
+    grid.depotRefresh = function depotRefresh(depot,result,opts){
         // ¡ATENCIÓN!: esta función no debe despleegar, llama a updateRowData, ahí se despliega
+        opts=opts||{};
         upadteNumberOfRows(depot,grid);
         var retrievedRow = result.updatedRow;
         for(var fieldName in retrievedRow){
@@ -2043,8 +2044,10 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         }
         depot.retrievedRow = retrievedRow;
         grid.updateRowData(depot);
-        depot.tr.dispatchEvent(new CustomEvent('savedRowOk'));
-        grid.dom.main.dispatchEvent(new CustomEvent('savedRowOk'));
+        if(!opts.noDispatchEvents){
+            depot.tr.dispatchEvent(new CustomEvent('savedRowOk'));
+            grid.dom.main.dispatchEvent(new CustomEvent('savedRowOk'));
+        }
         grid.refreshAggregates();
     }
     grid.createExtraRow = function createExtraRow(depot, tbody){
