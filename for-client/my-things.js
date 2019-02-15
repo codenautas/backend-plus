@@ -75,6 +75,7 @@ var TypeStore=require('type-store');
 
 var JSON4all = require('json4all');
 var LocalDbTransaction = require('./my-localdb').LocalDbTransaction;
+var LocalDb = require('./my-localdb').LocalDb;
 
 /** @param {T} x
  *  @returns {T}
@@ -176,7 +177,7 @@ myOwn.autoSetupFunctions = [
                     try{
                         // my.ldb = new LocalDb(my.appName+my.clientVersion);
                         /** @type {(callback:(ldb:any)=>Promise<T>)=>Promise<T>} */
-                        my.inLdb = new LocalDbTransaction(my.appName+my.clientVersion).getBindedInTransaction();
+                        my.inLdb = new LocalDbTransaction(my.appName+my.clientVersion).getBindedInTransaction()
                     }catch(err){
                         my.log(err);
                     }
@@ -216,6 +217,9 @@ myOwn.autoSetupFunctions = [
         return readProcedureDefinitions();
     }
 ];
+myOwn.deleteLocalDb = function deleteLocalDb(){
+    return LocalDb.deleteDatabase(my.appName+my.clientVersion);
+}
 myOwn.autoSetup = function autoSetup(){
     var my=this;
     if(my.promiseChainAutoSetup){

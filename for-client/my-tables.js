@@ -2455,9 +2455,26 @@ myOwn.clientSides={
 
 myOwn.references={};
 
-myOwn.getReference = function getReference(referenceName, forceRefresh){
+myOwn.getReference = function getReference(referenceName, opts){
+    opts = changing({
+        getValue: function getValue(row){
+            return row[reference.tableDef.primaryKey[0]];
+        },
+        getLabels: function getLabels(row, includePk){
+            var lookupFields = reference.tableDef.lookupFields || reference.tableDef.nameFields;
+            return (includePk || !lookupFields.length?
+                this.tableDef.primaryKey:[]
+            ).concat(lookupFields).map(function(fieldName){
+                return row[fieldName];
+            });
+        },
+        getLabel: function getLabel(row){
+            return this.getLabels(row).join(', ');
+        },
+        fixedFields:[]
+    },opts);
     var reference={};
-    if(!my.references[referenceName]){
+    if(!my.references[referenceName] || opts.fixedFields.length){
         var dummyElement = html.div().create();
         var Connector = my.offline.mode?my.TableConnectorLocal:my.TableConnector; 
         var connector=new Connector({
@@ -2465,7 +2482,7 @@ myOwn.getReference = function getReference(referenceName, forceRefresh){
             tableName: referenceName, 
             getElementToDisplayCount:function(){ return dummyElement; },
             activeOnly: true
-        });
+        }, {fixedFields:opts.fixedFields});
         connector.getStructure();
         var dataReady=connector.getData().then(function(rows){
             reference.Allrows=rows;
@@ -2476,20 +2493,9 @@ myOwn.getReference = function getReference(referenceName, forceRefresh){
                 });
             }
             reference.rows=rows;
-            reference.getValue = function getValue(row){
-                return row[reference.tableDef.primaryKey[0]];
-            };
-            reference.getLabels = function getLabels(row, includePk){
-                var lookupFields = reference.tableDef.lookupFields || reference.tableDef.nameFields;
-                return (includePk || !lookupFields.length?
-                    this.tableDef.primaryKey:[]
-                ).concat(lookupFields).map(function(fieldName){
-                    return row[fieldName];
-                });
-            };
-            reference.getLabel = function getLabel(row){
-                return this.getLabels(row).join(', ');
-            };
+            reference.getValue = opts.getValue;
+            reference.getLabels = opts.getLabels;
+            reference.getLabel = opts.getLabel;
             return rows;
         });
         reference=my.references[referenceName]={
@@ -2514,9 +2520,13 @@ myOwn.ExpanderReferences={
         return typeInfo.references && !typeInfo.skipReferenceLookup;
     },
     dialogInput:function(typedControl, opts){
+        opts = changing({
+            reference: {},
+            extraRow: null
+        },opts ||{});
         var typeInfo = typedControl.controledType.typeInfo;
         var canceled;
-        var reference = my.getReference(typeInfo.references);
+        var reference = my.getReference(typeInfo.references, opts.reference);
         var dataReady = reference.dataReady;
         var timeoutWaiting=setTimeout(function(){
             timeoutWaiting=null;
@@ -2553,6 +2563,9 @@ myOwn.ExpanderReferences={
             if(canceled){
                 return Promise.reject();
             }
+            if(opts.extraRow){
+                rows=rows.concat(opts.extraRow);
+            }
             var menu=rows.map(function(row){
                 return {
                     value:reference.getValue(row),
@@ -2565,12 +2578,28 @@ myOwn.ExpanderReferences={
             return miniMenuPromise(menu,{
                 underElement:typedControl,
                 withCloseButton:true,
-                initialSearch:(opts||{}),
+                initialSearch:(opts),
                 whenReady:function(){
                     typedControl.displayingExpander=null;
                 }
             }).then(function(value){
-                typedControl.setTypedValue(value, true);
+                if(opts.extraRow && value == opts.reference.getValue(opts.extraRow)){
+                    promptPromise('ingrese valor',{
+                        withCloseButton:true,
+                        underElement:typedControl,
+                        inputDef:{
+                            attributes: {'allow-write': true}
+                        }
+                    }).then(function(text){
+                        typedControl.setTypedValue(text||null, true);    
+                    }).catch(function(err){
+                        if(!DialogPromise){
+                            return alertPromise(err.message);
+                        }
+                    });
+                }else{
+                    typedControl.setTypedValue(value, true);
+                }
             });
         });
     }

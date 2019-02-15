@@ -34,6 +34,7 @@
  *   2) TODO: Falta programar la detección del problema de iOS viejo, quizás haya que ser explícito, hay que probarlo con varios iPad
  */
 
+
 import * as likeAr from "like-ar";
 import { ForeignKey } from "backend-plus";
 
@@ -98,6 +99,17 @@ export class LocalDb{
             }
         }
         ldb.wait4db = ldb.IDBX(requestDB);
+    }
+    public static deleteDatabase(name:string):Promise<void>{
+        var request = indexedDB.deleteDatabase(name);
+        return new Promise(function(resolve,reject){
+            request.onsuccess=function(){
+                resolve()
+            }
+            request.onerror=function(){
+                reject()
+            }
+        })
     }
     private async IDBX(request: IDBOpenDBRequest):Promise<IDBDatabase>
     private async IDBX(request: IDBTransaction):Promise<void>
@@ -375,7 +387,6 @@ export class LocalDb{
             }
         }
     }
-
     async clear(tableName:string):Promise<void>{
         var ldb=this;
         var db=await ldb.wait4db;
