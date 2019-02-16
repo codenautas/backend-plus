@@ -2475,7 +2475,7 @@ myOwn.getReference = function getReference(referenceName, opts){
             return this.getLabels(row).join(', ');
         },
         fixedFields:[]
-    },opts);
+    },opts||{});
     var reference={};
     if(!my.references[referenceName] || opts.fixedFields.length){
         var dummyElement = html.div().create();
