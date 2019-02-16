@@ -58,6 +58,7 @@ myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     deleteAllRecords: "delete all records",
     deleteRecord: "delete record",
     details: "details",
+    doesNotHave: "does not have",
     download: "download",
     distinctFrom:'distinct from',
     export: "export",
@@ -115,6 +116,7 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     deleteRecord: "borrar este registro",
     details: "detalles",
     distinctFrom: "distinto de",
+    doesNotHave: "no tiene",
     download: "descargar",
     empty:'vacío',
     export: "exportar",
@@ -617,18 +619,11 @@ myOwn.TableGrid.prototype.prepareAndDisplayGrid = function prepareAndDisplayGrid
         return structureRequest.then(function(){
             if(grid.def.layout.errorList){
                 if(!rows.length){
-                    grid.dom.caption.textContent='no tiene: '+grid.dom.caption.textContent;
-                    grid.dom.caption.style.backgroundColor='green';
-                    grid.dom.table.tHead.style.display='none';
-                    if(grid.dom.table.tBodies[0]){
-                        grid.dom.table.tBodies[0].style.display='none';
-                    }
-                    if(grid.dom.table.tFoot){
-                        grid.dom.table.tFoot.style.display='none';
-                    }
-                    return grid;
+                    grid.dom.caption.textContent=my.messages.doesNotHave+': '+grid.dom.caption.textContent;
+                    grid.dom.table.setAttribute('error-list','no-errors');
                 }else{
-                    grid.dom.caption.style.backgroundColor='#F44';
+                    grid.dom.table.setAttribute('error-list','have-errors');
+                    // grid.dom.caption.style.backgroundColor='#F44';
                 }
             }
             grid.prepareDepots(rows);
