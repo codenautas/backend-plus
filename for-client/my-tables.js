@@ -58,7 +58,7 @@ myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     deleteAllRecords: "delete all records",
     deleteRecord: "delete record",
     details: "details",
-    doesNotHave: "does not have",
+    thereAreNot: "no",
     download: "download",
     distinctFrom:'distinct from',
     export: "export",
@@ -116,7 +116,7 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     deleteRecord: "borrar este registro",
     details: "detalles",
     distinctFrom: "distinto de",
-    doesNotHave: "no tiene",
+    thereAreNot: "no hay",
     download: "descargar",
     empty:'vacío',
     export: "exportar",
@@ -619,7 +619,7 @@ myOwn.TableGrid.prototype.prepareAndDisplayGrid = function prepareAndDisplayGrid
         return structureRequest.then(function(){
             if(grid.def.layout.errorList){
                 if(!rows.length){
-                    grid.dom.caption.textContent=my.messages.doesNotHave+': '+grid.dom.caption.textContent;
+                    grid.dom.caption.textContent=my.messages.thereAreNot+': '+grid.dom.caption.textContent;
                     grid.dom.table.setAttribute('error-list','no-errors');
                 }else{
                     grid.dom.table.setAttribute('error-list','have-errors');
@@ -1022,7 +1022,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
             detailControl.img.src=my.path.img+'detail-contract.png';
             detailControl.img.alt="[-]";
             detailControl.img.title=my.messages.lessDetails;
-            var newTr = grid.my.insertRow({under:tr,smooth:{height:70, spans:spansForSmooth}});
+            var newTr = grid.my.insertRow({under:tr,smooth:{height:70, spans:spansForSmooth},autoFocus:false});
             detailControl.tr = newTr;
             var tdMargin = newTr.insertCell(-1);
             tdMargin.colSpan = td.cellIndex+1;

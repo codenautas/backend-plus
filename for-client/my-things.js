@@ -358,10 +358,12 @@ myOwn.insertRow = function insertRow(where){
             trDummy.style.display='none';
             tr.style.display='';
             section.removeChild(trDummy);
-            setTimeout(function(){
-                my.focusFirstColumnOf(tr);
-                window.keyStarForceFocusNow=true;
-            },100);
+            if(where.autoFocus!==false){
+                setTimeout(function(){
+                    my.focusFirstColumnOf(tr);
+                    window.keyStarForceFocusNow=true;
+                },100);
+            }
         },500);
     }
     return tr;
