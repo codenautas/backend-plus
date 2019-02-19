@@ -195,6 +195,47 @@ myOwn.getStructureFromLocalDb = function getStructureFromLocalDb(tableName){
     });
 }
 
+myOwn.getStructuresToRegisterInLdb = function getStructuresToRegisterInLdb(parentTableDef, structuresArray){
+    var promiseChain = Promise.resolve();
+    if(parentTableDef.offline.mode==='master'){
+        parentTableDef.offline.details.forEach(function(tableName){
+            promiseChain = promiseChain.then(function(){
+                var dummyElement = html.div().create();
+                var Connector = my.TableConnector;
+                var connector = new Connector({
+                    my:my, 
+                    tableName: tableName,
+                    getElementToDisplayCount:function(){ return dummyElement }
+                });
+                connector.getStructure();
+                return connector.whenStructureReady.then(function(tableDef){
+                    structuresArray.push(tableDef);
+                    return getStructuresToRegisterInLdb(tableDef, structuresArray)
+                });
+            });
+        });
+    }
+    parentTableDef.foreignKeys.forEach(function(foreignKey){
+        promiseChain = promiseChain.then(function(){
+            var dummyElement = html.div().create();
+            var Connector = my.TableConnector;
+            var connector = new Connector({
+                my:my, 
+                tableName: foreignKey.references,
+                getElementToDisplayCount:function(){ return dummyElement }
+            });
+            connector.getStructure();
+            return connector.whenStructureReady.then(function(tableDef){
+                structuresArray.push(tableDef);
+            });
+        });
+    });
+    promiseChain=promiseChain.then(function(){
+        return structuresArray;
+    })
+    return promiseChain;
+}
+
 myOwn.TableConnector = function(context, opts){
     var connector = this;
     for(var attr in context){
@@ -229,41 +270,18 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(opts){
     var structureFromBackend = getStructureFromBackend(connector.tableName);
     if(my.inLdb && opts.registerInLocalDB){
         var canContinue = structureFromBackend.then(function(tableDef){
-            return my.inLdb(function(ldb){
-                var structureToRegister=changing(tableDef, connector.opts.tableDef||{});
-                var promiseChain=ldb.registerStructure(structureToRegister);
-                /*if(!connector.localDef || JSON.stringify(tableDef)!=JSON.stringify(connector.localDef)){
-                    alertPromise('la tabla '+connector.tableName+' cambió de estructura. Debe Refrescar la página')
-                }*/
-                if(connector.def.offline.mode==='master'){
-                    connector.def.offline.details.forEach(function(tableName){
+            my.getStructuresToRegisterInLdb(tableDef,[]).then(function(structuresToRegister){
+                structuresToRegister.unshift(tableDef);
+                return my.inLdb(function(ldb){
+                    var promiseChain=Promise.resolve();
+                    structuresToRegister.forEach(function(structureToRegister){
                         promiseChain = promiseChain.then(function(){
-                            return ldb.getStructure(tableName).then(function(tableDef){
-                                if(!tableDef){
-                                    return getStructureFromBackend(tableName).then(function(tableDef){
-                                        return ldb.registerStructure(tableDef);
-                                    });
-                                }
-                            });
+                            return ldb.registerStructure(structureToRegister);
                         });
                     });
-                }
-                connector.def.foreignKeys.forEach(function(foreignKey){
-                    promiseChain = promiseChain.then(function(){
-                        return ldb.getStructure(foreignKey.references).then(function(tableDef){
-                            if(!tableDef){
-                                return getStructureFromBackend(foreignKey.references).then(function(tableDef){
-                                    return ldb.registerStructure(tableDef);
-                                });
-                            }
-                        });
-                    });
+                    return promiseChain;
                 });
-                promiseChain = promiseChain.then(function(){
-                    return connector.def;
-                });
-                return promiseChain;
-            });
+            })
         });
         if(opts.waitForFreshStructure){
             canContinue = Promise.resolve();
