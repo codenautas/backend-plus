@@ -191,7 +191,7 @@ install:
     db:
       owner: user_owner
     scripts:
-      post-adapt: [special_triggers.sql, other_contraints.sql]
+      post-adapt: [special_triggers.sql, other_constraints.sql]
 login:
   plus:
     allowHttpLogin: true
