@@ -106,7 +106,7 @@ export class LocalDb{
             request.onsuccess=function(){
                 resolve()
             }
-            request.onerror=function(){
+            request.onerror=function(event){
                 reject()
             }
         })
@@ -358,22 +358,23 @@ export class LocalDb{
         
         var transaction=db.transaction(tableName,"readwrite");
         var objectStore=transaction.objectStore(tableName);
-        var promiseChain = Promise.resolve();
-        elements.forEach(function(element){
-            promiseChain=promiseChain.then(async function(){
-                var storeTask;
+        var i = 0;
+        putNext();
+        function putNext() {
+            if(i<elements.length){
                 if(detectedFeatures.needToUnwrapArrayKeys){
                     var newKey=tableName+JSON.stringify(tableDef.primaryKey.map(function(name){
-                        return element[name];
+                        return elements[i][name];
                     }));
-                    storeTask = objectStore.put(element,newKey);
+                    objectStore.put(elements[i],newKey).onsuccess=putNext;
                 }else{
-                    storeTask = objectStore.put(element);
+                    objectStore.put(elements[i]).onsuccess=putNext;
                 }
-                await ldb.IDBX<Key>(storeTask);
-            })
-        })
-        await promiseChain;
+                ++i;
+            }else{
+                return Promise.resolve();
+            }
+        } 
     }
     async close():Promise<void>{
         var db=await this.wait4db;

@@ -199,6 +199,7 @@ myOwn.getStructureFromLocalDb = function getStructureFromLocalDb(tableName){
 
 myOwn.getStructuresToRegisterInLdb = function getStructuresToRegisterInLdb(parentTableDef, structuresArray){
     var promiseChain = Promise.resolve();
+    structuresArray.push(parentTableDef);
     if(parentTableDef.offline.mode==='master'){
         parentTableDef.offline.details.forEach(function(tableName){
             promiseChain = promiseChain.then(function(){
@@ -211,7 +212,6 @@ myOwn.getStructuresToRegisterInLdb = function getStructuresToRegisterInLdb(paren
                 });
                 connector.getStructure();
                 return connector.whenStructureReady.then(function(tableDef){
-                    structuresArray.push(tableDef);
                     return getStructuresToRegisterInLdb(tableDef, structuresArray)
                 });
             });
@@ -272,10 +272,9 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(opts){
     var structureFromBackend = getStructureFromBackend(connector.tableName);
     if(my.inLdb && opts.registerInLocalDB){
         var canContinue = structureFromBackend.then(function(tableDef){
-            my.getStructuresToRegisterInLdb(tableDef,[]).then(function(structuresToRegister){
-                structuresToRegister.unshift(tableDef);
+            return my.getStructuresToRegisterInLdb(tableDef,[]).then(function(structuresToRegister){
+                var promiseChain=Promise.resolve();
                 return my.inLdb(function(ldb){
-                    var promiseChain=Promise.resolve();
                     structuresToRegister.forEach(function(structureToRegister){
                         promiseChain = promiseChain.then(function(){
                             return ldb.registerStructure(structureToRegister);
@@ -283,9 +282,9 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(opts){
                     });
                     return promiseChain;
                 });
-            })
+            });
         });
-        if(opts.waitForFreshStructure){
+        if(!opts.waitForFreshStructure){
             canContinue = Promise.resolve();
         }
         connector.whenStructureReady = canContinue.then(function(){

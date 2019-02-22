@@ -5,7 +5,7 @@
 /// <reference path="../../src/for-client/my-localdb.ts" />
 /// <reference path="../../src/for-client/my-localdb.ts" />
 
-import {LocalDb, TableDefinition} from "../for-client/my-localdb";
+import {LocalDb, LocalDbTransaction, TableDefinition} from "../for-client/my-localdb";
 import {changing} from "best-globals";
 import "mocha";
 
@@ -248,4 +248,80 @@ describe("local-db", function(){
             compare(myChangedProduct, changing(products[0],{unit:'ml', units__description:'millilitre'}));
         })
     })
+});
+
+describe("local-db-transaction", function(){
+    /** @type {(callback:(ldb:any)=>Promise<T>)=>Promise<T>} */
+    var inLdb;
+    var tableDef;
+    var tableDef2;
+    var tableDef3;
+    var databaseName: string;
+    before(function(){
+        databaseName = "the-test-name"+Math.random();
+        inLdb = new LocalDbTransaction(databaseName).getBindedInTransaction();
+        tableDef={
+            name:'this_name',
+            fields:[
+                {name: 'pk1', typeName:'text'}
+            ],
+            primaryKey:['pk1']
+        };
+        tableDef2={
+            name:'other_name',
+            fields:[
+                {name: 'pk2', typeName:'text'}
+            ],
+            primaryKey:['pk2']
+        };
+        tableDef3={
+            name:'another_name',
+            fields:[
+                {name: 'pk3', typeName:'text'}
+            ],
+            primaryKey:['pk3']
+        };
+    });
+    describe("structures", function(){
+        it("put and get structure", async function(){
+            this.timeout(10000);
+            var structure = await inLdb(async function(ldb){
+                await ldb.registerStructure(tableDef);
+                return ldb.getStructure(tableDef.name)
+            });
+            compare(tableDef,structure);
+        });
+        it("drop database and put structure", async function(){
+            this.timeout(10000);
+            await LocalDb.deleteDatabase(databaseName);
+            var structure = await inLdb(async function(ldb){
+                await ldb.registerStructure(tableDef);
+                return ldb.getStructure(tableDef.name)
+            });
+            compare(tableDef,structure);
+        });
+        it("drop database and put a collection of structures", async function(){
+            this.timeout(10000);
+            var structures = [tableDef, tableDef2, tableDef3]
+            await LocalDb.deleteDatabase(databaseName);
+            var registeredStructs = await inLdb(async function(ldb){
+                var promiseChain=Promise.resolve();
+                structures.forEach(async function(structureToRegister){
+                    promiseChain = promiseChain.then(function(){
+                        return ldb.registerStructure(structureToRegister);
+                    });
+                });
+                promiseChain = promiseChain.then(async function(){
+                    var struct = await ldb.getStructure(tableDef.name);
+                    var struct2 = await ldb.getStructure(tableDef2.name);
+                    var struct3 = await ldb.getStructure(tableDef3.name);
+                    return [struct,struct2,struct3]
+                });
+                return promiseChain;
+            });
+            compare(tableDef,registeredStructs[0]);
+            compare(tableDef2,registeredStructs[1]);
+            compare(tableDef3,registeredStructs[2]);
+        });
+    });
 });
