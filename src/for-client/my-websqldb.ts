@@ -106,12 +106,13 @@ export class WebsqlDb{
         })
     }*/
     async registerStructure(tableDef:TableDefinition):Promise<any>{
-        await this.executeQuery("CREATE TABLE IF NOT EXISTS _structures (name string primary key, def json not null)",[]);
-        await this.executeQuery("insert into _structures (name, def) values (?, ?)",[tableDef.name, tableDef]);
+        await this.executeQuery(`CREATE TABLE IF NOT EXISTS _structures (name string primary key, def string not null);`,[]);
+        await this.executeQuery(`INSERT OR REPLACE INTO _structures (name, def) values (?, ?);`
+        ,[tableDef.name, JSON.stringify(tableDef)]);
     }
     async getStructure(tableName:string):Promise<TableDefinition>{
-        var result = await this.executeQuery("select * from _structures where name = (?)",[tableName]);
-        return result;
+        var result = await this.executeQuery("SELECT * from _structures where name = (?)",[tableName]);
+        return JSON.parse(result[0].def);
     }
 //    async detectFeatures(store:IDBObjectStore):Promise<DetectFeatures>{
 //        return new Promise<DetectFeatures>((resolve) => {
