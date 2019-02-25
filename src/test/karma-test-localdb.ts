@@ -3,11 +3,12 @@
 /// <reference path="../node_modules/types.d.ts/modules/myOwn/in-myOwn.d.ts" />
 /// <reference path="../../lib/in-backend-plus.d.ts" />
 /// <reference path="../../src/for-client/my-localdb.ts" />
-/// <reference path="../../src/for-client/my-localdb.ts" />
+/// <reference path="../../src/for-client/my-websqldb.ts" />
 
 import {LocalDb, LocalDbTransaction, TableDefinition} from "../for-client/my-localdb";
 import {changing} from "best-globals";
 import "mocha";
+import { WebsqlDb } from "../for-client/my-websqldb";
 
 function compare<T>(obtained:T, expected:T):boolean{
     expect(obtained).to.eql(expected);
@@ -22,7 +23,32 @@ before(function(){
     // @ts-ignore
     window.myOwn.config.useragent=new UserAgent().parse(window.navigator.userAgent);
 })
-
+/*
+describe("websql-db", function(){
+    var ldb:WebsqlDb;
+    before(function(){
+        ldb = new WebsqlDb("the-test-name"+Math.random());
+    });
+    after(function(){
+        //ldb.close();
+    });
+    describe("structures", function(){
+        it("put and get structure", async function(){
+            this.timeout(10000);
+            var tableDef:TableDefinition={
+                name:'this_name',
+                fields:[
+                    {name: 'pk1', typeName:'text'}
+                ],
+                primaryKey:['pk1']
+            };
+            await ldb.registerStructure(tableDef);
+            var newTableDef = await ldb.getStructure(tableDef.name);
+            compare(tableDef, newTableDef);
+        });
+    });
+});
+*/
 describe("local-db", function(){
     var ldb:LocalDb;
     before(function(){

@@ -31,6 +31,7 @@ module.exports = function(config, preConfig) {
       'node_modules/type-store/type-store.js',
       'node_modules/express-useragent/lib/express-useragent.js',
       'for-client/my-localdb.js',
+      'for-client/my-websqldb.js',
       'test/karma-test-*.js'
     ],
 

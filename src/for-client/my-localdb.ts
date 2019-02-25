@@ -36,7 +36,7 @@
 
 
 import * as likeAr from "like-ar";
-import { ForeignKey } from "backend-plus";
+import { ForeignKey, FieldDefinition } from "backend-plus";
 
 export type Key = string[];
 export type Stores = {[key:string]:IDBObjectStore};
@@ -48,6 +48,7 @@ export interface TableDefinition{
     primaryKey:string[]
     foreignKeys?:ForeignKey[]
     softForeignKeys?:ForeignKey[]
+    fields:FieldDefinition[]
 } 
 
 type VersionInfo = {
@@ -428,7 +429,7 @@ export class LocalDbTransaction {
                 await closeLdb(err);
                 throw err;
             }
-            await closeLdb();
+            //await closeLdb();
             return result;
     });
         return this.oneByOneChain;
