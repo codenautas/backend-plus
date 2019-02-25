@@ -406,17 +406,31 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
         ]));
         elements.push(status);
     }
-    var menuLine=html.div({id: "main-top-bar"+(depth||''), class: depth?"sub-menu-bar":"top-menu-bar"}, elements).create();
+    var spanElements=html.span(elements).create();
+    var menuLine=html.div({id: "main-top-bar"+(depth||''), class: depth?"sub-menu-bar":"top-menu-bar"}, spanElements).create();
     layout.appendChild(menuLine);
     var innerSelectedItem = selectedItem;
     if(selectedItem && selectedItem.menuType === 'menu'){
         var subMenu = my.displayMenu(layout, selectedItem.menuContent, addrParams, parents.concat(selectedItem.name));
         var realign = function(){
-            subMenu.menuLine.style.paddingLeft = selectedItem.button.offsetLeft + 'px';
+            var div=html.div({style:'position:absolute; left:0; top:0; visibility:x-hidden'}).create();
+            div.innerHTML=subMenu.spanElements.outerHTML;
+            subMenu.spanElements.parentNode.appendChild(div);
+            var theWidth=subMenu.spanElements.offsetWidth;
+            theWidth=div.childNodes[0].offsetWidth||theWidth;
+            subMenu.spanElements.parentNode.removeChild(div);
+            var oneLimit=Math.max(1,layout.offsetWidth-theWidth-32);
+            if(oneLimit<theWidth){
+                subMenu.menuLine.style.textAlign = 'right';
+                subMenu.menuLine.style.paddingLeft = null;
+            }else{
+                subMenu.menuLine.style.textAlign = 'left';
+                subMenu.menuLine.style.paddingLeft = Math.min(selectedItem.button.offsetLeft, oneLimit) + 'px';
+            }
         };
         innerSelectedItem = subMenu.selectedItem;
     }
-    return {menuLine: menuLine, selectedItem: innerSelectedItem, realigns:(subMenu?subMenu.realigns:[]).concat(realign)};
+    return {menuLine: menuLine, selectedItem: innerSelectedItem, realigns:(subMenu?subMenu.realigns:[]).concat(realign), spanElements:spanElements};
 };
 
 myOwn.displayMainMenu = function(addrParams){
@@ -425,9 +439,10 @@ myOwn.displayMainMenu = function(addrParams){
     totalLayout.innerHTML='';
     var menu = my.displayMenu(totalLayout,my.config.menu,addrParams,[]);
     totalLayout.appendChild(html.div({id:'main_layout'}).create());
-    setTimeout(function(){
+    my.doMenuRealigns=function(){
         menu.realigns.reverse().forEach(function(realign){ if(realign){ realign(); }});
-    },10);
+    }
+    setTimeout(my.doMenuRealigns,10);
     setTimeout(function(){
         my.offlineModeRefresh();
     },10);
@@ -575,6 +590,11 @@ window.addEventListener('load', function(){
         html.img({src:my.path.img+'server-error.png'}),
         html.img({src:my.path.img+'network-no-signal.png'}),
     ]).create());
+    window.addEventListener('resize', function(){
+        if(my.doMenuRealigns){
+            my.doMenuRealigns();
+        }
+    })
 });
 
 function updateOnlineStatus(){
