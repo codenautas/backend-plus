@@ -11,7 +11,7 @@ module.exports = function(context){
         elementName:'new element',
         forInsertOnlyMode:true,
         layout:{vertical:true},
-        // sql:{isTable:false}
+        sql:{isTable:false}
     });
     return defNewElement;
 }
