@@ -192,9 +192,7 @@ myOwn.comparator={
 };
 
 myOwn.getStructureFromLocalDb = function getStructureFromLocalDb(tableName){
-    return my.inLdb(function(ldb){
-        return ldb.getStructure(tableName);
-    });
+    return my.ldb.getStructure(tableName);
 }
 
 myOwn.getStructuresToRegisterInLdb = function getStructuresToRegisterInLdb(parentTableDef, structuresArray){
@@ -270,18 +268,16 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(opts){
         });
     }
     var structureFromBackend = getStructureFromBackend(connector.tableName);
-    if(my.inLdb && opts.registerInLocalDB){
+    if(my.ldb && opts.registerInLocalDB){
         var canContinue = structureFromBackend.then(function(tableDef){
             return my.getStructuresToRegisterInLdb(tableDef,[]).then(function(structuresToRegister){
                 var promiseChain=Promise.resolve();
-                return my.inLdb(function(ldb){
-                    structuresToRegister.forEach(function(structureToRegister){
-                        promiseChain = promiseChain.then(function(){
-                            return ldb.registerStructure(structureToRegister);
-                        });
+                structuresToRegister.forEach(function(structureToRegister){
+                    promiseChain = promiseChain.then(function(){
+                        return my.ldb.registerStructure(structureToRegister);
                     });
-                    return promiseChain;
                 });
+                return promiseChain;
             });
         });
         if(!opts.waitForFreshStructure){
@@ -438,20 +434,18 @@ myOwn.TableConnectorLocal.prototype.getData = function getData(){
             var key=primaryKey.shift();
             parentKey.push(connector.fixedField[key]);
         }
-        return my.inLdb(function(ldb){
-            return ldb.getChild(connector.def.name,parentKey).then(function(rows){
-                var result = rows.filter(function(row){
-                    return !filterValues.find(function(pair){
-                        return row[pair.fieldName]!=pair.value
-                    });
+        return my.ldb.getChild(connector.def.name,parentKey).then(function(rows){
+            var result = rows.filter(function(row){
+                return !filterValues.find(function(pair){
+                    return row[pair.fieldName]!=pair.value
                 });
-                if(connector.def.sortColumns){
-                    return result.sort(function(a,b){
-                        return bestGlobals.compareForOrder(connector.def.sortColumns)(a,b);
-                    })
-                }
-                return result;
-            })
+            });
+            if(connector.def.sortColumns){
+                return result.sort(function(a,b){
+                    return bestGlobals.compareForOrder(connector.def.sortColumns)(a,b);
+                })
+            }
+            return result;
         })
     }).then(function(rows){
         connector.getElementToDisplayCount().textContent=rows.length+' '+my.messages.displaying+'...';
@@ -481,10 +475,8 @@ myOwn.TableConnectorLocal.prototype.saveRecord = function saveRecord(depot, opts
     var connector = this;
     var sendedForUpdate = depot.my.cloneRow(depot.rowPendingForUpdate);
     depot.row.$dirty=true;
-    return my.inLdb(function(ldb){
-        return ldb.putOne(connector.tableName,depot.row).then(function(row){
-            return {sendedForUpdate:sendedForUpdate, updatedRow:row};
-        });
+    return my.ldb.putOne(connector.tableName,depot.row).then(function(row){
+        return {sendedForUpdate:sendedForUpdate, updatedRow:row};
     });
 };
 
@@ -2448,17 +2440,15 @@ myOwn.clientSides={
                             token:token,
                             softLock: false
                         }).then(function(result){
-                            return my.inLdb(function(ldb){
-                                var promiseArray = [];
-                                var tables=[depot.def.name].concat(depot.def.offline.details)
-                                tables.forEach(function(name,i){
-                                    promiseArray.push(
-                                        ldb.putMany(name,result.data[i])
-                                    );
-                                })
-                                return Promise.all(promiseArray).then(function(){
-                                    control.setTypedValue('🔑');
-                                })
+                            var promiseArray = [];
+                            var tables=[depot.def.name].concat(depot.def.offline.details)
+                            tables.forEach(function(name,i){
+                                promiseArray.push(
+                                    my.ldb.putMany(name,result.data[i])
+                                );
+                            })
+                            return Promise.all(promiseArray).then(function(){
+                                control.setTypedValue('🔑');
                             })
                         })
                     })

@@ -395,7 +395,7 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
                 );
             }),
             my.light('airplane', function(){
-                if(my.inLdb && my.offline){
+                if(my.ldb && my.offline){
                     if(my.offline.mode && !my.server.connected){
                         alertPromise("No es posible salir del modo avión sin conexión al servidor");
                     }else{
@@ -517,47 +517,44 @@ myOwn.changeOfflineMode = function changeOfflineMode(){
     if(my.offline.mode){
         var fkToStoreData = [];
         var promiseArray1 = [];
-        my.inLdb(function(ldb){
-            var promiseChain = ldb.getAll('$structures').then(function(tablesDef){
-                tablesDef.forEach(function(tableDef){
-                    promiseArray1.push(
-                        ldb.isEmpty(tableDef.name).then(function(isEmpty){
-                            if(!isEmpty){
-                                var fkToStoreSearch = tableDef.foreignKeys.filter(function(fk){
-                                    return fk.fields.find(function(field){
-                                        return !tableDef.primaryKey.includes(field.source)
-                                    })
-                                });
-                                fkToStoreData = fkToStoreData.concat(fkToStoreSearch);
-                            }
+        var promiseChain = my.ldb.getAllStructures().then(function(tablesDef){
+            tablesDef.forEach(function(tableDef){
+                promiseArray1.push(
+                    my.ldb.isEmpty(tableDef.name).then(function(isEmpty){
+                        if(!isEmpty){
+                            var fkToStoreSearch = tableDef.foreignKeys.filter(function(fk){
+                                return fk.fields.find(function(field){
+                                    return !tableDef.primaryKey.includes(field.source)
+                                })
+                            });
+                            fkToStoreData = fkToStoreData.concat(fkToStoreSearch);
+                        }
+                    })
+                );
+            });
+        });
+        var promiseArray2 = [];
+        promiseChain = promiseChain.then(function(){
+            return Promise.all(promiseArray1).then(function(){
+                return fkToStoreData.forEach(function(fk){
+                    var conn = new my.TableConnector({tableName: fk.references, my:my});
+                    var opts = { registerInLocalDB: false };
+                    conn.getStructure(opts)
+                    promiseArray2.push(
+                        Promise.resolve().then(function(){
+                            return conn.getData().then(function(rows){
+                                return my.ldb.putMany(fk.references, rows)
+                            })
                         })
                     );
                 });
             });
-            var promiseArray2 = [];
-            promiseChain = promiseChain.then(function(){
-                return Promise.all(promiseArray1).then(function(){
-                    return fkToStoreData.forEach(function(fk){
-                        var conn = new my.TableConnector({tableName: fk.references, my:my});
-                        var opts = { registerInLocalDB: false };
-                        conn.getStructure(opts)
-                        promiseArray2.push(
-                            Promise.resolve().then(function(){
-                                return conn.getData().then(function(rows){
-                                    return ldb.putMany(fk.references, rows)
-                                })
-                            })
-                        );
-                    });
-                });
-            });
-            promiseChain = promiseChain.then(function(){
-                return Promise.all(promiseArray2)
-            });
-            return promiseChain;
-        }).then(function(){
-            location.reload();
-        })
+        });
+        promiseChain = promiseChain.then(function(){
+            Promise.all(promiseArray2).then(function(){
+                location.reload();
+            })
+        });
     }else{
         my.showPage();
         location.reload();

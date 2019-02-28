@@ -66,40 +66,42 @@ export class WebsqlDb{
     private generateSqlForTableDef(tableDef:TableDefinition):string{
         var typeDb={
             integer: 'integer',
-            number: 'numeric',
+            number: 'real',
             date: 'date',
             boolean: 'boolean',
-            text: 'text'
+            text: 'text',
+            jsonb: 'text',
+            json: 'text'
         };
         var lines = [];
         var consLines:string[] = [];
         lines.push('CREATE TABLE IF NOT EXISTS '+sqlTools.quoteIdent(tableDef.name)+' (');
         var fields:any[]=[];
+        //REVISAR
+        //tableDef.fields.unshift({ name:"$dirty", typeName: 'boolean' });
         tableDef.fields.forEach(function(fieldDef:FieldDefinition){
-            if(!fieldDef.clientSide && fieldDef.inTable!==false/* && !(tableDef.sql.fields[fieldDef.name]||{}).expr || fieldDef.inTable*/){
-                var fieldType=typeDb[fieldDef.typeName]||'"'+fieldDef.typeName+'"';
-                if(fieldDef.sizeByte==4){
-                    fieldType = 'integer';
-                }
-                fields.push(
-                    '  '+sqlTools.quoteIdent(fieldDef.name)+
-                    ' '+fieldType+
-                    (fieldDef.defaultValue!=null?' default '+sqlTools.quoteLiteral(fieldDef.defaultValue):'')+
-                    (fieldDef.defaultDbValue!=null?' default '+fieldDef.defaultDbValue:'')
+            var fieldType=typeDb[fieldDef.typeName]||'"'+fieldDef.typeName+'"';
+            if(fieldDef.sizeByte==4){
+                fieldType = 'integer';
+            }
+            fields.push(
+                '  '+sqlTools.quoteIdent(fieldDef.name)+
+                ' '+fieldType+
+                (fieldDef.defaultValue!=null?' default '+sqlTools.quoteLiteral(fieldDef.defaultValue):'')+
+                (fieldDef.defaultDbValue!=null?' default '+fieldDef.defaultDbValue:'')
+            );
+            if(fieldDef.typeName==='text' && !fieldDef.allowEmptyText){
+                consLines.push(
+                    'alter table '+sqlTools.quoteIdent(tableDef.name)+
+                    ' add constraint '+sqlTools.quoteIdent(fieldDef.name+"<>''")+
+                    ' check ('+sqlTools.quoteIdent(fieldDef.name)+"<>'');"
                 );
-                if(fieldDef.typeName==='text' && !fieldDef.allowEmptyText){
-                    consLines.push(
-                        'alter table '+sqlTools.quoteIdent(tableDef.name)+
-                        ' add constraint '+sqlTools.quoteIdent(fieldDef.name+"<>''")+
-                        ' check ('+sqlTools.quoteIdent(fieldDef.name)+"<>'');"
-                    );
-                }
-                if(fieldDef.nullable===false){
-                    consLines.push(
-                        'alter table '+sqlTools.quoteIdent(tableDef.name)+
-                        ' alter column '+sqlTools.quoteIdent(fieldDef.name)+' set not null;'
-                    );
-                }
+            }
+            if(fieldDef.nullable===false){
+                consLines.push(
+                    'alter table '+sqlTools.quoteIdent(tableDef.name)+
+                    ' alter column '+sqlTools.quoteIdent(fieldDef.name)+' set not null;'
+                );
             }
         });
         lines.push(fields.join(', \n'));
@@ -109,18 +111,9 @@ export class WebsqlDb{
         lines.push(');');
         return lines.join('\n')//+'\n-- conss\n' + consLines.join('\n')
     }
-    /*public static deleteDatabase(name:string):Promise<void>{
-        var request = indexedDB.deleteDatabase(name);
-        return new Promise(function(resolve,reject){
-            request.onsuccess=function(){
-                resolve()
-            }
-            request.onerror=function(event){
-                reject()
-            }
-        })
-    }*/
-    
+    public static deleteDatabase(name:string):Promise<void>{
+        return Promise.resolve()
+    }
     async executeQuery(sql:string, params:null|{}[]){
         var db = this.db;
         return new Promise(function(resolve, reject){
@@ -171,8 +164,32 @@ export class WebsqlDb{
         var tableDef = await this.getStructure(tableName);
         return tableDef?true:false;
     }
+    private fieldIsJsonb(fieldName:string, jsonbFields:FieldDefinition[]):boolean{
+        var isJsonb = jsonbFields.find(function(field){
+            return field.name==fieldName;
+        })
+        return isJsonb?true:false
+    }
+    private getJsonbFieldsFields(tableDef:TableDefinition):FieldDefinition[]{
+        var jsonbFields = tableDef.fields.filter(function(field){
+            return field.typeName=='jsonb';
+        })
+        return jsonbFields;
+    }
+    private convertJsonbFields(records:any[], jsonbFields:FieldDefinition[]):any[]{
+        records.forEach(function(row){
+            if(jsonbFields){
+                jsonbFields.forEach(function(jsonbField){
+                    var fieldName = jsonbField.name;
+                    row[fieldName]=JSON.parse(row[fieldName]);
+                })    
+            }
+        })
+        return records
+    }
     async getOneIfExists<T>(tableName:string, key:Key):Promise<T|undefined>{
         var tableDef = await this.getStructure(tableName);
+        var jsonbFields = this.getJsonbFieldsFields(tableDef);
         var fieldNames=tableDef.primaryKey;
         var whereExpr:string[] = [];
         fieldNames.forEach(function(fieldName, i){
@@ -182,10 +199,12 @@ export class WebsqlDb{
                     from `+sqlTools.quoteIdent(tableName)+`
                     where ` + whereExpr.join(' and ');
         var result = await this.executeQuery(sql,[]);
-        return result[0]?result[0]:undefined;
+        var convertedResult = this.convertJsonbFields(likeAr(result).array(), jsonbFields);
+        return convertedResult[0]?convertedResult[0]:undefined;
     }
     async getOne<T>(tableName:string, key:Key):Promise<T>{
         var tableDef = await this.getStructure(tableName);
+        var jsonbFields = this.getJsonbFieldsFields(tableDef);
         var fieldNames=tableDef.primaryKey;
         var whereExpr:string[] = [];
         fieldNames.forEach(function(fieldName, i){
@@ -196,28 +215,32 @@ export class WebsqlDb{
                 from `+sqlTools.quoteIdent(tableName)+`
                 where ` + whereExpr.join(' and ');
         var result = await this.executeQuery(sql,[]);
-        return result[0];
+        var convertedResult = this.convertJsonbFields(likeAr(result).array(), jsonbFields);
+        return convertedResult[0];
     }
     async getChild<T>(tableName:string, parentKey:Key):Promise<T[]>{
         var tableDef = await this.getStructure(tableName);
+        var jsonbFields = this.getJsonbFieldsFields(tableDef);
         var fieldNames=tableDef.primaryKey;
         var whereExpr:string[] = [];
         parentKey.forEach(function(key, i){
             whereExpr.push(fieldNames[i] + '=' + sqlTools.quoteLiteral(key))
         })
-        var sql = `SELECT * 
-                    from `+sqlTools.quoteIdent(tableName)+`
-                    where ` + whereExpr.join(' and ');
+        var sql = `SELECT * from `+sqlTools.quoteIdent(tableName);
+        if(parentKey.length){
+            sql+= ` where ` + whereExpr.join(' and ');
+        }
         var result = await this.executeQuery(sql,[]);
-        return likeAr(result).array()
+        return this.convertJsonbFields(likeAr(result).array(), jsonbFields);
     }
     async getAll<T>(tableName:string):Promise<T[]>{
+        var tableDef = await this.getStructure(tableName);
+        var jsonbFields = this.getJsonbFieldsFields(tableDef);
         var results = await this.executeQuery(`SELECT * from `+sqlTools.quoteIdent(tableName),[]);
-        return likeAr(results).array()
+        return this.convertJsonbFields(likeAr(results).array(), jsonbFields);
     }
     async getAllStructures<T>():Promise<T[]>{
         var results = await this.executeQuery(`SELECT * from _structures`,[]);
-        var structures:TableDefinition[] = [];
         return likeAr(results).array().map(function(element:any){
             return JSON.parse(element.def);
         })
@@ -251,6 +274,7 @@ export class WebsqlDb{
             })
         }
         var tableDef=await ldb.getStructure(tableName);
+        var jsonbFields = this.getJsonbFieldsFields(tableDef);
         var promisesArray: Promise<void>[] = [];
         if(tableDef.foreignKeys){
             tableDef.foreignKeys.forEach(async function(fk){
@@ -267,7 +291,7 @@ export class WebsqlDb{
             var fieldValues=[];
             likeAr(element).forEach(function(value,key){
                 fieldNames.push(sqlTools.quoteIdent(key));
-                fieldValues.push(sqlTools.quoteLiteral(value));
+                fieldValues.push(sqlTools.quoteLiteral(ldb.fieldIsJsonb(key,jsonbFields)?JSON.stringify(value):value));
             })
             await ldb.executeQuery(
                 `INSERT OR REPLACE INTO `+sqlTools.quoteIdent(tableName)+
@@ -278,7 +302,10 @@ export class WebsqlDb{
     }
     async putMany<T extends {}>(tableName:string, elements:T[]):Promise<void>{
         var sql:string;
+        var ldb = this;
         var data:(any[])[]=[];
+        var tableDef=await this.getStructure(tableName);
+        var jsonbFields = this.getJsonbFieldsFields(tableDef);
         elements.forEach(function(element){
             if(!sql){
                 var fieldNames:string[]=[];
@@ -288,7 +315,7 @@ export class WebsqlDb{
                 if(!sql){
                     fieldNames.push(sqlTools.quoteIdent(key));
                 }
-                values.push(value);
+                values.push(ldb.fieldIsJsonb(key,jsonbFields)?JSON.stringify(value):value);
             })
             if(!sql){
                 sql = `INSERT OR REPLACE INTO `+sqlTools.quoteIdent(tableName)+

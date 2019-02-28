@@ -76,6 +76,7 @@ var TypeStore=require('type-store');
 var JSON4all = require('json4all');
 var LocalDbTransaction = require('./my-localdb').LocalDbTransaction;
 var LocalDb = require('./my-localdb').LocalDb;
+var WebSqlDb = require('./my-websqldb').WebsqlDb;
 
 /** @param {T} x
  *  @returns {T}
@@ -173,11 +174,22 @@ myOwn.autoSetupFunctions = [
                 });
                 DialogPromise.path.img=my.path.img;
                 TypedControls.path.img=my.path.img;
-                if(my.config.config['grid-buffer']=='idbx'){
+                var gridBuffer = my.config.config['grid-buffer'];
+                var offlineMode = gridBuffer && (gridBuffer === 'idbx' || gridBuffer === 'wsql');
+                if(offlineMode){
                     try{
-                        // my.ldb = new LocalDb(my.appName+my.clientVersion);
-                        /** @type {(callback:(ldb:any)=>Promise<T>)=>Promise<T>} */
-                        my.inLdb = new LocalDbTransaction(my.appName+my.clientVersion).getBindedInTransaction()
+                        switch(gridBuffer) {
+                            case 'idbx':
+                              my.ldb = new LocalDb(my.appName+my.clientVersion);
+                              ///** @type {(callback:(ldb:any)=>Promise<T>)=>Promise<T>} */
+                              //my.inLdb = new LocalDbTransaction(my.appName+my.clientVersion).getBindedInTransaction()
+                              break;
+                            case 'wsql':
+                              my.ldb = new WebSqlDb(my.appName+my.clientVersion);
+                              break;
+                            default:
+                              throw new Error('grid buffer name is bad defined')
+                          }
                     }catch(err){
                         my.log(err);
                     }
@@ -218,7 +230,23 @@ myOwn.autoSetupFunctions = [
     }
 ];
 myOwn.deleteLocalDb = function deleteLocalDb(){
-    return LocalDb.deleteDatabase(my.appName+my.clientVersion);
+    var gridBuffer = my.config.config['grid-buffer'];
+    var offlineMode = gridBuffer && (gridBuffer === 'idbx' || gridBuffer === 'wsql');
+    if(offlineMode){
+        try{
+            switch(gridBuffer) {
+                case 'idbx':
+                  return LocalDb.deleteDatabase(my.appName+my.clientVersion);              
+                case 'wsql':
+                  return WebSqlDb.deleteDatabase(my.appName+my.clientVersion);              
+                default:
+                  throw new Error('grid buffer name is bad defined')
+              }
+        }catch(err){
+            my.log(err);
+        }
+    }
+    
 }
 myOwn.autoSetup = function autoSetup(){
     var my=this;

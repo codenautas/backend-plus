@@ -287,6 +287,9 @@ export class LocalDb{
     async getAll<T>(tableName:string):Promise<T[]>{
         return this.getChild<T>(tableName,tableName[0]=='$'?null:[]);
     }
+    async getAllStructures<T>():Promise<T[]>{
+        return this.getAll('$structures');
+    }
     async isEmpty(tableName:string):Promise<boolean>{
         var ldb=this;
         var db=await ldb.wait4db;
