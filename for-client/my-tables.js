@@ -474,7 +474,9 @@ myOwn.TableConnectorLocal.prototype.deleteRecord = function deleteRecord(depot, 
 myOwn.TableConnectorLocal.prototype.saveRecord = function saveRecord(depot, opts){
     var connector = this;
     var sendedForUpdate = depot.my.cloneRow(depot.rowPendingForUpdate);
-    depot.row.$dirty=true;
+    if(depot.row.$dirty){
+        depot.row.$dirty=true;
+    }
     return my.ldb.putOne(connector.tableName,depot.row).then(function(row){
         return {sendedForUpdate:sendedForUpdate, updatedRow:row};
     });
