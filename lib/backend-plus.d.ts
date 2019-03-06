@@ -54,9 +54,12 @@ export interface ContextForDump extends Context {
     forDump?:boolean
 }
 
+export type InformProgressFunction=(opts:Error|{data:any}|{message:string}|{message?:string, lengthComputable:boolean, loaded:number, total:number})=>void
+
 export type ProcedureContext=Context & {
     client:pg.Client,
-    doing:string
+    doing:string,
+    informProgress:InformProgressFunction
 }
 export interface Request extends express.Request {
     user:User
