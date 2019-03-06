@@ -15,42 +15,21 @@
 import * as likeAr from "like-ar";
 import { ForeignKey, TableDefinition, FieldDefinition } from "backend-plus";
 import { changing } from "best-globals";
+import * as SqlTools from "sql-tools";
 
 export type Key = string[];
-export type Stores = {[key:string]:IDBObjectStore};
-export type StoreDefs = {[key:string]:Key|string};
-export type Record = {[key:string]:any};
-
-//QUITAR DE ACÁ y tratar de importar sql-tools
-var sqlTools = {};
-sqlTools.quoteIdent = function(dbObjectName){
-    return '"'+dbObjectName.toString().replace(/"/g,'""')+'"';
-}
-
-sqlTools.quoteLiteral = function(dbAnyValue){
-    return dbAnyValue==null?"null":"'"+dbAnyValue.toString().replace(/'/g,"''")+"'";
-}
-
-
-type VersionInfo = {
-    var:'version',
-    num:1, 
-    timestamp:string,
-    stores:StoreDefs
-}
-
-type RegisterResult={new?:true, dataErased?:true, changed:boolean};
 
 type DetectFeatures={
-    needToUnwrapArrayKeys:boolean
+    needToCopyResults:boolean
 }
 
 export var detectedFeatures:DetectFeatures={
-    needToUnwrapArrayKeys:null
+    needToCopyResults:null
 }
 
 export class WebsqlDb{
     private db:Database;
+    private wait4detectedFeatures:Promise<DetectFeatures>;
     constructor(public name:string){
         var version = 1.0;
         var dbName = this.name;
@@ -58,10 +37,33 @@ export class WebsqlDb{
         var dbSize = 2 * 1024 * 1024;
         try{
             this.db = openDatabase(dbName, version, dbDisplayName, dbSize);
+            this.wait4detectedFeatures = this.detectFeatures();
         }catch(err){
             console.log(err.message);
             throw err;
         }
+    }
+    private async detectFeatures():Promise<DetectFeatures>{
+        var detectedFeatures:DetectFeatures = {needToCopyResults: false};
+        var detectElement = {feature: 'need_to_copy_results', value:false};
+        try{
+            var tableDef:TableDefinition={
+                name:'_detect',
+                fields:[
+                    {name:'feature', typeName:'text'},
+                    {name:'value'  , typeName:'boolean'}
+                ],
+                primaryKey:['feature']
+            };
+            await this.registerStructure(tableDef);
+            await this.putOne('_detect', detectElement);
+            await this.getOne('_detect',['need_to_copy_results'], true);
+        }catch(err){
+            detectElement.value=true;
+            detectedFeatures.needToCopyResults = true;
+            await this.putOne('_detect', detectElement);
+        }
+        return detectedFeatures;
     }
     private generateSqlForTableDef(tableDef:TableDefinition):string{
         var typeDb={
@@ -75,7 +77,7 @@ export class WebsqlDb{
         };
         var lines = [];
         var consLines:string[] = [];
-        lines.push('CREATE TABLE IF NOT EXISTS '+sqlTools.quoteIdent(tableDef.name)+' (');
+        lines.push('CREATE TABLE IF NOT EXISTS '+SqlTools.quoteIdent(tableDef.name)+' (');
         var fields:any[]=[];
         tableDef.fields.forEach(function(fieldDef:FieldDefinition){
             var fieldType=typeDb[fieldDef.typeName]||'"'+fieldDef.typeName+'"';
@@ -83,28 +85,28 @@ export class WebsqlDb{
                 fieldType = 'integer';
             }
             fields.push(
-                '  '+sqlTools.quoteIdent(fieldDef.name)+
+                '  '+SqlTools.quoteIdent(fieldDef.name)+
                 ' '+fieldType+
-                (fieldDef.defaultValue!=null?' default '+sqlTools.quoteLiteral(fieldDef.defaultValue):'')+
+                (fieldDef.defaultValue!=null?' default '+SqlTools.quoteLiteral(fieldDef.defaultValue):'')+
                 (fieldDef.defaultDbValue!=null?' default '+fieldDef.defaultDbValue:'')
             );
             if(fieldDef.typeName==='text' && !fieldDef.allowEmptyText){
                 consLines.push(
-                    'alter table '+sqlTools.quoteIdent(tableDef.name)+
-                    ' add constraint '+sqlTools.quoteIdent(fieldDef.name+"<>''")+
-                    ' check ('+sqlTools.quoteIdent(fieldDef.name)+"<>'');"
+                    'alter table '+SqlTools.quoteIdent(tableDef.name)+
+                    ' add constraint '+SqlTools.quoteIdent(fieldDef.name+"<>''")+
+                    ' check ('+SqlTools.quoteIdent(fieldDef.name)+"<>'');"
                 );
             }
             if(fieldDef.nullable===false){
                 consLines.push(
-                    'alter table '+sqlTools.quoteIdent(tableDef.name)+
-                    ' alter column '+sqlTools.quoteIdent(fieldDef.name)+' set not null;'
+                    'alter table '+SqlTools.quoteIdent(tableDef.name)+
+                    ' alter column '+SqlTools.quoteIdent(fieldDef.name)+' set not null;'
                 );
             }
         });
         lines.push(fields.join(', \n'));
         if(tableDef.primaryKey){
-            lines.push(', primary key ('+tableDef.primaryKey.map(function(name){ return sqlTools.quoteIdent(name); }).join(', ')+')');
+            lines.push(', primary key ('+tableDef.primaryKey.map(function(name){ return SqlTools.quoteIdent(name); }).join(', ')+')');
         }
         lines.push(');');
         return lines.join('\n')//+'\n-- conss\n' + consLines.join('\n')
@@ -148,7 +150,7 @@ export class WebsqlDb{
         await this.executeQuery(`CREATE TABLE IF NOT EXISTS _structures (name string primary key, def string not null);`,[]);
         await this.executeQuery(`INSERT OR REPLACE INTO _structures (name, def) values (?, ?);`
         ,[tableDef.name, JSON.stringify(tableDef)]);
-        await this.executeQuery(`DROP TABLE IF EXISTS `+ sqlTools.quoteIdent(tableDef.name),[]);
+        await this.executeQuery(`DROP TABLE IF EXISTS `+ SqlTools.quoteIdent(tableDef.name),[]);
         await this.executeQuery(this.generateSqlForTableDef(tableDef),[]);
     }
     async getStructure(tableName:string):Promise<TableDefinition|undefined>{
@@ -163,10 +165,14 @@ export class WebsqlDb{
         var tableDef = await this.getStructure(tableName);
         return tableDef?true:false;
     }
-    private convertSQLResultSetRowListToArray(rowResultSetList:SQLResultSetRowList):Array{
+    private convertSQLResultSetRowListToArray(rowResultSetList:SQLResultSetRowList, copyResults:boolean):any[]{
         var arr:any[]=[];
         for(var i=0; i<rowResultSetList.length;i++){
-            arr.push(rowResultSetList.item(i));
+            var result = rowResultSetList.item(i);
+            if(copyResults){
+                result = changing(result,{})
+            }
+            arr.push(result);
         }
         return arr;
     }
@@ -200,22 +206,28 @@ export class WebsqlDb{
             return undefined
         }
     }
-    async getOne<T>(tableName:string, key:Key):Promise<T>{
+    async getOne<T>(tableName:string, key:Key, ignoreDetectFeatures?:boolean):Promise<T>{
+        ignoreDetectFeatures=ignoreDetectFeatures||false; 
         var tableDef = await this.getStructure(tableName);
         var jsonbFields = this.getNotSupportedFields(tableDef);
         var fieldNames=tableDef.primaryKey;
         var whereExpr:string[] = [];
         fieldNames.forEach(function(fieldName, i){
-            whereExpr.push(fieldName + '=' + sqlTools.quoteLiteral(key[i]))
+            whereExpr.push(fieldName + '=' + SqlTools.quoteLiteral(key[i]))
         })
         var sql = 
             `SELECT * 
-                from `+sqlTools.quoteIdent(tableName)+`
+                from `+SqlTools.quoteIdent(tableName)+`
                 where ` + whereExpr.join(' and ');
         var result = await this.executeQuery(sql,[]);
-        var convertedResult = this.convertNotSupportedFields(this.convertSQLResultSetRowListToArray(result), jsonbFields);
+        var detectedFeatures;
+        if(!ignoreDetectFeatures){
+            detectedFeatures = await this.wait4detectedFeatures;
+        }
+        var copyResults = !ignoreDetectFeatures && detectedFeatures.needToCopyResults;
+        var convertedResult = this.convertNotSupportedFields(this.convertSQLResultSetRowListToArray(result,copyResults), jsonbFields);
         if(convertedResult[0]){
-            return changing(convertedResult[0],convertedResult[0]);
+            return convertedResult[0];
         }else{
             throw Error('no existe el elemento');
         }
@@ -226,23 +238,25 @@ export class WebsqlDb{
         var fieldNames=tableDef.primaryKey;
         var whereExpr:string[] = [];
         parentKey.forEach(function(key, i){
-            whereExpr.push(fieldNames[i] + '=' + sqlTools.quoteLiteral(key))
+            whereExpr.push(fieldNames[i] + '=' + SqlTools.quoteLiteral(key))
         })
-        var sql = `SELECT * from `+sqlTools.quoteIdent(tableName);
+        var sql = `SELECT * from `+SqlTools.quoteIdent(tableName);
         if(parentKey.length){
             sql+= ` where ` + whereExpr.join(' and ');
         }
         var result = await this.executeQuery(sql,[]);
-        return this.convertNotSupportedFields(this.convertSQLResultSetRowListToArray(result), jsonbFields);
+        var detectedFeatures = await this.wait4detectedFeatures;
+        return this.convertNotSupportedFields(this.convertSQLResultSetRowListToArray(result, detectedFeatures.needToCopyResults), jsonbFields);
     }
     async getAll<T>(tableName:string):Promise<T[]>{
         var tableDef = await this.getStructure(tableName);
         var jsonbFields = this.getNotSupportedFields(tableDef);
-        var results = await this.executeQuery(`SELECT * from `+sqlTools.quoteIdent(tableName),[]);
-        return this.convertNotSupportedFields(this.convertSQLResultSetRowListToArray(results), jsonbFields);
+        var results = await this.executeQuery(`SELECT * from `+SqlTools.quoteIdent(tableName),[]);
+        var detectedFeatures = await this.wait4detectedFeatures;
+        return this.convertNotSupportedFields(this.convertSQLResultSetRowListToArray(results, detectedFeatures.needToCopyResults), jsonbFields);
     }
     async getAllStructures():Promise<TableDefinition[]>{
-        var results = await this.executeQuery(`SELECT * from _structures`,[]);
+        var results = await this.executeQuery(`SELECT * from _structures where name <> '_detect'`,[]);
         var structures:TableDefinition[]=[];
         for(var i=0; i<results.length;i++){
             structures.push(JSON.parse(results.item(i).def));
@@ -250,7 +264,7 @@ export class WebsqlDb{
         return structures;
     }
     async isEmpty(tableName:string):Promise<boolean>{
-        var result:SQLResultSetRowList = await this.executeQuery(`SELECT count(*) as cantidad from `+sqlTools.quoteIdent(tableName),[]);
+        var result:SQLResultSetRowList = await this.executeQuery(`SELECT count(*) as cantidad from `+SqlTools.quoteIdent(tableName),[]);
         return result.item(0).cantidad == 0;
     }
     async putOne<T>(tableName:string, element:T):Promise<T>{
@@ -295,12 +309,12 @@ export class WebsqlDb{
             var fieldValues:string[]=[];
             var unquotedFieldValues:string[]=[];
             likeAr(element).forEach(function(value,key){
-                fieldNames.push(sqlTools.quoteIdent(key));
-                fieldValues.push(sqlTools.quoteLiteral(ldb.fieldIsNotSupported(key,jsonbFields)?JSON.stringify(value):value));
+                fieldNames.push(SqlTools.quoteIdent(key));
+                fieldValues.push(SqlTools.quoteLiteral(ldb.fieldIsNotSupported(key,jsonbFields)?JSON.stringify(value):value));
                 unquotedFieldValues.push(value);
             })
             await ldb.executeQuery(
-                `INSERT OR REPLACE INTO `+sqlTools.quoteIdent(tableName)+
+                `INSERT OR REPLACE INTO `+SqlTools.quoteIdent(tableName)+
                     ` (`+ fieldNames.join(',')+`) values (`+ fieldValues.join(',')+`);`
             ,[]);
             return element
@@ -319,12 +333,12 @@ export class WebsqlDb{
             var values:any[]=[];
             likeAr(element).forEach(function(value,key){
                 if(!sql){
-                    fieldNames.push(sqlTools.quoteIdent(key));
+                    fieldNames.push(SqlTools.quoteIdent(key));
                 }
                 values.push(ldb.fieldIsNotSupported(key,jsonbFields)?JSON.stringify(value):value);
             })
             if(!sql){
-                sql = `INSERT OR REPLACE INTO `+sqlTools.quoteIdent(tableName)+
+                sql = `INSERT OR REPLACE INTO `+SqlTools.quoteIdent(tableName)+
                         ` (`+ fieldNames.join(',')+`) values (`+ values.map(_=>'?').join(',')+`);`;
             }
             data.push(values);
@@ -337,7 +351,7 @@ export class WebsqlDb{
     }
     async clear(tableName:string):Promise<void>{
         await this.executeQuery(
-            `DELETE FROM `+sqlTools.quoteIdent(tableName)+`;`
+            `DELETE FROM `+SqlTools.quoteIdent(tableName)+`;`
         ,[]);
     }
 }

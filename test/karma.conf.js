@@ -20,6 +20,7 @@ module.exports = function(config, preConfig) {
       'node_modules/require-bro/lib/require-bro.js',
       'node_modules/like-ar/like-ar.js',
       'node_modules/best-globals/best-globals.js',
+      'node_modules/sql-tools/bin/sql-tools.js',
       'node_modules/json4all/json4all.js',
       'node_modules/js-to-html/lib/js-to-html.js',
       'node_modules/discrepances/lib/discrepances.js',
