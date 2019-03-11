@@ -97,8 +97,9 @@ class AppExample extends backendPlus.AppBackend{
             {menuType:'menu', name:'test', menuContent:[
                 {menuType:'table', name:'bigint'},
                 {menuType:'proc', name:'example_date'},
-				{menuType:'table', table:'ptable', name:'ptable-actinide' , label:'actinide elements' , ff:{group:'Actinide' }},
-				{menuType:'table', table:'ptable', name:'ptable-metalloid', label:'metalloid elements', ff:{group:'Metalloid'}, showParams:["ff"], selectedByDefault:true, directUrl:true}
+                {menuType:'table', table:'ptable', name:'ptable-actinide' , label:'actinide elements' , ff:{group:'Actinide' }},
+                {menuType:'table', table:'ptable', name:'ptable-metalloid', label:'metalloid elements', ff:{group:'Metalloid'}, showParams:["ff"], selectedByDefault:true, directUrl:true},
+                {menuType:'table', table:'ptable_multi_edit', name:'ptable-me', label:'multi edit'}
             ]},
             {menuType:'menu', name:'bitacora', menuContent:[
                 {menuType:'table', name:'bitacora'},
@@ -115,6 +116,7 @@ class AppExample extends backendPlus.AppBackend{
             'users',
             {name:'pgroups', fileName:'groups'},
             'ptable',
+            'ptable_multi_edit',
             'isotopes',
             'element_images',
             'cursors',
