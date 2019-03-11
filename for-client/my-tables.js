@@ -862,7 +862,8 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
     if(fieldDef.mobileInputType && my.mobileMode){
         var inputAttrs = {type:'text'};
         if(fieldDef.mobileInputType=='number'){
-            inputAttrs.pattern = "[0-9]*";
+            inputAttrs.type = 'number';
+            //inputAttrs.pattern = "[0-9]*";
         }
         control = html.input(changing({class:'bp-input'},inputAttrs)).create();
         td = html.td(this.cellAttributes({}),[control]).create();
