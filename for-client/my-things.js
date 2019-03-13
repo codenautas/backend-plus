@@ -520,9 +520,9 @@ myOwn.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
                     checkAutoClose.addEventListener('change',function(){
                         myOwn.ajaxPromise.autoClose=checkAutoClose.checked;
                     });
-                    divProgress=html.div({class:'result-progress',style:'height:200px; width:300px'}).create();
+                    divProgress=html.div({class:'result-progress'}).create();
                     simpleFormPromise({elementsList:[divButton,divProgress]});
-                    onClose=function(){
+                    onClose=function(err){
                         var closeButton=html.button(DialogPromise.messages.Ok).create();
                         var stopCountDown=html.button(my.messages.stopCountDown).create();
                         divButton.innerHTML="";
@@ -530,10 +530,13 @@ myOwn.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
                         closeButton.onclick=function(){
                             divButton.dialogPromiseDone();
                         }
-                        if(myOwn.ajaxPromise.autoClose){
+                        if(err){
+                            divProgress.appendChild(html.div({class:'error-message'},err.message).create())
+                        }
+                        if(myOwn.ajaxPromise.autoClose && !err){
                             setTimeout(function(){
                                 divButton.dialogPromiseDone();
-                            },3000);
+                            },myOwn.ajaxPromise.autoClose);
                         }
                     }
                 }
@@ -599,7 +602,7 @@ myOwn.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
             controlLoggedIn(result);
             return my.encoders[procedureDef.encoding].parse(result);
         }).catch(function(err){
-            onClose();
+            onClose(err);
             if(opts.launcher){
                 opts.launcher.setAttribute('my-working','error');
                 opts.launcher.title='err';
@@ -625,7 +628,7 @@ myOwn.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
     });
 };
 
-myOwn.ajaxPromise.autoClose=true;
+myOwn.ajaxPromise.autoClose=6000;
 
 myOwn.testKeepAlive = function testKeepAlive(){
     var my = this;
@@ -1149,7 +1152,13 @@ myOwn.createSmartButton = function createSmartButton(opts){
     button.onclick=function(){
         var button=this;
         button.smartState='working';
-        opts.mainFun().then(function(result){
+        Promise.resolve().then(function(){
+            if(opts.confirmMessage){
+                return confirmPromise(opts.confirmMessage);
+            }
+        }).then(function(){
+            return opts.mainFun({ajaxOpts:{launcher:button}});
+        }).then(function(result){
             button.smartState='unknown';
             (opts.okFun||function(result){
                 button.smartState='active';
