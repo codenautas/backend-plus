@@ -2,7 +2,11 @@ declare module "backend-plus"{
 
 import * as net from "net";
 import * as express from "express";
+import {Client} from "pg-promise-strict";
 import * as pg from "pg-promise-strict";
+
+export * from "pg-promise-strict";
+export type MotorDb = typeof pg;
 
 export type Server=net.Server;
 
@@ -57,7 +61,7 @@ export interface ContextForDump extends Context {
 export type InformProgressFunction=(opts:Error|{data:any}|{message:string}|{message?:string, lengthComputable:boolean, loaded:number, total:number})=>void
 
 export type ProcedureContext=Context & {
-    client:pg.Client,
+    client:Client,
     doing:string,
     informProgress:InformProgressFunction
 }
@@ -232,7 +236,7 @@ export class AppBackend{
     app:ExpressPlus
     getTableDefinition: TableDefinitionsGetters
     tableStructures: TableDefinitions
-    db:typeof pg
+    db: MotorDb
     config: any
     rootPath: string
     start(opts?: StartOptions):Promise<void>
@@ -247,8 +251,8 @@ export class AppBackend{
     addLoggedServices():void
     getProcedures():Promise<ProcedureDef[]>
     getMenu(context?:Context):MenuDefinition
-    inDbClient<T>(req:Request|null, doThisWithDbClient:(client:pg.Client)=>Promise<T>):Promise<T>
-    inTransaction<T>(req:Request|null, doThisWithDbTransaction:(client:pg.Client)=>Promise<T>):Promise<T>
+    inDbClient<T>(req:Request|null, doThisWithDbClient:(client:Client)=>Promise<T>):Promise<T>
+    inTransaction<T>(req:Request|null, doThisWithDbTransaction:(client:Client)=>Promise<T>):Promise<T>
     procedureDefCompleter(procedureDef:ProcedureDef):ProcedureDef
     tableDefAdapt(tableDef:TableDefinition, context:Context):TableDefinition
     pushApp(dirname:string):void

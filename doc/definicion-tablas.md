@@ -81,6 +81,7 @@ orientation | x  |       | cambiar la orientación de la grilla de vertical/hori
 sql            | uso
 ---------------|----------------
 postCreateSqls | texto con una o varias sentencias SQL que deben ejecutarse después de la creación. Sirve para agregar constraints que el motor no soporta. 
+constraintsDeferred|true equivale a ejecutar SET CONSTRAINTS ALL DEFERRED al comienzo de la transacción al hacer upload
 
 <!--lang:en--]
 
@@ -129,6 +130,7 @@ orientation | x     |       | (see Spanish)
 sql            | usage
 ---------------|----------------
 postCreateSqls | (see Spanish)
+constraintsDeferred|true means: "SET CONSTRAINTS ALL DEFERRED" when uploading
 
 
 [!--lang:*-->
