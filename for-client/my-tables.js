@@ -2087,6 +2087,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         });
         if(!grid.vertical){ 
             tr.addEventListener('focusout', function(event){
+                tr.removeAttribute('current_line');
                 if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
                     depot.connector.recordLeave(depot).then(function(result){
                     });
@@ -2096,6 +2097,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 }
             });
             tr.addEventListener('focusin',function(event){
+                tr.setAttribute('current_line','1');
                 if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
                     return depot.connector.recordEnter(depot).then(function(result){
                     });
