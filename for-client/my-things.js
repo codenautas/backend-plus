@@ -469,11 +469,13 @@ myOwn.alertError = function(err){
         button.addEventListener('click',function(){
             closeWindow();
         });
-        dialogWindow.appendChild(html.div([
-            html.div({class:'dialog-error-img'}, [html.img({src:my.path.img+'warning128.png'})]),
-            html.pre(err.message),
-            html.div([button])
-        ]).create());
+        dialogWindow.appendChild(html.table([html.tr([
+            html.td({class:'dialog-error-img'}, [html.img({src:my.path.img+'warning128.png'})]),
+            html.td([
+                html.pre(err.message),
+                html.div([button])
+            ])
+        ])]).create());
     });
 }
 

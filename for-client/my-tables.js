@@ -1605,6 +1605,17 @@ myOwn.TableGrid.prototype.refreshAggregates = function refreshAggregates(){
             grid.dom.aggregate[fieldDef.name].setTypedValue(aggData[fieldDef.name].result());
         }
     })
+    if(my.refreshErrorListWithAggregates){
+        if(grid.def.layout.errorList){
+            if(!grid.depotsToDisplay.length){
+                grid.dom.caption.textContent=my.messages.thereAreNot+': '+grid.dom.caption.textContent;
+                grid.dom.table.setAttribute('error-list','no-errors');
+            }else{
+                grid.dom.table.setAttribute('error-list','have-errors');
+                // grid.dom.caption.style.backgroundColor='#F44';
+            }
+        }
+    }
 };
 
 myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
