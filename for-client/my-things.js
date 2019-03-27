@@ -463,6 +463,8 @@ myOwn.launcherCatch=function(launcher){
     }
 }
 
+myOwn.propertiesWhiteList=['message','detail','code','table','constraint','name','severity'];
+
 myOwn.alertError = function(err){
     return dialogPromise(function(dialogWindow, closeWindow){
         var button=html.button(DialogPromise.messages.Ok).create();
@@ -472,7 +474,9 @@ myOwn.alertError = function(err){
         dialogWindow.appendChild(html.table([html.tr([
             html.td({class:'dialog-error-img'}, [html.img({src:my.path.img+'warning128.png'})]),
             html.td([
-                html.pre(err.message),
+                html.pre(myOwn.propertiesWhiteList.map(function(name){ 
+                    return err[name]?err[name]+'\n':'';
+                }).join('')),
                 html.div([button])
             ])
         ])]).create());
