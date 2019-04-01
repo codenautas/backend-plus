@@ -66,7 +66,7 @@ export type ProcedureContext=Context & {
     informProgress:InformProgressFunction
 }
 export interface Request extends express.Request {
-    user:User
+    user?:User
 }
 export {Response, Express} from "express";
 export interface ResponsePlus extends express.Response{}
