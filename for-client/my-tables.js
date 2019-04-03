@@ -1357,7 +1357,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
                     var type=fieldDef.typeName;
                     if(fieldDef.defaultForOtherFields){
                         var textArrayInitialization = Array.apply(null, Array(grid.def.otherFields.length)).map(function () {return "";});
-                        var otherFields = JSON.parse(value) || [];
+                        var otherFields = JSON.parse(value||'[]');
                         var textArray = textArrayInitialization;
                         otherFields.forEach(function(otherField){
                             textArray[otherFieldsTabColumn[otherField.name]] = otherField.value;
@@ -1802,11 +1802,29 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
 };
 
 myOwn.specialDefaultValue={
-    current_date:function(){ return myOwn.config.currentDate||bestGlobals.date.today(); }
+    current_date:function(){ return myOwn.config.currentDate||bestGlobals.date.today(); },
+    next_number:function(fieldName, aboveDepot, belowDepot){ 
+        return belowDepot.row[fieldName]?belowDepot.row[fieldName]+1:(
+            aboveDepot.row[fieldName]?aboveDepot.row[fieldName]-1:1
+        ); 
+    }
 }
 
-myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElements(aboveDepot){
+myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElements(aboveDepot, belowDepot){
     var grid = this;
+    if(!belowDepot){
+        if(aboveDepot){
+            if(belowDepot=aboveDepot.tr.previousSibling){
+                belowDepot=aboveDepot.tr.previousSibling.depot;
+            }
+        }else{
+            var lastTBody=grid.dom.table.tBodies[grid.dom.table.tBodies.length-1];
+            var lastTr=lastTBody.rows[lastTBody.rows.length-1];
+            if(lastTr){
+                belowDepot=lastTr.depot;
+            }
+        }
+    }
     var position;
     if(grid.vertical){
         position=1;
@@ -1844,7 +1862,7 @@ myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElem
         if('specialDefaultValue' in fieldDef){
             //********************* REVISAR PORQUE ESTABA LA LÍNEA COMENTADA*************
             //value=my.specialDefaultValue[fieldDef.specialDefaultValue](fieldDef.name, depot);
-            value=my.specialDefaultValue[fieldDef.specialDefaultValue](fieldDef.name, aboveDepot);
+            value=my.specialDefaultValue[fieldDef.specialDefaultValue](fieldDef.name, aboveDepot||{row:{}}, belowDepot||{row:{}});
         }
         if(value!==null){
             depotForInsert.row[fieldDef.name] = value;
@@ -2135,6 +2153,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             });
         }
         grid.updateTotals(grid.depots.length?1:0, grid.depots.length);
+        tr.depot = depot;
         return depot;
     };
     grid.destroyRowFilter = function destroyRowFilter(){

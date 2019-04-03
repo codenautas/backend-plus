@@ -41,7 +41,7 @@ module.exports = function(context){
         actionNamesList:['showImg'],
         allow:{showImg:true},
         sql:{
-            isTable:true,
+            isTable:false,
             from:`(
                 select * from ptable p
                   left join lateral (select kind, mass_number, url from element_images e where e.atomic_number = p.atomic_number order by kind, mass_number limit 1) e on true
