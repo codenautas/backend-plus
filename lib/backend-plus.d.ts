@@ -156,6 +156,7 @@ export type FieldDefinition = EditableDbDefinition & {
     defaultForOtherFields?:boolean   /* the field that stores the "other fields" of a flexible imported table */
     exportMetadata?:ExportMetadataDefinition 
     description?:string
+    dataLength?:number
 }
 export type EditableDbDefinition = {
     editable?:boolean
