@@ -157,6 +157,7 @@ export type FieldDefinition = EditableDbDefinition & {
     exportMetadata?:ExportMetadataDefinition 
     description?:string
     dataLength?:number
+    options?:(string|{option:string|number, label:string})[]
 }
 export type EditableDbDefinition = {
     editable?:boolean
