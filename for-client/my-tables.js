@@ -2153,7 +2153,9 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             });
         }
         grid.updateTotals(grid.depots.length?1:0, grid.depots.length);
-        tr.depot = depot;
+        if(tr){ // en despliegue vertical no hay un tr definido.
+            tr.depot = depot;
+        }
         return depot;
     };
     grid.destroyRowFilter = function destroyRowFilter(){
