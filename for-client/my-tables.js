@@ -522,6 +522,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
         tableName: tableName, 
         getElementToDisplayCount:function(){ return grid.dom.footInfo.displayTo; }
     }, opts);
+    // apertura de las detail grillas por URL
     var preparing = grid.prepareAndDisplayGrid().then(function(){
         if(opts.detailing){
             grid.depots.forEach(function(depot){
