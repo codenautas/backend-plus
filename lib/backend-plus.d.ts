@@ -205,6 +205,11 @@ export type TableDefinition = EditableDbDefinition & {
             fieldName:string
         }
         tableName?:string
+        fields:{
+            [k:string]:{
+                expr:string
+            }
+        }
     }
     foreignKeys?:ForeignKey[]
     softForeignKeys?:ForeignKey[]
