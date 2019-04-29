@@ -1376,6 +1376,9 @@ myOwn.dialogDownload = function dialogDownload(grid){
             downloadElementText.setAttribute("download", grid.def.name+".tab");
         },10);
         var otherFieldsExcelColumns = [];
+        var STYLE_HEADER={ font: {bold:true, underline:true}/*, alignment:{horizontal:'center'}*/};
+        var STYLE_PK={font:{bold:true}};
+        var STYLE_LOOKUP={font:{color:{ rgb: "5588DD" }}};
         var populateTableXLS = function populateTableXLS(ws, depots, fieldDefs, topRow, leftColumn){
             topRow=topRow||0;
             leftColumn=leftColumn||0;
@@ -1383,11 +1386,11 @@ myOwn.dialogDownload = function dialogDownload(grid){
                 if(field.defaultForOtherFields){
                     grid.def.otherFields.forEach(function(otherField){
                         otherFieldsExcelColumns[otherField[grid.def.registerImports.fieldNames.fieldName]] = iColumn+leftColumn;
-                        ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:topRow})]={t:'s',v:otherField[grid.def.registerImports.fieldNames.fieldName], s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                        ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:topRow})]={t:'s',v:otherField[grid.def.registerImports.fieldNames.fieldName], s:STYLE_HEADER};
                         iColumn++;
                     });
                 }else{
-                    ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:topRow})]={t:'s',v:field.name, s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+                    ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:topRow})]={t:'s',v:field.name, s:STYLE_HEADER};
                 }
             });
             depots.forEach(function(depot, iRow){
@@ -1397,12 +1400,12 @@ myOwn.dialogDownload = function dialogDownload(grid){
                         var valueType=typeStore.typerFrom(fieldDef).toExcelType(value);
                         var cell={t:valueType,v:excelValue};
                         if(fieldDef.typeName == 'interval'){
-                            cell.z='[h]:mm:ss'
+                            cell.z='[h]:mm:ss';
                         }
                         if(fieldDef.isPk){
-                            cell.s={font:{bold:true}};
+                            cell.s=STYLE_PK;
                         }else if(!fieldDef.allow || !fieldDef.allow.update){
-                            cell.s={font:{color:{ rgb: "88AA00" }}};
+                            cell.s=STYLE_LOOKUP;
                         }
                         ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:iRow+1+topRow})]=cell;
                     }
@@ -1426,11 +1429,11 @@ myOwn.dialogDownload = function dialogDownload(grid){
             var ws = {};
             var exportFileInformationWs={};
             var i=0;
-            exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'table',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+            exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'table',s:STYLE_HEADER};
             exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:  i})]={t:'s',v:grid.def.name};
-            exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'date',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+            exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'date',s:STYLE_HEADER};
             exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:  i})]={t:'s',v:new Date().toISOString()};
-            exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'user',s:{ font: {bold:true, underline:true}, alignment:{horizontal:'center'}}};
+            exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'user',s:STYLE_HEADER};
             exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:  i})]={t:'s',v:my.config.username};
             // grid.def.allow.forEach(function(action,iAction){
             //     exportFileInformationWs[XLSX.utils.encode_cell({c:iAction,r:2})]={t:'s',v:action};
