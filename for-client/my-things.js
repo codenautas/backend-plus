@@ -498,6 +498,10 @@ myOwn.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
         opts.launcher.setAttribute('my-working','working');
     }
     return Promise.resolve().then(function(){
+        var startTime=bestGlobals.datetime.now();
+        var tickTime=startTime;
+        var lineNumber=0;
+        var lineProgress=null;
         var params={};
         procedureDef.parameters.forEach(function(paramDef){
             var value=coalesce(data[paramDef.name],'defaultValue' in paramDef?paramDef.defaultValue:coalesce.throwErrorIfUndefined("lack of parameter "+paramDef.name));
@@ -512,7 +516,7 @@ myOwn.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
         var divProgress;
         var onClose=function(){}
         var defaultInformProgress = function defaultInformProgress(progressInfo){
-            if(progressInfo.message){
+            if(progressInfo.message || progressInfo.end){
                 if(!divProgress){
                     var idAutoClose='id-auto-close-'+Math.random();
                     var checkAutoClose=html.input({type:'checkbox', id:idAutoClose, checked:myOwn.ajaxPromise.autoClose}).create();
@@ -546,10 +550,32 @@ myOwn.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
                         }
                     }
                 }
-                divProgress.insertBefore(
-                    html.div({class:'my-progress'},progressInfo.message).create(),
-                    divProgress.childNodes[0]
-                );
+                var now=bestGlobals.datetime.now();
+                var elapsed = now.sub(tickTime);
+                tickTime=now;
+                if(lineProgress){
+                    if(lineProgress.elapsed){
+                        lineProgress.elapsed.textContent=elapsed.toHmsOrMs();
+                    }
+                    if(lineProgress.acum){
+                        lineProgress.acum.textContent=now.sub(startTime).toHmsOrMs()
+                    }
+                }
+                if(progressInfo.message){
+                    lineProgress={
+                        elapsed:html.span({class:'my-progress-step-t'},'..:....').create(),
+                        acum   :html.span({class:'my-progress-acum-t'},'..:....').create()
+                    };
+                    divProgress.insertBefore(
+                        html.div({class:'my-progress'}, [
+                            html.span({class:'my-progress-num'}, ++lineNumber)," ",
+                            lineProgress.elapsed," ",
+                            lineProgress.acum," ",
+                            progressInfo.message||''
+                        ]).create(),
+                        divProgress.childNodes[0]
+                    );
+                }
             }
         }
         var informProgress;
@@ -606,6 +632,9 @@ myOwn.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
             onClose();
             result=result.join('');
             controlLoggedIn(result);
+            if(lineNumber){
+                informProgress({end:true})
+            }
             return my.encoders[procedureDef.encoding].parse(result);
         }).catch(function(err){
             onClose(err);
