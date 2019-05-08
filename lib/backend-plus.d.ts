@@ -205,7 +205,7 @@ export type TableDefinition = EditableDbDefinition & {
             fieldName:string
         }
         tableName?:string
-        fields:{
+        fields?:{
             [k:string]:{
                 expr:string
             }

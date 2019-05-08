@@ -522,7 +522,6 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
         tableName: tableName, 
         getElementToDisplayCount:function(){ return grid.dom.footInfo.displayTo; }
     }, opts);
-    // apertura de las detail grillas por URL
     var preparing = grid.prepareAndDisplayGrid().then(function(){
         if(opts.detailing){
             grid.depots.forEach(function(depot){
@@ -1338,8 +1337,11 @@ myOwn.dialogDownload = function dialogDownload(grid){
         var txtToDownload;
         var otherFieldsTabColumn = [];
         setTimeout(function(){
-            var txtToDownload=grid.def.fields.map(function(fieldDef){
-                if(!fieldDef.inTable && !my.INCLUDE_LOOKUP_COLUMNS_IN_TXT_EXPORT) return '';
+            var fieldsDef2Export=grid.def.fields.filter(function(fieldDef){ 
+                return fieldDef.inTable!==false || my.INCLUDE_LOOKUP_COLUMNS_IN_TXT_EXPORT;
+            });
+            var txtToDownload=fieldsDef2Export.map(function(fieldDef){
+                if(fieldDef.inTable===false && !my.INCLUDE_LOOKUP_COLUMNS_IN_TXT_EXPORT) return '';
                 if(fieldDef.defaultForOtherFields){
                     var textArray=[];
                     grid.def.otherFields.forEach(function(otherField, index){
@@ -1352,8 +1354,8 @@ myOwn.dialogDownload = function dialogDownload(grid){
                 }
             }).join('|')+'\r\n'+
             grid.depotsToDisplay.map(function(depot){
-                return grid.def.fields.map(function(fieldDef){
-                    if(!fieldDef.inTable && !my.INCLUDE_LOOKUP_COLUMNS_IN_TXT_EXPORT) return '';
+                return fieldsDef2Export.map(function(fieldDef){
+                    if(fieldDef.inTable===false && !my.INCLUDE_LOOKUP_COLUMNS_IN_TXT_EXPORT) return '';
                     var value=depot.row[fieldDef.name];
                     var type=fieldDef.typeName;
                     if(fieldDef.defaultForOtherFields){
