@@ -221,7 +221,7 @@ export type TableDefinition = EditableDbDefinition & {
     }
     clientSide?:string         /* keyof: myOwn.clientSides */
 }
-export interface DetailTable { table: string, fields: FieldsForConnect, abr: string, label?: string }
+export interface DetailTable { table: string, fields: FieldsForConnect, abr: string, label?: string, refreshParent?:boolean, wScreen?:string, condition?:string }
 export type TableDefinitionFunction = (context: ContextForDump) => TableDefinition;
 export type TableItemDef=string|{name:string}&({tableGenerator:(context:TableContext)=>TableDefinition})
 export interface TableDefinitions {
