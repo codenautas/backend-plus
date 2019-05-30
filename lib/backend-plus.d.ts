@@ -39,6 +39,7 @@ export interface ProcedureDef {
     progress?:true
     files?:{count?:number}
     roles?:string[]
+    cacheable?:true
 }
 
 export interface User {
@@ -246,6 +247,10 @@ export class AppBackend{
     db: MotorDb
     config: any
     rootPath: string
+    caches:{
+        procedures:{[k:string]:{timestamp:number, result:any}}
+    }
+    clearCaches():void
     start(opts?: StartOptions):Promise<void>
     getTables():TableItemDef[]
     prepareGetTables():void
