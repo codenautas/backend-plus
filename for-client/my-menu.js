@@ -263,7 +263,9 @@ myOwn.showPage = function showPage(pageDef){
         totalLayout.appendChild(rightMenu);
     }
     rightMenu.onclick=function(){
-        my.rightMenu();
+        if(!my.offline.mode){
+            my.rightMenu();
+        }
     }
 };
 
