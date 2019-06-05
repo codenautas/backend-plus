@@ -313,16 +313,15 @@ user      | objeto con la información del usuario una vez que está logueado.
 
 
 [!--lang:es-->
-Ejemplo integrador:
+Ejemplo integrador, primero en javascript luego en typescript con `other tables`:
 
 <!--lang:en--]
 Integrating example:
 
 [!--lang:*-->
-
 ```js
 module.exports = function(context){
-    return context.be.tableDefAdapt({
+    return {
         name:'isotopes',
         title:'stable isotopes',
         allow:{
@@ -355,15 +354,19 @@ module.exports = function(context){
         foreignKeys:[
             {references:'ptable', fields:['atomic_number']}
         ]
-    },context);
+    };
 }
+```
 
-//other fields table definition
+```ts
+"use strict";
 
-module.exports = function(context){
+import {TableDefinition, TableContext} from "backend-plus";
+
+export function table_with_otherfields(context:TableContext):TableDefinition {
     var admin = context.user.rol==='boss';
-    return context.be.tableDefAdapt({
-        name:'other_fields',
+    return {
+        name:'table_with_otherfields',
         allow:{
             insert:true,
             update:true,
@@ -379,6 +382,6 @@ module.exports = function(context){
             {name:'last_upload'         , typeName:'timestamp'                    },
         ],
         primaryKey:['table_name', 'field'],
-    }, context);
+    };
 }
 ```
