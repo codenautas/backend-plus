@@ -11,7 +11,7 @@ myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     networkSignal1:'network $1',
     offLine:'off line',
     onLine:'on line',
-    proced:'proced',
+    proceed:'proceed',
     signIn:'sign in',
     speed1:'speed $1',
     user:'user',
@@ -25,7 +25,7 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     networkSignal1:'estado de la red: $1',
     offLine:'fuera de línea',
     onLine:'en línea',
-    proced:'proceder',
+    proceed:'proceder',
     signIn:'login',
     speed1:'velocidad $1',
     user:'usuario',
@@ -65,7 +65,7 @@ myOwn.wScreens.procAux = {
         addrParams.autoproced = addrParams.autoproced || false
         addrParams.up=addrParams.up||{};
         var params=addrParams.up;
-        var button = html.button(my.messages.proced).create();
+        var button = html.button(formDef.labelProceed||my.messages.proceed).create();
         var divResult = html.div({class:formDef.resultClass||'result-pre'}).create();
         var id='progress'+Math.random();
         var toggleProgress = html.input({type:'checkbox', id:id, checked:true, disabled:true}).create();
@@ -94,7 +94,7 @@ myOwn.wScreens.procAux = {
         )).create());
         main_layout.appendChild(divResult);
         main_layout.appendChild(divProgressOutside);
-        var proced = function proced(){
+        var proceed = function proceed(){
             button.disabled=true;
             divResult.innerHTML="";
             divProgress.innerHTML="";
@@ -108,10 +108,10 @@ myOwn.wScreens.procAux = {
             })
         }
         button.onclick=function(){
-            proced();
+            proceed();
         }
         if(addrParams.autoproced){
-            proced();
+            proceed();
         }
     },
     mainAction:function(){
@@ -205,7 +205,6 @@ myOwn.preDisplayPage = function preDisplayPage(addrParams, wScreen){
 
 myOwn.showPage = function showPage(pageDef){
     my.prepareFloating3dots();
-    my.prepareRulerToggle();
     var newHash;
     if(!location.hash){
         newHash=sessionStorage.getItem('backend-plus-hash-redirect');
