@@ -65,7 +65,7 @@ myOwn.wScreens.procAux = {
         addrParams.autoproced = addrParams.autoproced || false
         addrParams.up=addrParams.up||{};
         var params=addrParams.up;
-        var button = html.button(formDef.labelProceed||my.messages.proceed).create();
+        var button = html.button(formDef.proceedLabel||my.messages.proceed).create();
         var divResult = html.div({class:formDef.resultClass||'result-pre'}).create();
         var id='progress'+Math.random();
         var toggleProgress = html.input({type:'checkbox', id:id, checked:true, disabled:true}).create();
@@ -88,7 +88,7 @@ myOwn.wScreens.procAux = {
                 params[parameterDef.name] = control.getTypedValue();
                 myOwn.replaceAddrParams(addrParams);
             });
-            return html.tr([ html.td(parameterDef.label||parameterDef.name.replace(/_/g,' ')),control]);
+            return html.tr({"parameter-name":parameterDef.name},[ html.td(parameterDef.label||parameterDef.name.replace(/_/g,' ')),control]);
         }).concat(
             html.tr([html.td(), html.td([button])])
         )).create());
@@ -196,11 +196,11 @@ myOwn.UriSearchToObjectParams={
 	detailing        :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return JSON.parse(x)}  },
 }
 
-myOwn.preDisplayPage = function preDisplayPage(addrParams, wScreen){
+myOwn.preDisplayPage = function preDisplayPage(addrParams, wScreen, w){
     var my = this;
     var pageTitle = wScreen.pageTitle || addrParams.pageTitle || addrParams.title || addrParams.name || my.config.config.title;
     document.title = pageTitle;
-
+    main_layout.setAttribute('my_w',w);
 }
 
 myOwn.showPage = function showPage(pageDef){
@@ -239,7 +239,8 @@ myOwn.showPage = function showPage(pageDef){
                 wScreen.mainFunction=wScreen.mainFunction||function(addrParams){
                     my.wScreens.procAux.showParams({
                         parameters:wScreen.parameters,
-                        resultClass:wScreen.resultClass
+                        resultClass:wScreen.resultClass,
+                        proceedLabel:wScreen.proceedLabel,
                     }, main_layout, addrParams, wScreen.mainAction);
                 }
             }
@@ -248,7 +249,7 @@ myOwn.showPage = function showPage(pageDef){
                 mainFunction:function(){}
             }
         }
-        my.preDisplayPage(addrParams, wScreen);
+        my.preDisplayPage(addrParams, wScreen, w);
         wScreen.mainFunction.call(my, addrParams);
         rightMenu = document.getElementById('right-menu-icon');
     }else{
