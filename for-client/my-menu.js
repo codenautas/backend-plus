@@ -403,7 +403,11 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
             my.light('airplane', function(){
                 if(my.ldb && my.offline){
                     if(my.offline.mode && !my.server.connected){
-                        alertPromise("No es posible salir del modo avión sin conexión al servidor");
+                        promptPromise("Si desea salir del modo avión puede forzarlo").then((texto)=>{
+                            if (texto == 'forzar') {
+                                my.changeOfflineMode();
+                            }
+                        });
                     }else{
                         my.changeOfflineMode();
                     }
