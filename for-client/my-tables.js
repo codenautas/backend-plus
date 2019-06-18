@@ -1276,7 +1276,13 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                 return my.ajax.table_records_delete({
                     table:grid.def.name,
                     rowsToDelete:grid.depotsToDisplay.map(function(depot){
-                        return depot.row;
+                        return likeAr(depot.row).filter(function(_value, name){
+                            var fieldDef = grid.def.field[name];
+                            if(fieldDef.clientSide && !fieldDef.serverSide || fieldDef.inTable === false){
+                                return false;
+                            }
+                            return true;
+                        }).plain();
                     }),
                     expectedRemainCount:grid.depots.length-grid.depotsToDisplay.length
                 }).then(function(message){
