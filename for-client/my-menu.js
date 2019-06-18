@@ -302,10 +302,19 @@ myOwn.createForkeableButton = function createForkeableButton(menu, opts){
     menu.button = button;
     button.onmousedown=opts.updateHrefBeforeClick||function(){};
     button.onclick=opts.onclick||function(event){
-        if(!event.ctrlKey && event.button!=1){
-            history.pushState(null, null, this.href);
-            my.showPage();
-            event.preventDefault();
+        /** @type {null|string} */
+        var errorText;
+        if(opts.preOnClick){
+            errorText=button.preOnClick();
+        }
+        if(errorText){
+            alertPromise(errorText);
+        }else{
+            if(!event.ctrlKey && event.button!=1){
+                history.pushState(null, null, this.href);
+                my.showPage();
+                event.preventDefault();
+            }
         }
     };
     return button;

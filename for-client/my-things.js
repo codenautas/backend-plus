@@ -204,7 +204,7 @@ myOwn.autoSetupFunctions = [
         // });
         setInterval(function(){
             my.testKeepAlive();
-        },2000);
+        },20000);
         window.addEventListener("error", function myErrorHandler(error, url, lineNumber) {
             my.log('error', error.message);
         });
