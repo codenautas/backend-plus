@@ -412,7 +412,7 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
             my.light('airplane', function(){
                 if(my.ldb && my.offline){
                     if(my.offline.mode && !my.server.connected){
-                        promptPromise("Si desea salir del modo avión puede forzarlo").then((texto)=>{
+                        promptPromise("Si desea salir del modo avión puede forzarlo").then(function(texto){
                             if (texto == 'forzar') {
                                 my.changeOfflineMode();
                             }
