@@ -40,6 +40,7 @@ export interface ProcedureDef {
     files?:{count?:number}
     roles?:string[]
     cacheable?:true
+    resultOk?:string
 }
 
 export interface User {
