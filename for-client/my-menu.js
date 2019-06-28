@@ -305,7 +305,7 @@ myOwn.createForkeableButton = function createForkeableButton(menu, opts){
         /** @type {null|string} */
         var errorText;
         if(opts.preOnClick){
-            errorText=button.preOnClick();
+            errorText=opts.preOnClick();
         }
         if(errorText){
             alertPromise(errorText);
