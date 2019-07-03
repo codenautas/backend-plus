@@ -41,6 +41,7 @@ export interface ProcedureDef {
     roles?:string[]
     cacheable?:true
     resultOk?:string
+    bitacora?:{always?:boolean, error?:boolean}
 }
 
 export interface User {
