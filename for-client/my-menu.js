@@ -105,7 +105,10 @@ myOwn.wScreens.procAux = {
                 divProgressOutside.style.opacity=0.33;
                 toggleProgress.disabled=false;
                 labelProgress.textContent=resultOk?my.messages.completed:'error';
-            })
+            }).catch(function(err){
+                my.log(err);
+                divProgress.textContent=err.message;
+            });
         }
         button.onclick=function(){
             proceed();
