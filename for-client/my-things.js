@@ -35,7 +35,7 @@
 /*jshint +W040 */
 
 /*jshint -W004 */
-var myOwn = {};
+var myOwn = require('../unlogged/my-ajax');
 /*jshint +W004 */
 
 // var DialogPromise = require('dialog-promise');
@@ -157,7 +157,10 @@ myOwn.autoSetupFunctions = [
                 }
             })
         }
-        return readProcedureDefinitions();
+        return readProcedureDefinitions().then(function(){
+            DialogPromise.path.img=my.path.img;
+            TypedControls.path.img=my.path.img;
+        })
     }
 ];
 myOwn.deleteLocalDb = function deleteLocalDb(){
@@ -356,27 +359,6 @@ Object.defineProperty(myOwn, 'ajax', {
         }
     }
 });
-
-myOwn.encoders = {
-    JSON: { parse: JSON.parse, stringify: JSON.stringify },
-    plain: { 
-        parse: function(x){return x;}, 
-        stringify: function(x){
-            if(typeof x === "object" /* && !(x instanceof FileList)*/){
-                throw new Error("Invalid plain type "+(x==null?value:typeof x)+" detected");
-            }
-            return x;
-        }
-    },
-    yaml: {
-        parse: jsYaml.load.bind(jsYaml),
-        stringify: jsYaml.dump.bind(jsYaml),
-    },
-    JSON4all: {
-        parse: JSON4all.parse,
-        stringify: JSON4all.stringify,
-    },
-};
 
 myOwn.launcherOk=function(launcher){
     return function(result){

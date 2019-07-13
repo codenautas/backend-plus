@@ -1,4 +1,32 @@
-function readProcedureDefinitions(){
+(function codenautasModuleDefinition(root, name, factory) {
+    /* global define */
+    /* istanbul ignore next */
+    if(typeof root.globalModuleName !== 'string'){
+        root.globalModuleName = name;
+    }
+    /* istanbul ignore next */
+    if(typeof exports === 'object' && typeof module === 'object'){
+        module.exports = factory();
+    }else if(typeof define === 'function' && define.amd){
+        define(factory);
+    }else if(typeof exports === 'object'){
+        // @ts-ignore
+        exports[root.globalModuleName] = factory();
+    }else{
+        root[root.globalModuleName] = factory();
+    }
+    root.globalModuleName = null;
+})(/*jshint -W040 */this, 'myAjax', function() {
+/*jshint +W040 */
+
+/*jshint -W004 */
+var myAjax = {};
+/*jshint +W004 */
+
+var jsYaml = require('js-yaml');
+var JSON4all = require('json4all');
+
+myAjax.readProcedureDefinitions=function readProcedureDefinitions(){
     var promise;
     if(!my.offline.mode){
         promise = my.ajaxPromise({
@@ -46,8 +74,6 @@ function readProcedureDefinitions(){
                 activeUserElement.textContent=my.config.username||'-';
             }
         });
-        DialogPromise.path.img=my.path.img;
-        TypedControls.path.img=my.path.img;
         var gridBuffer = my.config.config['grid-buffer'];
         var offlineMode = gridBuffer && (gridBuffer === 'idbx' || gridBuffer === 'wsql');
         if(offlineMode){
@@ -71,7 +97,7 @@ function readProcedureDefinitions(){
     });
 };
 
-myOwn.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
+myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
     opts = opts || {};
     if(!('visiblyLogErrors' in opts)){
         opts.visiblyLogErrors=true;
@@ -185,6 +211,7 @@ myOwn.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
         }
         var controlLoggedIn = function controlLoggedIn(result){
             if(result && result[0]=="<" && result.match(/login/m)){
+                console.log('xxxxxxxxxxx',procedureDef.action)
                 my.informDetectedStatus('notLogged');
                 throw bestGlobals.changing(new Error(my.messages.notLogged),{displayed:true, isNotLoggedError:true});
             }
@@ -251,6 +278,30 @@ myOwn.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
     });
 };
 
+myAjax.encoders = {
+    JSON: { parse: JSON.parse, stringify: JSON.stringify },
+    plain: { 
+        parse: function(x){return x;}, 
+        stringify: function(x){
+            if(typeof x === "object" /* && !(x instanceof FileList)*/){
+                throw new Error("Invalid plain type "+(x==null?value:typeof x)+" detected");
+            }
+            return x;
+        }
+    },
+    yaml: {
+        parse: jsYaml.load.bind(jsYaml),
+        stringify: jsYaml.dump.bind(jsYaml),
+    },
+    JSON4all: {
+        parse: JSON4all.parse,
+        stringify: JSON4all.stringify,
+    },
+};
+
+myAjax.ajaxPromise.autoClose=6000;
 
 
-myOwn.ajaxPromise.autoClose=6000;
+return myAjax;
+
+});
