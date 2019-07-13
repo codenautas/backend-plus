@@ -23,6 +23,12 @@
 var myAjax = {};
 /*jshint +W004 */
 
+/** @param {T} x
+ *  @returns {T}
+ *  @template {T}
+ */
+myAjax.functionId = function id(x){return x;}
+
 var jsYaml = require('js-yaml');
 var JSON4all = require('json4all');
 
@@ -55,7 +61,7 @@ myAjax.readProcedureDefinitions=function readProcedureDefinitions(){
             procedureDef.parameters.forEach(function(parameterDef){
                 procedureDef.parameter[parameterDef.name]=parameterDef;
             });
-            var partsNames=procedureDef.action.split('/').filter(id).forEach(function(name){
+            var partsNames=procedureDef.action.split('/').filter(my.functionId).forEach(function(name){
                 if(lastName){
                     if(!target[lastName]){
                         target[lastName]={"dont-use":lastName};

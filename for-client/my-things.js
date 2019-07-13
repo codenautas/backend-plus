@@ -78,11 +78,6 @@ var LocalDbTransaction = require('./my-localdb').LocalDbTransaction;
 var LocalDb = require('./my-localdb').LocalDb;
 var WebSqlDb = require('./my-websqldb').WebsqlDb;
 
-/** @param {T} x
- *  @returns {T}
- *  @template {T}
- */
-function id(x){return x;}
 
 /** @param {string} name 
   * @param {number|undefined} version
@@ -157,7 +152,7 @@ myOwn.autoSetupFunctions = [
                 }
             })
         }
-        return readProcedureDefinitions().then(function(){
+        return my.readProcedureDefinitions().then(function(){
             DialogPromise.path.img=my.path.img;
             TypedControls.path.img=my.path.img;
         })

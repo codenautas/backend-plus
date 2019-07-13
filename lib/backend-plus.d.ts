@@ -43,6 +43,7 @@ export interface ProcedureDef {
     cacheable?:true
     resultOk?:string
     bitacora?:{always?:boolean, error?:boolean}
+    unlogged?:boolean
 }
 
 export interface User {
