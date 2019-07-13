@@ -33,8 +33,9 @@ export type CoreFunction = ((context: ProcedureContext, parameters: CoreFunction
 export interface ProcedureDef {
     action: string
     parameters: ProcedureParameter[]
+    method?: 'get'|'post'
     coreFunction: CoreFunction 
-    encode?:string
+    encodeing?:string
     multipart?:true
     progress?:true
     files?:{count?:number}
