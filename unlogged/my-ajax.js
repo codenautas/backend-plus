@@ -32,6 +32,10 @@ myAjax.functionId = function id(x){return x;}
 var jsYaml = require('js-yaml');
 var JSON4all = require('json4all');
 
+myAjax.parseCookies = function parseCookies(){
+    window.cookies = likeAr.toPlainObject(document.cookie.split(';').map(function(pair){ return pair.split(/\s*=\s*/) }),0,1)
+}
+
 myAjax.readProcedureDefinitions=function readProcedureDefinitions(){
     var promise;
     if(!my.offline.mode){
@@ -117,6 +121,7 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
         }
         opts.launcher.setAttribute('my-working','working');
     }
+    myAjax.parseCookies();
     return Promise.resolve().then(function(){
         var startTime=bestGlobals.datetime.now();
         var tickTime=startTime;
@@ -124,7 +129,7 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
         var lineProgress=null;
         var params={};
         procedureDef.parameters.forEach(function(paramDef){
-            var value=coalesce(data[paramDef.name],'defaultValue' in paramDef?paramDef.defaultValue:coalesce.throwErrorIfUndefined("lack of parameter "+paramDef.name));
+            var value=bestGlobals.coalesce(data[paramDef.name],'defaultValue' in paramDef?paramDef.defaultValue:bestGlobals.coalesce.throwErrorIfUndefined("lack of parameter "+paramDef.name));
             value = my.encoders[paramDef.encoding].stringify(value);
             params[paramDef.name]=value;
         });
@@ -250,6 +255,9 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
                 result.push(line||ender);
             }
         }).then(function(){
+            if(procedureDef.setCookies){
+                myAjax.parseCookies()
+            }
             onClose();
             result=result.join('');
             controlLoggedIn(result);
@@ -306,7 +314,6 @@ myAjax.encoders = {
 };
 
 myAjax.ajaxPromise.autoClose=6000;
-
 
 return myAjax;
 
