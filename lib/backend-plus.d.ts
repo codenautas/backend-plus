@@ -44,6 +44,7 @@ export interface ProcedureDef {
     resultOk?:string
     bitacora?:{always?:boolean, error?:boolean}
     unlogged?:boolean
+    setCookies?:boolean
 }
 
 export interface User {
@@ -66,9 +67,10 @@ export interface ContextForDump extends Context {
 export type InformProgressFunction=(opts:Error|{data:any}|{message:string}|{message?:string, lengthComputable:boolean, loaded:number, total:number})=>void
 
 export type ProcedureContext=Context & {
-    client:Client,
-    doing:string,
+    client:Client
+    doing:string
     informProgress:InformProgressFunction
+    setCookie:(name:string, value:string, opts:express.CookieOptions)=>void
 }
 export interface Request extends express.Request {
     user?:User
