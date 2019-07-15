@@ -33,7 +33,11 @@ var jsYaml = require('js-yaml');
 var JSON4all = require('json4all');
 
 myAjax.parseCookies = function parseCookies(){
-    window.cookies = likeAr.toPlainObject(document.cookie.split(';').map(function(pair){ return pair.split(/\s*=\s*/) }),0,1)
+    var prefijo = location.pathname.replace(/(^|\/)[^/]*$/,'').substr(1)+':';
+    window.cookies = likeAr.toPlainObject(document.cookie.split(';').map(function(pair){ 
+        var [name, value] = pair.split(/\s*=\s*/);
+        return [name.replace(prefijo,''), value];
+    }),0,1)
 }
 
 myAjax.readProcedureDefinitions=function readProcedureDefinitions(){
