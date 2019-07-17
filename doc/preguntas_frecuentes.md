@@ -10,8 +10,8 @@ el resultado ok.
 Se debe definir un `wScreen` en `my.wScreens.proc.result`.
 En la definición del procedimiento se debe indicar en `resultOk` el nombre de la definición. 
 
+**Del lado del cliente poner (podría ser en `menu.js`)**
 ```js
-
 function mostrarGrillaComoResultado(nombreGrilla, divResult, filtro){
     var fixedFields={};
     likeAr(filtro).forEach(function(value, attrName){
@@ -30,9 +30,10 @@ my.wScreens.proc.result.muestra_grilla_provincias=function(result, divResult){
 my.wScreens.proc.result.muestra_grilla_usuarios=function(result, divResult){
     mostrarGrillaComoResultado('usuarios',divResult,{})
 }
+```
 
-// ...
-
+**Del lado del servidor poner (podría ser en `procedures-app.js`)**
+```js
 {
     action: 'provincias_actualizar',
     parameters: [
