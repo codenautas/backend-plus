@@ -72,6 +72,7 @@ export type ProcedureContext=Context & {
     informProgress:InformProgressFunction
     setCookie:(name:string, value:string, opts:express.CookieOptions)=>void
     clearCookie:(name:string, opts:express.CookieOptions)=>void
+    cookies:{[key:string]: string}
 }
 export interface Request extends express.Request {
     user?:User
