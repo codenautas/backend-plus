@@ -103,7 +103,7 @@
     "why-is-node-running": "~2.1.0"
   },
   "engines": {
-    "node": ">= 8.5"
+    "node": ">= 10"
   },
   "scripts": {
     "test": "(npm run prepublish || echo \"continue w/error\") && mocha --reporter spec --single-run --bail  test/test-*.js",
