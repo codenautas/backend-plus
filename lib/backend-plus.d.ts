@@ -54,7 +54,7 @@ export interface User {
 export interface Context {
     be:AppBackend, 
     user:User, 
-    session:object, 
+    session:{[K:string]:any}, 
     username:string, 
     machineId:string, 
     navigator:string
