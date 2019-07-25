@@ -1,3 +1,4 @@
+"use strict";
 (function codenautasModuleDefinition(root, name, factory) {
     /* global define */
     /* istanbul ignore next */
@@ -52,21 +53,25 @@ myAjax.parseStrCookies = function parseStrCookies(cookieString, prefix){
 
 myAjax.readProcedureDefinitions=function readProcedureDefinitions(){
     var promise;
-    if(!my.offline.mode){
-        promise = my.ajaxPromise({
-            action:'client-setup',
-            method:'get',
-            encoding:'JSON',
-            parameters:[],
-            progress:false
-        })
-    }else{
-        promise = Promise.resolve(
-            JSON.parse(localStorage.getItem('setup'))
-        );
+    var getStored=function(setupOrError){
+        if(setupOrError && !(setupOrError instanceof Error) && !setupOrError.isoffline){
+            localStorage.setItem('setup', JSON.stringify(setupOrError));
+            return setupOrError;
+        }
+        var setupJson=localStorage.getItem('setup');
+        if(setupJson){
+            return JSON.parse(setupJson);
+        }
+        throw new Error("NOT CLIENT-CONFIGURED")
     }
+    promise = my.ajaxPromise({
+        action:'client-setup',
+        method:'get',
+        encoding:'JSON',
+        parameters:[],
+        progress:false
+    }).then(getStored, getStored);
     return promise.then(function(setup){
-        localStorage.setItem('setup', JSON.stringify(setup));
         my.config = setup;
     }).then(function(){
         my.config.procedure=my.config.procedure||{};
@@ -118,6 +123,9 @@ myAjax.readProcedureDefinitions=function readProcedureDefinitions(){
                 my.log(err);
             }
         }
+    }).catch(function(err){
+        console.log('error setting myOwn.ajax');
+        throw err;
     });
 };
 
