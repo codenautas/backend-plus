@@ -883,7 +883,7 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
     if(depot.row[fieldDef.name]!=null){
         control.setTypedValue(depot.row[fieldDef.name]);
     }
-    if(!fieldDef.clientSide || fieldDef.serverSide){
+    if(!fieldDef.clientSide || fieldDef.serverSide && fieldDef.inTable!==false){
         control.addEventListener('update',function(){
             var value = this.getTypedValue();
             if(!sameValue(value,depot.row[fieldDef.name])){
@@ -1342,10 +1342,10 @@ myOwn.dialogDownload = function dialogDownload(grid){
         dialogWindow.appendChild(mainDiv);
         var txtToDownload;
         var otherFieldsTabColumn = [];
+        var fieldsDef2Export=grid.def.fields.filter(function(fieldDef){ 
+            return (fieldDef.inTable!==false || my.INCLUDE_LOOKUP_COLUMNS_IN_TXT_EXPORT) && fieldDef.visible;
+        });
         setTimeout(function(){
-            var fieldsDef2Export=grid.def.fields.filter(function(fieldDef){ 
-                return fieldDef.inTable!==false || my.INCLUDE_LOOKUP_COLUMNS_IN_TXT_EXPORT;
-            });
             var txtToDownload=fieldsDef2Export.map(function(fieldDef){
                 if(fieldDef.inTable===false && !my.INCLUDE_LOOKUP_COLUMNS_IN_TXT_EXPORT) return '';
                 if(fieldDef.defaultForOtherFields){
@@ -1451,7 +1451,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
                     var fieldPropertiesDefs=grid.def.exportMetadata.fieldProperties.map(function(propName, i){
                         return {name:propName, typeName:'text', isPk:!i};
                     });
-                    var fieldPropertiesDepot=grid.def.fields.filter(function(fieldDef){
+                    var fieldPropertiesDepot=fieldsDef2Export.filter(function(fieldDef){
                         return coalesce(fieldDef.exportMetadata,grid.def.exportMetadata.exportAnyField,true);
                     }).map(function(fieldDef){
                         return {row:fieldDef};
@@ -1459,7 +1459,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
                     populateTableXLS(exportFileInformationWs, fieldPropertiesDepot,fieldPropertiesDefs,i+1,1);
                 }
             }
-            populateTableXLS(ws, grid.depotsToDisplay, grid.def.fields);
+            populateTableXLS(ws, grid.depotsToDisplay, fieldsDef2Export);
             var sheet1name=grid.def.name;
             var sheet2name=grid.def.name!=="metadata"?"metadata":"meta-data";
             wb.SheetNames=[sheet1name,sheet2name];
