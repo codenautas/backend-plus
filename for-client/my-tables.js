@@ -1009,6 +1009,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
             return fieldCondition;
         });
     }
+    detailControl.calculateFixedFields = calculateFixedFields;
     var updateHrefBeforeClick = function(){
         var fixedFields = calculateFixedFields();
         menuRef.fixedFields=fixedFields;
@@ -1024,6 +1025,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
         detailControl.displayDetailGrid({fixedFields:fixedFields, detailing:{}},event);    
     }
     detailControl.displayDetailGrid = function(opts,event){
+        var result;
         event=event||{};
         if(!('fixedFields' in opts)){
             opts.fixedFields = calculateFixedFields();
@@ -1054,7 +1056,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
                     }
                     wScreen.mainAction(params,divGrid);
                 }else{
-                    grid.my.tableGrid(detailTableDef.table, divGrid, {
+                    result = grid.my.tableGrid(detailTableDef.table, divGrid, {
                         fixedFields: fixedFields, 
                         detailing:opts.detailing, 
                         detailingForUrl:grid.detailingForUrl,
@@ -1068,6 +1070,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
                             g.dom.main.addEventListener('deletedRowOk', refresh);
                             g.dom.main.addEventListener('savedRowOk', refresh);
                         }
+                        return g;
                     });
                 }
             }else{
@@ -1093,6 +1096,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
             // delete opts.detailing[depot.lastsPrimaryKeyValues][detailTableNameAndAbr];
         }
         console.log('details', opts.detailing, grid.detailingForUrl, grid.detailingPath)
+        return result;
     };
     var button = my.createForkeableButton(menuRef,{label:detailControl.img, onclick:buttonClick, updateHrefBeforeClick:updateHrefBeforeClick, class:'table-button'});
     button.setAttribute("skip-enter",true);
