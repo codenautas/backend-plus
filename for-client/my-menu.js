@@ -281,6 +281,30 @@ Object.defineProperty(myOwn, 'menup', {
     }
 });
 
+myOwn.getHRef = function getHRef(menu){
+    var href;
+    if(!menu.w && menu.menuType){
+        if(menu.directUrl){
+            href = my.menup + my.paramsToUriPart(changing({w:menu.menuType}, changing(menu,{menuType:null, label:null, button:null},changing.options({deletingValue:undefined}))));
+        }else{
+            href = my.menup + my.paramsToUriPart(changing({i:menu.name},menu),true);
+        }
+    }else{
+        href = my.menup + my.paramsToUriPart(menu);
+    }
+    return href;
+}
+
+myOwn.gotoAddrParams = function gotoAddrParams(addrParams, pushing){
+    var href = my.getHRef(addrParams);
+    if(pushing){
+        history.pushState(null, null, href);
+    }else{
+        history.replaceState(null, null, href);
+    }
+    my.showPage();
+}
+
 myOwn.createForkeableButton = function createForkeableButton(menu, opts){
     var my = this;
     if(typeof opts==="string" || opts==null){
@@ -289,17 +313,7 @@ myOwn.createForkeableButton = function createForkeableButton(menu, opts){
     var label=opts.label;
     var button=html.a({"class": opts["class"]||menu["class"]||"menu-item", "menu-type":menu.menuType||menu.w, "menu-name":menu.name||'noname'}, label || menu.label || menu.name.replace(/_/g,' ')).create();
     button.setForkeableHref = function setForkeableHref(menu){
-        var href;
-        if(!menu.w && menu.menuType){
-			if(menu.directUrl){
-				href = my.menup + my.paramsToUriPart(changing({w:menu.menuType}, changing(menu,{menuType:null, label:null, button:null},changing.options({deletingValue:undefined}))));
-			}else{
-				href = my.menup + my.paramsToUriPart(changing({i:menu.name},menu),true);
-			}
-        }else{
-            href = my.menup + my.paramsToUriPart(menu);
-        }
-        button.href = href;
+        button.href = my.getHRef(menu);
     }
     button.setForkeableHref(menu);
     menu.button = button;
