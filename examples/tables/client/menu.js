@@ -1,4 +1,4 @@
-"use string";
+"use strict";
 
 var html=require('js-to-html').html;
 

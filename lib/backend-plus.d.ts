@@ -45,6 +45,7 @@ export interface ProcedureDef {
     bitacora?:{always?:boolean, error?:boolean}
     unlogged?:boolean
     setCookies?:boolean
+    proceedLabel?:string
 }
 
 export interface User {
@@ -73,6 +74,7 @@ export type ProcedureContext=Context & {
     setCookie:(name:string, value:string, opts:express.CookieOptions)=>void
     clearCookie:(name:string, opts:express.CookieOptions)=>void
     cookies:{[key:string]: string}
+    regenerateSession():void
 }
 export interface Request extends express.Request {
     user?:User
