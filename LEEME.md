@@ -319,7 +319,7 @@ db                           | opciones de la base de datos
 .password                    |
 .port                        | 
 .schema                      | esquema principal donde crear los objetos nuevos
-.search_path                 | array de nombres de esquemas, si no se especifica el search_path = [schema]  
+.search_path                 | array de nombres de esquemas, si no se especifica `search_path = [schema, 'public']`
 .log-last-error              | true si se desea que se deje en un archivo la última sentencia SQL que contuvo error (solo funciona si config.devel está especficiada)
 imports                      | opciones de importación a la plataforma
 .allow-plain-xls             | si permite importar xlsx que no tienen la señal #backend-plus en la celda A1
