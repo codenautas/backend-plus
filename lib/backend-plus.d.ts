@@ -201,6 +201,7 @@ export type TableDefinition = EditableDbDefinition & {
     title?:string
     fields:FieldDefinition[],
     primaryKey:string[],
+    refrescable?: boolean;
     sql?:{
         isTable?:boolean
         from?:string

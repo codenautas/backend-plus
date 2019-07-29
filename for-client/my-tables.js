@@ -533,6 +533,33 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                 }
             })
         }
+        if(grid.def.refrescable){
+            setInterval(function(){
+                grid.connector.my.ajax.table_data({
+                    table:grid.connector.tableName,
+                    fixedFields:grid.connector.fixedFields,
+                    paramfun:grid.connector.parameterFunctions||{}
+                }).then(function(rows){
+                    var primaryKey = grid.def.primaryKey;
+                    var getPrimaryKeyValues=function getPrimaryKeyValues(primaryKey, row){
+                        return primaryKey.map(function(fieldName){
+                            return row[fieldName]
+                        })
+                    };
+                    rows.forEach(function(row){
+                        var primaryKeyValuesForRow = getPrimaryKeyValues(primaryKey, row);
+                        var depot = grid.depots.find(function(depot){
+                            var primaryKeyValuesForDepotRow = getPrimaryKeyValues(primaryKey, depot.row);
+                            return sameValue(JSON.stringify(primaryKeyValuesForRow),JSON.stringify(primaryKeyValuesForDepotRow))
+                        });
+                        //chequeo que exista depot por las dudas
+                        if(depot && !sameValue(JSON.stringify(row),JSON.stringify(depot.row))){
+                            grid.retrieveRowAndRefresh(depot);
+                        }
+                    })
+                })
+            },5000)
+        }
     });
     grid.waitForReady = function waitForReady(fun){
         return preparing.then(function(){
