@@ -1,5 +1,37 @@
 # Preguntas frecuentes
 
+## ¿Cómo hago para dibujar una pantalla cualquiera después de ejecutar un procedimiento?
+
+Si al final de la ejecución exitosa de un procedimiento se desea mostrar 
+algo mejor que el texto del resutlado, por ejemplo dibujando una pantalla bonita, 
+se le puede indicar al procedimiento que tiene un comportamiento especial
+el resultado ok. 
+
+Se debe definir un `wScreen` en `my.wScreens.proc.result`.
+En la definición del procedimiento se debe indicar en `resultOk` el nombre de la definición. 
+
+```js
+my.wScreens.proc.result.dibujar_grafico_resulados=function(result, divResult){
+    var graficoHtml = algunaFuncionGrafica(result);
+    divResult.appendChild(graficoHtml.create());
+}
+```
+
+**Del lado del servidor poner (podría ser en `procedures-app.js`)**
+```js
+{
+    action: 'provincias_grafico',
+    parameters: [
+        {name:'region', typeName:'integer', references:'regiones'}
+    ],
+    resultOk:'dibujar_grafico_resulados',
+    coreFunction:async function(context, parameters){
+        var result = await context.client.query('select datos_provincias_region($1)', [parameters.region]).fetchAll();
+        return result.rows;
+    }
+}
+```
+
 ## ¿Cómo hago para abrir una grilla después de ejecutar un procedimiento?
 
 Si al final de la ejecución exitosa de un procedimiento se desea mostrar 

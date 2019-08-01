@@ -30,6 +30,9 @@ var myAjax = {};
  */
 myAjax.functionId = function id(x){return x;}
 
+var LocalDb = (typeof process != 'undefined'?{}:(require('./my-localdb')||{})).LocalDb;
+var WebSqlDb = (typeof process!= 'undefined'?{}:(require('./my-websqldb')||{})).WebsqlDb;
+
 var jsYaml = require('js-yaml');
 var JSON4all = require('json4all');
 
