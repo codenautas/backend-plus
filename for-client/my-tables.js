@@ -676,6 +676,7 @@ myOwn.TableGrid.prototype.prepareAndDisplayGrid = function prepareAndDisplayGrid
         });
     }).catch(function(err){
         grid.my.log(err);
+        throw err;
     });
 };
 
