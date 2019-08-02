@@ -169,6 +169,7 @@ export type FieldDefinition = EditableDbDefinition & {
     description?:string
     dataLength?:number
     options?:(string|{option:string|number, label:string})[]
+    inView?:boolean
 }
 export type EditableDbDefinition = {
     editable?:boolean
@@ -221,7 +222,8 @@ export type TableDefinition = EditableDbDefinition & {
             [k:string]:{
                 expr:string
             }
-        }
+        },
+        viewBody?:string
     }
     foreignKeys?:ForeignKey[]
     softForeignKeys?:ForeignKey[]

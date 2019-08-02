@@ -1627,6 +1627,30 @@ myOwn.TableAggregates.count.prototype.acum=function acum(value){
 myOwn.TableAggregates.count.prototype.result=function result(){
     return this.n;
 }
+myOwn.TableAggregates.min=function(){
+};
+myOwn.TableAggregates.min.prototype.acum=function acum(value){
+    if(value!=null){
+        if(this.value==null || this.value>value){
+            this.value = value;
+        }
+    }
+}
+myOwn.TableAggregates.min.prototype.result=function result(){
+    return this.value;
+}
+myOwn.TableAggregates.max=function(){
+};
+myOwn.TableAggregates.max.prototype.acum=function acum(value){
+    if(value!=null){
+        if(this.value==null || this.value<value){
+            this.value = value;
+        }
+    }
+}
+myOwn.TableAggregates.max.prototype.result=function result(){
+    return this.value;
+}
 
 myOwn.TableGrid.prototype.refreshAggregates = function refreshAggregates(){
     var grid = this;
