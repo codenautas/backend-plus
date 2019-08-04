@@ -30,8 +30,20 @@ var myAjax = {};
  */
 myAjax.functionId = function id(x){return x;}
 
-var LocalDb = (typeof process != 'undefined'?{}:(require('./my-localdb')||{})).LocalDb;
-var WebSqlDb = (typeof process!= 'undefined'?{}:(require('./my-websqldb')||{})).WebsqlDb;
+function requireIfExists(moduleName){
+    if(typeof process != "undefined"){
+        return {}
+    }
+    try{
+        // eslint-disable-next-line 
+        return require(moduleName);
+    }catch(err){
+        return {};
+    }
+}
+
+var LocalDb  = requireIfExists('./my-localdb' ).LocalDb ;
+var WebSqlDb = requireIfExists('./my-websqldb').WebsqlDb;
 
 var jsYaml = require('js-yaml');
 var JSON4all = require('json4all');

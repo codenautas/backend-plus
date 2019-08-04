@@ -130,7 +130,7 @@ export interface TableContext extends Context{
     superuser?:true
     forDump?:boolean
 }
-export type PgKnownTypes='decimal'|'text'|'boolean'|'integer'|'bigint'|'date'|'interval'|'timestamp'|'jsonb';
+export type PgKnownTypes='decimal'|'text'|'boolean'|'integer'|'bigint'|'date'|'interval'|'timestamp'|'jsonb'|'double';
 export type PgKnownDbValues='current_timestamp'|'current_user'|'session_user';
 export type SequenceDefinition = {
     name:string
@@ -223,6 +223,7 @@ export type TableDefinition = EditableDbDefinition & {
                 expr:string
             }
         },
+        orderBy?:string[]
         viewBody?:string
     }
     foreignKeys?:ForeignKey[]
@@ -234,6 +235,7 @@ export type TableDefinition = EditableDbDefinition & {
         details:string[]
     }
     clientSide?:string         /* keyof: myOwn.clientSides */
+    hiddenColumns?:string[]
 }
 export interface DetailTable { table: string, fields: FieldsForConnect, abr: string, label?: string, refreshParent?:boolean, wScreen?:string, condition?:string }
 export type TableDefinitionFunction = (context: ContextForDump) => TableDefinition;
