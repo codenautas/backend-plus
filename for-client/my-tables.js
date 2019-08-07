@@ -1729,7 +1729,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         });
     }
     if(grid.def.allow.filter && !grid.def.forInsertOnlyMode){
-        buttonCreateFilter=html.button({class:'table-button', 'when-filter':'no'}, [
+        buttonCreateFilter=html.button({class:'table-button', 'when-filter':'no', "skip-enter":true}, [
             html.img({
                 src:my.path.img+'filter.png',
                 alt:'FILTER',
@@ -1739,7 +1739,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         buttonCreateFilter.addEventListener('click', function(){
             grid.view.filter=[grid.createRowFilter(0,[])];
         });
-        buttonCreateFilterAdd=html.button({class:'table-button', 'when-filter':'yes'}, [
+        buttonCreateFilterAdd=html.button({class:'table-button', 'when-filter':'yes', "skip-enter":true}, [
             html.img({
                 src:my.path.img+'filter-line-add.png',
                 alt:'FIL',
@@ -1749,7 +1749,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         buttonCreateFilterAdd.addEventListener('click', function(){
             grid.view.filter.push(grid.createRowFilter(1,[]));
         });
-        buttonDestroyFilter=html.button({class:'table-button', 'when-filter':'yes'}, [
+        buttonDestroyFilter=html.button({class:'table-button', 'when-filter':'yes', "skip-enter":true}, [
             html.img({
                 src:my.path.img+'destroy-filter.png',
                 alt:'FILTER OFF',
@@ -1778,7 +1778,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
             grid.dom.table.setAttribute("my-orientation",grid.vertical?'vertical':'horizontal');
         });
     }
-    buttonMenu=html.button({class:'table-button'}, [
+    buttonMenu=html.button({class:'table-button', "skip-enter":true}, [
         html.img({
             src:my.path.img+'menu-dots.png',
         })
