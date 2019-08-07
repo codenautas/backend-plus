@@ -1664,7 +1664,7 @@ myOwn.TableGrid.prototype.refreshAggregates = function refreshAggregates(){
     grid.depots.forEach(function(depot){
         grid.def.fields.forEach(function(fieldDef){
             if(fieldDef.aggregate){
-                aggData[fieldDef.name].acum(depot.row[fieldDef.name]);
+                aggData[fieldDef.name].acum(depot.row[fieldDef.name],depot.row);
             }
         })
     });
