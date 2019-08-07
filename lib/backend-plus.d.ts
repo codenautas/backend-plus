@@ -181,6 +181,7 @@ export type EditableDbDefinition = {
         deleteAll?: boolean
         import?: boolean
         export?: boolean
+        'vertical-edit': boolean
     }
 }
 export type FieldsForConnect = (string | {source:string, target:string})[]
