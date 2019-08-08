@@ -237,6 +237,9 @@ export type TableDefinition = EditableDbDefinition & {
     }
     clientSide?:string         /* keyof: myOwn.clientSides */
     hiddenColumns?:string[]
+    layout?:{
+        vertical?:boolean
+    }
 }
 export interface DetailTable { table: string, fields: FieldsForConnect, abr: string, label?: string, refreshParent?:boolean, wScreen?:string, condition?:string }
 export type TableDefinitionFunction = (context: ContextForDump) => TableDefinition;
