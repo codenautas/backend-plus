@@ -2035,6 +2035,10 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 grid.depotRefresh(depot,result);
             }).catch(function(err){
                 changeIoStatus(depot,'error',depot.rowPendingForUpdate,err.message);
+                //REVISAR SI SE QUIERE REVERTIR
+                //setTimeout(function(){
+                //    grid.retrieveRowAndRefresh(depot,{revert:true})
+                //},2000)
             });
         });
     };
@@ -2085,6 +2089,8 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         var retrievedRow = result.updatedRow;
         for(var fieldName in retrievedRow){
             if(!/^\$/.test(fieldName)){
+                //REVISAR CONDICION
+                //if(!grid.def.field[fieldName].clientSide ||grid.def.field[fieldName].clientSide && grid.def.field[fieldName].serverSide){
                 if(!grid.def.field[fieldName].clientSide){
                     if(depot.rowControls[fieldName]){
                         var value = depot.rowControls[fieldName].getTypedValue();
@@ -2111,6 +2117,12 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                         // ok, si bien lo que viene no coincide con lo pendiente que sigue pendiente, 
                         // sí coincide con lo que estaba antes de mandar a grabar, 
                         // entonces no hay conflicto el usuario sabe sobre qué está modificando
+                        //REVISAR SI SE QUIERE REVERTIR
+                        //if(opts.revert){
+                            //depot.row[fieldName] = retrievedRow[fieldName];
+                            //depot.rowControls[fieldName].setTypedValue(retrievedRow[fieldName]);
+                            //changeIoStatus(depot,'ok', fieldName);
+                        //}
                     }else{
                         // no coincide con lo pendiente ni con lo anterior, 
                         // hay un conflicto con el conocimiento del usuario que modificó algo que estaba en otro estado
