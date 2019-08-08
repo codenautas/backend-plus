@@ -1981,7 +1981,8 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 }else if(grid.my.clientSides[fieldDef.clientSide].update){
                     grid.my.clientSides[fieldDef.clientSide].update(depot, fieldDef.name);
                 }
-            }else if(!skipUpdateStatus){
+            }
+            if(!skipUpdateStatus){
                 var newValue=coalesce(depot.row[fieldDef.name],null);
                 if(!sameValue(newValue,td.getTypedValue())){
                     td.setTypedValue(newValue);
@@ -2111,6 +2112,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                         // ok, si bien lo que viene no coincide con lo pendiente que sigue pendiente, 
                         // sí coincide con lo que estaba antes de mandar a grabar, 
                         // entonces no hay conflicto el usuario sabe sobre qué está modificando
+                        //REVISAR SI SE QUIERE REVERTIR
                     }else{
                         // no coincide con lo pendiente ni con lo anterior, 
                         // hay un conflicto con el conocimiento del usuario que modificó algo que estaba en otro estado
