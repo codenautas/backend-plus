@@ -1981,8 +1981,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 }else if(grid.my.clientSides[fieldDef.clientSide].update){
                     grid.my.clientSides[fieldDef.clientSide].update(depot, fieldDef.name);
                 }
-            }
-            if(!skipUpdateStatus){
+            }else if(!skipUpdateStatus){
                 var newValue=coalesce(depot.row[fieldDef.name],null);
                 if(!sameValue(newValue,td.getTypedValue())){
                     td.setTypedValue(newValue);
