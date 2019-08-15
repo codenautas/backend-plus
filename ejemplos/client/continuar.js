@@ -325,7 +325,6 @@ function presentarAlmacen(result, formAMostrar, ordenAMostrar){
 };
 
 function alCargarOCambiarHash(event){
-    console.log(event);
     // document.getElementById('status').textContent = "Cargando...";
     AjaxBestPromise.post({
         url:'info-enc-act',

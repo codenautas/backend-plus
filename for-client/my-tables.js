@@ -506,7 +506,6 @@ myOwn.TableGrid = function(context, mainElement){
 };
 
 function upadteNumberOfRows(depot,grid){
-    console.log("grid.depotsToDisplay.length",grid.depotsToDisplay.length)
     depot.manager.dom.footInfo.displayTo.textContent=grid.depotsToDisplay.length;
 }
 
@@ -1123,7 +1122,6 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
             // opts.detailing[depot.lastsPrimaryKeyValues]=opts.detailing[depot.lastsPrimaryKeyValues]||{};
             // delete opts.detailing[depot.lastsPrimaryKeyValues][detailTableNameAndAbr];
         }
-        console.log('details', opts.detailing, grid.detailingForUrl, grid.detailingPath)
         return result;
     };
     var button = my.createForkeableButton(menuRef,{label:detailControl.img, onclick:buttonClick, updateHrefBeforeClick:updateHrefBeforeClick, class:'table-button'});
@@ -1976,15 +1974,15 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     grid.my.clientSides[fieldDef.clientSide].prepare(depot, fieldDef.name);
                     td.clientSidePrepared=true;
                 }
-                if(grid.my.clientSides[fieldDef.clientSide].update===true){
-                    td.setTypedValue(depot.row[fieldDef.name]);
-                }else if(grid.my.clientSides[fieldDef.clientSide].update){
+                if(typeof grid.my.clientSides[fieldDef.clientSide].update === "function"){
                     grid.my.clientSides[fieldDef.clientSide].update(depot, fieldDef.name);
                 }
-            }else if(!skipUpdateStatus){
+            }
+            if(!skipUpdateStatus && (!fieldDef.clientSide || grid.my.clientSides[fieldDef.clientSide].update===true)){
                 var newValue=coalesce(depot.row[fieldDef.name],null);
-                if(!sameValue(newValue,td.getTypedValue())){
-                    td.setTypedValue(newValue);
+                var actualValue=td.getTypedValue();
+                if(!sameValue(newValue,actualValue)){
+                    td.setTypedValue(newValue); /// ANALISIS SET-TYPED-VALUE
                 }
             }
         });
@@ -2085,7 +2083,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         var retrievedRow = result.updatedRow;
         for(var fieldName in retrievedRow){
             if(!/^\$/.test(fieldName)){
-                if(!grid.def.field[fieldName].clientSide){
+                if(!grid.def.field[fieldName].clientSide || grid.def.field[fieldName].serverSide && grid.def.field[fieldName].inTable!==false){
                     if(depot.rowControls[fieldName]){
                         var value = depot.rowControls[fieldName].getTypedValue();
                         if(!sameValue(depot.row[fieldName], value)){
