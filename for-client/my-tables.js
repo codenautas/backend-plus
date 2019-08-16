@@ -519,7 +519,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
     grid.connector = new Connector({
         my:this, 
         tableName: tableName, 
-        getElementToDisplayCount:function(){ return grid.dom.footInfo.displayTo; }
+        getElementToDisplayCount:function(){ return (grid.dom.footInfo||{}).displayTo||html.div().create(); }
     }, opts);
     var preparing = grid.prepareAndDisplayGrid().then(function(){
         if(opts.detailing){

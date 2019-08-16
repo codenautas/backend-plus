@@ -411,7 +411,9 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
         elements.push(loginElement);
         var status=html.span({id: "mini-console"}).create();
         status.addEventListener('click',function(){
-            alertPromise(status.textContent,{underElement:status, withCloseButton:true, mainAttrs:{style:'white-space:pre'}});
+            var mensajeDiv=document.createElement('div');
+            mensajeDiv.innerHTML=status.innerHTML;
+            alertPromise(mensajeDiv,{underElement:status, withCloseButton:true, mainAttrs:{style:'white-space:pre'}});
         });
         elements.push(html.span({class:'right-lights'},[
             my.light('server', function(){
