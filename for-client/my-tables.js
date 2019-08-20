@@ -1051,6 +1051,13 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
         }
         detailControl.displayDetailGrid({fixedFields:fixedFields, detailing:{}},event);    
     }
+    detailControl.forceDisplayDetailGrid = function(opts){
+        if(detailControl.show){
+            this.displayDetailGrid(opts);
+        }
+        this.divDetail=null;
+        this.displayDetailGrid(opts);
+    }
     detailControl.displayDetailGrid = function(opts,event){
         var result;
         event=event||{};
