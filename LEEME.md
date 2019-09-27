@@ -104,6 +104,7 @@ name        | T    |                |          | nombre de la opción (id)
 menuContent | A    |                | menu     | contenido del menú
 table       | T    | `name`         | table    | nombre de la tabla 
 label       | T    | `name`         |          | lo que se ve en el menú
+selectedByDefault | B |             |          | si es la opción predeterminada
 
 <!--lang:en--]
 ### Menus definition
@@ -121,6 +122,7 @@ name        | T    |                |          | option name (id)
 menuContent | A    |                | menu     | menu content
 table       | T    | `name`         | table    | table name
 label       | T    | `name`         |          | if you don't want to use default value to display in menu
+selectedByDefault | B |             |          | is the selected by default option
 
 <!--lang:es-->
 Ejemplo integrador:

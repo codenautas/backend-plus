@@ -88,6 +88,9 @@ myAjax.readProcedureDefinitions=function readProcedureDefinitions(){
     }).then(getStored, getStored);
     return promise.then(function(setup){
         my.config = setup;
+        if(my.config.config && my.config.config['background-img'] && typeof document !== "undefined"){
+            document.body.style.backgroundImage='url("'+my.path.img+my.config.config['background-img']+'")';
+        }
     }).then(function(){
         my.config.procedure=my.config.procedure||{};
         my.config.procedures.forEach(/** @param {bp.ProcedureDef} procedureDef */function(procedureDef){

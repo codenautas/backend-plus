@@ -90,6 +90,7 @@ export type MenuInfoBase={
     menuType:string // 'menu'|'table'|'proc'
     name:string
     label?:string
+    selectedByDefault?:true
     [k:string]:any
 }
 export type MenuInfoMinimo={
@@ -226,6 +227,7 @@ export type TableDefinition = EditableDbDefinition & {
         },
         orderBy?:string[]
         viewBody?:string
+        insertIfNotUpdate?:boolean
     }
     foreignKeys?:ForeignKey[]
     softForeignKeys?:ForeignKey[]
@@ -240,6 +242,7 @@ export type TableDefinition = EditableDbDefinition & {
     layout?:{
         vertical?:boolean
     }
+    sortColumns?:{column:string, order?:1|-1}[]
 }
 export interface DetailTable { table: string, fields: FieldsForConnect, abr: string, label?: string, refreshParent?:boolean, wScreen?:string, condition?:string }
 export type TableDefinitionFunction = (context: ContextForDump) => TableDefinition;
