@@ -39,7 +39,6 @@ foreignKeys       | [O]  | `[]`                  | FK definition list
 softForeignKeys   | [O]  | `[]`                  | SFK definition list. It's used to specify FKs (one to one) not defined in database.
 constraints       | [O]  | `[]`                  | constraints list (except PK and FK)
 sql               | O    | *deduced*             | SQL syntax for special cases
-isTable           | L    | `true`                | (see Spanish)
 layout            | O    | {}                    | (see Spanish)
 vertical          | L    | `false`               | (see Spanish)
 forInsertOnlyMode | L    | `false`               | (see Spanish)
