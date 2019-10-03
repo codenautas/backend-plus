@@ -299,6 +299,7 @@ login                        | opciones de login
 .activeClausule              | expresión booleana SQL que determina si el usuario está activo
 .messages                    | mensajes a mostrar en la pantalla de login
 .keepAlive                   | máxima duración logueado si solo se reciben mensajes keep-alive
+.preserve-case               | si acepta usuarios con mayúsculas
 log                          | log por consola
 .req                         | muestra cada requerimiento
 .session                     | muestra info de las sesiones

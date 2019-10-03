@@ -61,6 +61,7 @@ name        | T    |                |          | option name (id)
 menuContent | A    |                | menu     | menu content
 table       | T    | `name`         | table    | table name
 label       | T    | `name`         |          | if you don't want to use default value to display in menu
+selectedByDefault | B |             |          | is the selected by default option
 
 Integrating example:
 
@@ -93,6 +94,7 @@ property    | type | default value                 | use
 action      | T    |                               | Name that will be invoked the procedure
 bitacora    | BO   | { error:false, always:false } | Bitacora Object for core functions register
 parameters  | POA  | `[]`                          | Param Objects Array
+cacheable   | Bool | false                         | The result can be cached
 coreFunction| F    |                               | Function that implements the procedure
 
 #### bitacoraDef:

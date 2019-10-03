@@ -260,6 +260,16 @@ export type StartOptions={
 export type TableDefinitionsGetters = {
     [key:string]: (context:TableContext) => TableDefinition
 }
+export type UnloggedRequest = {
+    useragent:{
+        os?:string
+        version?:string
+    }
+}
+export type OptsClientPage = {
+    hideBEPlusInclusions?:boolean
+    skipMenu?:boolean
+}
 export class AppBackend{
     procedures:ProcedureDef[]
     procedure:{ [key:string]:ProcedureDef }
@@ -296,6 +306,9 @@ export class AppBackend{
     configList(): (object|string)[]
     configStaticConfig():void
     setStaticConfig(defConfigYamlString:string):void
+    mainPage(req:Request|{},offlineMode?:boolean,opts?:OptsClientPage):{
+        toHtmlDoc:()=>string
+    }
 }
 
 }
