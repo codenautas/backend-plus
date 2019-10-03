@@ -70,6 +70,7 @@ orientation | x     |       | (see Spanish)
 sql            | usage
 ---------------|----------------
 postCreateSqls | (see Spanish)
+isTable        | (see Spanish)
 
 
 
