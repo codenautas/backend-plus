@@ -46,7 +46,6 @@ foreignKeys       | [O]  | `[]`                  | lista las definiciones de las
 softForeignKeys   | [O]  | `[]`                  | lista las definiciones de las SFK. Especifica FKs (uno a uno) que no se define en la BBDD
 constraints       | [O]  | `[]`                  | lista de constraints (salvo las Pk, FK que van en otra lista)
 sql               | O    | *deducido*            | sintaxis SQL para casos especiales
-isTable           | L    | `true`                | si es una tabla y por lo tanto hay que hacer el dump para el create table y si se le deben deducir los campos name de sus FK
 tableName         | T    | `name`                | nombre de la tabla física (generalmente es el mismo name de definición de la tabla en el sistema)
 layout            | O    | {}                    | opciones de despliegue
 vertical          | L    | `false`               | si el despliegue predeterminado es vertical
@@ -82,7 +81,7 @@ sql            | uso
 ---------------|----------------
 postCreateSqls | texto con una o varias sentencias SQL que deben ejecutarse después de la creación. Sirve para agregar constraints que el motor no soporta. 
 constraintsDeferred|true equivale a ejecutar SET CONSTRAINTS ALL DEFERRED al comienzo de la transacción al hacer upload
-
+isTable        |true si es una tabla y por lo tanto hay que hacer el dump para el create table y si se le deben deducir los campos name de sus FK
 <!--lang:en--]
 
 property          | type | default value         | use
