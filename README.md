@@ -166,7 +166,6 @@ entry                        | usage
 server                       |
 .module-store                |
 install                      | (see Spanish)
-.table-data-dir              | folder with .tabs files which will be used when run npm start -- --dump-db (which creates inserts in local-db-dump.sql)
 .dump                        | (see Spanish)
 ..db.owner               | (see Spanish)
 ..scripts.post-adapt     | (see Spanish)

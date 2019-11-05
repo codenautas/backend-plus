@@ -177,6 +177,7 @@ fields                | [O]  |                | lista de nombres de campos para 
 alias                 | T    | `references`   | alias para el join, es necesario cuando hay dos `foreignKeys` que referencian a la misma tabla.
 displayFields         | [T]  | [`references.isName`] | lista de nombres  de campos de la tabla referida que deben mostrarse en la grilla de esta tabla. En caso de que no se especifiquen se toman los campos marcados con `isName`
 displayAllFields      | B    | false          | si se deben mostrar todos los campos de la tabla referida
+onUpdate              | T    | 'cascade'      | que hacer si hay un update en la tabla relacionada
 onDelete              | T    |                | que hacer si hay un borrado (valor posible: `'cascade'`).
 consName              | T    |                | nombre de la constraint generada
 initiallyDeferred     | B    | false          | si se calcula al final la constraint
@@ -185,14 +186,15 @@ initiallyDeferred     | B    | false          | si se calcula al final la constr
 
 property              | type | default value | use
 ----------------------|------|---------------|-------------------
-references            | T    |                | see spanish 
-fields                | [O]  |                | see spanish
-alias                 | T    | `references`   | see spanish
-displayFields         | [T]  | [`references.isName`] | see spanish
-displayAllFields      | B    | false          | see spanish
-onDelete              | T    |                | see spanish
-consName              | T    |                | see spanish
-initiallyDeferred     | B    | false          | see spanish
+references            | T    |                | referenced table
+fields                | [O]  |                | fields of unique constraint
+alias                 | T    | `references`   | alias of the table in the build sqls
+displayFields         | [T]  | [`references.isName`] | with fields will display in grids
+displayAllFields      | B    | false          | display all fields in grids
+onUpdate              | T    | 'cascade'      | on update clause
+onDelete              | T    |                | on delete clause
+consName              | T    |                | constraint name
+initiallyDeferred     | B    | false          | intitially deferred clause
 
 [!--lang:*-->
 

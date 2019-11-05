@@ -186,10 +186,12 @@ export type EditableDbDefinition = {
     }
 }
 export type FieldsForConnect = (string | {source:string, target:string})[]
+export type FkActions = 'no action'|'restrict'|'cascade'|'set null'|'set default';
 export type ForeignKey = {
     references:string, 
     fields:FieldsForConnect, 
-    onDelete?: string, 
+    onUpdate?: FkActions, 
+    onDelete?: FkActions, 
     displayAllFields?: boolean, 
     alias?:string, 
     displayFields?:string[], 
