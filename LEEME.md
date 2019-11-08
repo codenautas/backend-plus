@@ -279,6 +279,7 @@ entrada                      | uso
 server                       | opciones a nivel del servidor
 .module-store                | nombre del módulo que guarda sesiones: file, memory (en modo devel guarda en disco cada tanto)
 install                      | opciones de instalación
+.table-data-dir              | directorio donde están los .tabs que se usarán en el comando dump-db (que crea inserte en archivo local-db-dump.sql)
 .dump                        | opciones del dump de instalación
 ..db.owner                   | usuario dueño de la base de datos
 ..scripts.post-adapt         | lista de nombres de archivos para adaptar la estructura de la base de datos
