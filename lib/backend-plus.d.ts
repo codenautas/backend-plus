@@ -46,6 +46,7 @@ export interface ProcedureDef {
     unlogged?:boolean
     setCookies?:boolean
     proceedLabel?:string
+    policy?:string
 }
 
 export interface User {
@@ -121,6 +122,8 @@ export interface ClientModuleDefinition{
         url:string
         path:string
     }
+    fileProduction?:string
+    fileDevelopment?:string
 }
 export type MenuInfo = MenuInfoMenu | MenuInfoTable | MenuInfoProc;
 // type MenuDefinition = {menu:Readonly<MenuInfoBase[]>}
@@ -245,6 +248,7 @@ export type TableDefinition = EditableDbDefinition & {
         vertical?:boolean
     }
     sortColumns?:{column:string, order?:1|-1}[]
+    policy?:string
 }
 export interface DetailTable { table: string, fields: FieldsForConnect, abr: string, label?: string, refreshParent?:boolean, wScreen?:string, condition?:string }
 export type TableDefinitionFunction = (context: ContextForDump) => TableDefinition;
@@ -291,7 +295,7 @@ export class AppBackend{
     appendToTableDefinition(tableName:string, appenderFunction:(tableDef:TableDefinition, context?:TableContext)=>void):void
     getContext(req:Request):Context
     postConfig(...params: any[]):any
-    clientIncludes(req:Request|null, hideBEPlusInclusions?:boolean):ClientModuleDefinition[]
+    clientIncludes(req:Request|null, hideBEPlusInclusions?:OptsClientPage):ClientModuleDefinition[]
     addSchrödingerServices(mainApp:ExpressPlus, baseUrl:string):void
     addUnloggedServices(mainApp:ExpressPlus, baseUrl:string):void
     addLoggedServices():void
@@ -311,6 +315,7 @@ export class AppBackend{
     mainPage(req:Request|{},offlineMode?:boolean,opts?:OptsClientPage):{
         toHtmlDoc:()=>string
     }
+    isThisProcedureAllowed<T>(context:Context, procedureDef:ProcedureDef, params:{[key:string]:T}):Promise<boolean>
 }
 
 }
