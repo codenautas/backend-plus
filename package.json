@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for typed controls",
-  "version": "0.31.9",
+  "version": "0.31.10",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -100,6 +100,7 @@
     "sinon": "~7.5.0",
     "supertest": "~4.0.2",
     "why-is-node-running": "~2.1.0",
+    "typescript": "^3.7.4",
     "types.d.ts": "~0.4.10"
   },
   "engines": {
