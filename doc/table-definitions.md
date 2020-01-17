@@ -67,11 +67,11 @@ import      | x     |       | (see Spanish)
 export      | x     |       | (see Spanish)
 orientation | x     |       | (see Spanish)
 
-sql            | usage
----------------|----------------
-postCreateSqls | (see Spanish)
-isTable        | (see Spanish)
-
+sql                | usage
+-------------------|----------------
+postCreateSqls     | (see Spanish)
+isTable            | (see Spanish)
+insertIfNotUpdate  | for excel import you can *disable insertion of new rows present in excel* (pk not in DB) by setting in false this property 
 
 
 ## fieldDef
