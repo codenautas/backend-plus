@@ -159,33 +159,76 @@ Process definition example:
     },
 ```
 
-## def-config.yaml
+## def-config
+
+```js
+/// def-config.ts
+export defConfig=`
+server:
+  port: 3000
+  base-url: /my-app
+db:
+  motor: postgresql
+  host: localhost
+  database: my_app_db
+  user: my_app_user
+install:
+  dump:
+    db:
+      owner: my_app_owner
+client-setup:
+  title: My app
+  lang: es
+`;
+
+/// main.ts
+import {defConfig} from "./def-config"
+
+export function emergeMyApp<T extends Constructor<AppBackend>>(Base:T){
+    /// ...
+    configStaticConfig(){
+        super.configStaticConfig();
+        this.setStaticConfig(defConfig);
+    }
+    ///...
+}
+
+```
+
+The general application config is setted with `setStaticConfig`.
+Any option can be overwrited in `local-config.yaml` file.
+
+`BACKEND_PLUS_LOCAL_CONFIG` enviroment variable can be a `filename.yaml` with more config options.
+
+### config format:
 
 entry                        | usage
 -----------------------------|---------------
 server                       |
+.port                        | port where is listening
+.base-rul                    | base url added to domain name
 .module-store                |
 install                      | (see Spanish)
 .dump                        | (see Spanish)
-..db.owner               | (see Spanish)
-..scripts.post-adapt     | (see Spanish)
-..scripts.parts-order    | (see Spanish)
+..db.owner                   | (see Spanish)
+..scripts.post-adapt         | (see Spanish)
+..scripts.parts-order        | (see Spanish)
 devel                        | (see Spanish)
-.delay                     | (see Spanish)
-.cache-content             | (see Spanish)
-.forceShowAsEditable       | (see Spanish)
+.delay                       | (see Spanish)
+.cache-content               | (see Spanish)
+.forceShowAsEditable         | (see Spanish)
 login                        | (see Spanish)
-.plus                      | (see Spanish)
-..allowHttpLogin         | (see Spanish)
+.plus                        | (see Spanish)
+..allowHttpLogin             | (see Spanish)
 log                          | (see Spanish)
-.req                       | (see Spanish)
-.session                   | (see Spanish)
+.req                         | (see Spanish)
+.session                     | (see Spanish)
 client-setup                 | (see Spanish)
-.cursors                   | (see Spanish)
-.skin                      | (see Spanish)
-.menu                      | (see Spanish)
-.title                     | (see Spanish)
-.lang                      | (see Spanish)
+.cursors                     | (see Spanish)
+.skin                        | (see Spanish)
+.menu                        | (see Spanish)
+.title                       | (see Spanish)
+.lang                        | (see Spanish)
 
 ```yaml
 install:

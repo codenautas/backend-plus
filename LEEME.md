@@ -271,12 +271,66 @@ Process definition example:
 ```
 
 <!--lang:*-->
-## def-config.yaml
+## def-config
+
+```js
+/// def-config.ts
+export defConfig=`
+server:
+  port: 3000
+  base-url: /my-app
+db:
+  motor: postgresql
+  host: localhost
+  database: my_app_db
+  user: my_app_user
+install:
+  dump:
+    db:
+      owner: my_app_owner
+client-setup:
+  title: My app
+  lang: es
+`;
+
+/// main.ts
+import {defConfig} from "./def-config"
+
+export function emergeMyApp<T extends Constructor<AppBackend>>(Base:T){
+    /// ...
+    configStaticConfig(){
+        super.configStaticConfig();
+        this.setStaticConfig(defConfig);
+    }
+    ///...
+}
+
+```
 
 <!--lang:es-->
+La configuración general de la aplicación debe pasarse a la función `setStaticConfig` en formato texto-yaml. 
+Las distintas instancias instaladas pueden cambiar las opciones poniéndolas en el archivo `local-config.yaml` 
+(por ejemplo se podrían tener dos instancias de testing en el mismo servidor colgado de puertos distintos 
+apuntando a distntas bases de datos).
+
+La variable de ambiente `BACKEND_PLUS_LOCAL_CONFIG` puede especificar un tercer archivo de configuración yaml
+que será aplicado después de `setStaticConfig` y de `local-config.yaml`. 
+Eso permite tener dos instancias corriendo en la misma carpeta (pero para ello el sistema no debería usar el 
+sistema de archivos para almacenar ningún tipo de  información). 
+
+<!--lang:en--]
+The general application config is setted with `setStaticConfig`. 
+Any option can be overwrited in `local-config.yaml` file.
+
+`BACKEND_PLUS_LOCAL_CONFIG` enviroment variable can be a `filename.yaml` with more config options. 
+
+<!--lang:es-->
+### formato de la configuración:
+
 entrada                      | uso
 -----------------------------|---------------
 server                       | opciones a nivel del servidor
+.port                        | puerto en el que atiende el servidio
 .module-store                | nombre del módulo que guarda sesiones: file, memory (en modo devel guarda en disco cada tanto)
 install                      | opciones de instalación
 .table-data-dir              | directorio donde están los .tabs que se usarán en el comando dump-db (que crea inserte en archivo local-db-dump.sql)
@@ -330,31 +384,35 @@ imports                      | opciones de importación a la plataforma
 
 
 <!--lang:en--]
+### config format:
+
 entry                        | usage
 -----------------------------|---------------
 server                       |
+.port                        | port where is listening
+.base-rul                    | base url added to domain name
 .module-store                |
 install                      | (see Spanish)
 .dump                        | (see Spanish)
-..db.owner               | (see Spanish)
-..scripts.post-adapt     | (see Spanish)
-..scripts.parts-order    | (see Spanish)
+..db.owner                   | (see Spanish)
+..scripts.post-adapt         | (see Spanish)
+..scripts.parts-order        | (see Spanish)
 devel                        | (see Spanish)
-.delay                     | (see Spanish)
-.cache-content             | (see Spanish)
-.forceShowAsEditable       | (see Spanish)
+.delay                       | (see Spanish)
+.cache-content               | (see Spanish)
+.forceShowAsEditable         | (see Spanish)
 login                        | (see Spanish) 
-.plus                      | (see Spanish) 
-..allowHttpLogin         | (see Spanish) 
+.plus                        | (see Spanish) 
+..allowHttpLogin             | (see Spanish) 
 log                          | (see Spanish) 
-.req                       | (see Spanish) 
-.session                   | (see Spanish) 
+.req                         | (see Spanish) 
+.session                     | (see Spanish) 
 client-setup                 | (see Spanish) 
-.cursors                   | (see Spanish) 
-.skin                      | (see Spanish) 
-.menu                      | (see Spanish) 
-.title                     | (see Spanish) 
-.lang                      | (see Spanish) 
+.cursors                     | (see Spanish) 
+.skin                        | (see Spanish) 
+.menu                        | (see Spanish) 
+.title                       | (see Spanish) 
+.lang                        | (see Spanish) 
 
 [!--lang:*-->  
 ```yaml  
