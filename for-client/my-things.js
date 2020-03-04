@@ -520,7 +520,7 @@ function isInteracive(element){
     && element.style.display!='none'
     && element.style.visibility!='hidden'
     && !element.getAttribute('skip-enter')
-    && (element.tabIndex==null || element.tabIndex>=0);
+    && (element.tabIndex==null || element.tabIndex>=0 || element.contentEditable=="true");
 }
 
 function nextElement(elemento, noGoDownWhen){
