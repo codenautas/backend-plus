@@ -174,6 +174,7 @@ export type FieldDefinition = EditableDbDefinition & {
     dataLength?:number
     options?:(string|{option:string|number, label:string})[]
     inView?:boolean
+    sortMethod?:string
 }
 export type EditableDbDefinition = {
     editable?:boolean
@@ -252,7 +253,8 @@ export type TableDefinition = EditableDbDefinition & {
 }
 export interface DetailTable { table: string, fields: FieldsForConnect, abr: string, label?: string, refreshParent?:boolean, wScreen?:string, condition?:string }
 export type TableDefinitionFunction = (context: ContextForDump) => TableDefinition;
-export type TableItemDef=string|{name:string}&({tableGenerator:(context:TableContext)=>TableDefinition})
+export type TableItemDef=string|{name:string, path?:string, tableGenerator?:(context:TableContext)=>TableDefinition}
+// {{name: string; path?:string; fileName?: string; source?: string; tableGenerator?:()=>void; title?:string; mixin?:any[]}} TableItem
 export interface TableDefinitions {
     [k: string]: TableDefinitionFunction
 }
@@ -275,6 +277,9 @@ export type UnloggedRequest = {
 export type OptsClientPage = {
     hideBEPlusInclusions?:boolean
     skipMenu?:boolean
+    manifestPath?:string
+    extraFiles?:ClientModuleDefinition[]
+    icon?:string
 }
 export class AppBackend{
     procedures:ProcedureDef[]
@@ -288,6 +293,7 @@ export class AppBackend{
     caches:{
         procedures:{[k:string]:{timestamp:number, result:any}}
     }
+    fieldDomain:{[k:string]:Nullable<FieldDefinition>}
     clearCaches():void
     start(opts?: StartOptions):Promise<void>
     getTables():TableItemDef[]
