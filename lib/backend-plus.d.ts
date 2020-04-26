@@ -175,6 +175,7 @@ export type FieldDefinition = EditableDbDefinition & {
     options?:(string|{option:string|number, label:string})[]
     inView?:boolean
     sortMethod?:string
+    generatedAs?:string
 }
 export type EditableDbDefinition = {
     editable?:boolean
@@ -322,6 +323,7 @@ export class AppBackend{
         toHtmlDoc:()=>string
     }
     isThisProcedureAllowed<T>(context:Context, procedureDef:ProcedureDef, params:{[key:string]:T}):Promise<boolean>
+    checkDatabaseStructure(client:Client):Promise<void>
 }
 
 }
