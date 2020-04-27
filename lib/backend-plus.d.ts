@@ -282,6 +282,9 @@ export type OptsClientPage = {
     extraFiles?:ClientModuleDefinition[]
     icon?:string
 }
+
+export type DumpOptions={complete?:boolean, skipEnance?:boolean}
+
 export class AppBackend{
     procedures:ProcedureDef[]
     procedure:{ [key:string]:ProcedureDef }
@@ -313,7 +316,7 @@ export class AppBackend{
     procedureDefCompleter(procedureDef:ProcedureDef):ProcedureDef
     tableDefAdapt(tableDef:TableDefinition, context:Context):TableDefinition
     pushApp(dirname:string):void
-    dumpDbSchemaPartial(partialTableStructures:TableDefinitions, opts?:{complete?:boolean, skipEnance?:boolean}):Promise<{mainSql:string; enancePart:string}> 
+    dumpDbSchemaPartial(partialTableStructures:TableDefinitions, opts?:DumpOptions):Promise<{mainSql:string; enancePart:string}> 
     getContextForDump(): ContextForDump
     getClientSetupForSendToFrontEnd(req:Request):ClientSetup
     configList(): (object|string)[]
@@ -324,6 +327,7 @@ export class AppBackend{
     }
     isThisProcedureAllowed<T>(context:Context, procedureDef:ProcedureDef, params:{[key:string]:T}):Promise<boolean>
     checkDatabaseStructure(client:Client):Promise<void>
+    getDbFunctions(opts:DumpOptions):Promise<{dumpText:string}[]>
 }
 
 }
