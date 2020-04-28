@@ -146,6 +146,9 @@ myOwn.wScreens.proc.result={
         divResult.textContent = result;
         divResult.style.backgroundColor = '#5F5';
     },
+    showGrid:function(result, divResult){
+        myOwn.tableGrid(result.tableName, divResult);
+    },
     showError:function(err, divResult){
         divResult.textContent = err.message;
         divResult.style.backgroundColor = 'orange';

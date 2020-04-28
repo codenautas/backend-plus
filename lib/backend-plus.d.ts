@@ -98,6 +98,7 @@ export type MenuInfoMinimo={
     // menuType:string // 'menu'|'table'|'proc'
     name:string
     label?:string
+    selectedByDefault?:true
 }
 export type MenuInfoMenu = {
     menuType:'menu'
@@ -298,6 +299,9 @@ export class AppBackend{
         procedures:{[k:string]:{timestamp:number, result:any}}
     }
     fieldDomain:{[k:string]:Nullable<FieldDefinition>}
+    exts:{img?:string[]}
+    optsGenericForAll:{allowedExts?:string[]}
+    sqls:{[k:string]:string}
     clearCaches():void
     start(opts?: StartOptions):Promise<void>
     getTables():TableItemDef[]
