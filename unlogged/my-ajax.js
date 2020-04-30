@@ -355,6 +355,58 @@ myAjax.encoders = {
 
 myAjax.ajaxPromise.autoClose=6000;
 
+myAjax.getAppPrefix = function getAppPrefix(){
+    return myOwn.appName+'_'+myOwn.clientVersion+'_';
+}
+
+myAjax.getLocalVar = function getLocalVar(varName){
+    if(myOwn.existsLocalVar(varName)){
+        return JSON4all.parse(localStorage.getItem(myOwn.getAppPrefix()+varName));
+    }else{
+        return null
+    }
+}
+
+myAjax.setLocalVar = function setLocalVar(varName, value){
+    localStorage.setItem(myOwn.getAppPrefix()+varName, JSON4all.stringify(value))
+}
+
+myAjax.existsLocalVar = function existsLocalVar(varName){
+    if(localStorage.getItem(myOwn.getAppPrefix()+varName)){
+        return true
+    }else{
+        return false
+    }
+}
+
+myAjax.removeLocalVar = function removeLocalVar(varName){
+    localStorage.removeItem(myOwn.getAppPrefix()+varName);
+}
+
+myAjax.getSessionVar = function getSessionVar(varName){
+    if(myOwn.existsSessionVar(varName)){
+        return JSON.parse(sessionStorage.getItem(myOwn.getAppPrefix()+varName));
+    }else{
+        return null
+    }
+}
+
+myAjax.setSessionVar = function setSessionVar(varName, value){
+    sessionStorage.setItem(myOwn.getAppPrefix()+varName, JSON.stringify(value))
+}
+
+myAjax.existsSessionVar = function existsSessionVar(varName){
+    if(sessionStorage.getItem(myOwn.getAppPrefix()+varName)){
+        return true
+    }else{
+        return false
+    }
+}
+
+myAjax.removeSessionVar = function removeSessionVar(varName){
+    sessionStorage.removeItem(myOwn.getAppPrefix()+varName);
+}
+
 return myAjax;
 
 });

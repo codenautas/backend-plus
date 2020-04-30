@@ -113,58 +113,6 @@ if(typeof window != "undefined"){
 
 myOwn.statusDivName = 'reconnection_div';
 
-myOwn.getAppPrefix = function getAppPrefix(){
-    return myOwn.appName+'_'+ +myOwn.clientVersion+'_';
-}
-
-myOwn.getLocalVar = function getLocalVar(varName){
-    if(myOwn.existsLocalVar(varName)){
-        return JSON4all.parse(localStorage.getItem(myOwn.getAppPrefix()+varName));
-    }else{
-        return null
-    }
-}
-
-myOwn.setLocalVar = function setLocalVar(varName, value){
-    localStorage.setItem(myOwn.getAppPrefix()+varName, JSON4all.stringify(value))
-}
-
-myOwn.existsLocalVar = function existsLocalVar(varName){
-    if(localStorage.getItem(myOwn.getAppPrefix()+varName)){
-        return true
-    }else{
-        return false
-    }
-}
-
-myOwn.removeLocalVar = function removeLocalVar(varName){
-    localStorage.removeItem(myOwn.getAppPrefix()+varName);
-}
-
-myOwn.getSessionVar = function getSessionVar(varName){
-    if(myOwn.existsSessionVar(varName)){
-        return JSON.parse(sessionStorage.getItem(myOwn.getAppPrefix()+varName));
-    }else{
-        return null
-    }
-}
-
-myOwn.setSessionVar = function setSessionVar(varName, value){
-    sessionStorage.setItem(myOwn.getAppPrefix()+varName, JSON.stringify(value))
-}
-
-myOwn.existsSessionVar = function existsSessionVar(varName){
-    if(sessionStorage.getItem(myOwn.getAppPrefix()+varName)){
-        return true
-    }else{
-        return false
-    }
-}
-
-myOwn.removeSessionVar = function removeSessionVar(varName){
-    sessionStorage.removeItem(myOwn.getAppPrefix()+varName);
-}
-
 myOwn.autoSetupFunctions = [
     function autoSetupMyThings(){
         var my = this;
