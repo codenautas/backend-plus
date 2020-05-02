@@ -78,11 +78,16 @@ myOwn.wScreens.procAux = {
             control.style.minWidth='200px';
             control.style.backgroundColor='white';
             TypedControls.adaptElement(control,changing({typeName:'text'}, parameterDef));
-            if(parameterDef.name in params){
-                control.setTypedValue(params[parameterDef.name]);
-            }else if('defaultValue' in parameterDef){
-                params[parameterDef.name] = parameterDef.defaultValue;
-                control.setTypedValue(parameterDef.defaultValue);
+            const value = parameterDef.name in params ? params[parameterDef.name] : (
+                'defaultValue' in parameterDef ? parameterDef.defaultValue : (
+                    'specialDefaultValue' in parameterDef ? my.specialDefaultValue[parameterDef.specialDefaultValue](parameterDef.name, {row:{}}, {row:{}}) : (
+                        undefined
+                    )
+                )
+            )
+            if(value!==undefined){
+                params[parameterDef.name] = value;
+                control.setTypedValue(value);
             }
             control.addEventListener('update', function(){
                 params[parameterDef.name] = control.getTypedValue();

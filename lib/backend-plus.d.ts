@@ -21,6 +21,7 @@ export interface ProcedureParameter {
     defaultValue?: any
     typeName?: string
     references?: string
+    specialDefaultValue?: string
 }
 export type UploadedFileInfo={
     originalFilename: string
@@ -170,6 +171,7 @@ export type FieldDefinition = EditableDbDefinition & {
     aggregate?:string          /* keyof myOwn.TableAggregates */
     specialDefaultValue?:string /* keyof myOwn.specialDefaultValues
     defaultForOtherFields?:boolean   /* the field that stores the "other fields" of a flexible imported table */
+    specialColumn?:string 
     exportMetadata?:ExportMetadataDefinition 
     description?:string
     dataLength?:number
