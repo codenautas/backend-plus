@@ -132,7 +132,7 @@ export type MenuInfo = MenuInfoMenu | MenuInfoTable | MenuInfoProc;
 export type MenuDefinition = {menu:MenuInfoBase[]}
 // types for Table definitions
 export interface TableContext extends Context{
-    puede:object
+    puede?:object
     superuser?:true
     forDump?:boolean
 }
@@ -304,6 +304,7 @@ export class AppBackend{
     exts:{img?:string[]}
     optsGenericForAll:{allowedExts?:string[]}
     sqls:{[k:string]:string}
+    messages:{[k:string]:string}
     clearCaches():void
     start(opts?: StartOptions):Promise<void>
     getTables():TableItemDef[]
