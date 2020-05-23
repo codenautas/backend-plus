@@ -4,11 +4,17 @@ var Path = require('path');
 var backendPlus = require("../../..");
 var MiniTools = require('mini-tools');
 
+var staticConfigYaml = require('./def-config');
+
 var changing = require('best-globals').changing;
 
 class AppExample extends backendPlus.AppBackend{
     constructor(){
         super();
+    }
+    configStaticConfig(){
+        super.configStaticConfig();
+        this.setStaticConfig(staticConfigYaml);
     }
     get rootPath(){ return Path.resolve(__dirname,'..'); }
     addLoggedServices(){

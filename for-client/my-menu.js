@@ -336,6 +336,11 @@ myOwn.createForkeableButton = function createForkeableButton(menu, opts){
             alertPromise(errorText);
         }else{
             if(!event.ctrlKey && event.button!=1){
+                /*
+                if(button.parentNode.clientSidePrepared){
+                    history.replaceState(null, null, )
+                }
+                */
                 history.pushState(null, null, this.href);
                 my.showPage();
                 event.preventDefault();

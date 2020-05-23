@@ -20,7 +20,7 @@ describe("interactive ",function(){
         server = new AppExample();
         // console.log("starting server");
         config = await MiniTools.readConfig(
-            ['examples/4test/def-config','examples/4test/local-config'],
+            ['examples/4test/test-config','examples/4test/local-config'],
             {readConfig:{whenNotExist:'ignore'}, testing:true}
         );
         client = await pg.connect(config.db);

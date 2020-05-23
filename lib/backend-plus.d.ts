@@ -171,7 +171,7 @@ export type FieldDefinition = EditableDbDefinition & {
     aggregate?:string          /* keyof myOwn.TableAggregates */
     specialDefaultValue?:string /* keyof myOwn.specialDefaultValues
     defaultForOtherFields?:boolean   /* the field that stores the "other fields" of a flexible imported table */
-    specialColumn?:string 
+    specialValueWhenInsert?:string 
     exportMetadata?:ExportMetadataDefinition 
     description?:string
     dataLength?:number
@@ -251,6 +251,7 @@ export type TableDefinition = EditableDbDefinition & {
     hiddenColumns?:string[]
     layout?:{
         vertical?:boolean
+        styleColumns?:string[]
     }
     sortColumns?:{column:string, order?:1|-1}[]
     policy?:string
