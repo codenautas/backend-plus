@@ -238,6 +238,13 @@ export type TableDefinition = EditableDbDefinition & {
         orderBy?:string[]
         viewBody?:string
         insertIfNotUpdate?:boolean
+        policies?:{
+            all   ?:{using?:string, check?:string}
+            select?:{using?:string}
+            insert?:{               check?:string}
+            update?:{using?:string, check?:string}
+            delete?:{using?:string}
+        }
     }
     foreignKeys?:ForeignKey[]
     softForeignKeys?:ForeignKey[]
@@ -306,6 +313,8 @@ export class AppBackend{
     optsGenericForAll:{allowedExts?:string[]}
     sqls:{[k:string]:string}
     messages:{[k:string]:string}
+    dbUserNameExpr:string
+    dbUserRolExpr:string
     clearCaches():void
     start(opts?: StartOptions):Promise<void>
     getTables():TableItemDef[]
