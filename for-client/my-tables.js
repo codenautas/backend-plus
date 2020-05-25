@@ -601,13 +601,14 @@ myOwn.TableGrid.prototype.createDepotFromRow = function createDepotFromRow(row, 
         manager: grid,
         rowControls:{},
         row: row,
-        retrievedRow: changing({},row),
+        retrievedRow: changing(row, {"$allow.delete":null,"$allow.update":null}, changing.options({deletingValue:null})),
         rowPendingForUpdate:{},
         primaryKeyValues:false,
         status: status||'preparing',
         detailControls:{},
         detailRows:[],
-        actionButton:{}
+        actionButton:{},
+        allow:{delete:row["$allow.delete"], update:row["$allow.update"]}
     };
     return depot;
 };
@@ -736,7 +737,7 @@ myOwn.ActionColumnGrid.prototype.td = function td(depot){
             }
             actionNamesList.forEach(function(actionName){
             var actionDef = my.tableAction[actionName];
-            if(grid.def.allow[actionName]){
+            if(grid.def.allow[actionName] && depot.allow[actionName] !== false){
                 var buttonAction=html.button({class:'table-button', "skip-enter":true}, [
                     html.img({src:actionDef.img, alt:actionDef.alt, title:my.messages[actionDef.titleMsg]})
                 ]).create();
@@ -882,7 +883,7 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
     var grid = this.grid;
     var fieldDef = this.fieldDef;
     var forInsert = false; // TODO: Verificar que esto está en desuso
-    var enabledInput=grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
+    var enabledInput=depot.allow.update !== false && grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
     var directInput=true;
     var control;
     var td;
@@ -1449,7 +1450,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
                         }
                         if(fieldDef.isPk){
                             cell.s=STYLE_PK;
-                        }else if(!fieldDef.allow || !fieldDef.allow.update){
+                        }else if(!fieldDef.allow || !fieldDef.allow.update || depot.allow.update === false){
                             cell.s=STYLE_LOOKUP;
                         }
                         ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:iRow+1+topRow})]=cell;
@@ -1920,7 +1921,7 @@ myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElem
         }
         */
     }
-    var depotForInsert = grid.createDepotFromRow({}, 'new');
+    var depotForInsert = grid.createDepotFromRow({$allow:{delete:true, update:true}}, 'new');
     grid.connector.fixedFields.forEach(function(pair){
         if(!pair.range){
             depotForInsert.row[pair.fieldName] = pair.value;
@@ -1974,7 +1975,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             return fieldDef.visible;
         }).forEach(function(fieldDef){
             var td = depot.rowControls[fieldDef.name];
-            var editable=grid.connector.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update && grid.connector.def.field[fieldDef.name].allow.update);
+            var editable=depot.allow.update !== false && grid.connector.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update && grid.connector.def.field[fieldDef.name].allow.update);
             td.disable(!editable);
             if(fieldDef.clientSide){
                 if(!td.clientSidePrepared){
@@ -2150,6 +2151,8 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                         }
                     }
                 }
+            }else if(!/^\$allow\./.test(fieldName)){
+                depot.allow[fieldName.replace(/^\$allow\./,'')] = retrievedRow[fieldName];
             }
         }
         depot.retrievedRow = retrievedRow;
