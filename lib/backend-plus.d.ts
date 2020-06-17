@@ -159,7 +159,6 @@ export type FieldDefinition = EditableDbDefinition & {
     inTable?:boolean           /* default:!clientSide && !sql.fields[...].expr. Is a real fisical field in the table */
     /* sizeByte?:number  deprecated size in bytes for numbers */
     allowEmtpyText?:boolean    /* if a text field accepts '' as a valid value */
-    sequence?:SequenceDefinition
     mobileInputType?:string     
     extraRow?:number
     inexactNumber?:number      /* default:depends on typeName  if = means abs(x-v)<espilon
@@ -179,7 +178,11 @@ export type FieldDefinition = EditableDbDefinition & {
     inView?:boolean
     sortMethod?:string
     generatedAs?:string
-}
+} & ({} | {
+    sequence:SequenceDefinition
+    nullable:true
+    editable:false
+})
 export type EditableDbDefinition = {
     editable?:boolean
     allow?:{
@@ -262,6 +265,8 @@ export type TableDefinition = EditableDbDefinition & {
     }
     sortColumns?:{column:string, order?:1|-1}[]
     policy?:string
+    firstDisplayCount?:number
+    firstDisplayOverLimit?:number
 }
 export interface DetailTable { table: string, fields: FieldsForConnect, abr: string, label?: string, refreshParent?:boolean, wScreen?:string, condition?:string }
 export type TableDefinitionFunction = (context: ContextForDump) => TableDefinition;
