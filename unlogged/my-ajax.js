@@ -385,14 +385,14 @@ myAjax.removeLocalVar = function removeLocalVar(varName){
 
 myAjax.getSessionVar = function getSessionVar(varName){
     if(myOwn.existsSessionVar(varName)){
-        return JSON.parse(sessionStorage.getItem(myOwn.getAppPrefix()+varName));
+        return JSON4all.parse(sessionStorage.getItem(myOwn.getAppPrefix()+varName));
     }else{
         return null
     }
 }
 
 myAjax.setSessionVar = function setSessionVar(varName, value){
-    sessionStorage.setItem(myOwn.getAppPrefix()+varName, JSON.stringify(value))
+    sessionStorage.setItem(myOwn.getAppPrefix()+varName, JSON4all.stringify(value))
 }
 
 myAjax.existsSessionVar = function existsSessionVar(varName){
