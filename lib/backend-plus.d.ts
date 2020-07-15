@@ -132,7 +132,6 @@ export type MenuInfo = MenuInfoMenu | MenuInfoTable | MenuInfoProc;
 export type MenuDefinition = {menu:MenuInfoBase[]}
 // types for Table definitions
 export interface TableContext extends Context{
-    puede?:object
     superuser?:true
     forDump?:boolean
 }
