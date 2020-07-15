@@ -359,9 +359,14 @@ myAjax.getAppPrefix = function getAppPrefix(){
     return myOwn.appName+'_'+myOwn.clientVersion+'_';
 }
 
+myAjax.getRawLocalVar = function getRawLocalVar(varName){
+    return localStorage.getItem(myOwn.getAppPrefix()+varName)
+}
+
 myAjax.getLocalVar = function getLocalVar(varName){
-    if(myOwn.existsLocalVar(varName)){
-        return JSON4all.parse(localStorage.getItem(myOwn.getAppPrefix()+varName));
+    var rawData = myAjax.getRawLocalVar(varName);
+    if(rawData){
+        return JSON4all.parse(rawData);
     }else{
         return null
     }
@@ -372,11 +377,7 @@ myAjax.setLocalVar = function setLocalVar(varName, value){
 }
 
 myAjax.existsLocalVar = function existsLocalVar(varName){
-    if(localStorage.getItem(myOwn.getAppPrefix()+varName)){
-        return true
-    }else{
-        return false
-    }
+    return !!myAjax.getRawLocalVar(varName);
 }
 
 myAjax.removeLocalVar = function removeLocalVar(varName){
