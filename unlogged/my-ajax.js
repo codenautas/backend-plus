@@ -142,7 +142,7 @@ myAjax.readProcedureDefinitions=function readProcedureDefinitions(){
             }
         }
     }).catch(function(err){
-        console.log('error setting myOwn.ajax');
+        console.log('error setting myAjax.ajax');
         throw err;
     });
 };
@@ -184,7 +184,7 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
             if(progressInfo.message || progressInfo.end){
                 if(!divProgress){
                     var idAutoClose='id-auto-close-'+Math.random();
-                    var checkAutoClose=html.input({type:'checkbox', id:idAutoClose, checked:myOwn.ajaxPromise.autoClose}).create();
+                    var checkAutoClose=html.input({type:'checkbox', id:idAutoClose, checked:myAjax.ajaxPromise.autoClose}).create();
                     var divButton=html.div({style:'height:40px'},[
                         my.messages.viewProgress,
                         html.div([
@@ -193,7 +193,7 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
                         ])
                     ]).create();
                     checkAutoClose.addEventListener('change',function(){
-                        myOwn.ajaxPromise.autoClose=checkAutoClose.checked;
+                        myAjax.ajaxPromise.autoClose=checkAutoClose.checked;
                     });
                     divProgress=html.div({class:'result-progress'}).create();
                     simpleFormPromise({elementsList:[divButton,divProgress]});
@@ -208,10 +208,10 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
                         if(err){
                             divProgress.appendChild(html.div({class:'error-message'},err.message).create())
                         }
-                        if(myOwn.ajaxPromise.autoClose && !err){
+                        if(myAjax.ajaxPromise.autoClose && !err){
                             setTimeout(function(){
                                 divButton.dialogPromiseDone();
-                            },myOwn.ajaxPromise.autoClose);
+                            },myAjax.ajaxPromise.autoClose);
                         }
                     }
                 }
@@ -356,11 +356,11 @@ myAjax.encoders = {
 myAjax.ajaxPromise.autoClose=6000;
 
 myAjax.getAppPrefix = function getAppPrefix(){
-    return myOwn.appName+'_'+myOwn.clientVersion+'_';
+    return myAjax.appName+'_'+myAjax.clientVersion+'_';
 }
 
 myAjax.getRawLocalVar = function getRawLocalVar(varName){
-    return localStorage.getItem(myOwn.getAppPrefix()+varName)
+    return localStorage.getItem(myAjax.getAppPrefix()+varName)
 }
 
 myAjax.getLocalVar = function getLocalVar(varName){
@@ -373,7 +373,7 @@ myAjax.getLocalVar = function getLocalVar(varName){
 }
 
 myAjax.setLocalVar = function setLocalVar(varName, value){
-    localStorage.setItem(myOwn.getAppPrefix()+varName, JSON4all.stringify(value))
+    localStorage.setItem(myAjax.getAppPrefix()+varName, JSON4all.stringify(value))
 }
 
 myAjax.existsLocalVar = function existsLocalVar(varName){
@@ -381,23 +381,23 @@ myAjax.existsLocalVar = function existsLocalVar(varName){
 }
 
 myAjax.removeLocalVar = function removeLocalVar(varName){
-    localStorage.removeItem(myOwn.getAppPrefix()+varName);
+    localStorage.removeItem(myAjax.getAppPrefix()+varName);
 }
 
 myAjax.getSessionVar = function getSessionVar(varName){
-    if(myOwn.existsSessionVar(varName)){
-        return JSON4all.parse(sessionStorage.getItem(myOwn.getAppPrefix()+varName));
+    if(myAjax.existsSessionVar(varName)){
+        return JSON4all.parse(sessionStorage.getItem(myAjax.getAppPrefix()+varName));
     }else{
         return null
     }
 }
 
 myAjax.setSessionVar = function setSessionVar(varName, value){
-    sessionStorage.setItem(myOwn.getAppPrefix()+varName, JSON4all.stringify(value))
+    sessionStorage.setItem(myAjax.getAppPrefix()+varName, JSON4all.stringify(value))
 }
 
 myAjax.existsSessionVar = function existsSessionVar(varName){
-    if(sessionStorage.getItem(myOwn.getAppPrefix()+varName)){
+    if(sessionStorage.getItem(myAjax.getAppPrefix()+varName)){
         return true
     }else{
         return false
@@ -405,7 +405,11 @@ myAjax.existsSessionVar = function existsSessionVar(varName){
 }
 
 myAjax.removeSessionVar = function removeSessionVar(varName){
-    sessionStorage.removeItem(myOwn.getAppPrefix()+varName);
+    sessionStorage.removeItem(myAjax.getAppPrefix()+varName);
+}
+
+myAjax.path={
+    img:'img/'
 }
 
 return myAjax;
