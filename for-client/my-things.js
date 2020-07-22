@@ -279,7 +279,9 @@ myOwn.fade = function fade(element, options){
 myOwn.focusFirstColumnOf = function focusFirstColumnOf(row){
     var my = this;
     var element = my.nextElementThatIs(row.cells[0],my.beInteractive);
-    element.focus();
+    if(element){
+        element.focus();
+    }
 }
 
 
