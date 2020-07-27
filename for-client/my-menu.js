@@ -167,7 +167,7 @@ myOwn.wScreens.path = function(addrParams){
 myOwn.UriSearchToObject = function UriSearchToObject(locationSearch){
     var parts=locationSearch.split('&');
     var addrParams={}
-    parts.forEach(function(pair){
+    parts.forEach(function(pair,i){
         if(pair[0]==='#'){
             pair=pair.substr(1);
         }
@@ -183,6 +183,9 @@ myOwn.UriSearchToObject = function UriSearchToObject(locationSearch){
 				value = paramDef.decode(value);
 			}
             addrParams[varName] = value;
+            if(!i){
+                Object.defineProperty(addrParams,'_firstParameterName',{value:varName, writable:false, enumerable:false});
+            }
         }
     });
     return addrParams;
@@ -235,9 +238,13 @@ myOwn.showPage = function showPage(pageDef){
     if(totalLayout.getAttribute('menu-type')!='hidden'){
         var menu = my.displayMainMenu(addrParams);
         var w=addrParams.w;
-        if(!w && menu && menu.selectedItem){
-            addrParams = changing(menu.selectedItem, addrParams);
-            w=menu.selectedItem.menuType;
+        if(!w){
+            if(!addrParams.i.length && addrParams._firstParameterName && my.wScreens[addrParams._firstParameterName]){
+                w=addrParams._firstParameterName;
+            }else if(menu && menu.selectedItem){
+                addrParams = changing(menu.selectedItem, addrParams);
+                w=menu.selectedItem.menuType;
+            }
         }
         var wScreen;
         if(typeof my.wScreens[w] === 'function'){
