@@ -384,10 +384,14 @@ myOwn.replaceAddrParams = function replaceAddrParams(params){
     history.replaceState(null, null, my.menup+my.paramsToUriPart(params));
 }
 
-myOwn.light = function light(name, onclick){
+myOwn.light = function light(name, onclick, opts){
     var skin=((this.config||{}).config||{}).skin;
     var skinUrl=(skin?skin+'/':'');
-    var img = html.img({class:"light", id:'light-'+name, src:skinUrl+'img/'+name+'.png'}).create();
+    var attr={class:"light", id:'light-'+name, src:skinUrl+'img/'+name+'.png'};
+    if(opts && opts.attr){
+        likeAr(opts.attr).forEach(function(value, key){ attr[key]=value; })
+    }
+    var img = html.img(attr).create();
     img.result={};
     img.onclick=onclick;
     return img;
@@ -460,7 +464,7 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
                         my.changeOfflineMode();
                     }
                 }
-            })
+            }, {hidden:true})
         ]));
         elements.push(status);
     }
