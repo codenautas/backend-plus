@@ -182,6 +182,7 @@ onUpdate              | T    | 'cascade'      | que hacer si hay un update en la
 onDelete              | T    |                | que hacer si hay un borrado (valor posible: `'cascade'`).
 consName              | T    |                | nombre de la constraint generada
 initiallyDeferred     | B    | false          | si se calcula al final la constraint
+displayAfterFieldName | T    |                | después de qué nombre de campo debe desplegar los campos de la tabla relacionada
 
 <!--lang:en--]
 
@@ -196,6 +197,7 @@ onUpdate              | T    | 'cascade'      | on update clause
 onDelete              | T    |                | on delete clause
 consName              | T    |                | constraint name
 initiallyDeferred     | B    | false          | intitially deferred clause
+displayAfterFieldName | T    |                | fieldName after that it must display the related fields
 
 [!--lang:*-->
 

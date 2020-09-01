@@ -207,6 +207,7 @@ export type ForeignKey = {
     displayFields?:string[], 
     consName?:string, 
     initiallyDeferred?:boolean
+    displayAfterFieldName?:string
 }
 export type Constraint = {constraintType:'check'|'unique'|'not null', expr?:string, fields?:string[], consName?:string}
 export type TableDefinition = EditableDbDefinition & {
