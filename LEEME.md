@@ -340,6 +340,7 @@ devel                        | conjunto de opciones para el ambiente de desarrol
 .delay                       | tiempo de espera promedio adicional (para simular un servidor lento)
 .cache-content               | hace caché de imágenes y archivos en general (si no está en modo "devel" siempre hace caché, no se puede apagar el caché fuera del modo devel)
 .forceShowAsEditable         | fuerza mostrar las grillas como grillas editables para mostrar cómo el servidor impide la modificación
+.useFileDevelopment          | usa las versiones de fileDevelopment en vez de file provenientes de clientIncludes()
 login                        | opciones de login
 .plus                        | opciones a pasar al módulo login-plus
 ..allowHttpLogin             | si permite loguerse desde conexiones HTTP

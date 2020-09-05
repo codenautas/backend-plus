@@ -8,3 +8,4 @@ log:
   req: true
 modo-devel:
   hasta: 2016-01-01
+  useFileDevelopment: true
