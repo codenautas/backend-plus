@@ -532,32 +532,34 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                 }
             })
         }
-        if(grid.def.refrescable){
-            setInterval(function(){
-                grid.connector.my.ajax.table_data({
-                    table:grid.connector.tableName,
-                    fixedFields:grid.connector.fixedFields,
-                    paramfun:grid.connector.parameterFunctions||{}
-                }).then(function(rows){
-                    var primaryKey = grid.def.primaryKey;
-                    var getPrimaryKeyValues=function getPrimaryKeyValues(primaryKey, row){
-                        return primaryKey.map(function(fieldName){
-                            return row[fieldName]
-                        })
-                    };
-                    rows.forEach(function(row){
-                        var primaryKeyValuesForRow = getPrimaryKeyValues(primaryKey, row);
-                        var depot = grid.depots.find(function(depot){
-                            var primaryKeyValuesForDepotRow = getPrimaryKeyValues(primaryKey, depot.row);
-                            return sameValue(JSON.stringify(primaryKeyValuesForRow),JSON.stringify(primaryKeyValuesForDepotRow))
-                        });
-                        //chequeo que exista depot por las dudas
-                        if(depot && !sameValue(JSON.stringify(row),JSON.stringify(depot.row))){
-                            grid.retrieveRowAndRefresh(depot);
-                        }
+        grid.refreshAllRows = function(){
+            grid.connector.my.ajax.table_data({
+                table:grid.connector.tableName,
+                fixedFields:grid.connector.fixedFields,
+                paramfun:grid.connector.parameterFunctions||{}
+            }).then(function(rows){
+                var primaryKey = grid.def.primaryKey;
+                var getPrimaryKeyValues=function getPrimaryKeyValues(primaryKey, row){
+                    return primaryKey.map(function(fieldName){
+                        return row[fieldName]
                     })
+                };
+                rows.forEach(function(row){
+                    var primaryKeyValuesForRow = getPrimaryKeyValues(primaryKey, row);
+                    var depot = grid.depots.find(function(depot){
+                        var primaryKeyValuesForDepotRow = getPrimaryKeyValues(primaryKey, depot.row);
+                        return sameValue(JSON.stringify(primaryKeyValuesForRow),JSON.stringify(primaryKeyValuesForDepotRow))
+                    });
+                    //chequeo que exista depot por las dudas
+                    if(depot && !sameValue(JSON.stringify(row),JSON.stringify(depot.row))){
+                        //grid.retrieveRowAndRefresh(depot); 
+                        grid.depotRefresh(depot,{updatedRow:row, sendedForUpdate:{}});
+                    }
                 })
-            },5000)
+            })
+        }
+        if(grid.def.refrescable){
+            setInterval(grid.refreshAllRows,5000)
         }
     });
     grid.waitForReady = function waitForReady(fun){
@@ -1059,6 +1061,12 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
         this.divDetail=null;
         this.displayDetailGrid(opts);
     }
+    detailControl.refreshDetailGrid = function(opts){
+        var detailControl=this;
+        if(detailControl.show){
+            
+        }
+    }
     detailControl.displayDetailGrid = function(opts,event){
         var result;
         event=event||{};
@@ -1104,6 +1112,11 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
                             }
                             g.dom.main.addEventListener('deletedRowOk', refresh);
                             g.dom.main.addEventListener('savedRowOk', refresh);
+                        }
+                        detailControl.refreshAllRowsInGrid=function(){
+                            if(detailTableDef.refreshFromParent){
+                                g.refreshAllRows();
+                            }
                         }
                         return g;
                     });
@@ -2162,6 +2175,11 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             grid.dom.main.dispatchEvent(new CustomEvent('savedRowOk'));
         }
         grid.refreshAggregates();
+        for(var detailControl in depot.detailControls){
+            if(depot.detailControls[detailControl].tr){                
+                depot.detailControls[detailControl].refreshAllRowsInGrid()
+            }
+        };
     }
     grid.createExtraRow = function createExtraRow(depot, tbody){
         var tr = html.tr({class:'extra-row'}, [html.td().create()]).create();
