@@ -64,7 +64,7 @@ ejemplos lista       | formato elemento
  constraints         | {constraintType:'unique', fields:['atomic_number','order'], consName:'repeating order in atomic_number'}
  filterColumns       | {column:'atomic_number', operator:'=', value:7}
  sortColumns         | {column:'discovery_date', order:-1}
- detailTables        | {table:'ptable', fields:['atomic_number'], abr:'A', refreshParent:true}
+ detailTables        | {table:'ptable', fields:['atomic_number'], abr:'A', refreshParent:true, refreshFromParent:true}
 
 permisos | tabla | campo | indica si se permite...
 ---------|-------|-------|-------
@@ -114,7 +114,7 @@ list examples    | element format
  constraints     | {constraintType:'unique', fields:['atomic_number','order'], consName:'repeating order in atomic_number'}
  filterColumns   | {column:'atomic_number', operator:'=', value:7}
  sortColumns     | {column:'discovery_date', order:-1}
-detailTables     | {table:'ptable', fields:['atomic_number'], abr:'A', refreshParent:true}
+detailTables     | {table:'ptable', fields:['atomic_number'], abr:'A', refreshParent:true, refreshFromParent:true}
 
 permissions | table | field | allows:
 ------------|-------|-------|-------
