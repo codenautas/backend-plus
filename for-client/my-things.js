@@ -48,9 +48,13 @@ myOwn.i18n={messages:{}};
 myOwn.i18n.messages.en = {
     autoCloseWhenEnds: "auto close when ends",
     Cancel   : "Cancel",
+    exportFields: "export fields",
+    fromOtherTables: "from other tables",
+    hiddens: "hiddens",
     notLogged: "Not logged in",
     noServer : "The server is inaccessible",
     noNetwork: "Not connected to the network",
+    readOnly: "read only",
     reLogin  : "Sign in",
     stopCountDown: "stop count down"
 };
@@ -58,9 +62,13 @@ myOwn.i18n.messages.en = {
 myOwn.i18n.messages.es = {
     autoCloseWhenEnds: "cerrar la ventana al terminar",
     Cancel   : "Cancelar",
+    exportFields: "exportar campos",
+    fromOtherTables: "desde otras tablas",
+    hiddens: "ocultos",
     notLogged: "Sin sesión activa",
     noServer : "No se puede acceder al servidor",
     noNetwork: "No se detecta conexión de red",
+    readOnly: "solo lectura",
     reLogin  : "Iniciar sesión",
     stopCountDown: "detener la cuenta regresiva"
 };

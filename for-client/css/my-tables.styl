@@ -190,24 +190,32 @@ rotate-infinite()
   -webkit-animation-iteration-count infinite
   -webkit-animation-timing-function linear
   
-.dialog-export
+div.dialog-export
+  text-align left
   .img-preparing
     height 64px
     width  64px
     margin-bottom 10px
     rotate-infinite()
+  .state-dialog
+    display inherit
+  .state-preparing
+    display none
+  .state-ready
+    display none
+div.dialog-export[current-state="preparing"]
+  .state-dialog
+    opacity 75%
   .state-preparing
     display inherit
   .state-ready
     display none
-  .state-ready-txt
-    display none
-.dialog-export[current-state="ready"]
+div.dialog-export[current-state="ready"]
+  .state-dialog
+    opacity 75%
   .state-preparing
     display none
   .state-ready
-    display inherit
-  .state-ready-txt
     display inherit
   
 .dialog-menu .mini-menu-opt-img
