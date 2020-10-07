@@ -1451,7 +1451,10 @@ myOwn.dialogDownload = function dialogDownload(grid){
             },100)
         }
         prepareDownloadElement.onclick=prepare;
-        likeAr(input).forEach(function(input){ input.onclick=prepare; })
+        if("auto prepare"){
+            likeAr(input).forEach(function(input){ input.onclick=prepare; })
+            setTimeout(prepare,200);
+        }
         var txtExport = function(){
             var data=[];
             var titles = fieldsDef2Export.map(function(fieldDef){
