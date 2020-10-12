@@ -85,3 +85,30 @@ En el ejemplo se puede:
   * que se definió una función genérica para abrir cualquier grilla
   * que el procedimiento colgado del `wScreen` llama al genérico
   * que el resultado del procedimiento se puede usar para elegir qué ver (en este caso filtrar la grilla)
+
+## ¿Cómo hago para ejecutar un procedimiento automáticamente desde el menú (sin presionar el botón)?
+
+En la definición del procedimiento hay que poner valores predeterminados a los parámetros obligatorios
+(salvo que no haya parámetros). 
+
+```ts
+{
+    action: 'estado_resumen',
+    parameters: [
+        {name:'regiones', typeName:'text', defaultValue:'#todas'}
+    ],
+    proceedLabel:'refrescar',
+    coreFunction:async function(context, parameters){
+        var {row} = await context.client.query(
+            'select count(*) filter (where es_inconsistente) as inconsistencias', 
+            [parameters.regiones]
+        ).fetchUniqueRow();
+        return row;
+    }
+}
+```
+
+En el menú hay que poner `autoproced:true`:
+```ts
+    {menuType:'proc', name:'er', label:'resúmen', proc:'estado_resumen', autoproced:true}
+```

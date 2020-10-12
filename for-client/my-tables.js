@@ -48,20 +48,19 @@ myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     allRecordsDeleted: "all records where deleted",
     allTWillDelete: "(ALL {$t} records will be deleted)",
     anotherUserChangedTheRow: "The data was changed in the database",
+    confirmDeleteAll: "Do you want to delete these records?",
+    deleteAllRecords: "delete all records",
+    deleteRecord: "delete record",
+    details: "details",
+    download: "download",
+    distinctFrom:'distinct from',
+    export: "export",
     empty:'empty',
     equalTo:'equal to',
     exhibitedColumns:'Exhibited Columns',
     filterAdd:'add line to filter (line OR line)',
     filteredCompleteTable:'filtered complete table',
     hiddenColumns:'Hidden columns',
-    confirmDeleteAll: "Do you want to delete these records?",
-    deleteAllRecords: "delete all records",
-    deleteRecord: "delete record",
-    details: "details",
-    thereAreNot: "no",
-    download: "download",
-    distinctFrom:'distinct from',
-    export: "export",
     filter : "filter",
     filterOff: "filter off",
     format: "format",
@@ -92,7 +91,11 @@ myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     refresh: "refresh - retrive data from database",
     showInheritedKeys: "show inherited keys",
     similarTo:'similar to',
+    skippedColumn:'skipped column',
+    skippedColumns:'skipped columns',
+    skipUnknownFieldsAtImport:'skip unknown fields at import',
     table: "table",
+    thereAreNot: "no",
     uploadFile: "upload file $1",
     verticalEdit: "vertical edit",
     xOverTWillDelete: "({$x} over a total of {$t} records will be deleted)",
@@ -107,25 +110,24 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     allRecordsDeleted: "todos los registros fueron borrados",
     allTWillDelete: "(se borrarán todos los registros: {$t} registros)",
     anotherUserChangedTheRow: "Hubo un cambio en la base de datos para este registro",
-    equalTo:'igual a',
-    exhibitedColumns:'Columnas que se muestran',
-    filterAdd:'otro renglón en el filtro (se mostrarán renglones que cumplan alguna de las líneas del filtro)',
-    filteredCompleteTable:'tabla completa y filtrada',
-    hiddenColumns:'Columnas ocultas',
     confirmDeleteAll: "¿Desea borrar estos registros?",
     deleteAllRecords: "borrar todos los registros",
     deleteRecord: "borrar este registro",
     details: "detalles",
     distinctFrom: "distinto de",
-    thereAreNot: "no hay",
+    equalTo:'igual a',
+    exhibitedColumns:'Columnas que se muestran',
     download: "descargar",
     empty:'vacío',
     export: "exportar",
     filter : "filtrar",
     filterOff: "desactiva el filtro (ver todos los registros)",
+    filterAdd:'otro renglón en el filtro (se mostrarán renglones que cumplan alguna de las líneas del filtro)',
+    filteredCompleteTable:'tabla completa y filtrada',
     format: "formato",
     greaterThan:'mayor que',
     greaterEqualThan:'mayor igual que',
+    hiddenColumns:'Columnas ocultas',
     hideOrShow: "ocultar o mostrar columnas",
     import: "importar",
     importDataFromFile: "importar datos de un archivo externo",
@@ -151,7 +153,11 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     refresh: "refrescar la grilla desde la base de datos",
     showInheritedKeys: "mostrar las columnas relacionadas",
     similarTo:'parecido a',
+    skippedColumn:'Columna salteada',
+    skippedColumns:'Columnas salteadas',
+    skipUnknownFieldsAtImport:'saltear columnas que no existan',
     table: "tabla",
+    thereAreNot: "no hay",
     uploadFile: "subir el archivo $1",
     verticalEdit: "edición en forma de ficha",
     xOverTWillDelete: "(se borrarán {$x} registros sobre un total de {$t})",
@@ -1294,21 +1300,27 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                 {
                     table:grid.def.name, 
                     prefilledFields:grid.connector.fixedFields,
+                    skipUnknownFieldsAtImport:null
                 },
                 function(result){
-                    var message='';
+                    var messages=[];
                     if(result.uploaded){
                         if(result.uploaded.inserted==1){
-                            message+=my.messages.oneRowInserted;
+                            messages.push(my.messages.oneRowInserted);
                         }else if(result.uploaded.inserted>1){
-                            message+=my.messages.xRowsInserted.replace('{$x}',result.uploaded.inserted);;
+                            messages.push(my.messages.xRowsInserted.replace('{$x}',result.uploaded.inserted));
                         }
                         if(result.uploaded.updated==1){
-                            message+=my.messages.oneRowUpdated;
+                            messages.push(my.messages.oneRowUpdated);
                         }else if(result.uploaded.updated>1){
-                            message+=my.messages.xRowsUpdated.replace('{$x}',result.uploaded.updated);;
+                            messages.push(my.messages.xRowsUpdated.replace('{$x}',result.uploaded.updated));
                         }
-                        return message;
+                        if(result.uploaded.skippedColumns.length==1){
+                            messages.push(my.messages.skippedColumn+": "+result.uploaded.skippedColumns.join(', '));
+                        }else if(result.uploaded.skippedColumns.length>1){
+                            messages.push(my.messages.skippedColumns+": "+result.uploaded.skippedColumns.join(', '));
+                        }
+                        return messages.join(' \r\n');
                     }
                     return result.message || '';
                 },
@@ -1554,13 +1566,14 @@ myOwn.dialogDownload = function dialogDownload(grid){
 };
 
 myOwn.dialogUpload = function dialogUpload(ajaxPath, ajaxParams, ajaxPrepareResultFun, showWithMiniMenu, messages, refresheable, acceptPhotos){
+    messages = changing(my.messages, messages||{})
     var doneFun = function doneFun(){
         var fileAttr={class:'import-button',type:'file',style:'min-width:400px'};
         if(acceptPhotos){
             fileAttr.accept='image/*';
         }
         var buttonFile=html.input(fileAttr).create();
-        var buttonConfirmImport=html.input({class:'import-button',type:'button', value:changing(my.messages, messages).import}).create();
+        var buttonConfirmImport=html.input({class:'import-button',type:'button', value:messages.import}).create();
         var laodingIndicator=html.div({class:'indicator'},' ').create();
         var loadingBar=html.div({class:'progress-bar', style:'width:400px; height:8px;'},[laodingIndicator]).create();
         var divProgress=html.div({class:'result-progress', style:'width:400px; height:20px; margin:0px;'}).create();
@@ -1611,9 +1624,15 @@ myOwn.dialogUpload = function dialogUpload(ajaxPath, ajaxParams, ajaxPrepareResu
                 }),{uploading:uploadingProgress, informProgress:informProgress}).then(eButton,eButton);
             }).then(ajaxPrepareResultFun).then(this.dialogPromiseDone,this.dialogPromiseDone);
         });
+        var skipUnknownFieldsAtImportButton=html.input({type:'checkbox'}).create();
+        skipUnknownFieldsAtImportButton.onchange=function(){
+            ajaxParams.skipUnknownFieldsAtImport = skipUnknownFieldsAtImportButton.checked;
+        }
         simpleFormPromise({elementsList:[
-            changing(my.messages, messages).importDataFromFile,
+            messages.importDataFromFile,
             buttonFile, 
+            html.br().create(),
+            html.label([skipUnknownFieldsAtImportButton, messages.skipUnknownFieldsAtImport]).create(),
             html.br().create(),
             buttonConfirmImport,
             html.br().create(),

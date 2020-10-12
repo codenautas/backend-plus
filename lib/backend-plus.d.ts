@@ -15,6 +15,8 @@ export interface CoreFunctionParameters{
 }
 export type coreFunctionParameters=CoreFunctionParameters; // deprecated. Typo
 
+export type MarkdownDoc = 'markdown documentation with `` can content newlines. The identation of the first line is deleted in all others'|'etc...'; 
+
 export interface ProcedureParameter {
     name: string
     encoding?: string 
@@ -112,6 +114,7 @@ export type MenuInfoTable = {
 export type MenuInfoProc={
     menuType:'proc'
     proc?:string
+    autoproced?:boolean
 } & MenuInfoMinimo;
 export interface ClientModuleDefinition{
     type:'js'|'css'
@@ -267,6 +270,7 @@ export type TableDefinition = EditableDbDefinition & {
     policy?:string
     firstDisplayCount?:number
     firstDisplayOverLimit?:number
+    description?:MarkdownDoc
 }
 export interface DetailTable { table: string, fields: FieldsForConnect, abr: string, label?: string, refreshParent?:boolean, refreshFromParent?:boolean, wScreen?:string, condition?:string }
 export type TableDefinitionFunction = (context: ContextForDump) => TableDefinition;

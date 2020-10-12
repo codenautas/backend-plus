@@ -103,6 +103,7 @@ menuContent | A    |                | menu     | contenido del menú
 table       | T    | `name`         | table    | nombre de la tabla 
 label       | T    | `name`         |          | lo que se ve en el menú
 selectedByDefault | B |             |          | si es la opción predeterminada
+autoproced  | B    | `false`        | proc     | si debe ejecutarse el procedimiento
 
 <!--lang:en--]
 ### Menus definition
@@ -121,6 +122,7 @@ menuContent | A    |                | menu     | menu content
 table       | T    | `name`         | table    | table name
 label       | T    | `name`         |          | if you don't want to use default value to display in menu
 selectedByDefault | B |             |          | is the selected by default option
+autoproced  | B    | `false`        | proc     | if yo want to execute the procedure without clicking the proced button
 
 <!--lang:es-->
 Ejemplo integrador:
