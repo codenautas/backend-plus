@@ -1350,7 +1350,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                         }).plain();
                     }),
                     expectedRemainCount:grid.depots.length-grid.depotsToDisplay.length
-                }).then(function(message){
+                },{mayBeSlow:true}).then(function(message){
                     return Promise.all([
                         grid.refresh(),
                         alertPromise((

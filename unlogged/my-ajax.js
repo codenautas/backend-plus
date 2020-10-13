@@ -179,9 +179,13 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
         var result=[];
         var progress=procedureDef.progress!==false;
         var divProgress;
+        var divBarProgress;
+        var progressBar;
+        var progressIndicator;
+        var divBarProgressLabel;
         var onClose=function(){}
         var defaultInformProgress = function defaultInformProgress(progressInfo){
-            if(progressInfo.message || progressInfo.end){
+            if(progressInfo.message || progressInfo.end || progressInfo.start || progressInfo.loaded){
                 if(!divProgress){
                     var idAutoClose='id-auto-close-'+Math.random();
                     var checkAutoClose=html.input({type:'checkbox', id:idAutoClose, checked:myAjax.ajaxPromise.autoClose}).create();
@@ -215,6 +219,10 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
                         }
                     }
                 }
+            }
+            if(progressInfo.ephemeral && divBarProgressLabel){
+                divBarProgressLabel.textContent=progressInfo.message;
+            }else if(progressInfo.message || progressInfo.end){
                 var now=bestGlobals.datetime.now();
                 var elapsed = now.sub(tickTime);
                 tickTime=now;
@@ -240,6 +248,25 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
                         ]).create(),
                         divProgress.childNodes[0]
                     );
+                }
+            }
+            if(progressInfo.loaded){
+                if(!divBarProgress){
+                    divBarProgressLabel = html.div().create();
+                    progressIndicator=html.div({class:'indicator'},' ').create();
+                    progressBar=html.div({class:'progress-bar', style:'width:400px; height:8px;'},[progressIndicator]).create();
+                    divBarProgress = html.div([
+                        divBarProgressLabel,
+                        progressBar
+                    ]).create();
+                    divProgress.parentNode.insertBefore(divBarProgress, divProgress);
+                }
+                if(progressInfo.lengthComputable){
+                    progressIndicator.style.width=progressInfo.loaded*100/progressInfo.total+'%';
+                    progressIndicator.title=Math.round(progressInfo.loaded*100/progressInfo.total)+'%';
+                }else{
+                    progressIndicator.style.backgroundColor='#D4D';
+                    progressIndicator.title='N/D %';
                 }
             }
         }
@@ -268,6 +295,11 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
             }
             my.informDetectedStatus('logged', true);
         }
+        var slowTimer = setTimeout(function(){
+            if(opts.mayBeSlow){
+                informProgress({start:true})
+            }
+        }, 500)
         return AjaxBestPromise[procedureDef.method]({
             multipart:procedureDef.files,
             url:procedureDef.action,
@@ -301,6 +333,7 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
             onClose();
             result=result.join('');
             controlLoggedIn(result);
+            clearTimeout(slowTimer);
             if(lineNumber){
                 informProgress({end:true})
             }
@@ -327,6 +360,7 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
             if(!err.displayed && opts.visiblyLogErrors || err.status==403){
                 my.log(err);
             }
+            clearTimeout(slowTimer);
             throw err;
         });
     });
