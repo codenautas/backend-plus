@@ -69,7 +69,7 @@ export interface ContextForDump extends Context {
     forDump?:boolean
 }
 
-export type InformProgressFunction=(opts:Error|{data:any}|{message:string}|{message?:string, lengthComputable:boolean, loaded:number, total:number})=>void
+export type InformProgressFunction=(opts:Error|{data:any}|{start:any}|{message:string}|{message?:string, lengthComputable:boolean, loaded:number, total:number, force?:boolean})=>void
 
 export type ProcedureContext=Context & {
     client:Client
@@ -210,7 +210,7 @@ export type ForeignKey = {
     displayFields?:string[], 
     consName?:string, 
     initiallyDeferred?:boolean
-    displayAfterFieldName?:string
+    displayAfterFieldName?:string|boolean
 }
 export type Constraint = {constraintType:'check'|'unique'|'not null', expr?:string, fields?:string[], consName?:string}
 export type TableDefinition = EditableDbDefinition & {
