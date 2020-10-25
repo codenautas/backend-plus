@@ -975,6 +975,7 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
             }
         });
     }
+    control.depot=depot;
     control.addEventListener('update', function(){
         grid.refreshAggregates();
         if(grid.def.specialValidator){
@@ -2640,7 +2641,7 @@ myOwn.references={};
 myOwn.getReference = function getReference(referenceName, opts){
     opts = changing({
         getValue: function getValue(row){
-            return row[reference.tableDef.primaryKey[0]];
+            return row[reference.tableDef.primaryKey[reference.tableDef.primaryKey.length-1]];
         },
         getLabels: function getLabels(row, includePk){
             var lookupFields = reference.tableDef.lookupFields || reference.tableDef.nameFields;
@@ -2747,6 +2748,12 @@ myOwn.ExpanderReferences={
             }
             if(opts.extraRow){
                 rows=rows.concat(opts.extraRow);
+            }
+            if(typeInfo.referencesFields.length>1){
+                var prevFields=typeInfo.referencesFields.slice(0,typeInfo.referencesFields.length-1);
+                rows = rows.filter(function(row){
+                    return prevFields.find(function(pair){ return !bestGlobals.sameValues(row[pair.target], typedControl.depot.row[pair.source]) }) === undefined
+                })
             }
             var menu=rows.map(function(row){
                 return {
