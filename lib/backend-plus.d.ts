@@ -23,6 +23,7 @@ export interface ProcedureParameter {
     defaultValue?: any
     typeName?: string
     references?: string
+    options?: string[]
     specialDefaultValue?: string
 }
 export type UploadedFileInfo={
