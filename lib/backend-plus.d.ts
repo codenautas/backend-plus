@@ -285,6 +285,8 @@ export type ClientSetup= {
 }
 export type StartOptions={
     readConfig?:{whenNotExist:'ignore'}, 
+    config?:string|object
+    "dump-db"?:boolean
     testing?:true
 }
 export type TableDefinitionsGetters = {
