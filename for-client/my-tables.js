@@ -2749,7 +2749,7 @@ myOwn.ExpanderReferences={
             if(opts.extraRow){
                 rows=rows.concat(opts.extraRow);
             }
-            if(typeInfo.referencesFields.length>1){
+            if(typeInfo.referencesFields && typeInfo.referencesFields.length>1){
                 var prevFields=typeInfo.referencesFields.slice(0,typeInfo.referencesFields.length-1);
                 rows = rows.filter(function(row){
                     return prevFields.find(function(pair){ return !bestGlobals.sameValues(row[pair.target], typedControl.depot.row[pair.source]) }) === undefined
