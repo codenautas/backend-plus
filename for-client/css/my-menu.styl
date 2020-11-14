@@ -122,3 +122,33 @@ a.disabled
   display none
 .result-progress input:not(:checked)+label+div
   display none
+
+.result-div, .json-result
+  & > div > table
+    border 1px solid #AAA
+  table
+    border-collapse collapse
+    margin 0
+  tr
+    border-top 1px solid #AAA
+    &:first-child
+      border-top 0
+  td
+    border-left 1px solid #AAA
+    padding 0
+    &:first-child
+      border-left 0
+    &.plain-content
+      padding 3px
+    &.attr-name
+      padding 3px
+      font-size 90%
+      font-weight bold
+      color #666
+    &.row-num
+      padding 3px
+      font-size 80%
+      text-align right
+      color #777
+
+

@@ -148,8 +148,14 @@ myOwn.wScreens.proc = function(addrParams){
 
 myOwn.wScreens.proc.result={
     showText:function(result, divResult){
-        divResult.textContent = result;
-        divResult.style.backgroundColor = '#5F5';
+        if(typeof result=="object"){
+            var div = document.createElement('div');
+            divResult.appendChild(div);
+            myOwn.agregar_json(div, result);
+        }else{
+            divResult.textContent = result;
+            divResult.style.backgroundColor = '#9FA';
+        }
     },
     showGrid:function(result, divResult){
         myOwn.tableGrid(result.tableName, divResult);

@@ -24,9 +24,9 @@
 var myAjax = {};
 /*jshint +W004 */
 
-/** @param {T} x
- *  @returns {T}
- *  @template {T}
+/** 
+ *  @param {any} x
+ *  @returns {any}
  */
 myAjax.functionId = function id(x){return x;}
 
@@ -445,6 +445,99 @@ myAjax.removeSessionVar = function removeSessionVar(varName){
 myAjax.path={
     img:'img/'
 }
+
+/**
+ * 
+ * @param {HTMLElement} div 
+ * @param {any} o 
+ * @param {string} a 
+ */
+function agregar_json_default_ubicaciones(div, o, a){
+    //@ts-ignore
+    /** @type {HTMLTimeElement & {laTabla:HTMLTableElement}} */
+    var div2 = div;
+    if(!div2.laTabla){
+        div2.laTabla = document.createElement('table');
+        div.appendChild(div2.laTabla);
+    }
+    var table = div2.laTabla;
+    var row = table.insertRow(-1);
+    var cellName = row.insertCell(-1);
+    cellName.className='attr-name';
+    cellName.textContent = a; 
+    var cell = row.insertCell(-1);
+    return {title:cellName, data:cell, skip:o[a] == null}
+}
+
+/**
+ * 
+ * @param {HTMLElement} div 
+ * @param {any} o 
+ * @param {(div:HTMLElement, o:any, a:string)=>{title:HTMLElement|null, data:HTMLElement, skip:boolean|null}=(div,o,a)} ubicaciones 
+ */
+function agregar_json(div, o, ubicaciones=agregar_json_default_ubicaciones){
+    if(typeof o == null){
+        return ;
+    }
+    if(typeof o == "object" && !(o instanceof Date)){
+        if(o instanceof Array && o[0] && o[0] instanceof Object && !(o[0] instanceof Array)){
+            var table = document.createElement('table');
+            div.appendChild(table);
+            var titleRow = table.insertRow(-1);
+            titleRow.insertCell(-1);
+            /** @type {[k:string]:any} */
+            var titleObject = {};
+            for(var a in o){
+                if(o[a]!=null){
+                    var row = table.insertRow(-1);
+                    var cellName = row.insertCell(-1);
+                    cellName.className='row-num';
+                    // @ts-ignore numero y texto
+                    cellName.textContent = isNaN(a)?a:Number(a)+1; 
+                    agregar_json(row, o[a], function(div, _o, a){
+                        // @ts-ignore sé que es Row
+                        /** @type {HTMLTableRowElement} */
+                        var row = div;
+                        var i;
+                        /** @type {HTMLTableCellElement|null} */
+                        var cellTitle=null;
+                        if(titleObject[a] == null){
+                            cellTitle = titleRow.insertCell(-1);
+                            i = cellTitle.cellIndex;
+                            titleObject[a] = i;
+                        }else{
+                            i = titleObject[a]
+                        }
+                        while(i>=row.cells.length){
+                            row.insertCell(-1);
+                        }
+                        return {title:cellTitle, data:row.cells[i], skip:false}
+                    });
+                }
+            }
+        }else{
+            for(var a in o){
+                var cells=ubicaciones(div, o, a);
+                if(!cells.skip){
+                    if(cells.title){
+                        cells.title.className='attr-name';
+                        cells.title.textContent = a; 
+                    }
+                    agregar_json(cells.data, o[a]);
+                }
+            }
+        }
+    }else{
+        div.className='plain-content';
+        if(typeof o == "boolean"){
+            div.textContent = o?'Sí':'No'
+        }else{
+            div.textContent = o.toLocaleString();
+        }
+    }
+}
+
+myAjax.agregar_json=agregar_json;
 
 return myAjax;
 

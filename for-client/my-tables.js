@@ -2706,8 +2706,41 @@ myOwn.getReference = function getReference(referenceName, opts){
 myOwn.autoSetupFunctions.push(function autoSetupMyTables(){
     var my=this;
     TypedControls.Expanders.unshift(myOwn.ExpanderReferences);
+    TypedControls.Expanders.unshift(myOwn.ExpanderJsonReadOnly);
 });
 
+myOwn.ExpanderJsonReadOnly={
+    autoExpand:true,
+    whenReadOnly:true,
+    whenType: function(typedControl){ 
+        var typeInfo = typedControl.controledType.typeInfo;
+        return typeInfo.typeName === 'jsonb';
+    },
+    dialogInput:function(typedControl, opts){
+        var typer = typedControl.controledType;
+        var value = typedControl.getTypedValue();
+        if(typedControl.disabled){
+            var div=html.div({class:'json-result'}).create();
+            my.agregar_json(div, value);
+            return alertPromise(div,{
+                underElement:typedControl,
+                withCloseButton:false,
+            }).then(function(){return false;});
+        }
+        return promptPromise(typer.typeInfo.label||'', actualValue,{
+            underElement:typedControl,
+            withCloseButton:false,
+        }).then(function(text){
+            var value=typer.fromLocalString(text);
+            typedControl.setTypedValue(value);
+            typedControl.dispatchEvent(new CustomEvent('update'));
+        }).catch(function(err){
+            if(!DialogPromise){
+                return alertPromise(err.message);
+            }
+        });
+}
+}
 myOwn.ExpanderReferences={
     autoExpand:true,
     whenType: function(typedControl){ 
