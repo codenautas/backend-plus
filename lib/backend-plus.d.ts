@@ -139,7 +139,7 @@ export interface TableContext extends Context{
     superuser?:true
     forDump?:boolean
 }
-export type PgKnownTypes='decimal'|'text'|'boolean'|'integer'|'bigint'|'date'|'interval'|'timestamp'|'jsonb'|'double';
+export type PgKnownTypes='decimal'|'text'|'boolean'|'integer'|'bigint'|'date'|'interval'|'timestamp'|'jsonb'|'double'|'blob';
 export type PgKnownDbValues='current_timestamp'|'current_user'|'session_user';
 export type SequenceDefinition = {
     name:string
@@ -218,6 +218,7 @@ export type TableDefinition = EditableDbDefinition & {
     name:string
     elementName?:string
     tableName?:string
+    schema?:string
     title?:string
     fields:FieldDefinition[],
     primaryKey:string[],
