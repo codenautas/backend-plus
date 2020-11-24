@@ -457,6 +457,11 @@ function agregar_json_default_ubicaciones(div, o, a){
     /** @type {HTMLTimeElement & {laTabla:HTMLTableElement}} */
     var div2 = div;
     if(!div2.laTabla){
+        if(a==='' && div.tagName=='TD' && o[a] != null){
+            var cellInTheMiddle = document.createElement('td');
+            div.parentElement.insertBefore(cellInTheMiddle,div);
+            return {title:null, data:cellInTheMiddle, skip:false}
+        }
         div2.laTabla = document.createElement('table');
         div.appendChild(div2.laTabla);
     }
@@ -466,6 +471,7 @@ function agregar_json_default_ubicaciones(div, o, a){
     cellName.className='attr-name';
     cellName.textContent = a; 
     var cell = row.insertCell(-1);
+    cell.colSpan=99;
     return {title:cellName, data:cell, skip:o[a] == null}
 }
 

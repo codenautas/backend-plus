@@ -111,6 +111,10 @@ export type MenuInfoMenu = {
 export type MenuInfoTable = {
     menuType:'table'
     table?:string
+    ff?:{fieldName:string, value:any}[]
+    fc?:{fieldName:string, operator:string, value:any}[]
+    pf?:any
+    detailing?:any
 } & MenuInfoMinimo;
 export type MenuInfoProc={
     menuType:'proc'
@@ -275,7 +279,7 @@ export type TableDefinition = EditableDbDefinition & {
     description?:MarkdownDoc
 }
 export interface DetailTable { table: string, fields: FieldsForConnect, abr: string, label?: string, refreshParent?:boolean, refreshFromParent?:boolean, wScreen?:string, condition?:string }
-export type TableDefinitionFunction = (context: ContextForDump) => TableDefinition;
+export type TableDefinitionFunction = (context: ContextForDump, opts?:any) => TableDefinition;
 export type TableItemDef=string|{name:string, path?:string, tableGenerator?:(context:TableContext)=>TableDefinition}
 // {{name: string; path?:string; fileName?: string; source?: string; tableGenerator?:()=>void; title?:string; mixin?:any[]}} TableItem
 export interface TableDefinitions {
