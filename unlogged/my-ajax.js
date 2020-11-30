@@ -526,8 +526,13 @@ function agregar_json(div, o, ubicaciones=agregar_json_default_ubicaciones){
                 var cells=ubicaciones(div, o, a);
                 if(!cells.skip){
                     if(cells.title){
-                        cells.title.className='attr-name';
-                        cells.title.textContent = a; 
+                        if(o instanceof Array && !isNaN(a)){
+                            cells.title.className='row-num';
+                            cells.title.textContent = Number(a) + 1; 
+                        }else{
+                            cells.title.className='attr-name';
+                            cells.title.textContent = a; 
+                        }
                     }
                     agregar_json(cells.data, o[a]);
                 }

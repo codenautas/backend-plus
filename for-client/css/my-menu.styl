@@ -64,6 +64,9 @@ img.light
   border-bottom 1px solid #ccc
   border-right 1px solid #ccc
   margin-top 0px
+  &[bp-is-disabled=true]
+    color #888
+    cursor not-allowed
 
 .top-menu-bar
   padding-top 0  
@@ -140,6 +143,7 @@ a.disabled
       border-left 0
     &.plain-content
       padding 3px
+      white-space pre-line
     &.attr-name
       padding 3px
       font-size 90%

@@ -338,8 +338,15 @@ myOwn.createForkeableButton = function createForkeableButton(menu, opts){
     }
     button.setForkeableHref(menu);
     menu.button = button;
+    button.disable=function(disable){
+        button.setAttribute('bp-is-disabled',disable);
+    }
     button.onmousedown=opts.updateHrefBeforeClick||function(){};
     button.onclick=opts.onclick||function(event){
+        if(button.getAttribute('bp-is-disabled')=='true'){
+            event.preventDefault();
+            return;
+        }
         /** @type {null|string} */
         var errorText;
         if(opts.preOnClick){
