@@ -12,6 +12,7 @@ myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     offLine:'off line',
     onLine:'on line',
     proceed:'proceed',
+    processing:'processing',
     signIn:'sign in',
     speed1:'speed $1',
     user:'user',
@@ -26,6 +27,7 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     offLine:'fuera de línea',
     onLine:'en línea',
     proceed:'proceder',
+    processing:'procesando',
     signIn:'login',
     speed1:'velocidad $1',
     user:'usuario',
@@ -73,6 +75,7 @@ myOwn.wScreens.procAux = {
         // var divToggleProgress = html.div([toggleProgress, labelProgress]).create();
         var divProgress = html.div().create();
         var divProgressOutside = html.div({class:'result-progress', style:'opacity:0'},[toggleProgress,labelProgress,divProgress]).create();
+        var controls = [];
         main_layout.appendChild(html.table({class:"table-param-screen"},formDef.parameters.map(function(parameterDef){
             var control = html.td({"typed-controls-direct-input":true}).create();
             control.style.minWidth='200px';
@@ -93,7 +96,12 @@ myOwn.wScreens.procAux = {
                 params[parameterDef.name] = control.getTypedValue();
                 myOwn.replaceAddrParams(addrParams);
             });
-            return html.tr({"parameter-name":parameterDef.name},[ html.td(parameterDef.label||parameterDef.name.replace(/_/g,' ')),control]);
+            controls.push(control);
+            return html.tr({"parameter-name":parameterDef.name},[ 
+                html.td(parameterDef.label||parameterDef.name.replace(/_/g,' ')),
+                control,
+                html.td(parameterDef.description||''),
+            ]);
         }).concat(
             html.tr([html.td(), html.td([button])])
         )).create());
@@ -104,8 +112,14 @@ myOwn.wScreens.procAux = {
             divResult.innerHTML="";
             divProgress.innerHTML="";
             divProgressOutside.style.opacity=0.77;
-            labelProgress.textContent='procesando';
+            labelProgress.textContent=my.messages.processing;
             mainAction(params,divResult,divProgress).then(function(resultOk){
+                if(formDef.uniqueUse){
+                    controls.forEach(function(c){ c.disable(true) });
+                    button.style.visibility='hidden'
+                }else{
+                    button.disabled=false;
+                }
                 button.disabled=false;
                 divProgressOutside.style.opacity=0.33;
                 toggleProgress.disabled=false;

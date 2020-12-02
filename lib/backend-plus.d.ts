@@ -25,6 +25,8 @@ export interface ProcedureParameter {
     references?: string
     options?: string[]
     specialDefaultValue?: string
+    label?: string
+    description?: string
 }
 export type UploadedFileInfo={
     originalFilename: string
@@ -51,6 +53,7 @@ export interface ProcedureDef {
     setCookies?:boolean
     proceedLabel?:string
     policy?:string
+    uniqueUse?:boolean
 }
 
 export interface User {

@@ -2739,7 +2739,7 @@ myOwn.ExpanderJsonReadOnly={
                 return alertPromise(err.message);
             }
         });
-}
+    }
 }
 myOwn.ExpanderReferences={
     autoExpand:true,
