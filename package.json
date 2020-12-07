@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for typed controls",
-  "version": "1.6.11",
+  "version": "1.6.12",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -28,7 +28,7 @@
     }
   ],
   "dependencies": {
-    "big.js": "^6.0.2",
+    "big.js": "^6.0.3",
     "body-parser": "^1.19.0",
     "connect-pg-simple": "^6.2.1",
     "cookie-parser": "^1.4.5",
@@ -51,8 +51,8 @@
     "stylus": "~0.54.8",
     "xlsx-style": "~0.8.13",
     "ajax-best-promise": "~0.3.7",
-    "backend-skins": "~0.1.11",
-    "best-globals": "~0.10.30",
+    "backend-skins": "~0.1.12",
+    "best-globals": "~0.10.31",
     "castellano": "~0.1.3",
     "dialog-promise": "~0.9.10",
     "discrepances": "~0.2.4",
@@ -61,7 +61,7 @@
     "lazy-some": "~0.1.0",
     "like-ar": "~0.2.19",
     "login-plus": "^1.5.7",
-    "mini-tools": "^1.10.0",
+    "mini-tools": "^1.11.0",
     "pg-promise-strict": "^1.2.3",
     "regexplicit": "~0.1.3",
     "require-bro": "~0.2.2",

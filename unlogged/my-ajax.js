@@ -482,7 +482,7 @@ function agregar_json_default_ubicaciones(div, o, a){
  * @param {(div:HTMLElement, o:any, a:string)=>{title:HTMLElement|null, data:HTMLElement, skip:boolean|null}=(div,o,a)} ubicaciones 
  */
 function agregar_json(div, o, ubicaciones=agregar_json_default_ubicaciones){
-    if(typeof o == null){
+    if(o == null){
         return ;
     }
     if(typeof o == "object" && !(o instanceof Date) &&  !o.isRealDateTime){
