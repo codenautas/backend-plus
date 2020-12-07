@@ -281,7 +281,7 @@ export type TableDefinition = EditableDbDefinition & {
     firstDisplayOverLimit?:number
     description?:MarkdownDoc
 }
-export interface DetailTable { table: string, fields: FieldsForConnect, abr: string, label?: string, refreshParent?:boolean, refreshFromParent?:boolean, wScreen?:string, condition?:string }
+export interface DetailTable { table?: string, fields: FieldsForConnect, abr: string, label?: string, refreshParent?:boolean, refreshFromParent?:boolean, wScreen?:string, condition?:string }
 export type TableDefinitionFunction = (context: ContextForDump, opts?:any) => TableDefinition;
 export type TableItemDef=string|{name:string, path?:string, tableGenerator?:(context:TableContext)=>TableDefinition}
 // {{name: string; path?:string; fileName?: string; source?: string; tableGenerator?:()=>void; title?:string; mixin?:any[]}} TableItem
