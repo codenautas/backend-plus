@@ -214,7 +214,7 @@ myOwn.UriSearchToObject = function UriSearchToObject(locationSearch){
 function noChange(x){ return x; }
 
 myOwn.UriSearchToObjectParams={
-	i                :{ showInMenu:true , encode:function(value,menu){ return (menu.parents||[]).concat(menu.name).join(',') }},
+	i                :{ showInMenu:true , encode:function(value,menu){ return menu.name?(menu.parents||[]).concat(menu.name).join(','):value }},
 	fc               :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return JSON.parse(x)}  },
 	ff               :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return JSON.parse(x)}  },
 	up               :{                   encode:function(x){ return json4all.stringify(x); }, decode:function(x){ return json4all.parse(x)}  },
