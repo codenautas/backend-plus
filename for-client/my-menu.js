@@ -172,7 +172,7 @@ myOwn.wScreens.proc.result={
         }
     },
     showGrid:function(result, divResult){
-        myOwn.tableGrid(result.tableName, divResult);
+        myOwn.tableGrid(result.tableName, divResult, result);
     },
     showError:function(err, divResult){
         divResult.textContent = err.message;
