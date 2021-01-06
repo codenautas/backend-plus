@@ -329,7 +329,7 @@ export class AppBackend{
     caches:{
         procedures:{[k:string]:{timestamp:number, result:any}}
     }
-    fieldDomain:{[k:string]:Nullable<FieldDefinition>}
+    fieldDomain:{[k:string]:Partial<FieldDefinition>}
     exts:{img?:string[]}
     optsGenericForAll:{allowedExts?:string[]}
     sqls:{[k:string]:string}

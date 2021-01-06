@@ -20,6 +20,7 @@ class AppExample extends backendPlus.AppBackend{
             port: 3033
             kill-9:
               pid: 1234
+              master-pass: asdfasdfas dasdf asdfasd
             skins:
               "":
                 local-path: client/

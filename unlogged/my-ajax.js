@@ -287,8 +287,8 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
         }else{
             informProgress = opts.informProgress || defaultInformProgress;
         }
-        var controlLoggedIn = function controlLoggedIn(result){
-            if(result && result[0]=="<" && result.match(/login/m)){
+        var controlLoggedIn = function controlLoggedIn(result, informNotLoggedIn){
+            if(informNotLoggedIn || result && result[0]=="<" && result.match(/login/m)){
                 console.log('xxxxxxxxxxx',procedureDef.action)
                 my.informDetectedStatus('notLogged');
                 throw bestGlobals.changing(new Error(my.messages.notLogged),{displayed:true, isNotLoggedError:true});
@@ -338,6 +338,10 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
                 informProgress({end:true})
             }
             return my.encoders[procedureDef.encoding].parse(result);
+        }).catch(function(err){
+            if(err.status==401){
+                controlLoggedIn(null, true);
+            }
         }).catch(function(err){
             onClose(err);
             if(opts.launcher){

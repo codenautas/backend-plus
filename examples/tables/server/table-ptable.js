@@ -19,7 +19,7 @@ module.exports = function(context){
             {name:'column'              , typeName:'integer', editable:true                  },
             {name:'period'              , typeName:'integer'                                 },
             {name:'block'               , typeName:'text'                                    },
-            {name:'state at STP'        , typeName:'text'                                    },
+            {name:'state at STP'        , typeName:'text'   , allowEmptyText:true            },
             {name:'ocurrence'           , typeName:'text'                                    },
             {name:'isotopes'            , typeName:'ARRAY:text', inTable: false , editable:false              },
             {name:'cant_images'         , typeName:'integer'   , inTable: false, editable:false              },
