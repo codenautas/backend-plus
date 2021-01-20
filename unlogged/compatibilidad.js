@@ -91,18 +91,29 @@ function controlar_compatibilidad(ya){
         if(!ok){
             var mensaje=document.createElement('div');
             mensaje.textContent="Falla en "+control;
+            if(def_control.gravedad=='incompatible'){
+                mensaje.style.color='red';
+            }
             div.appendChild(mensaje);
             hubo_errores=true;
             hubo_errores_tipo[def_control.gravedad]=true;
         }
     };
     if(!hubo_errores_tipo['incompatible']){
-        login.disabled=false;
         boton.disabled=false;
     }
     if(hubo_errores){
-        var alertDiv = document.createElement('h3');
-        alertDiv.textConent="El sistema no fue probado en este modelo de navegador. Si encuentra problemas durante el uso por favor avise que estaba usando un modelo no probado. Se recomienda usar una versión actualizada del navegador Google Chrome";
+        console.log('aca')
+        var alertDiv = document.createElement(hubo_errores_tipo[def_control.gravedad]?'h3':'div');
+        alertDiv.textContent="El sistema no fue probado en este modelo de navegador. Si experimenta problemas durante el uso cuando avise del problema incluya el nombre y versión del navegador. Se recomienda usar una versión actualizada del navegador Google Chrome";
+        if(hubo_errores_tipo[def_control.gravedad]){
+            var check = document.createElement('input');
+            check.type='checkbox';
+            check.onchange=function(){
+                boton.disabled=!check.checked
+            }
+            alertDiv.appendChild(check);
+        }
         div.appendChild(alertDiv);
     }
 }
