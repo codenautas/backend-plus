@@ -341,6 +341,8 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
         }).catch(function(err){
             if(err.status==401){
                 controlLoggedIn(null, true);
+            }else{
+                throw err;
             }
         }).catch(function(err){
             onClose(err);

@@ -37,4 +37,5 @@ html(lang=lang)
         each errorLine in (flash.error||[])
           tr(style={color:'red'})
             td(colspan=5)=errorLine
+    script(src="compatibilidad.js")
     script(src="auto-login.js")
