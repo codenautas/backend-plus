@@ -67,6 +67,7 @@ myAjax.parseStrCookies = function parseStrCookies(cookieString, prefix){
 }
 
 myAjax.readProcedureDefinitions=function readProcedureDefinitions(){
+    var my = this;
     var promise;
     var getStored=function(setupOrError){
         if(setupOrError && !(setupOrError instanceof Error) && !setupOrError.isoffline){
