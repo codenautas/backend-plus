@@ -41,7 +41,7 @@ export interface ProcedureDef {
     parameters: ProcedureParameter[]
     method?: 'get'|'post'
     coreFunction: CoreFunction 
-    encodeing?:string
+    encoding?:'JSON4all'|'JSON'|'download'
     multipart?:true
     progress?:true
     files?:{count?:number}
@@ -86,6 +86,7 @@ export type ProcedureContext=Context & {
 }
 export interface Request extends express.Request {
     user?:User
+    session:express.Request["session"]
 }
 export {Response, Express} from "express";
 export interface ResponsePlus extends express.Response{}
@@ -124,6 +125,10 @@ export type MenuInfoProc={
     proc?:string
     autoproced?:boolean
 } & MenuInfoMinimo;
+export type MenuInfoPath={
+    menuType:'path'
+    path:string
+} & MenuInfoMinimo;
 export interface ClientModuleDefinition{
     type:'js'|'css'
     module?:string // module where to search in node_modules (node_modules/module/modPath/file) to serve
@@ -138,7 +143,7 @@ export interface ClientModuleDefinition{
     fileProduction?:string
     fileDevelopment?:string
 }
-export type MenuInfo = MenuInfoMenu | MenuInfoTable | MenuInfoProc;
+export type MenuInfo = MenuInfoMenu | MenuInfoTable | MenuInfoProc | MenuInfoPath;
 // type MenuDefinition = {menu:Readonly<MenuInfoBase[]>}
 export type MenuDefinition = {menu:MenuInfoBase[]}
 // types for Table definitions

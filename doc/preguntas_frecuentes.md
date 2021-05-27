@@ -112,3 +112,14 @@ En el menú hay que poner `autoproced:true`:
 ```ts
     {menuType:'proc', name:'er', label:'resúmen', proc:'estado_resumen', autoproced:true}
 ```
+
+## ¿Cómo hago para refrescar una grilla hija desde el padre cuando sé que los datos cambiaron?
+
+Por ejemplo si en la grilla padre al modifiar el valor de un campo se disparará un trigger 
+que actualice algún dato en los registros relacionados, si la grilla hija se está visualizando
+se querrá que se actualice. 
+
+Esto se puede hacer cuando el cambio se realiza en la misma pantalla (no cuando otro usuario 
+o el mismo usuario en otra sesión haga el cambio).
+
+En la definición del detail hay que poner `refreshFromParent:true` 

@@ -223,21 +223,25 @@ fieldNames            | [O]  | (fieldNamesDef) | Object with table fields config
 
 <!--lang:es-->
 
-Un json que contiene información para generar una secuencia auto-incremental
+Un objeto que contiene información para generar una secuencia auto-incremental
+
+Si no se especifica el objeto o el nombre se usará la cláusula `GENERATED ALWAYS AS IDENTITY`
 
 property              | type | default value   | use
 ----------------------|------|-----------------|-------------------
-name                  | T    | null            | (REQUIRED) nombre de la secuencia
+name                  | T    | null            | nombre de la secuencia
 firstValue            | Number | 1             | primer número de la secuencia
 prefix                | T    | null            | prefijo de la secuencia 
 
 <!--lang:en--]
 
-A json containing the info for the generated sequence
+An object containing the info for the generated sequence
+
+If no object or no name the clausule `GENERATED ALWAYS AS IDENTITY` is used
 
 property              | type | default value   | use
 ----------------------|------|-----------------|-------------------
-name                  | T    | null            | (REQUIRED) sequence name
+name                  | T    | null            | sequence name
 firstValue            | Number | 1             | sequence first number
 prefix                | T    | null            | sequence prefix
 
