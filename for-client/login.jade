@@ -2,9 +2,19 @@ doctype html
 html(lang=lang)
   head
     link(rel='stylesheet', href=skinUrl+'css/login.css')
+    style.
+      .logintableImgRow{
+        display: none
+      }
+      .iconostd{
+        display: none
+      }
   body
     form(id="loginForm", action="login", method="post")
       table.logintable
+        tr.logintableLogoImgRow
+          td(colspan=3)
+            img.formImg(src='img/login-logo-icon.png')
         tr
           td(colspan=4)
             h2.formtitle=msgs.login.title

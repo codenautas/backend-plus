@@ -13,20 +13,25 @@ function gotoEmptyFieldOrSubmit(event){
     }else{
         setTimeout(function(){
             loginForm.submit();
-        },1000);
+        },500);
     }
 }
 
 window.addEventListener('load',function(){
-    var loginElement=document.getElementById('login');
-    if(loginElement){
-        loginElement.addEventListener('click',gotoEmptyFieldOrSubmit)
-        document.addEventListener('keypress',function(event){
-            if(event.key == 'Enter' || event.keyCode == 13){
-                gotoEmptyFieldOrSubmit(event);
+    var loginButtons = ['login','loginFormRightImg'];
+    loginButtons.forEach(function(id, i){
+        var loginElement=document.getElementById(id);
+        if(loginElement){
+            loginElement.addEventListener('click',gotoEmptyFieldOrSubmit)
+            if(!i){
+                document.addEventListener('keypress',function(event){
+                    if(event.key == 'Enter' || event.keyCode == 13){
+                        gotoEmptyFieldOrSubmit(event);
+                    }
+                })
             }
-        })
-    }
+        }
+    })
     var gotoLoginElement=document.getElementById('goto-login');
     if(gotoLoginElement){
         if(location.hash){
