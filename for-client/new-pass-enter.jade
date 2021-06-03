@@ -1,0 +1,61 @@
+doctype html
+html(lang=lang)
+  head
+    link(rel='stylesheet', href=skinUrl+'css/chpass.css')
+    style.
+      .logintableImgRow{
+        display: none
+      }
+      .iconostd{
+        display: none
+      }
+  body
+    form(id="chPassForm", action="new-pass-enter", method="post")
+      input(style='display:none', value=token, name="token", id="token")
+      table.chpasstable
+        tr.logintableLogoImgRow
+          td(colspan=3)
+            img.formImg(src='img/login-logo-icon.png')
+        tr
+          td(colspan=4)
+            h2.formtitle=msgs.chpass.title
+        tr.chpasstableImgRow
+          td(colspan=3)
+            img.formImg(src=skinUrl+'img/chpass-icon.png')
+        tr
+          td.iconostd
+            label(for="username")
+              img.iconoslog(src=skinUrl+'img/iconousuario.png')
+          td.formlabel
+            label(for="username")=msgs.chpass.username
+          td.formtd
+            input(id="username", name="username", placeholder=msgs.chpass.username, autocomplete="username", value=username, disabled)
+          td.chpasstableRightImg(rowspan=4)
+            img.formImg#chpassFormRightImg(src=skinUrl+'img/chpass-icon.png')
+        tr
+          td.iconostd
+            label(for="newPassword")=newPassword
+              img.iconosnewPassword(src=skinUrl+'img/icononewPassword.png')
+          td.formlabel
+            label(for="newPassword")=msgs.chpass.newPassword
+          td.formtd
+            input(id="newPassword", type="password", name="newPassword", placeholder=msgs.chpass.newPassword, autocomplete="new-password")
+          td#resultStrength
+        tr
+          td.iconostd
+            label(for="repPassword")=repPassword
+              img.iconosrepPassword(src=skinUrl+'img/iconorepPassword.png')
+          td.formlabel
+            label(for="repPassword")=msgs.chpass.repPassword
+          td.formtd
+            input(id="repPassword", type="password", name="repPassword", placeholder=msgs.chpass.repPassword, autocomplete="new-password")
+          td#resultDiff
+        tr
+          td
+          td
+            input(type="submit", value=msgs.chpass.button)
+        each errorLine in (flash.error||[])
+          tr(style={color:'red'})
+            td(colspan=5)=errorLine
+    if strength
+      script(src="strength-pass.js")

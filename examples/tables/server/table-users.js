@@ -12,6 +12,8 @@ module.exports = function(context){
             {name:'active_until'          , typeName:'date'                   },
             {name:'locked_since'          , typeName:'date'                   },
             {name:'rol'                   , typeName:'text'                   },
+            {name:'mail'                  , typeName:'text'                   },
+            {name:'mail2'                 , typeName:'text'                   },
         ],
         primaryKey:['username']
     });

@@ -47,5 +47,11 @@ html(lang=lang)
         each errorLine in (flash.error||[])
           tr(style={color:'red'})
             td(colspan=5)=errorLine
+        if forget
+          tr
+            td.iconostd
+              img.iconoslog(src=skinUrl+'img/iconoforget.png')
+            td.formlabel.forgetLabel(colspan=2)
+              a(href='.'+forget)=msgs.login.forget
     script(src="compatibilidad.js")
     script(src="auto-login.js")
