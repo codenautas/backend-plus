@@ -140,7 +140,7 @@ export interface ClientModuleDefinition{
         url:string
         path:string
     }
-    fileProduction?:string
+    // fileProduction?:string // DEPRECATED, USE fileDevelopment
     fileDevelopment?:string
 }
 export type MenuInfo = MenuInfoMenu | MenuInfoTable | MenuInfoProc | MenuInfoPath;
@@ -347,7 +347,7 @@ export class AppBackend{
     prepareGetTables():void
     appendToTableDefinition(tableName:string, appenderFunction:(tableDef:TableDefinition, context?:TableContext)=>void):void
     getContext(req:Request):Context
-    postConfig(...params: any[]):any
+    postConfig(...params: any[]):Promise<void>
     clientIncludes(req:Request|null, hideBEPlusInclusions?:OptsClientPage):ClientModuleDefinition[]
     addSchrödingerServices(mainApp:ExpressPlus, baseUrl:string):void
     addUnloggedServices(mainApp:ExpressPlus, baseUrl:string):void

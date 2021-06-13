@@ -18,3 +18,8 @@ server:
       local-path: ../backend-skins/dist/
   kill-9:
     master-pass: 3920192
+devel:
+  useFileDevelopment: true
+  delay: 400
+  cache-content: true
+  forceShowAsEditable: false
