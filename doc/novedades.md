@@ -1,5 +1,14 @@
 # novedades de _backend-plus_
 
+## Nuevo framework _backend-chi_
+
+_Backend-plus_ se va a poder usar utilizando todo el poder de _Typescript_ gracias a 
+[_backend-chi_](https://github.com/codenautas/backend-chi). 
+
+Por ahoracon  _backend-chi_ se pueden crear tablas de modo que:
+   * las _Fk_ y los _DetailTables_ se deduzcan automátcamente y
+   * se genere el tipo subyacente del registro almacenado en el campo.
+
 ## Secuencias `GENERATED AS IDENTITY` para valores autonuméricos
 
 Ahora _backend-plus_ usa [`GENERATED { ALWAYS | BY DEFAULT } AS IDENTITY ( sequence_options )`](https://www.postgresql.org/docs/current/sql-createtable.html) 
@@ -259,6 +268,8 @@ la lista de posibles valores para el campo (y se agregan las columnas `isName:tr
 Con la opción `npm start -- --dump-db` se genera el archivo `local-db-dump.sql` 
 que contiene las instrucciones para crear la base de datos en _postgres_ en base
 a la definición de la estructura de las tablas y sus relaciones. 
+
+**v1.10.5** Se agrega la extensión `pgcrypto`
 
 **v1.6.6** Se puede hacer una generación parcial (solo para algunas tablas parandos sus nombres como parámetros).
 
