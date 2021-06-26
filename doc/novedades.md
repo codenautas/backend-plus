@@ -14,6 +14,8 @@ Por ahoracon  _backend-chi_ se pueden crear tablas de modo que:
 Ahora _backend-plus_ usa [`GENERATED { ALWAYS | BY DEFAULT } AS IDENTITY ( sequence_options )`](https://www.postgresql.org/docs/current/sql-createtable.html) 
 para generar secuencias cuando no se especifica el nombre de la misma en la opción del campo `{sequence:{name:}}`.
 
+**v.10.7** Se pueden usar `.tab` en formato `YAML` para campos `generated as identity`
+
 **v1.10.3** Cuando se levanta información de un .tab para poblar una tabla con una secuencia `GENERATED AS IDENTITY`
 en vez de generarse instrucciones `INSERT TO` (que no están permitidas en este caso), 
 se generan instrucciones `COPY FROM STDIN` que permiten especificar valores para campos secuencias. 

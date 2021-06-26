@@ -167,7 +167,7 @@ export type FieldDefinition = EditableDbDefinition & {
     nullable?:boolean
     dbNullable?:boolean        /* dbNullable === false is not nullabla at DB level, but not at CLIENT LEVEL */
     defaultValue?:any
-    defaultDbValue?:PgKnownDbValues
+    defaultDbValue?:PgKnownDbValues|string
     clientSide?:string         /* keyof: myOwn.clientSides */
     isName?:boolean
     isPk?:number               /* internal: pos in the primaryKey array */
