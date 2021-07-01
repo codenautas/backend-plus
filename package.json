@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for typed controls",
-  "version": "1.10.10",
+  "version": "1.10.11",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -29,7 +29,7 @@
   ],
   "dependencies": {
     "ajax-best-promise": "~0.3.7",
-    "backend-skins": "~0.1.14",
+    "backend-skins": "~0.1.15",
     "best-globals": "~0.10.32",
     "big.js": "^6.1.1",
     "body-parser": "^1.19.0",
