@@ -12,12 +12,12 @@ html(lang=lang)
   body
     form(id="loginForm", action="login", method="post")
       table.logintable
-        tr
-          td(colspan=4)
-            h2.formtitle=msgs.login.title
         tr.logintableLogoImgRow
           td(colspan=3)
             img.formImg(src='img/login-logo-icon.png')
+        tr
+          td(colspan=4)
+            h2.formtitle=msgs.login.title
         tr.logintableImgRow
           td(colspan=3)
             img.formImg(src=skinUrl+'img/login-lock-icon.png')

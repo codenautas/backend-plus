@@ -557,6 +557,9 @@ function agregar_json(div, o, ubicaciones=agregar_json_default_ubicaciones){
 
 myAjax.agregar_json=agregar_json;
 
+// require.paths=require.paths||{}
+// require.paths.vs = '../node_modules/monaco-editor/min/vs';
+
 return myAjax;
 
 });
