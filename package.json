@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for typed controls",
-  "version": "1.10.13",
+  "version": "1.10.14",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -83,7 +83,7 @@
     "@types/multiparty": "~0.0.32",
     "@types/node": "^16.0.0",
     "@types/numeral": "~2.0.1",
-    "@types/session-file-store": "^1.2.1",
+    "@types/session-file-store": "^1.2.2",
     "@types/stack-trace": "~0.0.29",
     "@types/websql": "~0.0.27",
     "esprima": "^4.0.1",

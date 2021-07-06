@@ -909,7 +909,11 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
     var directInput=true;
     var control;
     var td;
-    if(fieldDef.mobileInputType && my.mobileMode){
+    if(fieldDef.clientSide && my.clientSides[fieldDef.clientSide].cellDef){
+        var cellDef = my.clientSides[fieldDef.clientSide].cellDef;
+        control = html[cellDef.tagName||'input'](changing({class:'bp-input'},cellDef.inputAttrs||{})).create();
+        td = html.td(this.cellAttributes(cellDef.cellAttrs||{}),[control]).create();
+    }else if(fieldDef.mobileInputType && my.mobileMode){
         var inputAttrs = {type:'text'};
         if(fieldDef.mobileInputType=='number'){
             inputAttrs.type = 'number';
@@ -2600,6 +2604,14 @@ myOwn.clientSides={
                     });
                 }
             }, true);
+        }
+    },
+    displayUrl:{
+        cellDef:{tagName:'a'},
+        update:function(depot, fieldName){
+            depot.rowControls[fieldName].href = depot.rowControls[fieldName].getTypedValue();
+        },
+        prepare:function(depot, fieldName){
         }
     },
     $lock:{
