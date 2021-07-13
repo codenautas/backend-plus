@@ -2609,7 +2609,9 @@ myOwn.clientSides={
     displayUrl:{
         cellDef:{tagName:'a'},
         update:function(depot, fieldName){
-            depot.rowControls[fieldName].href = depot.rowControls[fieldName].getTypedValue();
+            var value = depot.row[fieldName];
+            depot.rowControls[fieldName].setTypedValue(value);
+            depot.rowControls[fieldName].href = value;
         },
         prepare:function(depot, fieldName){
         }
