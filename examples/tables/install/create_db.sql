@@ -288,3 +288,7 @@ insert into ext.element_images(atomic_number, kind, url) values
 insert into ext.element_images(atomic_number, kind, mass_number, url) values 
   (1,'tube',1,'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Hydrogen_discharge_tube.jpg/220px-Hydrogen_discharge_tube.jpg'),
   (2,'tube',2,'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Deuterium_discharge_tube.jpg/220px-Deuterium_discharge_tube.jpg');
+
+alter table tokens add column tokentype text;
+alter table tokens add column info jsonb;
+alter table tokens add column due timestamp;
