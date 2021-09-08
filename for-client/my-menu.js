@@ -425,10 +425,6 @@ myOwn.light = function light(name, onclick, opts){
 }
 
 myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
-    if(window.currentAutofrefresh){
-        clearInterval(window.currentAutofrefresh);
-        window.currentAutofrefresh=null;
-    }
     var my = this;
     var selectedItem = null;
     var elements=[];
@@ -527,6 +523,11 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
 };
 
 myOwn.displayMainMenu = function(addrParams){
+    if(window.currentAutofrefresh){
+        console.log("borro currentAutoRefresh")
+        clearInterval(window.currentAutofrefresh);
+        window.currentAutofrefresh=null;
+    }
     var my = this;
     var totalLayout=document.getElementById('total-layout');
     totalLayout.innerHTML='';
