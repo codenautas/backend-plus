@@ -425,6 +425,10 @@ myOwn.light = function light(name, onclick, opts){
 }
 
 myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
+    if(window.currentAutofrefresh){
+        clearInterval(window.currentAutofrefresh);
+        window.currentAutofrefresh=null;
+    }
     var my = this;
     var selectedItem = null;
     var elements=[];

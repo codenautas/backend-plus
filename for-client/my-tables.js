@@ -573,7 +573,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
             })
         }
         if(grid.def.refrescable){
-            setInterval(grid.refreshAllRows,5000)
+            window.currentAutofrefresh = setInterval(grid.refreshAllRows,8000);
         }
     });
     grid.waitForReady = function waitForReady(fun){
