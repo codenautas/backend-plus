@@ -1439,6 +1439,8 @@ myOwn.dialogDownload = function dialogDownload(grid){
         ]).create();
         dialogWindow.appendChild(mainDiv);
         var fieldsDef2Export=[];
+        var extraColumns={}
+        var lastColumnExported=-1;
         var separator=';';
         var replacer=function(x){ return x};
         var dotExtension='.txt';
@@ -1506,6 +1508,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
             mainDiv.setAttribute("current-state", "ready");
         }
         var STYLE_HEADER={ font: {bold:true, underline:true}/*, alignment:{horizontal:'center'}*/};
+        var STYLE_EXTRA_HEADER={ font: {bold:true, underline:true, color:{rgb: "800040"}}/*, alignment:{horizontal:'center'}*/};
         var STYLE_PK={font:{bold:true}};
         var STYLE_LOOKUP={font:{color:{ rgb: "5588DD" }}};
         var populateTableXLS = function populateTableXLS(ws, depots, fieldDefs, topRow, leftColumn){
@@ -1513,6 +1516,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
             leftColumn=leftColumn||0;
             fieldDefs.forEach(function(field,iColumn){
                 ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:topRow})]={t:'s',v:field.name, s:STYLE_HEADER};
+                lastColumnExported = Math.max(lastColumnExported, iColumn);
             });
             depots.forEach(function(depot, iRow){
                 var addCell = function addCell(value, fieldDef, iColumn){
@@ -1533,10 +1537,24 @@ myOwn.dialogDownload = function dialogDownload(grid){
                 }
                 fieldDefs.forEach(function(fieldDef, iColumn){
                     var value=depot.row[fieldDef.name];
-                    addCell(value, fieldDef, iColumn);
+                    if(grid.def.exportJsonFieldAsColumns == fieldDef.name){
+                        var fields = typeof value == "string" ? JSON.parse(value) : value;
+                        for(var name in fields){
+                            var pos = extraColumns[name];
+                            if(pos==null){
+                                lastColumnExported++;
+                                extraColumns[name] = lastColumnExported;
+                                ws[XLSX.utils.encode_cell({c:lastColumnExported+leftColumn,r:topRow})]={t:'s',v:name, s:STYLE_EXTRA_HEADER};
+                                pos = lastColumnExported;
+                            }
+                            addCell(fields[name], {typeName:typeof fields[name] == 'number'? 'decimal':'text'}, pos)
+                        }
+                    }else{
+                        addCell(value, fieldDef, iColumn);
+                    }
                 });
             });
-            ws["!ref"]="A1:"+XLSX.utils.encode_cell({c:fieldDefs.length||iColumn+leftColumn + grid.def.otherFields.length,r:grid.depotsToDisplay.length+topRow});
+            ws["!ref"]="A1:"+XLSX.utils.encode_cell({c:lastColumnExported+leftColumn,r:grid.depotsToDisplay.length+topRow});
         }
         var excelExport = function(){
             var wb = new Workbook();
