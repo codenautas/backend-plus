@@ -341,6 +341,7 @@ export class AppBackend{
     messages:{[k:string]:string}
     dbUserNameExpr:string
     dbUserRolExpr:string
+    specialValueWhenInsert:{[k:string]:(context:ProcedureContext, defField:FieldDefinition, parameters:object)=>any}
     clearCaches():void
     start(opts?: StartOptions):Promise<void>
     getTables():TableItemDef[]

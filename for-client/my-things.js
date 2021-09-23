@@ -133,6 +133,13 @@ myOwn.autoSetupFunctions = [
         //         my.quitarLupa();
         //     }
         // });
+        document.addEventListener('click', function(event){
+            var button = event.target;
+            document.mayBeRepetibleButton = null;
+            if(button instanceof HTMLButtonElement || button instanceof HTMLInputElement && button.type=='button'){
+                if(button.parentNode.tagName=='TD' && button.parentNode.getAttribute('my-colname')) document.mayBeRepetibleButton = button;
+            }
+        })
         setTimeout(function(){
             my.testKeepAlive();
         },2000);
@@ -685,13 +692,28 @@ myOwn.captureKeys = function captureKeys() {
             }
         }
         if(evento.which==115 && !evento.shiftKey  && !evento.ctrlKey  && !evento.altKey  && !evento.metaKey){ // F4
-            var info=tableInfo(this.activeElement);
+            /** @type {HTMLElement} */
+            var activeElement = this.activeElement && this.activeElement.tagName!='BODY' && this.activeElement || document.mayBeRepetibleButton; 
+            var info=tableInfo(activeElement);
             if(info.table){
                 var abovePos=info.tr.rowIndex-1;
                 var aboveRow=info.table.rows[abovePos];
                 if(aboveRow){
                     var aboveCell = aboveRow.cells[info.td.cellIndex];
-                    if(aboveCell.getTypedValue){
+                    /** @type {HTMLButtonElement} */
+                    var button = activeElement;
+                    if(button.tagName == 'BUTTON' || button.tagName=='INPUT' && button.type=='button'){
+                        if(info.td.childNodes.length==1){
+                            button.click();
+                            var bellowRow = info.table.rows[info.tr.rowIndex+1];
+                            if(bellowRow){
+                                var nextButton = bellowRow.cells[info.td.cellIndex].childNodes[0]
+                                if(nextButton && nextButton.tagName == 'BUTTON' || nextButton.tagName=='INPUT' && buttnexButtonon.type=='BUTTON'){
+                                    nextButton.focus()
+                                }
+                            }
+                        }
+                    }else if(aboveCell.getTypedValue){
                         var value=aboveCell.getTypedValue();
                         if(info.td.setTypedValue){
                             info.td.setTypedValue(value, true);
@@ -726,6 +748,7 @@ myOwn.captureKeys = function captureKeys() {
                 }
             }
         }
+        document.mayBeRepetibleButton = null;
         previousKey=evento.which;
     });
     document.addEventListener('keypress', function(evento){

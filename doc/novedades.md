@@ -1,5 +1,16 @@
 # novedades de _backend-plus_
 
+## Tecla <kbd>F4</kbd>
+
+La tecla <kbd>F4</kbd> cuando el curor está detenido en una celda de una grilla 
+hace una copia del valor de la celda superior y avanza el cursor a la línea siguiente.
+La acción se realiza sobre el cursor.
+
+**v1.11.5** <kbd>F4</kbd> también se puede usar en botones dentro de la grilla. 
+Si un botón está en foco <kbd>F4</kbd> hace click en el botón y manda el foco al botón siguiente.
+Si no hay botón en foco pero se presionó un botón en forma reciente 
+<kbd>F4</kbd> manda el foco al botón siguiente.
+
 ## Nuevo framework _backend-chi_
 
 _Backend-plus_ se va a poder usar utilizando todo el poder de _Typescript_ gracias a 
@@ -14,7 +25,7 @@ Por ahoracon  _backend-chi_ se pueden crear tablas de modo que:
 Ahora _backend-plus_ usa [`GENERATED { ALWAYS | BY DEFAULT } AS IDENTITY ( sequence_options )`](https://www.postgresql.org/docs/current/sql-createtable.html) 
 para generar secuencias cuando no se especifica el nombre de la misma en la opción del campo `{sequence:{name:}}`.
 
-**v.10.7** Se pueden usar `.tab` en formato `YAML` para campos `generated as identity`
+**v1.10.7** Se pueden usar `.tab` en formato `YAML` para campos `generated as identity`
 
 **v1.10.3** Cuando se levanta información de un .tab para poblar una tabla con una secuencia `GENERATED AS IDENTITY`
 en vez de generarse instrucciones `INSERT TO` (que no están permitidas en este caso), 
@@ -112,9 +123,11 @@ son enviados automáticamente si tienen alguna de las extensiones permitidas:
 
 ```js 
 var fontExts = [ 'jfproj', 'ttf', 'pfa', 'woff', 'woff2', 'fnt', 'fot', 'otf', 'odttf', 'fon']
-var imgExts =  ['jpg', 'png', 'jpeg', 'ico', 'gif']
+var imgExts =  ['jpg', 'png', 'jpeg', 'ico', 'gif','svg']
 var otherExts = ['', 'js', 'map', 'html', 'css', 'appcache', 'manifest', 'json', 'webmanifest', 'zip']
 ```
+
+**v1.10.15** Se agregó `.svg`.
 
 **v1.8.4** Se agregó `.zip`.
 
@@ -344,6 +357,9 @@ La ejecución de procedimientos puede registrarse en la tabla bitacora definiend
 Las grillas de _backend-plus_ permiten la importación de datos desde archivos Excel o txt 
 (para los usuarios con permiso de `insert` y `update`).
 
+**v1.11.0** Se arregla un problema que en ciertas ocasiones al fallar la importación por la mitad 
+el rollback no evitba la inserción del primer registro.
+
 **v1.5.13** Se mejora el informe de progreso al importar.
 
 **v1.5.11** Se permite al usuario elegir saltear los campos que no forman parte de la tabla, 
@@ -556,6 +572,9 @@ Por ahora el idioma del _frontend_ se define al iniciar el sistema.
 El _frontend_ de las aplicaciones _backend-plus_ se puede programar:
    * agregando pantallas direccionables por el menú en `wScreens` y
    * agregando comportamiento especial en las celdas de las grillas en `clientSides`
+
+**v1.10.14** se agrega el clientSide.displayUrl cuando se quiere poder clickear la URL directo de la tabla;
+se agrega tabmién cellDef:{tagName:string} a la definición de los clientSides
 
 **v0.30.13** se agrega la función `gotoAddrParms` que redirecciona a una posición como si se hubiera 
 clickeado en una opción de menú o un _forkeable button_. 
