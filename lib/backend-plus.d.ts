@@ -286,6 +286,7 @@ export type TableDefinition = EditableDbDefinition & {
     firstDisplayCount?:number
     firstDisplayOverLimit?:number
     description?:MarkdownDoc
+    exportJsonFieldAsColumns?:string
 }
 export interface DetailTable { table?: string, fields: FieldsForConnect, abr: string, label?: string, refreshParent?:boolean, refreshFromParent?:boolean, wScreen?:string, condition?:string }
 export type TableDefinitionFunction = (context: ContextForDump, opts?:any) => TableDefinition;
