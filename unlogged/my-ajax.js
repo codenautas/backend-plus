@@ -466,6 +466,7 @@ function agregar_json_default_ubicaciones(div, o, a){
     if(!div2.laTabla){
         if(a==='' && div.tagName=='TD' && o[a] != null){
             var cellInTheMiddle = document.createElement('td');
+            cellInTheMiddle.style.width='30px';
             div.parentElement.insertBefore(cellInTheMiddle,div);
             return {title:null, data:cellInTheMiddle, skip:false}
         }
