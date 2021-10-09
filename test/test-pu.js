@@ -35,98 +35,106 @@ describe("interactive ",function(){
         await page.setViewport({width:1360, height:768});
         await page.goto('http://localhost:3333');
         await page.click('#goto-login')
-        await page.type('#username', 'bob');
-        await page.type('#password', 'bobpass');
-        await page.click('[type=submit]');
-        await page.waitForSelector('#light-network-signal');
+        console.log('a la pantalla de login')
         // console.log('sistema logueado');
     });
-    it("inserts one record", async function(){
-        this.timeout(38000);
-        await page.click('[menu-name=tables]');
-        await page.click('[menu-name=simple]');
-        await page.waitForSelector('[my-table=simple] tbody tr [alt=INS]');
-        await page.click('[my-table=simple] tbody tr [alt=INS]');
-        await page.waitFor(500);
-        var pkNewRecord = await page.$('[my-table=simple] tbody tr td');
-        var pkValue='333';
-        await pkNewRecord.type(pkValue,{delay:10});
-        await page.keyboard.press('Enter');
-        var data = ('x'+Math.random()).substr(0,8);
-        await page.waitForSelector('[my-colname=simple_code][io-status="temporal-ok"]');
-        await page.keyboard.type(data);
-        await page.keyboard.press('Enter');
-        await page.waitForSelector('[my-colname=simple_name][io-status="temporal-ok"]');
-        var result = await client.query("select simple_name from simple where simple_code = $1",[pkValue]).fetchUniqueValue();
-        discrepances.showAndThrow(result.value,data);
-        return 1;
-    });
-    it("open details", async function(){
-        this.timeout(38000);
-        await page.click('[menu-name=tables]');
-        await page.click('[menu-name=simple]');
-        await page.waitForSelector('[pk-values=\'["2"]\'] .grid-th-details');
-        await page.click('[pk-values=\'["2"]\'] .grid-th-details');
-        await page.waitForSelector('[pk-values=\'["2","A"]\'] td');
-        var result = await page.$eval('[pk-values=\'["2","A"]\'] [my-colname="wf_code"]', td => td.textContent);
-        discrepances.showAndThrow(result,'A');
-    });
-    it("open details in other tab", async function(){
-        this.timeout(38000);
-        await page.click('[menu-name=tables]');
-        await page.click('[menu-name=simple]');
-        await page.waitForSelector('[pk-values=\'["2"]\'] .grid-th-details');
-        await page.keyboard.down('ControlLeft');
-        await page.click('[pk-values=\'["2"]\'] .grid-th-details');
-        var pages = await browser.pages();
-        console.log('zzzzzz',pages.length)
-        await page.waitFor(1000);
-        await page.keyboard.up('ControlLeft');
-        var mustNotExists = await page.$('[pk-values=\'["2","A"]\'] td');
-        discrepances.showAndThrow(mustNotExists,null);
-        var pages = await browser.pages();
-        var page2 = pages[pages.length-1];
-        console.log('xxxxxx',pages.length)
-        await page2.bringToFront();
-        console.log('xxxxxxx front')
-        await page2.$('[pk-values=\'["2","A"]\'] td');
-        console.log('xxxxxxx res',result)
-        var result = await page2.$eval('td[my-colname="wf_code"]', td => td.textContent);
-        discrepances.showAndThrow(result,'A');
-    });
-    it.skip("FUTURO LEJANO. inserts one record with fk data", async function(){
-        // la idea de esta funcionalidad es poder ingresar un texto en el nombre en vez del código
-        this.timeout(38000);
-        console.log('tengo el menu')
-        await page.click('[menu-name=tables]');
-        await page.click('[menu-name=with_fk]');
-        console.log('vamos por acá 1');
-        await page.waitForSelector('[my-table=with_fk] [alt=INS]');
-        console.log('vamos por acá 2');
-        await page.click('[my-table=with_fk] [alt=INS]');
-        console.log('vamos por acá 3');
-        await page.waitFor(500);
-        console.log('vamos por acá 4');
-        console.log('vamos por acá 5');
-        var pkNewRecord = await page.$('[my-table=with_fk] tbody tr td');
-        var pkValue='A1';
-        await pkNewRecord.press('Enter');  // keep empty simple_code
-        await page.keyboard.type('Three');          // simple_name (lookup field)
-        await page.keyboard.press('Enter');
-        await page.waitForSelector('[my-colname=simple_name][io-status="temporal-ok"]');
-        var result = await client.query("select simple_code, simple_name from simple where simple_name = $1",['Three']).fetchUniqueRow();
-        discrepances.showAndThrow(result.row,{simple_code:'3', simple_name:'Three'});
-        var result = await page.$eval('[my-colname=simple_code]', td => td.textContent);
-        discrepances.showAndThrow(result,'3');
-        return ;
-        await page.keyboard.type(pkValue);
-        await page.keyboard.press('Enter'); 
-        // await page.screenshot({path: 'local-capture2.png'});
-        await page.keyboard.press('Enter');
-        var result = await client.query("select * from with_fk where wf_code = $1",['A1']).fetchUniqueRow();
-        discrepances.showAndThrow(result.row,{simple_code:'3', wf_code:'A1'});
-        return 1;
-    });
+    describe("interact with data", async function(){
+        before(async function(){
+            this.timeout(50000);
+            console.log('voy a loguearme')
+            await page.type('#username', 'bob');
+            await page.type('#password', 'bobpass');
+            await page.click('[type=submit]');
+            await page.waitForSelector('#light-network-signal');
+            // console.log('sistema logueado');
+        });
+        it("inserts one record", async function(){
+            this.timeout(38000);
+            await page.click('[menu-name=tables]');
+            await page.click('[menu-name=simple]');
+            await page.waitForSelector('[my-table=simple] tbody tr [alt=INS]');
+            await page.click('[my-table=simple] tbody tr [alt=INS]');
+            await page.waitFor(500);
+            var pkNewRecord = await page.$('[my-table=simple] tbody tr td');
+            var pkValue='333';
+            await pkNewRecord.type(pkValue,{delay:10});
+            await page.keyboard.press('Enter');
+            var data = ('x'+Math.random()).substr(0,8);
+            await page.waitForSelector('[my-colname=simple_code][io-status="temporal-ok"]');
+            await page.keyboard.type(data);
+            await page.keyboard.press('Enter');
+            await page.waitForSelector('[my-colname=simple_name][io-status="temporal-ok"]');
+            var result = await client.query("select simple_name from simple where simple_code = $1",[pkValue]).fetchUniqueValue();
+            discrepances.showAndThrow(result.value,data);
+            return 1;
+        });
+        it("open details", async function(){
+            this.timeout(38000);
+            await page.click('[menu-name=tables]');
+            await page.click('[menu-name=simple]');
+            await page.waitForSelector('[pk-values=\'["2"]\'] .grid-th-details');
+            await page.click('[pk-values=\'["2"]\'] .grid-th-details');
+            await page.waitForSelector('[pk-values=\'["2","A"]\'] td');
+            var result = await page.$eval('[pk-values=\'["2","A"]\'] [my-colname="wf_code"]', td => td.textContent);
+            discrepances.showAndThrow(result,'A');
+        });
+        it("open details in other tab", async function(){
+            this.timeout(38000);
+            await page.click('[menu-name=tables]');
+            await page.click('[menu-name=simple]');
+            await page.waitForSelector('[pk-values=\'["2"]\'] .grid-th-details');
+            await page.keyboard.down('ControlLeft');
+            await page.click('[pk-values=\'["2"]\'] .grid-th-details');
+            var pages = await browser.pages();
+            console.log('zzzzzz',pages.length)
+            await page.waitFor(1000);
+            await page.keyboard.up('ControlLeft');
+            var mustNotExists = await page.$('[pk-values=\'["2","A"]\'] td');
+            discrepances.showAndThrow(mustNotExists,null);
+            var pages = await browser.pages();
+            var page2 = pages[pages.length-1];
+            console.log('xxxxxx',pages.length)
+            await page2.bringToFront();
+            console.log('xxxxxxx front')
+            await page2.$('[pk-values=\'["2","A"]\'] td');
+            console.log('xxxxxxx res',result)
+            var result = await page2.$eval('td[my-colname="wf_code"]', td => td.textContent);
+            discrepances.showAndThrow(result,'A');
+        });
+        it.skip("FUTURO LEJANO. inserts one record with fk data", async function(){
+            // la idea de esta funcionalidad es poder ingresar un texto en el nombre en vez del código
+            this.timeout(38000);
+            console.log('tengo el menu')
+            await page.click('[menu-name=tables]');
+            await page.click('[menu-name=with_fk]');
+            console.log('vamos por acá 1');
+            await page.waitForSelector('[my-table=with_fk] [alt=INS]');
+            console.log('vamos por acá 2');
+            await page.click('[my-table=with_fk] [alt=INS]');
+            console.log('vamos por acá 3');
+            await page.waitFor(500);
+            console.log('vamos por acá 4');
+            console.log('vamos por acá 5');
+            var pkNewRecord = await page.$('[my-table=with_fk] tbody tr td');
+            var pkValue='A1';
+            await pkNewRecord.press('Enter');  // keep empty simple_code
+            await page.keyboard.type('Three');          // simple_name (lookup field)
+            await page.keyboard.press('Enter');
+            await page.waitForSelector('[my-colname=simple_name][io-status="temporal-ok"]');
+            var result = await client.query("select simple_code, simple_name from simple where simple_name = $1",['Three']).fetchUniqueRow();
+            discrepances.showAndThrow(result.row,{simple_code:'3', simple_name:'Three'});
+            var result = await page.$eval('[my-colname=simple_code]', td => td.textContent);
+            discrepances.showAndThrow(result,'3');
+            return ;
+            await page.keyboard.type(pkValue);
+            await page.keyboard.press('Enter'); 
+            // await page.screenshot({path: 'local-capture2.png'});
+            await page.keyboard.press('Enter');
+            var result = await client.query("select * from with_fk where wf_code = $1",['A1']).fetchUniqueRow();
+            discrepances.showAndThrow(result.row,{simple_code:'3', wf_code:'A1'});
+            return 1;
+        });
+    })
     after(async function(){
         this.timeout(30000);
         await client.done();
