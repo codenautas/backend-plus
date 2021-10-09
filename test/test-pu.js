@@ -27,7 +27,9 @@ describe("interactive ",function(){
         await client.executeSqlScript('test/fixtures/dump-4test.sql');
         // console.log('base abierta y limpia');
         await server.start();
-        browser = await puppeteer.launch(process.env.TRAVIS?{}:{headless: process.env.TRAVIS || !config.test["view-chrome"], slowMo: 50});
+        var headless = process.env.TRAVIS || !config.test["view-chrome"];
+        var slowMo = headless ? 12 : 50;
+        browser = await puppeteer.launch(process.env.TRAVIS?{}:{headless, slowMo});
         page = await browser.newPage();
         page.on('console', msg => { 
             console.log('console.'+msg.type(), msg.text()) 
@@ -36,7 +38,6 @@ describe("interactive ",function(){
         await page.goto('http://localhost:3333');
         await page.click('#goto-login')
         console.log('a la pantalla de login')
-        // console.log('sistema logueado');
     });
     describe("interact with data", async function(){
         before(async function(){
@@ -46,7 +47,6 @@ describe("interactive ",function(){
             await page.type('#password', 'bobpass');
             await page.click('[type=submit]');
             await page.waitForSelector('#light-network-signal');
-            // console.log('sistema logueado');
         });
         it("inserts one record", async function(){
             this.timeout(38000);
@@ -54,7 +54,8 @@ describe("interactive ",function(){
             await page.click('[menu-name=simple]');
             await page.waitForSelector('[my-table=simple] tbody tr [alt=INS]');
             await page.click('[my-table=simple] tbody tr [alt=INS]');
-            await page.waitFor(500);
+            await page.waitForTimeout(500);
+            await page.waitForSelector('[my-table=simple] tbody tr td')
             var pkNewRecord = await page.$('[my-table=simple] tbody tr td');
             var pkValue='333';
             await pkNewRecord.type(pkValue,{delay:10});
@@ -83,12 +84,15 @@ describe("interactive ",function(){
             await page.click('[menu-name=tables]');
             await page.click('[menu-name=simple]');
             await page.waitForSelector('[pk-values=\'["2"]\'] .grid-th-details');
+            const pageTarget = page.target();
             await page.keyboard.down('ControlLeft');
             await page.click('[pk-values=\'["2"]\'] .grid-th-details');
             var pages = await browser.pages();
-            console.log('zzzzzz',pages.length)
-            await page.waitFor(1000);
+            await page.waitForTimeout(100);
             await page.keyboard.up('ControlLeft');
+            const newTarget = await browser.waitForTarget(target => {
+                return target.url().includes('with_fk');
+            });
             var mustNotExists = await page.$('[pk-values=\'["2","A"]\'] td');
             discrepances.showAndThrow(mustNotExists,null);
             var pages = await browser.pages();
@@ -98,6 +102,7 @@ describe("interactive ",function(){
             console.log('xxxxxxx front')
             await page2.$('[pk-values=\'["2","A"]\'] td');
             console.log('xxxxxxx res',result)
+            await page2.waitForSelector('td[my-colname="wf_code"]');
             var result = await page2.$eval('td[my-colname="wf_code"]', td => td.textContent);
             discrepances.showAndThrow(result,'A');
         });
@@ -107,14 +112,10 @@ describe("interactive ",function(){
             console.log('tengo el menu')
             await page.click('[menu-name=tables]');
             await page.click('[menu-name=with_fk]');
-            console.log('vamos por acá 1');
             await page.waitForSelector('[my-table=with_fk] [alt=INS]');
-            console.log('vamos por acá 2');
             await page.click('[my-table=with_fk] [alt=INS]');
-            console.log('vamos por acá 3');
-            await page.waitFor(500);
-            console.log('vamos por acá 4');
-            console.log('vamos por acá 5');
+            await page.waitForTimeout(100);
+            await page.waitForSelector('[my-table=with_fk] tbody tr td');
             var pkNewRecord = await page.$('[my-table=with_fk] tbody tr td');
             var pkValue='A1';
             await pkNewRecord.press('Enter');  // keep empty simple_code
@@ -138,7 +139,7 @@ describe("interactive ",function(){
     after(async function(){
         this.timeout(30000);
         await client.done();
-        await page.waitFor(process.env.TRAVIS?10:1000);
+        await page.waitForTimeout(process.env.TRAVIS?10:1000);
         await browser.close()
         await server.shootDownBackend();
     });
