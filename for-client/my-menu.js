@@ -553,7 +553,7 @@ myOwn.rigthMenuDoneFunLocation = function rigthMenuDoneFunLocation(newLocation){
 myOwn.rightMenuOpts = function rightMenuOpts(){
     return [
         // {label:my.messages.user, startGroud:'true'},
-        {img:my.path.img+'chpass.png', label:my.messages.chpass, doneFun:my.rigthMenuDoneFunLocation('chpass')},
+        {id:'right-menu-chpass', img:my.path.img+'chpass.png', label:my.messages.chpass, doneFun:my.rigthMenuDoneFunLocation('chpass')},
     ]
 };
 
