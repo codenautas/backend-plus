@@ -39,6 +39,25 @@ describe("interactive ",function(){
         await page.click('#goto-login')
         console.log('a la pantalla de login')
     });
+    describe("login page ", async function(){
+        async function testBadLogin(username, password){
+            await page.type('#username', username);
+            await page.type('#password', password);
+            await page.click('[type=submit]');
+            await page.waitForTimeout(50);
+            await browser.waitForTarget(target => {
+                return target.url().includes('login');
+            });
+            var result = await page.$eval('.error-message', td => td.textContent);
+            discrepances.showAndThrow(result,'usuario o clave incorrecta');
+        }
+        it("reject bad username", async function(){
+            await testBadLogin('baduser', 'wrongpass')
+        })
+        it("reject bad password", async function(){
+            await testBadLogin('bob', 'wrongpass')
+        })
+    })
     describe("interact with data", async function(){
         before(async function(){
             this.timeout(50000);
@@ -84,24 +103,20 @@ describe("interactive ",function(){
             await page.click('[menu-name=tables]');
             await page.click('[menu-name=simple]');
             await page.waitForSelector('[pk-values=\'["2"]\'] .grid-th-details');
-            const pageTarget = page.target();
             await page.keyboard.down('ControlLeft');
             await page.click('[pk-values=\'["2"]\'] .grid-th-details');
             var pages = await browser.pages();
             await page.waitForTimeout(100);
             await page.keyboard.up('ControlLeft');
-            const newTarget = await browser.waitForTarget(target => {
+            await browser.waitForTarget(target => {
                 return target.url().includes('with_fk');
             });
             var mustNotExists = await page.$('[pk-values=\'["2","A"]\'] td');
             discrepances.showAndThrow(mustNotExists,null);
             var pages = await browser.pages();
             var page2 = pages[pages.length-1];
-            console.log('xxxxxx',pages.length)
             await page2.bringToFront();
-            console.log('xxxxxxx front')
             await page2.$('[pk-values=\'["2","A"]\'] td');
-            console.log('xxxxxxx res',result)
             await page2.waitForSelector('td[my-colname="wf_code"]');
             var result = await page2.$eval('td[my-colname="wf_code"]', td => td.textContent);
             discrepances.showAndThrow(result,'A');

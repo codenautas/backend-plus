@@ -46,7 +46,7 @@ html(lang=lang)
             input.submit(id="login", type="submit", value=msgs.login.button)
         each errorLine in (flash.error||[])
           tr(style={color:'red'})
-            td(colspan=5)=errorLine
+            td.error-message(colspan=5)=errorLine
         if forget
           tr
             td.iconostd
