@@ -34,6 +34,7 @@ describe("interactive ",function(){
         });
         await page.setViewport({width:1360, height:768});
         await page.goto('http://localhost:3333');
+        await page.click('#goto-login')
         await page.type('#username', 'bob');
         await page.type('#password', 'bobpass');
         await page.click('[type=submit]');
@@ -77,13 +78,15 @@ describe("interactive ",function(){
         await page.waitForSelector('[pk-values=\'["2"]\'] .grid-th-details');
         await page.keyboard.down('ControlLeft');
         await page.click('[pk-values=\'["2"]\'] .grid-th-details');
+        var pages = await browser.pages();
+        console.log('zzzzzz',pages.length)
+        await page.waitFor(1000);
         await page.keyboard.up('ControlLeft');
-        await page.waitFor(500);
         var mustNotExists = await page.$('[pk-values=\'["2","A"]\'] td');
         discrepances.showAndThrow(mustNotExists,null);
         var pages = await browser.pages();
         var page2 = pages[pages.length-1];
-        console.log('xxxxxx',pages.length,pages,page2)
+        console.log('xxxxxx',pages.length)
         await page2.bringToFront();
         console.log('xxxxxxx front')
         await page2.$('[pk-values=\'["2","A"]\'] td');
