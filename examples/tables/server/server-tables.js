@@ -46,7 +46,7 @@ class AppExample extends backendPlus.AppBackend{
             lockedClausule: current_timestamp>=locked_since
             plus:
               allowHttpLogin: true
-              chPassUrlPath: false
+              x-chPassUrlPath: false
               loginForm:
                 formTitle: example tables
                 formImg: unlogged/tables-lock.png
