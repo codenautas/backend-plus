@@ -100,7 +100,7 @@ describe("interactive ",function(){
                     await page.goto('http://localhost:3333/chpass');
                 }
             }
-            it("reject short pass", async function(){
+            it("rejects short pass", async function(){
                 await gotoChPass()
                 await page.type('#oldPassword', 'bobpass');
                 await page.type('#newPassword', 'x');
@@ -113,6 +113,32 @@ describe("interactive ",function(){
                 var result = await page.$eval('.error-message', td => td.textContent);
                 discrepances.showAndThrow(result?.substr(0,27),'la clave es demasiado corta');
             })
+            it("rejects old pass doesn't match", async function(){
+                await gotoChPass()
+                await page.type('#oldPassword', 'other pass');
+                await page.type('#newPassword', 'Correct12!');
+                await page.type('#repPassword', 'Correct12!');
+                await page.click('[type=submit]');
+                await page.waitForTimeout(50);
+                await browser.waitForTarget(target => {
+                    return target.url().includes('chpass');
+                });
+                var result = await page.$eval('.error-message', td => td.textContent);
+                discrepances.showAndThrow(result?.substr(0,27),'la clave anterior no coinci');
+            })
+            it("rejects new pass doesn't match", async function(){
+                await gotoChPass()
+                await page.type('#oldPassword', 'bobpass');
+                await page.type('#newPassword', 'Correct12!');
+                await page.type('#repPassword', 'Correct13!');
+                await page.click('[type=submit]');
+                await page.waitForTimeout(50);
+                await browser.waitForTarget(target => {
+                    return target.url().includes('chpass');
+                });
+                var result = await page.$eval('.error-message', td => td.textContent);
+                discrepances.showAndThrow(result?.substr(0,27),'las claves no coinciden');
+            })
         })
         describe("grids", async function(){
             before(async function(){
@@ -120,7 +146,6 @@ describe("interactive ",function(){
                 await browser.waitForTarget(target => {
                     return target.url().includes('menu');
                 });
-
             })
             it("inserts one record", async function(){
                 this.timeout(38000);
