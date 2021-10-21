@@ -53,6 +53,9 @@ el ownership y los permisos de la secuencia no se definen por separado.
 
 ## Fechas con idioma Español
 
+**v1.11.15** Se mitiga el bug de Firefox que no permite crear fechas exactas los
+días que hubo cambios horarios (vía `best-globals` v1.0.0).
+
 **v1.8.6** Independientemente del idioma en que se haya instalado la base de datos 
 cuando se configurea la aplicación en español reconocerá las fechas como `dd/mm/yyyy` 
 cuando no lleguen como `yyyy-mm-dd`.
@@ -124,8 +127,10 @@ son enviados automáticamente si tienen alguna de las extensiones permitidas:
 ```js 
 var fontExts = [ 'jfproj', 'ttf', 'pfa', 'woff', 'woff2', 'fnt', 'fot', 'otf', 'odttf', 'fon']
 var imgExts =  ['jpg', 'png', 'jpeg', 'ico', 'gif','svg']
-var otherExts = ['', 'js', 'map', 'html', 'css', 'appcache', 'manifest', 'json', 'webmanifest', 'zip']
+var otherExts = ['', 'js', 'map', 'html', 'css', 'appcache', 'manifest', 'json', 'webmanifest', 'zip', 'pdf']
 ```
+
+**v1.11.15** Se agregó `.pdf` para los sistemas de indicadores y la documentación en general.
 
 **v1.10.15** Se agregó `.svg`.
 
