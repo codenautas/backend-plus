@@ -26,16 +26,16 @@ opción `typeRoots`:
 }
 ```
 
-**v1.11.16** se agrega el paquete `"errores"` para tener catch fuertemente tipados:
+**v1.11.16** se agrega el paquete `"cast-error"` para tener catch fuertemente tipados:
 
 ```ts
-import { expected, unexpected } from "errores"
-...
+import { expected, unexpected } from "cast-error"
+// ...
 
 try{
   // ...
 }catch(err){
-  var error = unexpected(err); // Errores es de tipo Error & {code:string}
+  var error = unexpected(err); // error es de tipo Error & {code:string}
   console.log(error.code);
   throw error;
 }
@@ -48,10 +48,12 @@ para indicar el tipo esperado; si el tipo no es el esperado se agrega
 ```
 
 ```js
+import * as castError from "cast-error"
+
 try{
   // ...
 }catch(err){
-  var error = expected(err, TypeError); // si error no es de tipo TypeError avisa en console.log
+  var error = castError.expected(err, TypeError); // si error no es de tipo TypeError avisa en console.log
   console.log(error.message);
   throw error;
 }
