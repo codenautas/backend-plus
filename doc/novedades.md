@@ -1,5 +1,62 @@
 # novedades de _backend-plus_
 
+## _Typescript_ en backend-plus
+
+Backend-plus se puede usar con _Typescript_ gracias a la declaración de tipos de 
+`./lib/backend-plus.d.ts` que se importa automáticamente e impacta en los fuentes del backend. 
+Para tener tipos en el cliente se puede incluir el paquete `types.d.ts` en las
+`devDependencies` del `package.json` y agregar la definición de módulos en `tsconfig.json`
+opción `typeRoots`:
+
+```json
+{
+    "compilerOptions": {
+        "outDir": "../../dist/unlogged",
+        "inlineSourceMap": true,
+        "inlineSources": true,
+        "typeRoots" : ["node_modules/@types", "../../node_modules/types.d.ts/modules"],
+        "lib": ["es5", "dom", "ES2015"],
+        "target": "es2018",
+        "jsx": "react"
+    },
+    "include":[
+        "."
+    ],
+    "extends": "../../tsconfig-common.json"
+}
+```
+
+**v1.11.16** se agrega el paquete `"errores"` para tener catch fuertemente tipados:
+
+```ts
+import { expected, unexpected } from "errores"
+...
+
+try{
+  // ...
+}catch(err){
+  var error = unexpected(err); // Errores es de tipo Error & {code:string}
+  console.log(error.code);
+  throw error;
+}
+
+La diferncia entre `expected` o `unexpected` es que el segundo escribe en `console.log`.
+Ambas puede recibir un segundo parámetro con una clase derivada de `Error` 
+para indicar el tipo esperado; si el tipo no es el esperado se agrega 
+(en ambos casos) un renglón en `console.log` avisando. 
+
+```
+
+```js
+try{
+  // ...
+}catch(err){
+  var error = expected(err, TypeError); // si error no es de tipo TypeError avisa en console.log
+  console.log(error.message);
+  throw error;
+}
+```
+
 ## Tecla <kbd>F4</kbd>
 
 La tecla <kbd>F4</kbd> cuando el curor está detenido en una celda de una grilla 
