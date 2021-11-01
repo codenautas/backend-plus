@@ -1751,6 +1751,17 @@ myOwn.TableAggregates.max.prototype.result=function result(){
     return this.value;
 }
 
+myOwn.TableAggregates.countTrue=function(){
+    this.n=0;
+};
+myOwn.TableAggregates.countTrue.prototype.acum=function acum(value){
+    if(value===true){
+        this.n++;
+    }
+}
+myOwn.TableAggregates.countTrue.prototype.result=function result(){
+    return this.n;
+
 myOwn.TableGrid.prototype.refreshAggregates = function refreshAggregates(){
     var grid = this;
     var my = grid.my;

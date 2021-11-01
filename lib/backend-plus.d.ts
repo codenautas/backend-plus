@@ -183,7 +183,7 @@ export type FieldDefinition = EditableDbDefinition & {
     width?:number              /* Width in pixels for the grid */
     references?:string         /* table name */ 
     referencesField?:string  
-    aggregate?:string          /* keyof myOwn.TableAggregates */
+    aggregate?:'avg'|'sum'|'count'|'min'|'max'|'countTrue'          /* keyof myOwn.TableAggregates */
     specialDefaultValue?:string /* keyof myOwn.specialDefaultValues
     defaultForOtherFields?:boolean   /* the field that stores the "other fields" of a flexible imported table */
     specialValueWhenInsert?:string 
