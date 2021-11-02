@@ -321,7 +321,7 @@ export type OptsClientPage = {
     icon?:string
 }
 
-export type DumpOptions={complete?:boolean, skipEnance?:boolean}
+export type DumpOptions={complete?:boolean, skipEnance?:boolean, disableDBFunctions?:boolean}
 
 export class AppBackend{
     procedures:ProcedureDef[]
