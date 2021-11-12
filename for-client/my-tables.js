@@ -567,7 +567,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                     //chequeo que exista depot por las dudas
                     if(depot && !sameValue(JSON.stringify(row),JSON.stringify(depot.row))){
                         //grid.retrieveRowAndRefresh(depot); 
-                        grid.depotRefresh(depot,{updatedRow:row, sendedForUpdate:{}});
+                        grid.depotRefresh(depot,{updatedRow:row, sendedForUpdate:{}},{noDispatchEvents:true});
                     }
                 })
             })
