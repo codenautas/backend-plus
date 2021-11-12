@@ -137,7 +137,7 @@ myOwn.autoSetupFunctions = [
             var button = event.target;
             document.mayBeRepetibleButton = null;
             if(button instanceof HTMLButtonElement || button instanceof HTMLInputElement && button.type=='button'){
-                if(button.parentNode.tagName=='TD' && button.parentNode.getAttribute('my-colname')) document.mayBeRepetibleButton = button;
+                if(button.parentNode && button.parentNode.tagName=='TD' && button.parentNode.getAttribute('my-colname')) document.mayBeRepetibleButton = button;
             }
         })
         setTimeout(function(){
