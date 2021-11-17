@@ -194,6 +194,7 @@ export type FieldDefinition = EditableDbDefinition & {
     inView?:boolean
     sortMethod?:string
     generatedAs?:string
+    inJoin?:string /* alias from sql.join; implies inTable:false */
 } & ({} | {
     sequence:SequenceDefinition
     nullable:true
@@ -268,6 +269,7 @@ export type TableDefinition = EditableDbDefinition & {
             update?:{using?:string, check?:string}
             delete?:{using?:string}
         }
+        join?:string
     }
     foreignKeys?:ForeignKey[]
     softForeignKeys?:ForeignKey[]
