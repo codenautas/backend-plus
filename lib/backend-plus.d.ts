@@ -213,6 +213,8 @@ export type EditableDbDefinition = {
     }
 }
 export type FieldsForConnect = (string | {source:string, target:string})[]
+export type FieldsForConnectDetailTable = (string | {source:string, target:string} | {value:any, target:string})[]
+
 export type FkActions = 'no action'|'restrict'|'cascade'|'set null'|'set default';
 export type ForeignKey = {
     references:string, 
@@ -288,7 +290,7 @@ export type TableDefinition = EditableDbDefinition & {
     description?:MarkdownDoc
     exportJsonFieldAsColumns?:string
 }
-export interface DetailTable { table?: string, fields: FieldsForConnect, abr: string, label?: string, refreshParent?:boolean, refreshFromParent?:boolean, wScreen?:string, condition?:string }
+export interface DetailTable { table?: string, fields: FieldsForConnectDetailTable, abr: string, label?: string, refreshParent?:boolean, refreshFromParent?:boolean, wScreen?:string, condition?:string }
 export type TableDefinitionFunction = (context: ContextForDump, opts?:any) => TableDefinition;
 export type TableItemDef=string|{name:string, path?:string, tableGenerator?:(context:TableContext)=>TableDefinition}
 // {{name: string; path?:string; fileName?: string; source?: string; tableGenerator?:()=>void; title?:string; mixin?:any[]}} TableItem

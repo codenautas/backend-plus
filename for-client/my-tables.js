@@ -1057,7 +1057,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
     var menuRef={w:'table', table:detailTableDef.table};
     var calculateFixedFields = function(){
         return detailTableDef.fields.map(function(pair){
-            var fieldCondition={fieldName: pair.target, value:depot.row[pair.source]}
+            var fieldCondition={fieldName: pair.target, value:'value' in pair ? pair.value : depot.row[pair.source]}
             if(pair.range){
                 fieldCondition.range=pair.range;
             }

@@ -123,3 +123,34 @@ Esto se puede hacer cuando el cambio se realiza en la misma pantalla (no cuando 
 o el mismo usuario en otra sesión haga el cambio).
 
 En la definición del detail hay que poner `refreshFromParent:true` 
+
+## ¿Cómo hago para tener una sección o página pública que no necesite login? (y que sea la predeterminada)
+
+Si se quiere que cuando se ponga la `base-url` en el navegador y no haya usuario logueado 
+el sistema redireccione hacia ella:
+
+En en el `defConfig` o en el archivo `local-config.yaml`:
+```yaml
+login:
+  unloggedLandPage: false
+  plus:
+    noLoggedUrlPath: /pub
+```
+
+De este modo se redireccionará a la dirección **_base-url_/pub**. 
+
+Para que se vea debe haber un archivo `pub.jade` o un servicio `/pub`. 
+
+Si se quieren tener servicios que puedan leer la base de datos y devolver datos sin estar logueado el usuario.
+Se pueden utilizar las funciones `addUnloggedServices` o `addSchrödingerServices` 
+o bien definir un procedimiento como `unlogged: true`. Las diferencias son:
+   1. **procedimiento `unlogged: true`**, en forma predeterminada contestan al verbo `'POST'` y están
+   diseñados para usarse mediante una llamada AJAX. Si bien pueden enviar y modificar `cookies`
+   no pueden cambiar el resto de los headers ni indicar que se está devolviendo un `text/HTML`.
+   2. **addUnloggedServices**, tiene acceso al objeto `application` de `Express` y por lo tanto puede
+   llamar a `use` o `get` o lo que se necesite. Pueden por lo tanto modificar los headers de la manera que deseen.
+   Esos servicios no pueden acceder a los datos de sesión del usuario aún cuando haya alguien logueado. 
+   3. **addSchrödingerServices**, similar a _addUnloggedServices_ pero tiene acceso a la sesión del usuario
+   si hubiera uno logueado (en `req.user`). 
+   Dentro de la ejeución de un servicio Schrödinger el usuario podría o no estar logueado. 
+
