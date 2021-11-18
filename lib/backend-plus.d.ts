@@ -340,7 +340,7 @@ export class AppBackend{
         procedures:{[k:string]:{timestamp:number, result:any}}
     }
     fieldDomain:{[k:string]:Partial<FieldDefinition>}
-    exts:{img?:string[]}
+    exts:{img:string[], normal:string[]}
     optsGenericForAll:{allowedExts?:string[]}
     sqls:{[k:string]:string}
     messages:{[k:string]:string}

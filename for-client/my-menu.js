@@ -13,6 +13,7 @@ myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     onLine:'on line',
     proceed:'proceed',
     processing:'processing',
+    readyToDownload:'ready to download',
     signIn:'sign in',
     speed1:'speed $1',
     user:'user',
@@ -28,6 +29,7 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     onLine:'en línea',
     proceed:'proceder',
     processing:'procesando',
+    readyToDownload:'listo para descargar',
     signIn:'login',
     speed1:'velocidad $1',
     user:'usuario',
@@ -177,6 +179,13 @@ myOwn.wScreens.proc.result={
     showError:function(err, divResult){
         divResult.textContent = err.message;
         divResult.style.backgroundColor = 'orange';
+    },
+    showDownloadUrl:function(result, divResult){
+        divResult.innerHTML='';
+        divResult.appendChild(html.div([
+            html.div([my.messages.readyToDownload]),
+            html.div([html.a({href:result.url}, result.url)])
+        ]).create())
     }
 }
 

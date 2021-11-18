@@ -493,7 +493,7 @@ function agregar_json(div, o, ubicaciones=agregar_json_default_ubicaciones){
     if(o == null){
         return ;
     }
-    if(typeof o == "object" && !(o instanceof Date) &&  !o.isRealDateTime){
+    if(typeof o == "object" && !(o instanceof Date) && !o.isRealDateTime){
         if(o instanceof Array && o[0] && o[0] instanceof Object && !(o[0] instanceof Array) && !(o[0].isRealDateTime)){
             var table = document.createElement('table');
             div.appendChild(table);
@@ -550,6 +550,8 @@ function agregar_json(div, o, ubicaciones=agregar_json_default_ubicaciones){
         div.className='plain-content';
         if(typeof o == "boolean"){
             div.textContent = o?'Sí':'No'
+        }else if(o && o instanceof Date && o.isRealDate){
+            div.textContent = o.toDmy();
         }else{
             div.textContent = o.toLocaleString();
         }
