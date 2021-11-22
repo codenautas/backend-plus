@@ -90,6 +90,10 @@ myOwn.wScreens.procAux = {
                     )
                 )
             )
+            if(parameterDef.references || parameterDef.options){
+                setTimeout(()=>control.ponerLupa(true), 500)
+                
+            }
             if(value!==undefined){
                 params[parameterDef.name] = value;
                 control.setTypedValue(value);
@@ -184,7 +188,7 @@ myOwn.wScreens.proc.result={
         divResult.innerHTML='';
         divResult.appendChild(html.div([
             html.div([my.messages.readyToDownload]),
-            html.div([html.a({href:result.url}, result.url)])
+            ...result.map(r=>html.div([html.a({href:r.url}, r.label || r.url)]))
         ]).create())
     }
 }
