@@ -154,3 +154,30 @@ o bien definir un procedimiento como `unlogged: true`. Las diferencias son:
    si hubiera uno logueado (en `req.user`). 
    Dentro de la ejeución de un servicio Schrödinger el usuario podría o no estar logueado. 
 
+## ¿Cómo hago para modificar la estructura de una tabla heredada?
+
+Se usa la función **appendToTableDefinition** desde dentro de la función **prepareGetTables** 
+como se ve en este ejemplo:
+
+```ts
+prepareGetTables(){
+    super.prepareGetTables();
+    this.getTableDefinition={
+        ...this.getTableDefinition,
+        tabla_datos_comp
+    }
+    this.appendToTableDefinition('parametros', function(tableDef){
+        tableDef.fields.push(
+            {name:'esquema_tablas_externas', typeName:'text', defaultValue:'ext', editable:false}
+        );
+    });
+    this.appendToTableDefinition('tabla_datos', function(tableDef){
+        tableDef.fields.push(
+            {name:"generar"           , typeName:'bigint' , editable:false, clientSide:'generarTD'}
+        );
+        tableDef.detailTables?.push(
+            {table:'tabla_datos_comp', fields:['operativo', 'tabla_datos'], abr:'⚕', label:'consistencias'}
+        )
+    });
+}
+```

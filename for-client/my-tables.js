@@ -89,8 +89,10 @@ myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     preparingForExport: "preparing for export",
     recordsReimaining: "{$r} records remains in the table",
     refresh: "refresh - retrive data from database",
+    replaceNewLineWithSpace: 'replace new lines with spaces',
     showInheritedKeys: "show inherited keys",
     similarTo:'similar to',
+    simplificateSpaces:'simplificate spaces',
     skippedColumn:'skipped column',
     skippedColumns:'skipped columns',
     skipUnknownFieldsAtImport:'skip unknown fields at import',
@@ -151,8 +153,10 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     preparingForExport: "preparando para exportar",
     recordsReimaining: "quedan {$r} registros en la tabla",
     refresh: "refrescar la grilla desde la base de datos",
+    replaceNewLineWithSpace: 'replazar saltos de línea por espacios',
     showInheritedKeys: "mostrar las columnas relacionadas",
     similarTo:'parecido a',
+    simplificateSpaces:'simplificar espacios',
     skippedColumn:'Columna salteada',
     skippedColumns:'Columnas salteadas',
     skipUnknownFieldsAtImport:'saltear columnas que no existan',
@@ -1659,15 +1663,20 @@ myOwn.dialogUpload = function dialogUpload(ajaxPath, ajaxParams, ajaxPrepareResu
                 }),{uploading:uploadingProgress, informProgress:informProgress}).then(eButton,eButton);
             }).then(ajaxPrepareResultFun).then(this.dialogPromiseDone,this.dialogPromiseDone);
         });
-        var skipUnknownFieldsAtImportButton=html.input({type:'checkbox'}).create();
-        skipUnknownFieldsAtImportButton.onchange=function(){
-            ajaxParams.skipUnknownFieldsAtImport = skipUnknownFieldsAtImportButton.checked;
-        }
+        var optsNames = ['skipUnknownFieldsAtImport','simplificateSpaces','replaceNewLineWithSpace'];
+        var buttons = {}
+        optsNames.map((name, i)=>{
+            var defValue = !!i;
+            ajaxParams[name]=defValue;
+            buttons[name] = html.input({type:'checkbox', checked:defValue}).create()
+            buttons[name].onchange = function(){
+                ajaxParams[name] = buttons[name].checked;
+            }
+        });
         simpleFormPromise({elementsList:[
             messages.importDataFromFile,
             buttonFile, 
-            html.br().create(),
-            html.label([skipUnknownFieldsAtImportButton, messages.skipUnknownFieldsAtImport]).create(),
+            ...(optsNames.map(name => html.label([html.br(), buttons[name], messages[name]]).create())),
             html.br().create(),
             buttonConfirmImport,
             html.br().create(),
