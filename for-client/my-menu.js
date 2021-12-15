@@ -287,12 +287,16 @@ myOwn.showPage = function showPage(pageDef){
         }else if(typeof my.wScreens[w] === 'object'){
             wScreen = my.wScreens[w];
             if(wScreen.parameters){
-                wScreen.mainFunction=wScreen.mainFunction||function(addrParams){
-                    my.wScreens.procAux.showParams({
-                        parameters:wScreen.parameters,
-                        resultClass:wScreen.resultClass,
-                        proceedLabel:wScreen.proceedLabel,
-                    }, main_layout, addrParams, wScreen.mainAction);
+                if(wScreen.autoproced && addrParams[wScreen.parameters[0].name]!=null){
+                    wScreen.mainAction(addrParams,main_layout,null)
+                }else {
+                    wScreen.mainFunction=wScreen.mainFunction||function(addrParams){
+                        my.wScreens.procAux.showParams({
+                            parameters:wScreen.parameters,
+                            resultClass:wScreen.resultClass,
+                            proceedLabel:wScreen.proceedLabel,
+                        }, main_layout, addrParams, wScreen.mainAction);
+                    }
                 }
             }
         }else{
