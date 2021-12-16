@@ -66,10 +66,21 @@ myOwn.wScreens.table = function(addrParams){
 
 myOwn.wScreens.procAux = {
     showParams:function(formDef, main_layout, addrParams, mainAction){
-        addrParams.autoproced = addrParams.autoproced || false
+        var autoproced = addrParams.autoproced || false
         addrParams.up=addrParams.up||{};
         var params=addrParams.up;
-        var button = html.button(formDef.proceedLabel||my.messages.proceed).create();
+        // var button = html.button(formDef.proceedLabel||my.messages.proceed).create();
+        var label = formDef.proceedLabel||my.messages.proceed;
+        var button = my.createForkeableButton({}, label);
+        var setHref = function(){
+            button.setForkeableHref({
+                ...addrParams, 
+                autoproced:true, 
+                directUrl:true,
+                ...(formDef?.proceedLabel ? {label} : {}),
+                ...params
+            })
+        }
         var divResult = html.div({class:formDef.resultClass||'result-pre'}).create();
         var id='progress'+Math.random();
         var toggleProgress = html.input({type:'checkbox', id:id, checked:true, disabled:true}).create();
@@ -78,7 +89,7 @@ myOwn.wScreens.procAux = {
         var divProgress = html.div().create();
         var divProgressOutside = html.div({class:'result-progress', style:'opacity:0'},[toggleProgress,labelProgress,divProgress]).create();
         var controls = [];
-        main_layout.appendChild(html.table({class:"table-param-screen"},formDef.parameters.map(function(parameterDef){
+        var parameterForm = html.table({class:"table-param-screen"},formDef.parameters.map(function(parameterDef){
             var control = html.td({"typed-controls-direct-input":true}).create();
             control.style.minWidth='200px';
             control.style.backgroundColor='white';
@@ -100,7 +111,8 @@ myOwn.wScreens.procAux = {
             }
             control.addEventListener('update', function(){
                 params[parameterDef.name] = control.getTypedValue();
-                myOwn.replaceAddrParams(addrParams);
+                // myOwn.replaceAddrParams(addrParams);
+                setHref();
             });
             controls.push(control);
             return html.tr({"parameter-name":parameterDef.name},[ 
@@ -110,9 +122,8 @@ myOwn.wScreens.procAux = {
             ]);
         }).concat(
             html.tr([html.td(), html.td([button])])
-        )).create());
-        main_layout.appendChild(divResult);
-        main_layout.appendChild(divProgressOutside);
+        ));
+        setHref();
         var proceed = function proceed(){
             button.disabled=true;
             divResult.innerHTML="";
@@ -135,12 +146,13 @@ myOwn.wScreens.procAux = {
                 divProgress.textContent=err.message;
             });
         }
-        button.onclick=function(){
+        if(autoproced){
             proceed();
+        }else{
+            main_layout.appendChild(parameterForm.create());                
         }
-        if(addrParams.autoproced){
-            proceed();
-        }
+        main_layout.appendChild(divResult);
+        main_layout.appendChild(divProgressOutside);
     },
     mainAction:function(){
     },
@@ -287,16 +299,12 @@ myOwn.showPage = function showPage(pageDef){
         }else if(typeof my.wScreens[w] === 'object'){
             wScreen = my.wScreens[w];
             if(wScreen.parameters){
-                if(wScreen.autoproced && addrParams[wScreen.parameters[0].name]!=null){
-                    wScreen.mainAction(addrParams,main_layout,null)
-                }else {
-                    wScreen.mainFunction=wScreen.mainFunction||function(addrParams){
-                        my.wScreens.procAux.showParams({
-                            parameters:wScreen.parameters,
-                            resultClass:wScreen.resultClass,
-                            proceedLabel:wScreen.proceedLabel,
-                        }, main_layout, addrParams, wScreen.mainAction);
-                    }
+                wScreen.mainFunction=wScreen.mainFunction||function(addrParams){
+                    my.wScreens.procAux.showParams({
+                        parameters:wScreen.parameters,
+                        resultClass:wScreen.resultClass,
+                        proceedLabel:wScreen.proceedLabel,
+                    }, main_layout, addrParams, wScreen.mainAction);
                 }
             }
         }else{
