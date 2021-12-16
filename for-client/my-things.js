@@ -228,24 +228,26 @@ myOwn.log = function log(severity, message){
         clientMessage = message;
     }
     consoleMessage = consoleMessage || clientMessage;
-    var status = document.getElementById('mini-console');
     console.log(severity, consoleMessage);
-    status = status||document.body;
-    var divMessage = html.div({"class": ["status-"+severity]}, clientMessage).create();
-    if(status.firstChild){
-        status.insertBefore(divMessage, status.firstChild);
-    }else{
-        status.appendChild(divMessage);
-    }
-    if(!this["log-severities"][severity].permanent){
-        setTimeout(function(){
-            my.fade(divMessage);
-        },3000);
-    }else{
-        setTimeout(function(){
-            my.fade(divMessage);
-        },30000);
-    }
+    var statuses = [...document.querySelectorAll('#mini-console')];
+    if(statuses.length==0) statuses = [document.body];
+    statuses.forEach(status=>{
+        var divMessage = html.div({"class": ["status-"+severity]}, clientMessage).create();
+        if(status.firstChild){
+            status.insertBefore(divMessage, status.firstChild);
+        }else{
+            status.appendChild(divMessage);
+        }
+        if(!this["log-severities"][severity].permanent){
+            setTimeout(function(){
+                my.fade(divMessage);
+            },3000);
+        }else{
+            setTimeout(function(){
+                my.fade(divMessage);
+            },30000);
+        }
+    })
 };
 
 myOwn.fade = function fade(element, options){
