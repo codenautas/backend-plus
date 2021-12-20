@@ -77,7 +77,7 @@ myOwn.wScreens.procAux = {
                 ...addrParams, 
                 autoproced:true, 
                 directUrl:true,
-                ...(formDef?.proceedLabel ? {label} : {}),
+                ...(formDef && formDef.proceedLabel ? {label} : {}),
                 ...params
             })
         }
@@ -111,7 +111,7 @@ myOwn.wScreens.procAux = {
             }
             control.addEventListener('update', function(){
                 params[parameterDef.name] = control.getTypedValue();
-                // myOwn.replaceAddrParams(addrParams);
+                myOwn.replaceAddrParams(addrParams);
                 setHref();
             });
             controls.push(control);
