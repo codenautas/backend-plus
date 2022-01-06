@@ -1056,7 +1056,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
     detailControl.img = html.img({
         src:my.path.img+'detail-unknown.png',
         alt:'DETAIL',
-        title:my.messages.details
+        title:detailTableDef.label||my.messages.details
     }).create();
     var menuRef={w:'table', table:detailTableDef.table};
     var calculateFixedFields = function(){
@@ -1162,7 +1162,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
         }else{
             detailControl.img.src=my.path.img+'detail-expand.png';
             detailControl.img.alt="[+]";
-            detailControl.img.title=my.messages.details;
+            detailControl.img.title=detailTableDef.label||my.messages.details;
             if(detailControl.tr){
                 grid.my.fade(detailControl.tr, {smooth:{spans:spansForSmooth, content:detailControl.divDetail}});
                 depot.detailRows = depot.detailRows.filter(function(tr){ return tr!==detailControl.tr;});
