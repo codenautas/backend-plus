@@ -563,6 +563,52 @@ myAjax.agregar_json=agregar_json;
 // require.paths=require.paths||{}
 // require.paths.vs = '../node_modules/monaco-editor/min/vs';
 
+function noChange(x){ return x; }
+
+myAjax.UriSearchToObjectParams={
+	i                :{ showInMenu:true , encode:function(value,menu){ return menu.name?(menu.parents||[]).concat(menu.name).join(','):value }},
+	fc               :{                   encode:function(x){ return JSON.stringify(x); }, U:function(x){ return JSON.parse(x)}  },
+	ff               :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return JSON.parse(x)}  },
+	up               :{                   encode:function(x){ return json4all.stringify(x); }, decode:function(x){ return json4all.parse(x)}  },
+	pf               :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return JSON.parse(x)}  },
+	today            :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return bestGlobals.date.iso((x+'').substr(0,10))}  },
+	section          :{ showInMenu:true , encode:noChange                                , decode:noChange          },
+	directUrl        :{ hide:true       },
+	selectedByDefault:{ hide:true       },
+	showParams       :{ hide:true       },
+    parents          :{ hide:true       },
+    button           :{ hide:true       },
+    fixedFields      :{ varName:'ff'    , encode:function(pairs){ return JSON.stringify(likeAr.toPlainObject(pairs, 'fieldName')); }},
+	detailing        :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return JSON.parse(x)}  },
+}
+
+myAjax.UriSearchToObject = function UriSearchToObject(locationSearch){
+    var parts=locationSearch.split('&');
+    var addrParams={}
+    parts.forEach(function(pair,i){
+        if(pair[0]==='#'){
+            pair=pair.substr(1);
+        }
+        if(pair[0]==='?'){
+            pair=pair.substr(1);
+        }
+        var eq = pair.indexOf('=');
+        if(eq !== -1){
+            var varName=pair.substr(0, eq);
+            var value = decodeURIComponent(pair.substr(eq+1));
+			var paramDef=myOwn.UriSearchToObjectParams[varName];
+			if(paramDef && paramDef.decode){
+				value = paramDef.decode(value);
+			}
+            addrParams[varName] = value;
+            if(!i){
+                Object.defineProperty(addrParams,'_firstParameterName',{value:varName, writable:false, enumerable:false});
+            }
+        }
+    });
+    return addrParams;
+}
+
 return myAjax;
 
 });
