@@ -2717,6 +2717,9 @@ myOwn.getReference = function getReference(referenceName, opts){
         getLabel: function getLabel(row){
             return this.getLabels(row).join(', ');
         },
+        getImage: function getImage(row){
+            return row.image?'img/'+row.image:'';
+        },
         fixedFields:[]
     },opts||{});
     var reference={};
@@ -2742,6 +2745,7 @@ myOwn.getReference = function getReference(referenceName, opts){
             reference.getValue = opts.getValue;
             reference.getLabels = opts.getLabels;
             reference.getLabel = opts.getLabel;
+            reference.getImage = opts.getImage;
             return rows;
         });
         reference=my.references[referenceName]={
@@ -2854,7 +2858,8 @@ myOwn.ExpanderReferences={
             var menu=rows.map(function(row){
                 return {
                     value:reference.getValue(row),
-                    labels:reference.getLabels(row,true)
+                    labels:reference.getLabels(row,true),
+                    img:reference.getImage(row)
                 };
             });
             if(typeInfo.nullable){
