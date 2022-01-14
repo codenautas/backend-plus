@@ -648,7 +648,7 @@ myAjax.getRect = function getRect(element){
 
 myAjax.menuName = 'menu';
 myAjax.menuSeparator = '#';
-Object.defineProperty(myOwn, 'menup', {
+Object.defineProperty(myAjax, 'menup', {
     get:function(){
         var menuName = my.offline.mode?'ext':this.menuName;
         return menuName+this.menuSeparator; 
