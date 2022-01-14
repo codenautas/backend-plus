@@ -363,33 +363,6 @@ myOwn.createForkeableButton = function createForkeableButton(menu, opts){
     return button;
 };
 
-function encodeMinimalURIComponent(text){
-    return (text+'')
-        .replace(/\=/g, '%3D')
-        .replace(/\?/g, '%3F')
-        .replace(/\#/g, '%23')
-        .replace(/&/g, '%26')
-        .replace(/%/g, '%25');
-}
-
-myOwn.paramsToUriPart = function paramsToUriPart(params, inMenu){
-    var paramStr=likeAr(params).map(function(value, name){
-		var paramDef=myOwn.UriSearchToObjectParams[name] || { encode:function(x){return x}, varName:name };
-		if((paramDef.showInMenu || !inMenu) && !paramDef.hide || (params.showParams && params.showParams.includes(name))){
-			if(value!=null){
-                value=paramDef.encode(value, params);
-				return (paramDef.varName||name)+'='+encodeMinimalURIComponent(value);
-			}
-		}
-    }).filter(function(expr){return expr;}).join('&');
-	return paramStr;
-}
-
-myOwn.replaceAddrParams = function replaceAddrParams(params){
-    var my=this;
-    history.replaceState(null, null, my.menup+my.paramsToUriPart(params));
-}
-
 myOwn.light = function light(name, onclick, opts){
     var skin=((this.config||{}).config||{}).skin;
     var skinUrl=(skin?skin+'/':'');

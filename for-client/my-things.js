@@ -804,16 +804,6 @@ myOwn.captureKeys = function captureKeys() {
     });
 };
 
-myOwn.getRect = function getRect(element){
-    var rect = {top:0, left:0, width:element.offsetWidth, height:element.offsetHeight};
-    while( element != null ) {
-        rect.top += element.offsetTop;
-        rect.left += element.offsetLeft;
-        element = element.offsetParent;
-    }
-    return rect;
-}
-
 // myOwn.quitarLupa = function quitarLupa(){
 //     if(document.buttonLupa){
 //         document.body.removeChild(document.buttonLupa);

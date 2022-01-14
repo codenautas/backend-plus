@@ -609,6 +609,43 @@ myAjax.UriSearchToObject = function UriSearchToObject(locationSearch){
     return addrParams;
 }
 
+myAjax.replaceAddrParams = function replaceAddrParams(params){
+    var my=this;
+    history.replaceState(null, null, my.menup+my.paramsToUriPart(params));
+}
+
+function encodeMinimalURIComponent(text){
+    return (text+'')
+        .replace(/\=/g, '%3D')
+        .replace(/\?/g, '%3F')
+        .replace(/\#/g, '%23')
+        .replace(/&/g, '%26')
+        .replace(/%/g, '%25');
+}
+
+myAjax.paramsToUriPart = function paramsToUriPart(params, inMenu){
+    var paramStr=likeAr(params).map(function(value, name){
+		var paramDef=myOwn.UriSearchToObjectParams[name] || { encode:function(x){return x}, varName:name };
+		if((paramDef.showInMenu || !inMenu) && !paramDef.hide || (params.showParams && params.showParams.includes(name))){
+			if(value!=null){
+                value=paramDef.encode(value, params);
+				return (paramDef.varName||name)+'='+encodeMinimalURIComponent(value);
+			}
+		}
+    }).filter(function(expr){return expr;}).join('&');
+	return paramStr;
+}
+
+myAjax.getRect = function getRect(element){
+    var rect = {top:0, left:0, width:element.offsetWidth, height:element.offsetHeight};
+    while( element != null ) {
+        rect.top += element.offsetTop;
+        rect.left += element.offsetLeft;
+        element = element.offsetParent;
+    }
+    return rect;
+}
+
 return myAjax;
 
 });
