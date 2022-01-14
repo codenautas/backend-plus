@@ -286,15 +286,6 @@ myOwn.showPage = function showPage(pageDef){
     }
 };
 
-myOwn.menuName = 'menu';
-myOwn.menuSeparator = '#';
-Object.defineProperty(myOwn, 'menup', {
-    get:function(){
-        var menuName = my.offline.mode?'ext':this.menuName;
-        return menuName+this.menuSeparator; 
-    }
-});
-
 myOwn.getHRef = function getHRef(menu){
     var href;
     if(!menu.w && menu.menuType){

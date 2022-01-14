@@ -646,6 +646,15 @@ myAjax.getRect = function getRect(element){
     return rect;
 }
 
+myAjax.menuName = 'menu';
+myAjax.menuSeparator = '#';
+Object.defineProperty(myOwn, 'menup', {
+    get:function(){
+        var menuName = my.offline.mode?'ext':this.menuName;
+        return menuName+this.menuSeparator; 
+    }
+});
+
 return myAjax;
 
 });
