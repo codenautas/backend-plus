@@ -161,7 +161,7 @@ export type SequenceDefinition = {
 export type ExportMetadataDefinition={ /* TODO: define */ }
 export type FieldDefinition = EditableDbDefinition & {
     name:string
-    typeName:PgKnownTypes
+    typeName:PgKnownTypes|'ARRAY:text'
     label?:string
     title?:string
     nullable?:boolean
@@ -228,6 +228,7 @@ export type ForeignKey = {
     consName?:string, 
     initiallyDeferred?:boolean
     displayAfterFieldName?:string|boolean
+    forceDeferrable?:boolean
 }
 export type Constraint = {constraintType:'check'|'unique'|'not null', expr?:string, fields?:string[], consName?:string}
 export type TableDefinition = EditableDbDefinition & {
@@ -270,6 +271,7 @@ export type TableDefinition = EditableDbDefinition & {
             delete?:{using?:string}
         }
         join?:string
+        constraintsDeferred?:boolean
     }
     foreignKeys?:ForeignKey[]
     softForeignKeys?:ForeignKey[]
