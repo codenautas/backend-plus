@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for typed controls",
-  "version": "1.14.11",
+  "version": "1.14.12",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -30,7 +30,7 @@
   "dependencies": {
     "ajax-best-promise": "^0.3.7",
     "backend-skins": "^0.1.15",
-    "best-globals": "^1.0.2",
+    "best-globals": "^1.0.3",
     "big.js": "^6.1.1",
     "body-parser": "^1.19.1",
     "cast-error": "^0.1.0",
@@ -97,7 +97,7 @@
     "karma-ie-launcher": "^1.0.0",
     "karma-mocha": "^2.0.1",
     "kill-9": "~0.4.3",
-    "mocha": "^9.1.3",
+    "mocha": "^9.1.4",
     "nyc": "^15.1.0",
     "puppeteer": "^13.0.1",
     "sinon": "^12.0.1",
