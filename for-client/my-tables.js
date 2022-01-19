@@ -7,7 +7,7 @@
 var whenMergeOverride=true;
 
 var Big = require('big.js');
-var bestGlobals = require('best-globals');
+//var bestGlobals = require('best-globals');
 var html = require('js-to-html').html;
 var JSON4all = require('json4all');
 var TypedControls = require('typed-controls');
