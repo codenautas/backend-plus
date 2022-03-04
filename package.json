@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for typed controls",
-  "version": "1.14.15",
+  "version": "1.15.0",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -70,7 +70,7 @@
     "stylus": "^0.56.0",
     "type-store": "^0.2.41",
     "typed-controls": "^0.10.0",
-    "xlsx": "^0.18.2",
+    "xlsx": "^0.18.3",
     "xlsx-style": "^0.8.13"
   },
   "devDependencies": {

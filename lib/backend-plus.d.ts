@@ -195,6 +195,7 @@ export type FieldDefinition = EditableDbDefinition & {
     sortMethod?:string
     generatedAs?:string
     inJoin?:string /* alias from sql.join; implies inTable:false */
+    transformer?:string
 } & ({} | {
     sequence:SequenceDefinition
     nullable:true
