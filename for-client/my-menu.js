@@ -478,6 +478,13 @@ myOwn.displayMainMenu = function(addrParams){
     totalLayout.appendChild(html.div({id:'main_layout'}).create());
     my.doMenuRealigns=function(){
         menu.realigns.reverse().forEach(function(realign){ if(realign){ realign(); }});
+        var mtv = document.getElementById('main-top-bar');
+        if(mtv){
+            if(location.href.match(/^.{0,8}localhost/)){
+                mtv.style.backgroundImage='repeating-linear-gradient(-45deg, #FF4, #FF4 8px, #AAA 8px, #AAA 16px)'
+                mtv.title = 'Warning! Using system in localhost!'
+            }
+        }
     }
     setTimeout(my.doMenuRealigns,10);
     setTimeout(function(){

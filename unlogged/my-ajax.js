@@ -89,8 +89,22 @@ myAjax.readProcedureDefinitions=function readProcedureDefinitions(){
     }).then(getStored, getStored);
     return promise.then(function(setup){
         my.config = setup;
-        if(my.config.config && my.config.config['background-img'] && typeof document !== "undefined"){
-            document.body.style.backgroundImage='url("'+my.path.img+my.config.config['background-img']+'")';
+        if(typeof document !== "undefined"){
+            var backgroundUrl
+            if(my.config.config && my.config.config['background-img']){
+                backgroundUrl = 'url("'+my.path.img+my.config.config['background-img']+'")'
+            }else{
+                if(/(^|[-_0-9/])(test|pru|prueba)($|[-_0-9/])/.test(location.pathname)){
+                    backgroundUrl = 'url("img/background-test.png")';
+                }else if(/(^|[-_0-9/])(capa|capacitacion)($|[-_0-9/])/.test(location.pathname)){
+                    backgroundUrl = 'url("img/background-capa.png")';
+                }else if(/(^|[-_0-9/])(desa|devel)($|[-_0-9/])/.test(location.pathname)){
+                    backgroundUrl = 'url("img/background-devel.png")';
+                }else{
+                    backgroundUrl = '';
+                }
+            }
+            document.body.style.backgroundImage=backgroundUrl;
         }
     }).then(function(){
         my.config.procedure=my.config.procedure||{};
