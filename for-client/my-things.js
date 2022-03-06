@@ -1,4 +1,5 @@
 "use strict";
+
 /// <reference path="../node_modules/types.d.ts/modules/typed-controls/index.d.ts" />
 //no/ <reference path="../node_modules/types.d.ts/modules/dialog-promise/index.d.ts" />
 /// <reference path="../node_modules/types.d.ts/modules/codenautas-umd/index.d.ts" />
@@ -691,6 +692,20 @@ myOwn.captureKeys = function captureKeys() {
                         evento.preventDefault();
                     }
                 }
+            }
+        }
+        if(evento.which==123 && !evento.shiftKey  && !evento.ctrlKey  && evento.altKey  && !evento.metaKey){ // Shift F12
+            var info=tableInfo(this.activeElement);
+            if(info.tr.depot){
+                my.ajax.history_changes({
+                    tableName: info.tr.depot.def.name,
+                    fieldName: info.td.getAttribute('my-colname'),
+                    primaryKeyValues: info.tr.depot.primaryKeyValues //JSON4all.parse(info.tr.getAttribute('pk-values'))
+                }).then(function(value){
+                    var div=html.div({class:'json-result'}).create();
+                    my.agregar_json(div, value);
+                    return alertPromise(div);
+                })
             }
         }
         if(evento.which==115 && !evento.shiftKey  && !evento.ctrlKey  && !evento.altKey  && !evento.metaKey){ // F4

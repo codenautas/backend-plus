@@ -481,7 +481,7 @@ myOwn.displayMainMenu = function(addrParams){
         var mtv = document.getElementById('main-top-bar');
         if(mtv){
             if(location.href.match(/^.{0,8}localhost/)){
-                mtv.style.backgroundImage='repeating-linear-gradient(-45deg, #FF4, #FF4 8px, #AAA 8px, #AAA 16px)'
+                mtv.style.backgroundImage='repeating-linear-gradient(-45deg, #FF8, #FF8 8px, #DDD 8px, #DDD 16px)'
                 mtv.title = 'Warning! Using system in localhost!'
             }
         }
