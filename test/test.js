@@ -17,8 +17,8 @@ var assert = require('self-explain').assert;
 var myOwn = require('../for-client/my-things.js');
 const { resolve } = require('path');
 
-function testAFixture(){
-    return function(){ return new Promise(function(result,reject){
+async function testAFixture(be, fixture, agent, opt){
+    await new Promise(function(resolve,reject){
         var procedureDef = be.procedure[fixture.action];
         fixture.method=fixture.method||be.defaultMethod;
         var parameters={};
@@ -95,7 +95,12 @@ function testAFixture(){
             }
         })
         .expect(200,function done(err){ if(err) reject(err); else resolve()});
-    })}
+    });
+    if(fixture.then){
+        for(var subfixture of fixture.then){
+            await testAFixture(be, subfixture, agent, opt);
+        }
+    }
 }
 
 describe('backend-plus', function describeBackendPlus(){
@@ -161,7 +166,9 @@ describe('backend-plus', function describeBackendPlus(){
                             it.skip(nameIt);
                             return;
                         }
-                        it(nameIt, testAFixture);
+                        it(nameIt, async function(){
+                            return testAFixture(be, fixture, agent, opt);
+                        });
                     });
                 });
             //    it('must serve data if logged 2', function(done){
@@ -298,7 +305,7 @@ describe('backend-plus', function describeBackendPlus(){
                         return client.query("select data, idj, idn from conjson where idj = $1",[idj])
                         .fetchAll().then(function(result){
                             expect(result.rows).to.eql([
-                                {data:'1 2 3 4', idj:idj, idn:1}
+                                {data:'1,2,3,4', idj:idj, idn:1}
                             ])
                         });
                     });

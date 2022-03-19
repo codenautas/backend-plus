@@ -1,3 +1,5 @@
+const bestGlobals = require("best-globals");
+
 [{
     action: 'table_data',
     parameters: {table: 'employees', fixedFields:[]},
@@ -25,14 +27,24 @@
     parameters: {
         table: 'employees',
         primaryKeyValues: ['passport',123456],
-        newRow: {birth_date: new Date(1990,1-1,8)},
+        newRow: {birth_date: bestGlobals.date.ymd(1990,1,8)},
         oldRow: {birth_date: null},
         status: 'retrieved'
     },
     expected: {
         command: 'UPDATE', 
-        row: {id_type: 'passport',id: 123456,first_name: 'Bob' ,last_name: 'Smith',birth_date: new Date(1990,1-1,8),salary: null },
-    }
+        row: {id_type: 'passport',id: 123456,first_name: 'Bob' ,last_name: 'Smith',birth_date: bestGlobals.date.ymd(1990,1,8),salary: null },
+    },
+    then:[
+        {
+            action: 'table_data',
+            parameters: {table: 'employees', fixedFields:[]},
+            expected: [
+                {id_type: "card"    , id: 654213,first_name: "Mary",last_name: "Gomez",birth_date: null                          , salary: null },
+                {id_type: 'passport', id: 123456,first_name: 'Bob' ,last_name: 'Smith',birth_date: bestGlobals.date.ymd(1990,1,8), salary: null },
+            ]
+        }        
+    ]
 },{
     // skip: '#25',
     // name: 'double update',
@@ -43,8 +55,8 @@
             action: 'table_data',
             parameters: {table: 'employees', fixedFields:[]},
             expected: [
-                {id_type: 'card',id: 123456,first_name: 'Bob' ,last_name: 'Smith',birth_date: null,salary: null },
-                {id_type: "card",id: 654213,first_name: "Mary",last_name: "Gomez",birth_date: null,salary: null },
+                {id_type: "card"    , id: 654213,first_name: "Mary",last_name: "Gomez",birth_date: null                          , salary: null },
+                {id_type: 'passport', id: 123456,first_name: 'Bob' ,last_name: 'Smith',birth_date: bestGlobals.date.ymd(1990,1,8), salary: null },
             ]
         }        
     ]
