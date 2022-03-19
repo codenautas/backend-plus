@@ -117,6 +117,7 @@
     "test-good": "mocha --reporter spec --bail --check-leaks test/test*.js",
     "example-pu": "node test/puppeteer/first-step.js",
     "test-pu": "mocha --reporter spec --bail --check-leaks --globals cptable --globals QUOTE --globals __core-js_shared__ test/test-pu.js",
+    "test-server": "mocha --reporter spec --single-run --bail  test/test.js",
     "server-test": "node test/run-simple-backend.js",
     "example-tables": "node examples/tables/server/server-tables.js --dir-x examples/tables",
     "example-fichas": "node examples/fichero/server/server-fichas.js",

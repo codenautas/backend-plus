@@ -49,8 +49,10 @@ describe('backend-plus', function describeBackendPlus(){
                 it('must redirect if not logged in', function(done){
                     agent
                     .get(opt.base+'/echo')
-                    .expect('location', 'login')
-                    .expect(302, /Redirecting to login/, done);
+                    // if config without not-logged-in page: .expect('location', 'login')
+                    .expect('location', 'not-logged-in')
+                    // if config without not-logged-in page: .expect(302, /Redirecting to login/, done);
+                    .expect(302, /Redirecting to not-logged-in/, done);
                 });
                 it('must get login page when not logged in', function(done){
                     agent
@@ -107,7 +109,23 @@ describe('backend-plus', function describeBackendPlus(){
                                 if(res.error && fixture.expectedError){
                                     expect(res.error.message).to.match(fixture.expectedError);
                                 }else{
-                                    result=myOwn.encoders[procedureDef.encoding].parse(res.text);
+                                    try{
+                                        var text
+                                        var chunks = res.text || res._body.toString('utf8');
+                                        if(procedureDef.progress===false){
+                                            text = chunks;
+                                        }else{
+                                            var lines = chunks.split(/\r?\n/);
+                                            while(lines.length && lines[0] != '--') lines.shift();
+                                            lines.shift();
+                                            text = lines.join('');
+                                        }
+                                        result=myOwn.encoders[procedureDef.encoding].parse(text);
+                                    }catch(err){
+                                        console.log('Parsing result',text)
+                                        console.dir(res,{depth:0});
+                                        throw err;
+                                    }
                                     if(parameters.table && !"now, I'm using yaml"){
                                         if(result){
                                             var structure=be.tableStructures[parameters.table]({be});

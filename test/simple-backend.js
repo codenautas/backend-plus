@@ -39,7 +39,7 @@ class AppExample extends backendPlus.AppBackend{
 
 var localProcedures=[
     {
-        action:'double-update-employees',
+        action:'double_update_employees',
         parameters:[
             {name: 'value', encoding:'plain'}
         ],

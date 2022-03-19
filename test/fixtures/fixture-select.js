@@ -36,7 +36,7 @@
 },{
     skip: '#25',
     // name: 'double update',
-    action: 'double-update-employees',
+    action: 'double_update_employees',
     parameters: {
         value: 5,
     },
