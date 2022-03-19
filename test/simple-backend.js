@@ -40,12 +40,13 @@ class AppExample extends backendPlus.AppBackend{
 var localProcedures=[
     {
         action:'double_update_employees',
-        parameters:[
-            {name: 'value', encoding:'plain'}
-        ],
+        parameters:[],
         coreFunction:function(context, parameters){
             return context.client.query("UPDATE employees SET last_name='Perkins' WHERE id=123456").execute().then(function(result){
-                if(result.rowCount!==1){
+                console.log("********************")
+                console.dir(result,{depth:1});
+                if(result.rowCount < 10){
+                    console.log('************** fail to update')
                     throw new Error("fail to update id=123456");
                 }
                 return context.client.query("UPDATE employees SET id='Perkins' WHERE id=123456").execute();

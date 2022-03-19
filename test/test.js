@@ -15,6 +15,88 @@ var querystring = require('querystring');
 var assert = require('self-explain').assert;
 
 var myOwn = require('../for-client/my-things.js');
+const { resolve } = require('path');
+
+function testAFixture(){
+    return function(){ return new Promise(function(result,reject){
+        var procedureDef = be.procedure[fixture.action];
+        fixture.method=fixture.method||be.defaultMethod;
+        var parameters={};
+        procedureDef.parameters.forEach(function(parameterDef){
+            var value=fixture.parameters[parameterDef.name];
+            value=myOwn.encoders[parameterDef.encoding].stringify(value);
+            parameters[parameterDef.name]=value;
+        });
+        (fixture.method==='get'?(
+            agent.get(opt.base+'/'+fixture.action+'?'+querystring.stringify(parameters))
+        ):(
+            agent.post(opt.base+'/'+fixture.action).type('form').send(parameters)
+        ))
+        .expect(function(res){
+            var result;
+            var chunks = res.text || res._body.toString('utf8');
+            var error;
+            var text;
+            if(res.status>=400){
+                error = res.error || JSON.parse(chunk);
+            }else{
+                try{
+                    if(procedureDef.progress===false){
+                        text = chunks;
+                    }else{
+                        var lines = chunks.split(/\r?\n/);
+                        while(!text && !error){
+                            var line = lines[0];
+                            error = /^\{"error":/.test(line) && JSON.parse(line).error;
+                            lines.shift();
+                            if(line == '--') text = lines.join('');
+                        }
+                    }
+                    if(!error){
+                        result=myOwn.encoders[procedureDef.encoding].parse(text);
+                    }
+                }catch(err){
+                    console.log('Parsing result',text,result,error)
+                    console.dir(res,{depth:0});
+                    throw err;
+                }
+            }
+            if(error && !fixture.expectedError){
+                console.log("ERROR IN FIXTURE");
+                console.log(error.message)
+                console.log(error.stack)
+                throw new Error("unexpected error");
+            }
+            if(!error && fixture.expectedError){
+                console.log("EXPECTED ERROR BUT NOT");
+                console.log(fixture.expectedError);
+                throw new Error("EXPECTED ERROR BUT NOT");
+            }
+            if(error && fixture.expectedError){
+                expect(error.message).to.match(fixture.expectedError);
+            }else{
+                if(parameters.table && !"now, I'm using yaml"){
+                    if(result){
+                        var structure=be.tableStructures[parameters.table]({be});
+                        myOwn.adaptData(structure, (result instanceof Array?result:[result]));
+                    }
+                }
+                var expected = fixture.expected;
+                var dif=result && expected && assert.allDifferences(result, expected);
+                if(dif){
+                    console.log('expected');
+                    console.log(expected);
+                    console.log('obtained');
+                    console.log(result);
+                    console.log('unexpected differences');
+                    console.log(dif);
+                    throw new Error('differences');
+                }
+            }
+        })
+        .expect(200,function done(err){ if(err) reject(err); else resolve()});
+    })}
+}
 
 describe('backend-plus', function describeBackendPlus(){
     [
@@ -79,74 +161,7 @@ describe('backend-plus', function describeBackendPlus(){
                             it.skip(nameIt);
                             return;
                         }
-                        it(nameIt, function(done){
-                            var procedureDef = be.procedure[fixture.action];
-                            fixture.method=fixture.method||be.defaultMethod;
-                            var parameters={};
-                            procedureDef.parameters.forEach(function(parameterDef){
-                                var value=fixture.parameters[parameterDef.name];
-                                value=myOwn.encoders[parameterDef.encoding].stringify(value);
-                                parameters[parameterDef.name]=value;
-                            });
-                            (fixture.method==='get'?(
-                                agent.get(opt.base+'/'+fixture.action+'?'+querystring.stringify(parameters))
-                            ):(
-                                agent.post(opt.base+'/'+fixture.action).type('form').send(parameters)
-                            ))
-                            .expect(function(res){
-                                var result;
-                                if(res.error && !fixture.expectedError){
-                                    console.log("ERROR IN FIXTURE");
-                                    console.log(res.error);
-                                    console.log(res.error.stack);
-                                    throw new Error("unexpected error");
-                                }
-                                if(!res.error && fixture.expectedError){
-                                    console.log("EXPECTED ERROR BUT NOT");
-                                    console.log(fixture.expectedError);
-                                    throw new Error("EXPECTED ERROR BUT NOT");
-                                }
-                                if(res.error && fixture.expectedError){
-                                    expect(res.error.message).to.match(fixture.expectedError);
-                                }else{
-                                    try{
-                                        var text
-                                        var chunks = res.text || res._body.toString('utf8');
-                                        if(procedureDef.progress===false){
-                                            text = chunks;
-                                        }else{
-                                            var lines = chunks.split(/\r?\n/);
-                                            while(lines.length && lines[0] != '--') lines.shift();
-                                            lines.shift();
-                                            text = lines.join('');
-                                        }
-                                        result=myOwn.encoders[procedureDef.encoding].parse(text);
-                                    }catch(err){
-                                        console.log('Parsing result',text)
-                                        console.dir(res,{depth:0});
-                                        throw err;
-                                    }
-                                    if(parameters.table && !"now, I'm using yaml"){
-                                        if(result){
-                                            var structure=be.tableStructures[parameters.table]({be});
-                                            myOwn.adaptData(structure, (result instanceof Array?result:[result]));
-                                        }
-                                    }
-                                    var expected = fixture.expected;
-                                    var dif=result && expected && assert.allDifferences(result, expected);
-                                    if(dif){
-                                        console.log('expected');
-                                        console.log(expected);
-                                        console.log('obtained');
-                                        console.log(result);
-                                        console.log('unexpected differences');
-                                        console.log(dif);
-                                        throw new Error('differences');
-                                    }
-                                }
-                            })
-                            .expect(200,done);
-                        });
+                        it(nameIt, testAFixture);
                     });
                 });
             //    it('must serve data if logged 2', function(done){
@@ -278,12 +293,12 @@ describe('backend-plus', function describeBackendPlus(){
             //});
             describe("jsonb", function(){
                 it("read jsonb in a where", function(){
-                    var idj={uno:'dos', tres:'cuatro'}
+                    var idj={tres:'cuatro', uno:'dos'}
                     return be.inDbClient({},function(client){
                         return client.query("select data, idj, idn from conjson where idj = $1",[idj])
                         .fetchAll().then(function(result){
                             expect(result.rows).to.eql([
-                                {data:'1,2,3,4', idj:idj, idn:1}
+                                {data:'1 2 3 4', idj:idj, idn:1}
                             ])
                         });
                     });
