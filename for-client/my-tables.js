@@ -79,10 +79,14 @@ myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     notSimilarTo:'not similar to',
     numberExportedRows:"Rows exported",
     oldValue: "old value",
+    oneRowDeleted: "one row deleted.",
+    xRowsDeleted: "{$x} rows deleted.",
     oneRowInserted: "one row inserted.",
     xRowsInserted: "{$x} rows inserted.",
     oneRowUpdated: "one row updated.",
     xRowsUpdated: "{$x} rows updated.",
+    oneRowSkipped: "one skipped row",
+    xRowsSkipped: "{$x} skipped row",
     optionsForThisTable: "options for this table",
     orientationToggle: "toggle orientation (vertical vs horizontal)",
     prepare: "prepare",
@@ -143,10 +147,14 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     notSimilarTo:'no contiene',
     numberExportedRows:"Filas exportadas",
     oldValue: "valor anterior",
+    oneRowDeleted: "un registro borrado",
+    xRowsDeleted: "{$x} registros borrados",
     oneRowInserted: "un registro insertado.",
     xRowsInserted: "{$x} registros insertados.",
     oneRowUpdated: "un registro modificados.",
     xRowsUpdated: "{$x} registros modificados.",
+    oneRowSkipped: "un registro salteado",
+    xRowsSkipped: "{$x} registros salteados",
     optionsForThisTable: "opciones para esta tabla",
     orientationToggle: "cambiar la orientación de la tabla (por fila o por columna)",
     prepare: "preparar",
@@ -1335,6 +1343,16 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                             messages.push(my.messages.oneRowUpdated);
                         }else if(result.uploaded.updated>1){
                             messages.push(my.messages.xRowsUpdated.replace('{$x}',result.uploaded.updated));
+                        }
+                        if(result.uploaded.skipped==1){
+                            messages.push(my.messages.oneRowSkipped);
+                        }else if(result.uploaded.skipped>1){
+                            messages.push(my.messages.xRowsSkipped.replace('{$x}',result.uploaded.skipped));
+                        }
+                        if(result.uploaded.deleted==1){
+                            messages.push(my.messages.oneRowDeleted);
+                        }else if(result.uploaded.deleted>1){
+                            messages.push(my.messages.xRowsDeleted.replace('{$x}',result.uploaded.deleted));
                         }
                         if(result.uploaded.skippedColumns.length==1){
                             messages.push(my.messages.skippedColumn+": "+result.uploaded.skippedColumns.join(', '));
