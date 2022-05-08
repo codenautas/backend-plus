@@ -10,6 +10,7 @@ const MiniTools = require('mini-tools');
 const discrepances = require('discrepances');
 
 describe("interactive ",function(){
+    this.timeout(50000);
     var browser;
     var page;
     var client;
@@ -32,7 +33,7 @@ describe("interactive ",function(){
         browser = await puppeteer.launch(process.env.TRAVIS?{}:{headless, slowMo});
         page = await browser.newPage();
         page.on('console', msg => { 
-            console.log('console.'+msg.type(), msg.text()) 
+            console.log('console.'+msg.type(), msg.text(), msg.args(), msg.location()) 
         });
         await page.setViewport({width:1024, height:768});
         await page.goto('http://localhost:3333');
@@ -140,7 +141,7 @@ describe("interactive ",function(){
                 discrepances.showAndThrow(result?.substr(0,27),'las claves no coinciden');
             })
         })
-        describe("grids", async function(){
+        describe.only("grids", async function(){
             before(async function(){
                 await page.goto('http://localhost:3333/menu');
                 await browser.waitForTarget(target => {
@@ -148,7 +149,7 @@ describe("interactive ",function(){
                 });
             })
             it("inserts one record", async function(){
-                this.timeout(38000);
+                this.timeout(35000);
                 await page.click('[menu-name=tables]');
                 await page.click('[menu-name=simple]');
                 await page.waitForSelector('[my-table=simple] tbody tr [alt=INS]');
@@ -169,7 +170,7 @@ describe("interactive ",function(){
                 return 1;
             });
             it("open details", async function(){
-                this.timeout(38000);
+                this.timeout(36000);
                 await page.click('[menu-name=tables]');
                 await page.click('[menu-name=simple]');
                 await page.waitForSelector('[pk-values=\'["2"]\'] .grid-th-details');
@@ -179,7 +180,7 @@ describe("interactive ",function(){
                 discrepances.showAndThrow(result,'A');
             });
             it("open details in other tab", async function(){
-                this.timeout(38000);
+                this.timeout(37000);
                 await page.click('[menu-name=tables]');
                 await page.click('[menu-name=simple]');
                 await page.waitForSelector('[pk-values=\'["2"]\'] .grid-th-details');
@@ -200,9 +201,11 @@ describe("interactive ",function(){
                 await page2.waitForSelector('td[my-colname="wf_code"]');
                 var result = await page2.$eval('td[my-colname="wf_code"]', td => td.textContent);
                 discrepances.showAndThrow(result,'A');
+                page2.close();
             });
             it.skip("FUTURO LEJANO. inserts one record with fk data", async function(){
                 // la idea de esta funcionalidad es poder ingresar un texto en el nombre en vez del código
+                // no sé si tiene una utilidad clara ahora. No insistir con esto. 
                 this.timeout(38000);
                 console.log('tengo el menu')
                 await page.click('[menu-name=tables]');
