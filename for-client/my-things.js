@@ -750,17 +750,24 @@ myOwn.captureKeys = function captureKeys() {
         }
         if(evento.which==115 && evento.shiftKey  && !evento.ctrlKey  && !evento.altKey  && !evento.metaKey){ // F4
             var info=tableInfo(this.activeElement);
+            var getRefCell = function(delta){
+                var refPos=info.tr.rowIndex + delta;
+                var refRow=info.table.rows[refPos];
+                if(refRow){
+                    var candidateCell = refRow.cells[info.td.cellIndex];
+                    if(candidateCell.getTypedValue){
+                        return candidateCell;
+                    }
+                }
+                return null;
+            }
             if(info.table){
-                var abovePos=info.tr.rowIndex-1;
-                var aboveRow=info.table.rows[abovePos];
-                if(aboveRow){
-                    var aboveCell = aboveRow.cells[info.td.cellIndex];
-                    if(aboveCell.getTypedValue){
-                        var value=aboveCell.getTypedValue();
-                        if(info.td.setTypedValue){
-                            info.td.setTypedValue(value, true);
-                            goRight();
-                        }
+                var refCell = getRefCell(-1) || getRefCell(1);
+                if(refCell){
+                    var value=refCell.getTypedValue();
+                    if(info.td.setTypedValue){
+                        info.td.setTypedValue(value, true);
+                        goRight();
                     }
                 }
             }
