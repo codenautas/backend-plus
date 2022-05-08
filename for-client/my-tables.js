@@ -2008,6 +2008,18 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
 myOwn.specialDefaultValue={
     current_date:function(){ return myOwn.config.currentDate||bestGlobals.date.today(); },
     next_number:function(fieldName, aboveDepot, belowDepot){ 
+        var manager = aboveDepot.manager ?? belowDepot.manager
+        if(!manager){
+            return 1;
+        }else{
+            var max = 0;
+            for(var depot of manager.depots){
+                if(Number(depot.row[fieldName]) > max){
+                    max = Number(depot.row[fieldName])
+                }
+            }
+            return max + 1;
+        }
         return belowDepot.row[fieldName]?belowDepot.row[fieldName]+1:(
             aboveDepot.row[fieldName]?aboveDepot.row[fieldName]-1:1
         ); 
