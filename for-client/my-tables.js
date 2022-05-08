@@ -75,6 +75,7 @@ myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     lessDetails: "hide details",
     lessEqualThan:'less equal than',
     loading: "loading",
+    newUnsavedRow: "new unsaved row",
     notEmpty:'not empty',
     notSimilarTo:'not similar to',
     numberExportedRows:"Rows exported",
@@ -143,6 +144,7 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     lessDetails: "dejar de mostrar los detalles asocialdos al registro",
     lessEqualThan:'menor igual que',
     loading: "cargando",
+    newUnsavedRow: "el nuevo registro (aun no grabado)",
     notEmpty:'no vacío',
     notSimilarTo:'no contiene',
     numberExportedRows:"Filas exportadas",
@@ -2589,7 +2591,7 @@ myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot){
 
 myOwn.confirmDelete=function confirmDelete(depot, opts){
     return depot.my.showQuestion(
-        depot.my.messages.Delete+' '+JSON.stringify(depot.primaryKeyValues)+' ?', 
+        depot.my.messages.Delete+' '+(depot.primaryKeyValues === false ? depot.my.messages.newUnsavedRow : JSON.stringify(depot.primaryKeyValues))+' ?', 
         {askForNoRepeat:depot.my.messages.Delete+', '+depot.def.name}
     );
 }
