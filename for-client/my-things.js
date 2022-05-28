@@ -602,6 +602,8 @@ function tableInfo(element){
     return info;
 }
 
+myOwn.tableInfo = tableInfo
+
 function getCaretPosition(element) {
     // https://stackoverflow.com/questions/4811822/get-a-ranges-start-and-end-offsets-relative-to-its-parent-container/4812022#4812022
     var caretOffset = 0;
@@ -910,7 +912,6 @@ myOwn.createSmartButton = function createSmartButton(opts){
     }
     return button;
 };
-
 
 return myOwn;
 

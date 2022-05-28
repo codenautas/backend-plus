@@ -773,12 +773,28 @@ myOwn.ActionColumnGrid.prototype.th = function th(){
 };
 
 myOwn.ActionColumnGrid.prototype.thFilter = function thFilter(depot){
-    var buttonFilter=html.button({id:'button-filter'},myOwn.messages.Filter+"!").create();
     var grid = this.grid;
-    buttonFilter.addEventListener('click',function(){
-        grid.updateFilterInfo(' (F) ');
-        grid.displayBody();
-    });
+    if(depot.firstFilter){
+        var buttonFilter=html.button({id:'button-filter'},myOwn.messages.Filter+"!").create();
+        buttonFilter.addEventListener('click',function(){
+            grid.updateFilterInfo(' (F) ');
+            grid.displayBody();
+        });
+    }else{
+        var buttonFilter=html.button({class:'table-button', 'when-filter':'yes', "skip-enter":true}, [
+            html.img({
+                src:my.path.img+'destroy-filter.png',
+                alt:'FILTER OFF',
+                title:my.messages.filterOff
+            })
+        ]).create();
+        buttonFilter.addEventListener('click',function(){
+            // HACIENDO
+            grid.view.filter = grid.view.filter.filter(d=>d!=depot);
+            var info = my.tableInfo(this);
+            info.tr.parentNode.removeChild(info.tr);
+        });
+    }
     return html.th([buttonFilter]);
 };
 
@@ -2424,6 +2440,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         grid.sizesForFilters=Array.prototype.map.call(grid.dom.table.rows[0].cells,function(cell){
             return cell.offsetWidth;
         });
+        // HACIENDO
         var depot = {
             special: 'filter',
             my: grid.my,
@@ -2435,7 +2452,8 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             rowSymbols: {},
             isFilterPending:false,
             tr: tr,
-            actionButton:{}
+            actionButton:{},
+            firstFilter: !otherRow
         };
         if(!grid.hasFilterRow){
             grid.hasFilterRow=[];
@@ -2448,11 +2466,8 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         }
         var tr=html.tr({'class':'filter-line'}, grid.columns.map(function(column, iColumn){
             return column.thFilter(depot, iColumn);
-        }).filter(function(th,iColumn){
-           return iColumn || !grid.hasFilterRow.length;
         })).create();
         grid.hasFilterRow.push(tr);
-        grid.hasFilterRow[0].cells[0].rowSpan=grid.hasFilterRow.length;
         grid.dom.table.setAttribute('has-filter',1);
         if(grid.dom.table.tHead){ //TODO: el filtro para verticales debe organizarse sin tr
             grid.dom.table.tHead.appendChild(tr);
@@ -2469,6 +2484,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 while(iFilter<filterRows.length){
                     var filterData=filterRows[iFilter];
                     var partialOk=true;
+                    var columnsCompared = 0;
                     for(var column in depot.row){
                         var compSymb = filterData.rowSymbols[column];
                         if(compSymb && my.comparator[compSymb] && (my.comparatorParameterNull[compSymb] || filterData.row[column] != null)){
@@ -2476,9 +2492,10 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                             if(!isSatisfied){
                                 partialOk=false;
                             }
+                            columnsCompared++;
                         }
                     }
-                    if(partialOk){
+                    if(partialOk && columnsCompared){
                         return true;
                     }
                     iFilter++;
