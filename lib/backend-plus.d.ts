@@ -8,6 +8,8 @@ import * as pg from "pg-promise-strict";
 export * from "pg-promise-strict";
 export type MotorDb = typeof pg;
 
+export type LangId = 'en'|'es'|'etc...';
+
 export type Server=net.Server;
 
 export interface CoreFunctionParameters{
@@ -381,6 +383,9 @@ export class AppBackend{
     isThisProcedureAllowed<T>(context:Context, procedureDef:ProcedureDef, params:{[key:string]:T}):Promise<boolean>
     checkDatabaseStructure(client:Client):Promise<void>
     getDbFunctions(opts:DumpOptions):Promise<{dumpText:string}[]>
+    i18n:{
+        messages:Record<LangId,Record<string, string>>
+    }
 }
 
 }
