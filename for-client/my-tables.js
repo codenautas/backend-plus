@@ -178,17 +178,41 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     zoom: "zoom",
 });
 
-var escapeRegExp = bestGlobals.escapeRegExp;
+/** @param {string} text */
+function regex4search(text){
+    return new RegExp(
+        text.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+        // .replace(/"/g,"\\b")
+        .replace(/[ñÑ]/g,'(?:gn|nn?i?|[ñÑ])')
+        .replace(/[cCçÇ]/g,'[cçÇ]')
+        .replace(/[áÁàÀäÄãÃ]/gi,'[AáÁàÀäÄãÃ]')
+        .replace(/[éÉèÈëË]/gi,'[EéÉèÈëË]')
+        .replace(/[íÍìÌïÏ]/gi,'[IíÍìÌïÏ]')
+        .replace(/[óÓòÒöÖõÕ]/gi,'[OóÓòÒöÖõÕ]')
+        .replace(/[úÚùÙüÜ]/gi,'[UúÚùÙüÜ]')
+        .replace(/a/gi,'[AáÁàÀäÄãÃ]')
+        .replace(/e/gi,'[EéÉèÈëË]')
+        .replace(/i/gi,'[IíÍìÌïÏ]')
+        .replace(/o/gi,'[OóÓòÒöÖõÕ]')
+        .replace(/u/gi,'[UúÚùÙüÜ]')
+        // .replace(/\s+/g,'.*\\s+.*') mas estricto, exige el espacio
+        .replace(/\s+/g,'.*')
+    , 'i');
+}
 
 myOwn.firstDisplayCount = 20;
 myOwn.firstDisplayOverLimit = 30;
 myOwn.displayCountBreaks = [100,250,1000];
 myOwn.displayCountBreaks = [50,100,500];
 myOwn.comparatorWidth = 16;
+myOwn.comparatorParameterNull={
+    '\u2205':true,
+    '!=\u2205':true,
+}
 myOwn.comparator={
     '=':function(valueToCheck,condition){return valueToCheck == condition;},
-    '~':function(valueToCheck,condition){return condition==null || RegExp(escapeRegExp(condition.toString()),'i').test(valueToCheck);},
-    '!~':function(valueToCheck,condition){return condition==null || !RegExp(escapeRegExp(condition.toString()),'i').test(valueToCheck);},
+    '~':function(valueToCheck,condition){return condition==null || regex4search(condition.toString()).test(valueToCheck);},
+    '!~':function(valueToCheck,condition){return condition==null || !regex4search(condition.toString()).test(valueToCheck);},
     '/R/i':function(valueToCheck,condition){return condition==null || RegExp(condition,'i').test(valueToCheck);},
     '\u2205':function(valueToCheck,condition){return valueToCheck == null;},//\u2205 = conjunto vacío
     '!=\u2205':function(valueToCheck,condition){return valueToCheck != null;},//\u2205 = conjunto vacío
@@ -2446,8 +2470,9 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     var filterData=filterRows[iFilter];
                     var partialOk=true;
                     for(var column in depot.row){
-                        if(filterData.rowSymbols[column] && my.comparator[filterData.rowSymbols[column]]){
-                            var isSatisfied=my.comparator[filterData.rowSymbols[column]](depot.row[column],filterData.row[column]);
+                        var compSymb = filterData.rowSymbols[column];
+                        if(compSymb && my.comparator[compSymb] && (my.comparatorParameterNull[compSymb] || filterData.row[column] != null)){
+                            var isSatisfied=my.comparator[compSymb](depot.row[column],filterData.row[column]);
                             if(!isSatisfied){
                                 partialOk=false;
                             }
