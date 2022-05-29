@@ -15,6 +15,10 @@ function gotoEmptyFieldOrSubmit(event){
             loginForm.submit();
         },500);
     }
+    if(location.search){
+        var loginForm = document.getElementById('loginForm');
+        loginForm.action = loginForm.action + location.search;
+    }
 }
 
 window.addEventListener('load',function(){
@@ -42,6 +46,7 @@ window.addEventListener('load',function(){
         setTimeout(function(){
             location = gotoLoginElement.href;
         },5000)
+    }else{
+        controlar_compatibilidad();
     }
-    controlar_compatibilidad();
 })    
