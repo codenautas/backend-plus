@@ -4,6 +4,7 @@ function gotoEmptyFieldOrSubmit(event){
     if(location.hash){
         sessionStorage.setItem('backend-plus-hash-redirect',location.hash);
     }
+    var loginForm = document.getElementById('loginForm');
     if(document.getElementById('username').value==''){
         document.getElementById('username').focus();
         event.preventDefault();
@@ -16,7 +17,6 @@ function gotoEmptyFieldOrSubmit(event){
         },500);
     }
     if(location.search){
-        var loginForm = document.getElementById('loginForm');
         loginForm.action = loginForm.action + location.search;
     }
 }
@@ -46,6 +46,7 @@ window.addEventListener('load',function(){
         setTimeout(function(){
             location = gotoLoginElement.href;
         },5000)
+        gotoLoginElement.focus()
     }else{
         controlar_compatibilidad();
     }
