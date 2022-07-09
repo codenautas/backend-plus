@@ -77,7 +77,7 @@ export interface ContextForDump extends Context {
 
 export type InformProgressFunction=(opts:Error|{data:any}|{start:any}|{message:string}|{message?:string, lengthComputable:boolean, loaded:number, total:number, force?:boolean})=>void
 
-export type ProcedureContext=Context & {
+export interface ProcedureContext extends Context{
     client:Client
     doing:string
     informProgress:InformProgressFunction
@@ -371,6 +371,7 @@ export class AppBackend{
     procedureDefCompleter(procedureDef:ProcedureDef):ProcedureDef
     tableDefAdapt(tableDef:TableDefinition, context:Context):TableDefinition
     pushApp(dirname:string):void
+    dumpDbTableFields(tableDefinition:TableDefinition):string[]
     dumpDbSchemaPartial(partialTableStructures:TableDefinitions, opts?:DumpOptions):Promise<{mainSql:string; enancePart:string}> 
     getContextForDump(): ContextForDump
     getClientSetupForSendToFrontEnd(req:Request):ClientSetup

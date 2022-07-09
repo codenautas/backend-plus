@@ -54,7 +54,7 @@ html(lang=lang)
           td
           td
             input(type="submit", value=msgs.chpass.button)
-        each errorLine in (flash.error||[])
+        each errorLine in (flash && flash.error||[])
           tr(style={color:'red'})
             td.error-message(colspan=5)=errorLine
     if strength
