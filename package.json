@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for typed controls",
-  "version": "1.16.10",
+  "version": "1.16.11",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -49,7 +49,7 @@
     "json4all": "^1.1.0",
     "lazy-some": "^0.1.0",
     "like-ar": "^0.3.6",
-    "login-plus": "^1.6.3",
+    "login-plus": "^1.7.0",
     "memorystore": "^1.6.7",
     "mini-tools": "^1.11.2",
     "moment": "^2.29.4",
