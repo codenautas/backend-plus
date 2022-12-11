@@ -39,13 +39,16 @@ una grilla (basada en table-algo.js, ya sea tabla o vista),
 se le puede indicar al procedimiento que tiene un comportamiento especial
 el resultado ok. 
 
-Se debe definir un `wScreen` en `my.wScreens.proc.result`.
+En la definición del procedimiento poner: `resultOk: 'showGrid'`, y en
+el return definir un objeto de tipo `MenuInfoTable`
+
+Otra alternativa es: definir un `wScreen` en `my.wScreens.proc.result`.
 En la definición del procedimiento se debe indicar en `resultOk` el nombre de la definición. 
 
 **Del lado del cliente poner (podría ser en `menu.js`)**
 ```js
 function mostrarGrillaComoResultado(nombreGrilla, divResult, filtro){
-    var fixedFields={};
+    var fixedFields=[];
     likeAr(filtro).forEach(function(value, attrName){
         if(value!=null){
             fixedFields.push({fieldName: attrName, value: value});
@@ -181,3 +184,32 @@ prepareGetTables(){
     });
 }
 ```
+
+## ¿Cómo hago para extender los tipos, por ejemplo Context?
+
+Por ejemplo si queremos agregar campos a Context para usar en `getContext(req)` 
+y que `context.be` sea del tipo de tu app hay que usar el archivo `types-my-app.ts`
+y agregar ahí algo como:
+
+```ts
+import { AppMyApp } from "app-my-app";
+
+// exposes APIs from this package
+export * from "backend-plus";
+export * from "pg-promise-strict";
+
+declare module "backend-plus"{
+    interface Context {
+        forDump?:boolean
+        esAdmin:boolean, 
+        esOficina:boolean
+    }
+    interface ProcedureContext {
+        be:AppMyApp
+    }
+}
+
+export type Constructor<T> = new(...args: any[]) => T;
+```
+
+y asegurarse de importar los tipos desde `types-my-app.ts` en vez de `backend-plus.ts`
