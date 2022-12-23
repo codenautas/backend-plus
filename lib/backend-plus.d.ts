@@ -233,7 +233,10 @@ export type ForeignKey = {
     displayAfterFieldName?:string|boolean
     forceDeferrable?:boolean
 }
-export type Constraint = {constraintType:'check'|'unique'|'not null', expr?:string, fields?:string[], consName?:string}
+export type Constraint = {constraintType:string, consName?:string} & (
+    {constraintType:'unique', fields:string[], where?:string} |
+    {constraintType:'check', expr?:string} 
+)
 export type TableDefinition = EditableDbDefinition & {
     name:string
     elementName?:string

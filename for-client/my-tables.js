@@ -2179,10 +2179,10 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             }
         });
         if(grid.def.clientSide){
-            if(!grid.my.clientSidePrepared && grid.my.clientSides[grid.def.clientSide].prepare){
+            if(!depot.clientSidePrepared && grid.my.clientSides[grid.def.clientSide].prepare){
                 grid.my.clientSides[grid.def.clientSide].prepare(depot);
             };
-            grid.my.clientSidePrepared=true;
+            depot.clientSidePrepared=true;
             grid.my.clientSides[grid.def.clientSide].update(depot);
         }
     };
