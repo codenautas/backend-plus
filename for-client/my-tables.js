@@ -1183,6 +1183,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
                         detailing:opts.detailing, 
                         detailingForUrl:grid.detailingForUrl,
                         detailingPath:(grid.detailingPath||[]).concat(depot.lastsPrimaryKeyValues),
+                        parentDepot: depot
                     }).waitForReady(function(g){
                         detailControl.divDetail=g.dom.table;
                         if(detailTableDef.refreshParent || grid.def.complexDef && detailTableDef.refreshParent!==false){
@@ -2005,7 +2006,24 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     grid.dom.footInfo = html.th({colspan:grid.columns.length, "is-processing":"1"}).create();
     createInfoColumnStructure(grid.dom.footInfo);
     grid.actualName = (grid.def.gridAlias || grid.def.name) + (grid.connector.fixedFields.length ? '-' + JSON4all.stringify(grid.connector.fixedFields.map(function(pair){ return pair.value; })) : '')
-    grid.dom.caption=html.caption({class: 'grid-caption'}, grid.def.title).create();
+    var captionTitle = grid.def.title;
+    grid.connector.fixedFields.forEach(function(pair){
+        var toCaption = grid.def.field[pair.fieldName].toCaption || my.config.config['grid-smart-caption']
+        if(toCaption && pair.value){
+            var typeName = grid.def.field[pair.fieldName].typeName;
+            captionTitle += ' '
+            if(toCaption == 'labeled' || toCaption != 'alone' && (typeName == 'boolean' || typeName == 'integer' || typeName == 'bigint' || typeName == 'decimal')){
+                captionTitle += grid.def.field[pair.fieldName].title + ':'
+            }
+            if(typeName == 'date'){
+                var date = bestGlobals.date(new Date(pair.value))
+                captionTitle += date.toDmy()
+            }else{
+                captionTitle += pair.value instanceof Date && pair.value.toDmy ? pair.value.toDmy() : pair.value.toString()
+            }
+        }
+    });
+    grid.dom.caption=html.caption({class: 'grid-caption'}, captionTitle).create();
     if(grid.vertical){
         grid.dom.table = html.table({"class":"my-grid", "my-table": grid.actualName},[
             grid.dom.caption,
@@ -2077,7 +2095,7 @@ myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElem
             }
         }else{
             var lastTBody=grid.dom.table.tBodies[grid.dom.table.tBodies.length-1];
-            var lastTr=lastTBody.rows[lastTBody.rows.length-1];
+            var lastTr=lastTBody.rows[aboveDepot ?? lastTBody.rows.length-1];
             if(lastTr){
                 belowDepot=lastTr.depot;
             }
@@ -2094,7 +2112,7 @@ myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElem
                 aboveTr.rowIndex-grid.dom.table.tHead.rows.length
             );
         }else{
-            position = grid.dom.table.tBodies[0].rows.length;
+            position = aboveDepot ?? grid.dom.table.tBodies[0].rows.length;
         }
         /*
         while(
@@ -2249,12 +2267,15 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             depot.primaryKeyValues = grid.def.primaryKey.map(function(fieldName){ 
                 return depot.row[fieldName]; 
             });
+            /*
             depot.lastsPrimaryKeyValues = depot.primaryKeyValues.slice(0);
             var i=0;
             while(i<grid.def.primaryKey.length && depot.connector.fixedField[grid.def.primaryKey[i]]){
                 depot.lastsPrimaryKeyValues.shift();
                 i++;
             }
+            */
+            depot.lastsPrimaryKeyValues = depot.primaryKeyValues.filter((_,i) => depot.connector.fixedField[grid.def.primaryKey[i]] != null);
             if(depot.lastsPrimaryKeyValues.length==1){
                 depot.lastsPrimaryKeyValues=depot.lastsPrimaryKeyValues[0];
             }else{
