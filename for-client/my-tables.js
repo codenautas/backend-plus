@@ -2275,7 +2275,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 i++;
             }
             */
-            depot.lastsPrimaryKeyValues = depot.primaryKeyValues.filter((_,i) => depot.connector.fixedField[grid.def.primaryKey[i]] != null);
+            depot.lastsPrimaryKeyValues = depot.primaryKeyValues.filter((_,i) => depot.connector.fixedField[grid.def.primaryKey[i]] == null);
             if(depot.lastsPrimaryKeyValues.length==1){
                 depot.lastsPrimaryKeyValues=depot.lastsPrimaryKeyValues[0];
             }else{
