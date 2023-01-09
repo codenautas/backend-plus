@@ -846,11 +846,11 @@ myOwn.DataColumnGrid.prototype.cellAttributes = function cellAttributes(specific
             attr["my-mandatory"]="normal";
         }
     }
-    if(grid.connector.fixedField[fieldDef.name]){
+    if(grid.connector.fixedField[fieldDef.name] != null){
         attr["inherited-pk-column"]="yes";
     }
     if(fieldDef.referencesField){
-        if(grid.connector.fixedField[fieldDef.referencesField]){
+        if(grid.connector.fixedField[fieldDef.referencesField] != null){
             attr["inherited-pk-column"]="yes";
         }
         if(grid.def.field[fieldDef.referencesField].isPk){
@@ -2008,8 +2008,8 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     grid.actualName = (grid.def.gridAlias || grid.def.name) + (grid.connector.fixedFields.length ? '-' + JSON4all.stringify(grid.connector.fixedFields.map(function(pair){ return pair.value; })) : '')
     var captionTitle = grid.def.title;
     grid.connector.fixedFields.forEach(function(pair){
-        var toCaption = grid.def.field[pair.fieldName].toCaption || my.config.config['grid-smart-caption']
-        if(toCaption && pair.value){
+        var toCaption = grid.def.field[pair.fieldName].toCaption ?? my.config.config['grid-smart-caption']
+        if(toCaption && pair.value != null){
             var typeName = grid.def.field[pair.fieldName].typeName;
             captionTitle += ' '
             if(toCaption == 'labeled' || toCaption != 'alone' && (typeName == 'boolean' || typeName == 'integer' || typeName == 'bigint' || typeName == 'decimal')){

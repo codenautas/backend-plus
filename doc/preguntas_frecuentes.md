@@ -213,3 +213,97 @@ export type Constructor<T> = new(...args: any[]) => T;
 ```
 
 y asegurarse de importar los tipos desde `types-my-app.ts` en vez de `backend-plus.ts`
+
+## ¿Cómo hago para especificar columnas obligatorias en condicionadas al resto?
+
+A nivel de los datos, lo mejor es utilizar una serie de check constraints en la definición de la tabla. 
+```ts
+var provinciasConstraints = [
+    {
+        constraintType:'check', 
+        expr:`provincia = 'CABA' or localidad is not null`, 
+        consName:`debe especificar la localidad (salvo en CABA')`
+    },
+    {
+        constraintType:'check', 
+        expr:`provincia <> 'CABA' or comuna is not null`, 
+        consName:`en CABA debe especificar la comuna`
+    }
+]
+```
+Recordar que al consName se muestra como error de validación cuando se viola la constraint
+(por eso es recomendable usar más de una constraint según la complejidad de la condición).
+
+Si la lógica es más compleja también se puede utilizar un trigger que 
+rechace el registro si falta completar un campo en la ciercunstancia dada. 
+
+### La experiencia de usuario (el front end)
+
+Backend plus muestra los campos obligatorios `nullable: false` con una estrella 
+(eso se puede cambiar en el css con el estilo `my-mandatory`).
+
+Cuando las columnas condicionales dependen de condiciones debidas a lo cargado previamente
+se debe indicar un `specialValidator` en la definición de la tabla, 
+y programar el comportamiento a nivel del backend el miembro `validators`. 
+
+En el backend:
+```ts
+function personas(context:TableContext):TableDefinition{
+    return {
+        name:'personas',
+        special
+        fields:[
+            {name:'id', typeName:'bigint'},
+            {name:'nombre', typeName:'text', nullable:false},
+            {name:'apellido', typeName:'text', nullable:false},
+            {name:'provincia', typeName:'text', nullable:false},
+            {name:'localidad', typeName:'text'},
+            {name:'comuna', typeName:'text'},
+        ],
+        primaryKey:['id'], 
+        constraints: provinciasConstraints,
+        specialValidator: 'provincias'
+    }
+}
+```
+
+En el frontend:
+```ts
+myOwn.validators.provincias = {
+    getMandatoryMap(row:Record<string, any>){
+        var specialMandatories = {
+           localidad: row.provincia != 'CABA',
+           comuna: row.provincia == 'CABA'
+        }
+        return specialMandatories;
+    }
+}
+```
+
+En el .css:
+```css
+td[my-special]:empty {
+    background: url("../img/mandatory.png") top right no-repeat;
+    background-size: 12px 12px;
+}
+```
+
+## ¿Cómo hago para anular en algunas filas el detail tables de alguna columna?
+
+Si por ejemplo hay una columna de details para expandir las localidades de una provincia
+pero no se quiere el desplegable para la Ciudad de Buenos Aires se puede 
+declarar una condición del lado del backend y definirla del lado del frontend. 
+
+En el backend:
+```ts
+    // ...
+    detailTables:[
+        {name:'localidades', fields:['provincia'], abr:'L', condition:'noCABA'}
+    ]
+```
+En el frontend:
+```ts
+myOwn.conditions.noCABA = function(depot:Depot){
+    return depot.row.provincia != 'CABA';
+}
+```

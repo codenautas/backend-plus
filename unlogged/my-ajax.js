@@ -582,7 +582,7 @@ function noChange(x){ return x; }
 myAjax.UriSearchToObjectParams={
 	i                :{ showInMenu:true , encode:function(value,menu){ return menu.name?(menu.parents||[]).concat(menu.name).join(','):value }},
 	fc               :{                   encode:function(x){ return JSON.stringify(x); }, U:function(x){ return JSON.parse(x)}  },
-	ff               :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return JSON.parse(x)}  },
+	ff               :{                   encode:function(x){ return json4all.stringify(x); }, decode:function(x){ return json4all.parse(x)}  },
 	up               :{                   encode:function(x){ return json4all.stringify(x); }, decode:function(x){ return json4all.parse(x)}  },
 	pf               :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return JSON.parse(x)}  },
 	today            :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return bestGlobals.date.iso((x+'').substr(0,10))}  },
@@ -592,7 +592,7 @@ myAjax.UriSearchToObjectParams={
 	showParams       :{ hide:true       },
     parents          :{ hide:true       },
     button           :{ hide:true       },
-    fixedFields      :{ varName:'ff'    , encode:function(pairs){ return JSON.stringify(likeAr.toPlainObject(pairs, 'fieldName')); }},
+    fixedFields      :{ varName:'ff'    , encode:function(pairs){ return json4all.stringify(likeAr.toPlainObject(pairs, 'fieldName')); }},
 	detailing        :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return JSON.parse(x)}  },
 }
 
