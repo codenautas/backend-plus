@@ -1001,45 +1001,17 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
                 if(grid.modes.saveByField){
                     saveRow(depot,{visiblyLogErrors:false});
                 }
-                var promiseArray = [];
-                if(fieldDef.references){
-                    //busco FKs que tengan referencien a la tabla, que tengan como source a fieldDef y tengan displayFields
-                    grid.def.foreignKeys.filter(function(fkDef){
+                var promiseChain = Promise.resolve();
+                if (fieldDef.references) {
+                    promiseChain.then(grid.setInheritedFields(depot, function(fkDef){
                         return fkDef.references == fieldDef.references && 
                         fkDef.fields.find(function(field){
                             return field.source == fieldDef.name
                         }) &&
-                        fkDef.displayFields.length
-                    }).forEach(function(fkDef){
-                        var fixedFields = fkDef.fields.map(function(field){
-                            return {fieldName: field.target, value: depot.row[field.source]};
-                        })
-                        var dummyElement = html.div().create();
-                        var Connector = my.offline.mode?my.TableConnectorLocal:my.TableConnector;
-                        var myConnector = new Connector({
-                            my:my, 
-                            tableName: fieldDef.references,
-                            getElementToDisplayCount:function(){ return dummyElement }
-                        }, {fixedFields: fixedFields});
-                        myConnector.getStructure();
-                        //cargo registro y actualizo displayFields
-                        promiseArray.push(
-                            myConnector.getData().then(function(data){
-                                var referencedRow = data[0];
-                                fkDef.displayFields.forEach(function(displayFieldName){
-                                    var lookupValue=referencedRow?referencedRow[displayFieldName]:null;
-                                    var fieldName = fkDef.alias + '__' + displayFieldName;
-                                    depot.row[fieldName]=lookupValue;
-                                    if(depot.rowControls[fieldName]){
-                                        depot.rowControls[fieldName].setTypedValue(lookupValue);
-                                    }
-                                })
-                                
-                            })
-                        )
-                    });
+                        fkDef.displayFields.length >= 0 
+                    }));
                 }
-                Promise.all(promiseArray).then(function(){
+                promiseChain.then(function(){
                     grid.updateRowData(depot,true);
                 });
             }
@@ -2061,6 +2033,43 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
                 // [html.tr([html.th([buttonInsert]),grid.dom.footInfo])]
         ]).create();
     }
+    grid.setInheritedFields = function(depot, filterFun){
+        var promiseArray = [];
+        grid.def.foreignKeys.filter(filterFun||(x=>x)).forEach(function(fkDef){
+            var fixedFields = fkDef.fields.map(function(field){
+                return {fieldName: field.target, value: depot.row[field.source]};
+            })
+            var dummyElement = html.div().create();
+            var Connector = my.offline.mode?my.TableConnectorLocal:my.TableConnector;
+            var myConnector = new Connector({
+                my:my, 
+                tableName: fkDef.references,
+                getElementToDisplayCount:function(){ return dummyElement }
+            }, {fixedFields: fixedFields});
+            myConnector.getStructure();
+            //cargo registro y actualizo displayFields
+            promiseArray.push(
+                myConnector.getData().then(function(data){
+                    var referencedRow = data[0];
+                    grid.def.fields.forEach(function(fieldDef){
+                        var foreignFieldName =  fieldDef.references == fkDef.references ? fieldDef.referencedName : fieldDef.inherited ? fieldDef.name : null;
+                        if (referencedRow && foreignFieldName in referencedRow) {
+                            var lookupValue = referencedRow[foreignFieldName];
+                            var fieldName = fieldDef.name;
+                            depot.row[fieldName]=lookupValue;
+                            if(fieldDef.inherited){
+                                depot.rowPendingForUpdate[fieldName] = lookupValue;
+                            }
+                            if(depot.rowControls[fieldName]){
+                                depot.rowControls[fieldName].setTypedValue(lookupValue);
+                            }
+                        }
+                    })
+                })
+            )
+        });
+        return Promise.all(promiseArray);
+    }
     grid.dom.main.innerHTML='';
     grid.dom.main.appendChild(grid.dom.table);
 };
@@ -2201,8 +2210,12 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 grid.my.clientSides[grid.def.clientSide].prepare(depot);
             };
             depot.clientSidePrepared=true;
-            grid.my.clientSides[grid.def.clientSide].update(depot);
         }
+        grid.setInheritedFields(depot).then(function(){
+            if(grid.def.clientSide){
+                grid.my.clientSides[grid.def.clientSide].update(depot);
+            }
+        });
     };
     var changeIoStatus = function changeIoStatus(depot,newStatus, objectWithFieldsOrListOfFieldNames, title){
         var fieldNames=typeof objectWithFieldsOrListOfFieldNames === "string"?[objectWithFieldsOrListOfFieldNames]:(
