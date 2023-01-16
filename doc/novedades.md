@@ -1,5 +1,47 @@
 # novedades de _backend-plus_
 
+## Aggregates en grillas
+
+Las grillas pueden calcular sumas, promedios y cualquier otro tipo de resumen al pie de la grilla. 
+Para eso en la definición del campo de una tabla se puede definir el atributo `aggregate`, 
+que puede ser `sum`, `avg` o alguno definido dentro de la aplicación.
+
+```ts
+    {name:'importe', typeName:'decimal', aggregate:'sum'},
+    {name:'cantidad', typeName:'bigint', aggregate:'promedioArmonico'}
+```
+
+Para definir un aggregate nuevo se deben definir en el cliente las operaciones `result` y `acum`. 
+Por ejemplo para definir el promedio armónico:
+
+```ts
+myOwn.TableAggregates.promedioArmonico = function(){
+    this.n=0;
+    this.sumInv=0;
+    this.error=false;
+    this.acum=function acum(value){
+        if(value!=null){
+            if(value==0){
+                this.error = true;
+            }else{
+                this.n++;
+                this.sumInv+=1/value;
+            }
+        }
+    }
+    this.result=function result(){
+        if(!this.n) return null;
+        if(this.error) return Number.NaN;
+        return this.n/this.sum;
+    }
+};
+```
+
+**1.11.19** se agrega `countTrue` que cuenta cuántos casos hay con true
+**0.30.20** se agregan `max` y `min`
+**0.26.3** se agrega `count`
+**0.20.22** primera version con `sum`, `avg` y `TableAggregates` programables
+
 ## _Typescript_ en backend-plus
 
 Backend-plus se puede usar con _Typescript_ gracias a la declaración de tipos de 
