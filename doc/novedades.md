@@ -1,5 +1,41 @@
 # novedades de _backend-plus_
 
+## Filtros en grillas
+
+Todas las grillas se pueden fltrar con el botón filtro. Al presionar el botón aparece una línea donde escribir
+los filtros, por defecto la operación es búsqueda por similar (parcial del texto). 
+Si en la línea de filtro hay dos valores se deben cumplir ambos (operación AND). 
+Si se desea que cumpla uno u otro filtro (no ambos a la vez o sea operación OR) se pueden agregar renglones al filtro. 
+
+**v1.6.5** Además permite borrar líneas del filtro (cuando se agregaron para OR y no se necesitan más). 
+
+**v1.6.4** Se mejora la búsqueda con acentos y mayúsculas y minúsculas.
+
+
+## Acciones auotmáticas al finalizar un procedimiento
+
+Al final del procedimiento cuando se llama desde el menú aparece el mensaje de lo devuelto bajo el botón de procesar. 
+O en rojo el mensaje de error si hubo una excepción. Esto se puede cambiar especificando en `resultOk` una función
+del front-end que reciba la respuesta y ejecute una función del lado del cliente especificada en:
+
+```ts
+myOwn.wScreens.proc.result.nombre_nueva_funcion = function<T>(result:T, divResult:HTMLDivElement){
+  ///...
+}
+```
+
+Además hay comportamientos predefinidos:
+
+**v1.13.1** `showDownloadUrl` muestra un link para hacer download, la respuesta tiene que tener el formato `{url:string}`
+
+**v1.1.0** `showGrid` muestra una grilla `result:{tableName:string, ...opts}` donde opts es el tercer parámetro de `myOwn.tableGrid` 
+
+**v1.6.1** `showText` muestra el contenido json (en una tabla recursiva) `result:string|object`
+
+**v0.18.6** `showError` muestra un mensaje de error en rojo `result:Error|{message:string}`
+
+**v0.18.6** `showText` muestra un texto en verde `result:string`
+
 ## Aggregates en grillas
 
 Las grillas pueden calcular sumas, promedios y cualquier otro tipo de resumen al pie de la grilla. 
@@ -37,10 +73,10 @@ myOwn.TableAggregates.promedioArmonico = function(){
 };
 ```
 
-**1.11.19** se agrega `countTrue` que cuenta cuántos casos hay con true
-**0.30.20** se agregan `max` y `min`
-**0.26.3** se agrega `count`
-**0.20.22** primera version con `sum`, `avg` y `TableAggregates` programables
+**v1.11.19** se agrega `countTrue` que cuenta cuántos casos hay con true
+**v0.30.20** se agregan `max` y `min`
+**v0.26.3** se agrega `count`
+**v0.20.22** primera version con `sum`, `avg` y `TableAggregates` programables
 
 ## _Typescript_ en backend-plus
 
@@ -199,10 +235,12 @@ Se usa para insertar registros nuevos.
 
 **v0.30.4** Se agrega la opción `install.table-data-dir`.
 
-**0.29.26** Se muestra el número de renglón cuando se detecta un error de importación.
+**v0.29.26** Se muestra el número de renglón cuando se detecta un error de importación.
 
 
 ## Pantalla de login
+
+**v1.16.8** Al presionar <kbd>Enter</kbd> en la pantalla de login se va al próximo campo vacío o se acepta la página. 
 
 **v1.9.3** En la pantalla de login un logo que identifica al sistema. 
 Esto mejora la usabilidad cuando los mismos usuarios utilizan varios sistemas basados en _backend-plus_. 
@@ -258,6 +296,8 @@ Los principales controles son:
 
 ## Compatibilidad HTTP/401
 
+**v1.16.6** se agrega el manejo de `/login?return-to-url=` para volver después del login a la URL anterior.
+
 **v1.7.0** Cuando un archivo no se puede servir porque está `unlogged` se envía el código `401` 
 y en vez de mostrar la pantalla de login se muestra una pantalla que informa que no está logueado 
 (y redirecciona a la pantalla de login).
@@ -265,6 +305,18 @@ y en vez de mostrar la pantalla de login se muestra una pantalla que informa que
 ## Grillas maestro
 
 La definición de `detailTables` en una grilla permite relacionar grillas detalle por cualquier conjunto de campos.
+
+**v1.16.18** Se agrega la posibilidad de mostrar en el título de la grilla los valores de los campos 
+que definen la condición de la grilla detalle. En la definición del campo se puede especificar 
+`toCaption:'labeled'` para que aparezca el nombre del campo y su valor o 
+`toCaption:'alone'` para que solo se vea el valor o `toCaption:'smart'` para que decida según el tipo.
+También se puede definir en a nivel de la definición globa poniendo en `client-side.grid-smart-caption` 
+alguno de esos 3 valores y valen como valor por defecto de la aplicación. 
+
+**v1.12.4** Se permite relacionar contra constantes:
+```ts
+{name:'detail_table', fields:[{target:'linea', value:1}], label:'primer detail'}
+```
 
 **v1.6.17** Se permite relacionar valores en null 
 (solo tiene sentido cuando alguno de los campos de ambas tablas no forma parte de las respectivas `primary keys`). 
@@ -354,16 +406,18 @@ server:
 el frontend inhabilite el botón de ejecución hasta que el procedimiento termine.
 
 
-## Que el usuario pueda hacer ctrl-click en botones para abrir otra pestaña
+## Que el usuario pueda hacer <kbd>ctrl</kbd>-<kbd>click</kbd> en botones para abrir otra pestaña
 
-En _backend-plus_ se puede hacer ctrl-click sobre:
+En _backend-plus_ se puede hacer <kbd>ctrl</kbd>-<kbd>click</kbd> sobre:
    * una opción de menú para abrir la opción en una nueva pestaña
    * una flechita que abre una grilla de detalle para ver la grilla del detalle en otra pestaña
    * la ejecución del procedimiento para obtener los resultados en otra pestaña. 
 
 También se puede usar en el frontend de _backend-plus_ tiene la funcion `my.createForkeableButton` 
-que crea un botón igual al de los menúes que reacciona al ctrl-click enviando a una nueva pestaña
+que crea un botón igual al de los menúes que reacciona al <kbd>ctrl</kbd>-<kbd>click</kbd> enviando a una nueva pestaña
 utilizando los mismos parámetros que la definición del menú. 
+
+**v1.16.20** Se arregla un error de <kbd>ctrl</kbd>-<kbd>click</kbd> en maestros detalles relacionados por fechas
 
 **v1.6.14** Se puede utilizar el parámetro `i` (que tiene la ruta del menú) en la función `createForkeableButton`
 
@@ -380,6 +434,11 @@ la lista de posibles valores para el campo (y se agregan las columnas `isName:tr
 
 <kdb>F9</kbd> es la tecla de método abreviado para la lupa.
 
+**v1.14.8** muestra una imágen en las tablas de referencia cuando tienen un campo `image`
+(debe tener el nombre de archivo y encontrarse en `/img`)
+
+**v1.13.1** La lupa también funciona en los formularios automáticos de los procedimientos
+
 **v1.6.9** En campos `jsonb` aparece el contenido en forma tabular.
 
 **v1.5.13** Funciona el despliegue de la tabla relacionada en tablas con campos compuestos.
@@ -389,6 +448,9 @@ la lista de posibles valores para el campo (y se agregan las columnas `isName:tr
 Con la opción `npm start -- --dump-db` se genera el archivo `local-db-dump.sql` 
 que contiene las instrucciones para crear la base de datos en _postgres_ en base
 a la definición de la estructura de las tablas y sus relaciones. 
+
+**v1.16.10** Se agrega la función `dumpDbTableFields` que genera un array de definición SQL de campos.
+Eso puede servir para generar _alter tables_ dinámicos para extender las estructuras de las tablas. 
 
 **v1.10.5** Se agrega la extensión `pgcrypto`
 
@@ -437,7 +499,10 @@ se usa en los scripts especiales de instalación y deben ser reemplazados luego 
 
 ## Orden en las grillas
 
-**v1.6.0** Las grillas se ordenan siempre, si no está definido `sortColumns` se usan los campos de `primaryKey`.
+Las grillas se ordenan siempre, si no está definido el orden se usa el `primaryKey`
+
+**v1.12.1** si no está definido `sortColumns` se usa `sql.orderBy` y si no los campos de `primaryKey`. 
+**v1.6.0** si no está definido `sortColumns` se usan los campos de `primaryKey`.
 
 ## campos de otras tablas en grillas
 
@@ -447,6 +512,23 @@ muestran también los campos marcados como `isName:true` de las tablas relaciona
 
 Ese comportamiento se puede cambiar utilizando las opciones `displayFields:[campos...]` y `displayAllFields` 
 en la definición de la `foreignKey` o `softForeignKey`.
+
+**v1.16.21** permite definir un campo como `inherited:true` en esos casos si la tabla relacionada tiene un 
+campo del mismo nombre el valor del campo se hereda al momento de editar la grilla. Por ejemplo si se tiene
+la tabla de ventas (pk: fecha, producto) y la tabla de productos (pk:producto) y en ambas hay un campo oferta
+el campo oferta en la tabla productos indicaría que el producto está en oferta en este momento, el campo oferta
+en la tabla ventas indica si el producto estaba en oferta en ese momento. Si se utiliza una grilla con `inherited:true`
+y las grillas están relacionadas con una FK el valor del campo se hereda automáticamente. Hay que tener cuidado
+con reforzar el comportamiento con un trigger (por si la tabla ventas inserta registros desde otras fuentes, 
+importación excel o procedimientos). La razón para que este comportamiento exista a nivel del front-end
+es para usarlo cuando el registro tiene campos obligatorios que aún no fueron llenados, porque en esos casos
+_backend-plus_ no envía los datos a la base de datos hasta tener todos los campos obligatorios de la grilla, 
+y es por eso que el trigger no se ejecutó todavía. Ese comportamiento puede ser necesario para mejorar la UX
+o para poder colorear o generar comportamientos visuales específicos. 
+
+**v1.6.13** en la definición de un campo se puede especificar `inJoin` con el alias de una tabla o query 2que esté en el from. 
+Las tablas que son `foreignKey` y `softForeignKey` están automáticamente en el from de la grilla. 
+Se pueden agregar más queries especificando la propiedad `sql.join`. 
 
 **V1.5.21** `displayAllFields` muestra también los campos calculados (marcados como `inTable:false` en la tabla relacionada).
 
@@ -461,7 +543,20 @@ La ejecución de procedimientos puede registrarse en la tabla bitacora definiend
 ## importación desde Excel y txt
 
 Las grillas de _backend-plus_ permiten la importación de datos desde archivos Excel o txt 
-(para los usuarios con permiso de `insert` y `update`).
+(para los usuarios con permiso de `insert` y `update`). Normalmente se fija (usando la PK)
+si el renglón existe (y reemplaza el contenido de todas las columnas) y si no existe
+inserta un nuevo registro en la tabla. Cuando una celda está vacía (y el nombre de la columna está)
+el valor que exista en la tabla se pisa con un `null`.
+
+**v1.16.0** Se agregan el excel `#cuidado`. Es un formato especial del excel donde se especifica
+para cada renglón si se quiere insertar, modificar o borrar colocando en la primera columna de cada fila
+`#nuevo`, `#cambio` o `#borrar` respectivamente, y el título de la columna (la celda A1 debe ser `#cuidado`). 
+Eso agrega una manera de borrar registros desde el excel y agrega la seguridad de no agregar o no modificar
+renglones si eso no se quería (porque se especifica la opción correspondiente). 
+Para mejorar la seguridad al importar se puede especificar en la definición de ciertas tablas que solo reciban
+excel cuidados poniendo `inputCuidado:true`.
+
+**v1.13.6** Simplifica espacios y fines de línea al importar (muestra la opción en el front-end)
 
 **v1.11.0** Se arregla un problema que en ciertas ocasiones al fallar la importación por la mitad 
 el rollback no evitba la inserción del primer registro.
@@ -520,6 +615,11 @@ devel:
   forceShowAsEditable: false
 ```
 
+**v1.15.1** Cuando `client-setup.background-img` no esté especificado pone el fondo de capacitación
+si la url contiene la palabra `capa` o `capacitacion` o el fondo de test cuando contenga `test`, `pru` o `prueba`
+y el fondo de desarrollo cuando la url sea `devel` o `desa`. 
+Además pone una franja de `caution` (negra y amarilla en diagonal) si el dominio es `localhost`. 
+
 **v1.5.4** La opción `useFileDevelopment` sirve las versiones de _devel_ de los archivos `.js` que van al servidor
 cuando están definidos en `clientIncludes` con `fileDevelopment`.
 
@@ -527,7 +627,7 @@ cuando están definidos en `clientIncludes` con `fileDevelopment`.
 de la instancia de prueba de la instancia de capacitación de la instancia de producción. 
 Se usa configura en `client-setup.background-img`.
 
-**0.29.52** Cuando en la configuración se pone `server.session-store: memory` en modo `devel` las sesiones
+**v0.29.52** Cuando en la configuración se pone `server.session-store: memory` en modo `devel` las sesiones
 se guardan en disco para no necesitar reloguearse al reiniciar el sistema.
 
 ## definición de tablas
@@ -537,6 +637,13 @@ La definición de tablas incluye información para:
    * generar dinámicamente las grillas en el _frontend_,
    * generar listas desplegables para campos relacionados y parámetros,
    * generar los SQL de los procedimientos de recuperación y guardado
+
+**v1.16.16** Se puede agregar un filtro a una _unique constraint_. Por ejemplo si se quiere que
+en la tabla localidades haya una principal por cada provincia (basándose en el campo lógico `principal`)
+se puede escribir en la lista de constraints de la tabla localidades:
+```ts
+{consType:'unique', fields:['provincia'], where:`principal is true`}
+```
 
 **v1.5.3** Se agrega `displayAfterFieldName` para el agregado de un campo proveniente de otra tabla
 
@@ -554,18 +661,18 @@ la configuración de la aplicación en `db.fkOnUpdate: cascade`.
 **v0.30.15** Se agregan tablas `refrescables` que se actualizan automáticamente 
 cuando hay cambios en la base de datos (solo para vistas y tablas _read only_).
 
-**0.29.20** Se puede definir `constraintsDeferred:true` para guardar datos y calcular las constraints después. 
+**v0.29.20** Se puede definir `constraintsDeferred:true` para guardar datos y calcular las constraints después. 
 
-**0.29.15** Primera versión de `constraintsDeferred:true` que solo funciona para las restricciones
+**v0.29.15** Primera versión de `constraintsDeferred:true` que solo funciona para las restricciones
 afectadas por `SET CONSTRAINTS ALL DEFERRED`.
 
 ## Grillas
 
 **v0.29.41** Cambia la forma de fijar los títulos de las grills (ahora usa css). 
 
-**0.29.17** Se marcan los renglones donde está el cursor y donde está el mouse.
+**v0.29.17** Se marcan los renglones donde está el cursor y donde está el mouse.
 
-**0.29.0** Se pueden definir grillas basadas en varias tablas con campos editables de modo de 
+**v0.29.0** Se pueden definir grillas basadas en varias tablas con campos editables de modo de 
 que cada valor se grabe en la tabla correspondiente. 
 Para ello hay que definir el atributo `table` en la columna correspondiente o `tableName` y
 definir también a nivel tabla `otherTableDefs[tableName]`
@@ -573,7 +680,7 @@ definir también a nivel tabla `otherTableDefs[tableName]`
 ## _URL_ del _frontend_
 
 Las direcciones de la barra de navegación reflejan la opción de menú elegida 
-o, en caso de haber hecho <kbd>ctrl</kbd> <kbd>click</kbd> los parámetros de la grilla o procedimiento. 
+o, en caso de haber hecho <kbd>ctrl</kbd>-<kbd>click</kbd> los parámetros de la grilla o procedimiento. 
 Estas _URL_ pueden copiarse para utilizarlas después para llegar al mismo lugar 
 (si el usuario está logueado y tiene los mismos permisos). 
 
@@ -629,9 +736,15 @@ A nivel de campo se puede definir
 Las funciones que se pueden llamar a nivel del _frontend_ son las que están incluidas en `my.specialDefaultValue`.
 Cada aplicación puede agregar las propias, _backend-plus_ tiene definidas:
    * `current_date`: la fecha actual,
-   * `next_number`: el número siguiente al que se ve en el renglón de arriba. 
+   * `next_number`: el número siguiente teniendo en cuenta todos los números presentes en la columna. 
    Esto no impide el intento de generar duplicación de números en una clave desde el _frontend_ (el _backend_ lo rechazará).
    Pero bien usado es una ayuda al usuario que trabaja en forma ordenada.
+
+**v1.16.3** Se mejora `next_number` para que ponga el siguiente número en función de todos los presentes en la grilla 
+(visibles o no) y no solo en el superior y anterior.
+
+**v1.16.1** Se agrega el valor `lineNumberWhenImported` en `specialValueWhenInsert` para poner el número de línea del 
+archivo desde el que se inserta. 
 
 **v1.4.0** Se agrega `specialValueWhenInsert` en la definición de campos y como variable del _backend_ con la función `currentUsername`.
 
@@ -655,7 +768,7 @@ de la base de datos. _Backend-plus_ controla:
 
 Se puede `override`ar para agregar otros controles específicos de la aplicación. 
 
-**0.29.52** Se agrega en la configuración `server.session-store: memory` que indica dónde se guarda la información de sesión.
+**v0.29.52** Se agrega en la configuración `server.session-store: memory` que indica dónde se guarda la información de sesión.
 
 
 ## Idiomas en _backend-plus_
@@ -679,6 +792,8 @@ El _frontend_ de las aplicaciones _backend-plus_ se puede programar:
    * agregando pantallas direccionables por el menú en `wScreens` y
    * agregando comportamiento especial en las celdas de las grillas en `clientSides`
 
+**v1.13.8** Se agrega el atributo `autoProced` al `wScreen`
+
 **v1.10.14** se agrega el clientSide.displayUrl cuando se quiere poder clickear la URL directo de la tabla;
 se agrega tabmién cellDef:{tagName:string} a la definición de los clientSides
 
@@ -689,6 +804,7 @@ clickeado en una opción de menú o un _forkeable button_.
 
 ## procedimientos en el _backend_
 
+
 **v0.30.6** Recibe en el parámetro `context` las cookies.
 
 **v0.30.3** Se agrega `context.clearCookie`.
@@ -696,7 +812,7 @@ clickeado en una opción de menú o un _forkeable button_.
 **v0.30.0** Se agregan los procedimientos definidos como `unlogged` que pueden invocarse aunque
 el usuario no esté logueado. 
 
-**0.29.48** Se agrega la función `preOnClick` en las opciones del _forkeable button_ para fijarse 
+**v0.29.48** Se agrega la función `preOnClick` en las opciones del _forkeable button_ para fijarse 
 si se debe interrumpir la ejecución (`preOnClick` debe devolver un texto 
 en el caso de que no deba hacerse el _fork_ o proceder con el click).
 
