@@ -56,6 +56,10 @@ export interface ProcedureDef {
     proceedLabel?:string
     policy?:string
     uniqueUse?:boolean
+    forExport?:{
+        fileName?:string
+        csvFileName?:string
+    }
 }
 
 export interface User {

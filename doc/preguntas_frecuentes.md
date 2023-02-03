@@ -307,3 +307,43 @@ myOwn.conditions.noCABA = function(depot:Depot){
     return depot.row.provincia != 'CABA';
 }
 ```
+
+## ¿Cómo hacer un procedimiento que devuelva un archivo excel o csv?
+
+Al procedimiento se le puede agregar en la definición la propiedad `forExport`. 
+Y se pueden poner el nombre del archivo excel o del csv (o de ambos).
+El procedimiento tiene que devolver un arreglo de tablas (una por hoja del excel)
+o un arreglo con una sola tabla (para el CSV).
+
+¿Por qué se pueden especificar ambos? Porque en caso de que la generación del Excel dé error
+(por ser muy grande) el archivo .CSV se genera igual (o sea es la opción más segura).
+
+Si el procedimiento se llama dos veces seguidas (con menos de 10 minutos de diferencia)
+se ofrece el archivo generado con anterioridad y no se vuelve a generar. 
+
+```ts
+    {
+        action:"ejemplo_dos_hojas",
+        parameters:[],
+        forExport:{
+            fileName:'usuariosYfechas.xlsx',
+            csvFileName:'usuariosYfechas.csv'
+        },
+        coreFunction:async function(context:ProcedureContext, _parameters:CoreFunctionParameters){
+            return [
+                {
+                    title:'usuarios',
+                    rows: (
+                        await context.client.query(`select * from usuarios order by usuario`).fetchAll()
+                    ).rows.map(r=>{ delete r.md5clave; return r; })
+                },
+                {
+                    title:'signos',
+                    rows: (
+                        await context.client.query(`select * from signos order by 1`).fetchAll()
+                    ).rows
+                }
+            ]
+        }
+    }
+```

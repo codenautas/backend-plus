@@ -1977,7 +1977,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     createInfoColumnStructure(grid.dom.headInfo);
     grid.dom.footInfo = html.th({colspan:grid.columns.length, "is-processing":"1"}).create();
     createInfoColumnStructure(grid.dom.footInfo);
-    grid.actualName = (grid.def.gridAlias || grid.def.name) + (grid.connector.fixedFields.length ? '-' + JSON4all.stringify(grid.connector.fixedFields.map(function(pair){ return pair.value; })) : '')
+    grid.actualName = (grid.def.gridAlias || grid.def.name) + (grid.connector.fixedFields.length ? '-' + JSON4all.toUrl(grid.connector.fixedFields.map(function(pair){ return pair.value; })) : '')
     var captionTitle = grid.def.title;
     grid.connector.fixedFields.forEach(function(pair){
         var toCaption = grid.def.field[pair.fieldName].toCaption ?? my.config.config['grid-smart-caption']
