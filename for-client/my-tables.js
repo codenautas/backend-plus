@@ -596,6 +596,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                         return row[fieldName]
                     })
                 };
+                var tick = Math.random();
                 rows.forEach(function(row){
                     var primaryKeyValuesForRow = getPrimaryKeyValues(primaryKey, row);
                     var depot = grid.depots.find(function(depot){
@@ -603,15 +604,40 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                         return sameValue(JSON.stringify(primaryKeyValuesForRow),JSON.stringify(primaryKeyValuesForDepotRow))
                     });
                     //chequeo que exista depot por las dudas
-                    if(depot && !sameValue(JSON.stringify(row),JSON.stringify(depot.row))){
-                        //grid.retrieveRowAndRefresh(depot); 
-                        grid.depotRefresh(depot,{updatedRow:row, sendedForUpdate:{}},{noDispatchEvents:true});
+                    if (depot) { 
+                        if (!sameValue(JSON.stringify(row),JSON.stringify(depot.row))) {
+                            //grid.retrieveRowAndRefresh(depot); 
+                            grid.depotRefresh(depot,{updatedRow:row, sendedForUpdate:{}},{noDispatchEvents:true});
+                        }
+                        depot.tick = tick
+                    } else if (!depot) {
+                        var depot = grid.createDepotFromRow(row);
+                        grid.depots.push(depot);
+                        grid.createRowElements(-1, depot);
+                        grid.updateRowData(depot);
+                        depot.tick = tick
                     }
                 })
+                var i = 0;
+                while (i < grid.depots.length) {
+                    var depot = grid.depots[i];
+                    if (depot.tick != tick) {
+                        depot.manager.displayAsDeleted(depot);
+                    } else {
+                        i++;
+                    }
+                }
             })
         }
         if(grid.def.refrescable){
             window.currentAutofrefresh = setInterval(grid.refreshAllRows,8000);
+        }
+        if (grid.def.selfRefresh) {
+            var refresh = function refresh(){
+                grid.refreshAllRows();
+            }
+            grid.dom.main.addEventListener('deletedRowOk', refresh);
+            grid.dom.main.addEventListener('savedRowOk', refresh);
         }
     });
     grid.waitForReady = function waitForReady(fun){

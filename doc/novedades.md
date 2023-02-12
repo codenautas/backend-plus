@@ -642,6 +642,9 @@ La definición de tablas incluye información para:
    * generar listas desplegables para campos relacionados y parámetros,
    * generar los SQL de los procedimientos de recuperación y guardado
 
+**v1.17.1** Se agrega la opción `selfRefresh` que refresca toda la grilla después de grabar o borrar un dato. 
+Además se mejoran todos los refrescos de modo que se eliminen o agreguen filas si corresponde. 
+
 **v1.16.16** Se puede agregar un filtro a una _unique constraint_. Por ejemplo si se quiere que
 en la tabla localidades haya una principal por cada provincia (basándose en el campo lógico `principal`)
 se puede escribir en la lista de constraints de la tabla localidades:
