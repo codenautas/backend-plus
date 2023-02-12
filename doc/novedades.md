@@ -26,6 +26,10 @@ myOwn.wScreens.proc.result.nombre_nueva_funcion = function<T>(result:T, divResul
 
 Además hay comportamientos predefinidos:
 
+**v1.17.0** Se agrega un caso especial para `showDownloadUrl`, se puede definir un procedimiento como `forExport` 
+para que gestione la transformación de los datos resultantes en un archivo `xlsx` o `csv`, la respuesta tiene
+que tener el formato `{title:string, rows:Record<string,any>}[]`. Ver [preguntas frecuentes](preguntas_frecuentes.md#¿cómo-hacer-un-procedimiento-que-devuelva-un-archivo-excel-o-csv)
+
 **v1.13.1** `showDownloadUrl` muestra un link para hacer download, la respuesta tiene que tener el formato `{url:string}`
 
 **v1.1.0** `showGrid` muestra una grilla `result:{tableName:string, ...opts}` donde opts es el tercer parámetro de `myOwn.tableGrid` 
@@ -683,6 +687,11 @@ Las direcciones de la barra de navegación reflejan la opción de menú elegida
 o, en caso de haber hecho <kbd>ctrl</kbd>-<kbd>click</kbd> los parámetros de la grilla o procedimiento. 
 Estas _URL_ pueden copiarse para utilizarlas después para llegar al mismo lugar 
 (si el usuario está logueado y tiene los mismos permisos). 
+
+**v1.17.0** los valores que son objetos se muestran en un formato mejorado para el usuario 
+usando `JSON4all.toUrl` antes se mostraban con `JSON.stringify`. 
+Por ejemplo para el parametro `ff` (fixed fields) ahora la URL se ve así:
+`https://site.work/app_name/menu#table=name&ff=*,domnio:7,estado:activo,fecha:*2023-02-03`
 
 **v1.4.8** la opción `w` de la URL (que hace referencia a la `wScreen`) ya no es obligatorio
 se deduce del nombre del primer parámetro. O sea `?table=usuarios` se entiende como `?w=table&table=usuarios`. 
