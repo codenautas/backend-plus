@@ -672,6 +672,11 @@ afectadas por `SET CONSTRAINTS ALL DEFERRED`.
 
 ## Grillas
 
+**1.17.1** En `otherTableDefs[tableName]` se puede indicar si esa tabla se graba después de la tabla
+principal con `saveAfter:true` (para tablas detail). 
+Antes solo se grababa antes (útil para tablas referenciales con FK). 
+También se puede definir `prefiledFields`. 
+
 **v0.29.41** Cambia la forma de fijar los títulos de las grills (ahora usa css). 
 
 **v0.29.17** Se marcan los renglones donde está el cursor y donde está el mouse.
