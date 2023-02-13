@@ -2061,7 +2061,8 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     }
     grid.setInheritedFields = function(depot, filterFun){
         var promiseArray = [];
-        grid.def.foreignKeys.filter(filterFun||(x=>x)).forEach(function(fkDef){
+        grid.def.foreignKeys.concat(grid.def.softForeignKeys).filter(filterFun||(x=>x))
+        .filter(x=>!x.noInherit).forEach(function(fkDef){
             var fixedFields = fkDef.fields.map(function(field){
                 return {fieldName: field.target, value: depot.row[field.source]};
             })

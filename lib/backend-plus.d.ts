@@ -238,6 +238,7 @@ export type ForeignKey = {
     initiallyDeferred?:boolean
     displayAfterFieldName?:string|boolean
     forceDeferrable?:boolean
+    noInherit?:boolean
 }
 export type Constraint = {constraintType:string, consName?:string} & (
     {constraintType:'unique', fields:string[], where?:string} |
