@@ -613,7 +613,8 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                     } else if (!depot) {
                         var depot = grid.createDepotFromRow(row);
                         grid.depots.push(depot);
-                        grid.createRowElements(-1, depot);
+                        grid.sortColumns(grid.depots);
+                        grid.createRowElements(grid.depots.findIndex((myDepot)=>myDepot===depot), depot);
                         grid.updateRowData(depot);
                         depot.tick = tick
                     }
@@ -2570,6 +2571,18 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         }else{
             depotsToDisplay = grid.depots;
         }
+        grid.sortColumns = function sortColumns(depotsToDisplay){
+            return depotsToDisplay.sort(function(depot1, depot2){ 
+                grid.view.sortColumns.forEach(function(orderColumn){
+                    if(!grid.def.field[orderColumn.column]){
+                        my.log(orderColumn.column+' order no está en '+grid.def.name);
+                    }
+                    orderColumn.func=myOwn.sortMethods[grid.def.field[orderColumn.column].sortMethod||'default'];
+                })
+                return bestGlobals.compareForOrder(grid.view.sortColumns)(depot1.row, depot2.row);
+            });
+        }
+        grid.sortColumns(depotsToDisplay);
         if(grid.view.sortColumns.length>0){
             depotsToDisplay.sort(function(depot1, depot2){ 
                 grid.view.sortColumns.forEach(function(orderColumn){
