@@ -2083,7 +2083,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
                         var foreignFieldName =  fieldDef.references == fkDef.references ? fieldDef.referencedName : fieldDef.inherited ? fieldDef.name : null;
                         if (referencedRow && foreignFieldName in referencedRow) {
                             var lookupValue = referencedRow[foreignFieldName];
-                            var fieldName = fkDef.alias + '__' + displayFieldName;
+                            var fieldName = fieldDef.name;
                             if(fieldDef.inherited && !sameValue(depot.row[fieldName], lookupValue)){
                                 depot.rowPendingForUpdate[fieldName] = lookupValue;
                             }
