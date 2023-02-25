@@ -318,7 +318,8 @@ export type TableItemDef=string|{name:string, path?:string, tableGenerator?:(con
 export interface TableDefinitions {
     [k: string]: TableDefinitionFunction
 }
-export type ClientSetup= {
+export interface ClientSetup {
+    setup:Record<string, any>
     procedures:ProcedureDef[]
 }
 export type StartOptions={
@@ -381,13 +382,14 @@ export class AppBackend{
     getMenu(context?:Context):MenuDefinition
     inDbClient<T>(req:Request|null, doThisWithDbClient:(client:Client)=>Promise<T>):Promise<T>
     inTransaction<T>(req:Request|null, doThisWithDbTransaction:(client:Client)=>Promise<T>):Promise<T>
+    inTransactionProcedureContext<T>(req:Request|null, coreFunction:(context:ProcedureContext)=>Promise<T>):Promise<T>
     procedureDefCompleter(procedureDef:ProcedureDef):ProcedureDef
     tableDefAdapt(tableDef:TableDefinition, context:Context):TableDefinition
     pushApp(dirname:string):void
     dumpDbTableFields(tableDefinition:TableDefinition):string[]
     dumpDbSchemaPartial(partialTableStructures:TableDefinitions, opts?:DumpOptions):Promise<{mainSql:string; enancePart:string}> 
     getContextForDump(): ContextForDump
-    getClientSetupForSendToFrontEnd(req:Request):ClientSetup
+    getClientSetupForSendToFrontEnd(req:Request):Promise<ClientSetup>
     configList(): (object|string)[]
     configStaticConfig():void
     setStaticConfig(defConfigYamlString:string):void

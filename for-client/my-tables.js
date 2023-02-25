@@ -75,6 +75,7 @@ myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     lessDetails: "hide details",
     lessEqualThan:'less equal than',
     loading: "loading",
+    mandatoryFieldOmited:'mandatory fields omited: ',
     newUnsavedRow: "new unsaved row",
     notEmpty:'not empty',
     notSimilarTo:'not similar to',
@@ -144,6 +145,7 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     lessDetails: "dejar de mostrar los detalles asocialdos al registro",
     lessEqualThan:'menor igual que',
     loading: "cargando",
+    mandatoryFieldOmited:'faltan campos obligatorios: ',
     newUnsavedRow: "el nuevo registro (aun no grabado)",
     notEmpty:'no vacío',
     notSimilarTo:'no contiene',
@@ -2281,6 +2283,10 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 }
                 //var cual=grid.def.fields.filter(mandatoryOmitted)
                 if(grid.def.fields.some(mandatoryOmitted)){
+                    var where = depot.actionButton.insert ?? depot.tr ?? document.getElementById('main-logo') ?? document.body;
+                    if(where){
+                        where.title = myOwn.messages.mandatoryFieldOmited + grid.def.fields.filter(mandatoryOmitted).map(f=>f.name).join(', ');
+                    }
                     return Promise.resolve(); // no grabo todavía
                 };
             }
