@@ -615,7 +615,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                     } else if (!depot) {
                         var depot = grid.createDepotFromRow(row);
                         grid.depots.push(depot);
-                        grid.sortColumns(grid.depots);
+                        grid.sortDepotsToDisplay(grid.depots);
                         grid.createRowElements(grid.depots.findIndex((myDepot)=>myDepot===depot), depot);
                         grid.updateRowData(depot);
                         depot.tick = tick
@@ -1032,13 +1032,15 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
                 }
                 var promiseChain = Promise.resolve();
                 if (fieldDef.references) {
-                    promiseChain.then(grid.setInheritedFields(depot, function(fkDef){
-                        return fkDef.references == fieldDef.references && 
-                        fkDef.fields.find(function(field){
-                            return field.source == fieldDef.name
-                        }) &&
-                        fkDef.displayFields.length >= 0 
-                    }));
+                    promiseChain = promiseChain.then(
+                        grid.setInheritedFields(depot, function(fkDef){
+                            return fkDef.references == fieldDef.references && 
+                            fkDef.fields.find(function(field){
+                                return field.source == fieldDef.name
+                            }) &&
+                            fkDef.displayFields.length >= 0 
+                        }
+                    ));
                 }
                 promiseChain.then(function(){
                     grid.updateRowData(depot,true);
@@ -2065,7 +2067,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     grid.setInheritedFields = function(depot, filterFun){
         var promiseArray = [];
         grid.def.foreignKeys.concat(grid.def.softForeignKeys).filter(filterFun||(x=>x))
-        .filter(x=>x.noInherit && my.config.config['enhableFieldInherit']).forEach(function(fkDef){
+        .filter(x=>(x.inheritFieldsMode ?? my.config.config['inherit-fields-mode']) != 'no-inherit' ).forEach(function(fkDef){
             var fixedFields = fkDef.fields.map(function(field){
                 return {fieldName: field.target, value: depot.row[field.source]};
             })
@@ -2081,18 +2083,12 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
             promiseArray.push(
                 myConnector.getData().then(function(data){
                     var referencedRow = data[0];
-                    grid.def.fields.forEach(function(fieldDef){
-                        var foreignFieldName =  fieldDef.references == fkDef.references ? fieldDef.referencedName : fieldDef.inherited ? fieldDef.name : null;
-                        if (referencedRow && foreignFieldName in referencedRow) {
-                            var lookupValue = referencedRow[foreignFieldName];
-                            var fieldName = fieldDef.name;
-                            if(fieldDef.inherited && !sameValue(depot.row[fieldName], lookupValue)){
-                                depot.rowPendingForUpdate[fieldName] = lookupValue;
-                            }
-                            depot.row[fieldName]=lookupValue;
-                            if(depot.rowControls[fieldName]){
-                                depot.rowControls[fieldName].setTypedValue(lookupValue);
-                            }
+                    fkDef.displayFields.forEach(function(displayFieldName){
+                        var lookupValue=referencedRow?referencedRow[displayFieldName]:null;
+                        var fieldName = fkDef.alias + '__' + displayFieldName;
+                        depot.row[fieldName]=lookupValue;
+                        if(depot.rowControls[fieldName]){
+                            depot.rowControls[fieldName].setTypedValue(lookupValue);
                         }
                     })
                 })
@@ -2577,7 +2573,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         }else{
             depotsToDisplay = grid.depots;
         }
-        grid.sortColumns = function sortColumns(depotsToDisplay){
+        grid.sortDepotsToDisplay = function sortDepotsToDisplay(depotsToDisplay){
             if(grid.view.sortColumns.length>0){
                 return depotsToDisplay.sort(function(depot1, depot2){ 
                     grid.view.sortColumns.forEach(function(orderColumn){
@@ -2590,7 +2586,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 });
             }
         }
-        grid.sortColumns(depotsToDisplay);
+        grid.sortDepotsToDisplay(depotsToDisplay);
         grid.displayRows = function displayRows(fromRowNumber, toRowNumber, adding){
             var grid = this;
             if(!adding){
