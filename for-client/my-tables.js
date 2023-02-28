@@ -2204,6 +2204,23 @@ myOwn.TableGrid.prototype.updateRowCountHTML = function updateRowCountHTML(HTML)
     this.dom.headInfo.rowCount.innerHTML=HTML;
     this.dom.footInfo.rowCount.innerHTML=HTML;
 };
+
+var changeIoStatus = function changeIoStatus(depot,newStatus, objectWithFieldsOrListOfFieldNames, title){
+    var fieldNames=typeof objectWithFieldsOrListOfFieldNames === "string"?[objectWithFieldsOrListOfFieldNames]:(
+        objectWithFieldsOrListOfFieldNames instanceof Array?objectWithFieldsOrListOfFieldNames:Object.keys(objectWithFieldsOrListOfFieldNames)
+    );
+    fieldNames.forEach(function(name){ 
+        if(depot.rowControls[name]){
+            var td=depot.rowControls[name];
+            td.setAttribute('io-status', newStatus); 
+            if(title){
+                td.title=title;
+            }else{
+                td.title='';
+            }
+        }
+    });
+};
 myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
     var grid = this;
     var tbody = grid.dom.table.tBodies[0];
@@ -2244,22 +2261,6 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         grid.setInheritedFields(depot).then(function(){
             if(grid.def.clientSide){
                 grid.my.clientSides[grid.def.clientSide].update(depot);
-            }
-        });
-    };
-    var changeIoStatus = function changeIoStatus(depot,newStatus, objectWithFieldsOrListOfFieldNames, title){
-        var fieldNames=typeof objectWithFieldsOrListOfFieldNames === "string"?[objectWithFieldsOrListOfFieldNames]:(
-            objectWithFieldsOrListOfFieldNames instanceof Array?objectWithFieldsOrListOfFieldNames:Object.keys(objectWithFieldsOrListOfFieldNames)
-        );
-        fieldNames.forEach(function(name){ 
-            if(depot.rowControls[name]){
-                var td=depot.rowControls[name];
-                td.setAttribute('io-status', newStatus); 
-                if(title){
-                    td.title=title;
-                }else{
-                    td.title='';
-                }
             }
         });
     };
