@@ -619,6 +619,10 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                         grid.createRowElements(grid.depots.findIndex((myDepot)=>myDepot===depot), depot);
                         grid.updateRowData(depot);
                         depot.tick = tick
+                        changeIoStatus(depot,'background-change', depot.row);
+                        setTimeout(function(){
+                            changeIoStatus(depot,'ok', depot.row);
+                        },3000);
                     }
                 })
                 var i = 0;
