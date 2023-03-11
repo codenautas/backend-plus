@@ -2266,12 +2266,8 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 grid.my.clientSides[grid.def.clientSide].prepare(depot);
             };
             depot.clientSidePrepared=true;
+            grid.my.clientSides[grid.def.clientSide].update(depot);
         }
-        grid.setInheritedFields(depot).then(function(){
-            if(grid.def.clientSide){
-                grid.my.clientSides[grid.def.clientSide].update(depot);
-            }
-        });
     };
     var saveRow = function(depot, opts){
         if(!('saving' in depot)){
