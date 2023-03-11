@@ -149,7 +149,13 @@ export interface ClientModuleDefinition{
     // fileProduction?:string // DEPRECATED, USE fileDevelopment
     fileDevelopment?:string
 }
-export type MenuInfo = MenuInfoMenu | MenuInfoTable | MenuInfoProc | MenuInfoPath;
+export interface WScreens{
+//    "!": {}
+}
+export type MenuInfoWScreen = {
+    menuType: keyof WScreens & string
+} &  MenuInfoMinimo
+export type MenuInfo = MenuInfoMenu | MenuInfoTable | MenuInfoProc | MenuInfoPath | MenuInfoWScreen;
 // type MenuDefinition = {menu:Readonly<MenuInfoBase[]>}
 export type MenuDefinition = {menu:MenuInfoBase[]}
 // types for Table definitions
