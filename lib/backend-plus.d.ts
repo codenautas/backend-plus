@@ -15,7 +15,6 @@ export type Server=net.Server;
 export interface CoreFunctionParameters{
     [key:string]: any
 }
-export type coreFunctionParameters=CoreFunctionParameters; // deprecated. Typo
 
 export type MarkdownDoc = 'markdown documentation with `` can content newlines. The identation of the first line is deleted in all others'|'etc...'; 
 
