@@ -1638,7 +1638,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
             ws["!ref"]="A1:"+XLSX.utils.encode_cell({c:lastColumnExported+leftColumn,r:grid.depotsToDisplay.length+topRow});
         }
         var excelExport = function(){
-            var wb = new Workbook();
+            var wb = XLSX.utils.book_new();
             var ws = {};
             var exportFileInformationWs={};
             var i=0;
