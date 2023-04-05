@@ -609,16 +609,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                     if (depot) { 
                         if (!sameValue(JSON.stringify(row),JSON.stringify(depot.row))) {
                             //grid.retrieveRowAndRefresh(depot); 
-                            if(depot.tr){
-                                grid.depotRefresh(depot,{updatedRow:row, sendedForUpdate:{}},{noDispatchEvents:true});
-                            }else{
-                                depot.row = row
-                                grid.displayBody()
-                                changeIoStatus(depot,'background-change', depot.row);
-                                setTimeout(function(){
-                                    changeIoStatus(depot,'ok', depot.row);
-                                },3000);
-                            }
+                            grid.depotRefresh(depot,{updatedRow:row, sendedForUpdate:{}},{noDispatchEvents:true});
                         }
                         depot.tick = tick
                     } else if (!depot) {
