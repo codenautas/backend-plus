@@ -148,7 +148,7 @@ title                 | T    | `name`         | título para la grilla cuando no
 inTable               | L    | true           | si pertenece físicamente a la tabla y por lo tanto entra en el dump.
 sequence              | [O]  | (sequenceDef)  | determina si el campo tendria un valor auto-incremental
 defaultValue          | T    |                | Valor predeterminado
-defaultDbValue        | T    |                | Expresión del valor predeterminado a nivel de la base de datos, no se ve en las tablas
+defaultDbValue        | T    |                | Expresión SQL del valor predeterminado a nivel de la base de datos, no se ve en las tablas, for example "random()*1000"
 defaultForOtherFields | B    | false          | establece si el campo (que debe definirse como "text") se utiliza para guardar un JSON con los "otros" campos cuando se importa un archivo (*para que funcione **debe configurarse "registerImports"** (ver tableDef)*)
 
 <!--lang:en--]
