@@ -15,7 +15,6 @@ export type Server=net.Server;
 export interface CoreFunctionParameters{
     [key:string]: any
 }
-export type coreFunctionParameters=CoreFunctionParameters; // deprecated. Typo
 
 export type MarkdownDoc = 'markdown documentation with `` can content newlines. The identation of the first line is deleted in all others'|'etc...'; 
 
@@ -353,6 +352,10 @@ export type OptsClientPage = {
 
 export type DumpOptions={complete?:boolean, skipEnance?:boolean, disableDBFunctions?:boolean}
 
+export interface Caches {
+    procedures:Record<string, {timestamp:number, result:any}>
+}
+
 export class AppBackend{
     procedures:ProcedureDef[]
     procedure:{ [key:string]:ProcedureDef }
@@ -362,9 +365,7 @@ export class AppBackend{
     db: MotorDb
     config: any
     rootPath: string
-    caches:{
-        procedures:{[k:string]:{timestamp:number, result:any}}
-    }
+    caches:Caches
     fieldDomain:{[k:string]:Partial<FieldDefinition>}
     exts:{img:string[], normal:string[]}
     optsGenericForAll:{allowedExts?:string[]}
