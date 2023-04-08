@@ -347,3 +347,37 @@ se ofrece el archivo generado con anterioridad y no se vuelve a generar.
         }
     }
 ```
+
+## ¿Cómo funciona clientIncludes? ¿qué hacer si en el navegador no aparece un .js de un módulo incluido?
+
+La función clientIncludes se encargar de informar al backend la lista de módulos que deben servirse e
+incluirse en los tags `<script ...>` y `<link ... rel=stylesheet>` de la página principal. 
+Cada aplicación debe sobreescribir esta función para incluir sus propios módulos. 
+
+Por ejemplo en
+```ts
+clientIncludes(req:Request|null, opts:OptsClientPage):ClientModuleDefinition[]{
+    var list: ClientModuleDefinition[] = [
+        { type: 'js', module: 'react', modPath: 'umd', fileDevelopment:'react.development.js', file:'react.production.min.js' },
+        ...super.clientIncludes(req, opts),
+        { type: 'css', file: 'app-pages.css' },
+        { type: 'js', file: 'app-pages.js' },
+    return list;
+}
+```
+
+   * `type` indica si es un `js` o un `css` (que podrían venir de `.ts` y `.styl`)
+   * `module` se refiere a un módulo externo (mencionado en `package.json` y resuelto con el algoritmo de `require` de _Node.js_) si no se especifica se entiende que es un módulo propio de la aplicación
+   * `file` se refiere al nombre del archivo que se va incluir (puede omitirse en módulos externos si el módulo tiene al archivo deseado como principal, eso no suele ocurrir en los archivos mimificados)
+   * `modPath` sirve para corregir el _path_ del servidor cuando la carpeta a servir no es la que resuelve _Node.js_
+   * `fileDevelopment` el archivo a incluir en modo development. 
+   * `path` el _path_ en la URL donde se va a servir (si no se indica es `lib` para `js` y `css` para `css`)
+
+A veces con nuevas versiones de algunos paquetes las ubicaciones o nombres de los archivos mimificados pueden cambiar. 
+Cuando el navegador no encuentra el archivo `.js` o `.css` o el que sea 
+se puede arrancar la aplicación pidiéndole que muestre la lista de módulos incluidos
+
+```sh
+npm start -- --dump-includes
+```
+
