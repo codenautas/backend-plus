@@ -347,3 +347,37 @@ se ofrece el archivo generado con anterioridad y no se vuelve a generar.
         }
     }
 ```
+
+## ¿Cómo se agrega un campo calculado con la cuenta de los registros relacionados en una tabla hija?
+
+Se debe agregar la property ``sql:{fields:{string:{expr:`(expr_sql)`}}}`` donde string puede ser renombrado y será el resultado de la expresión `expr`, a continuación se puede ver expr_sql como una expresión sql que va entre parentesis.
+Para visualizar el resultado como una columna de la tabla se debe agregar en el array fields un FieldDefinition cuya property `name` contenga el mismo nombre que el string definido anteriormente y el typename debe ser igual que el tipo de dato del resultado.
+A continuación se muestra un ejemplo donde se quiere contar la cantidad de tickets por cada estado de la tabla estados.
+
+Tabla tickets
+```ts
+    {
+        name: 'tickets',
+        fields: [
+            {name:'ticket', type: 'text'},
+            {name:'estado', typeName: "text"}, 
+        ],
+        primaryKey: ['ticket'],
+        foreignKeys: [
+            {references: "estados", fields: ['estado']}
+        ],
+    }
+```
+
+Tabla estados
+```ts
+    {
+        name: 'estados',
+        fields: [
+            {name:'estado', type: 'text'},
+            {name:'cant_tickets', typeName: "bigint", inTable:false, editable:false}, 
+        ],
+        primaryKey: ['pk'],
+        sql:{fields:{ cant_tickets:{ expr: `(SELECT count(*) FROM tickets t WHERE t.estado = estados.estado)` }}}
+    }
+```
