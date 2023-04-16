@@ -56,6 +56,7 @@ sortColumns       | [O]  | `[]`                  | ordenamiento predeterminado
 detailTables      | [O]  | `[]`                  | lista de tablas que permitirán desplegar subgrillas (estilo maestro/detalle)
 functionDef       | O    | `null`                | definición de SQL paramétrico o funcional 
 lookupFields      | [T]  | `[f.isName]`          | lista de los nombres de campo que se muestran al desplegar la lista deplegable para elegir
+nameForUpsert     | T    | `null`                | nombre físico de la columna en la tabla usado para el `insert` o `update` en tablas basadas en consultas
 
 ejemplos lista       | formato elemento
 ---------------------|--------------------------------------
@@ -106,6 +107,7 @@ sortColumns       | [O]  | `[]`                  | default order
 detailTables      | [O]  | `[]`                  | master/detail subgrids based in other tables
 functionDef       | O    | `null`                | functional SQL or parametric definition
 lookupFields      | [T]  | `[f.isName]`          | lookup fieldnames
+nameForUpsert     | T    | `null`                | fisic name of the column used for inserting or updating in query based tables
 
 list examples    | element format
 -----------------|--------------------------------------

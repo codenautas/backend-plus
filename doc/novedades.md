@@ -1,5 +1,17 @@
 # novedades de _backend-plus_
 
+**v1.18.0** Se agrega en la definición de columnas de las tablas `nameForUpsert`. Se usa en las tablas
+compuestas basadas en consultas complejas editables que actualizan más de una tabla, 
+cuando se quiere actualizar una columna cuyo nombre original no corresponde con el `'name'`. 
+
+**v1.17.17** Se agrega el parámetro `--dump-includes` para mostrar al arrancar los módulos que se sirven y
+se incluyen en el _front-end_. 
+
+**v1.17.14** Se mejora la seguridad cambiando el módulo `xlsx-style` (que dejó de tener actualizaciones) por `xlsx`
+
+**v1.17.4~13** Se mejora el auto refresco en las grillas para respetar el orden cuando aparecen nuevos renglones,
+y señalizar con color los nuevos renglones. 
+
 ## Filtros en grillas
 
 Todas las grillas se pueden fltrar con el botón filtro. Al presionar el botón aparece una línea donde escribir
