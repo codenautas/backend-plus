@@ -209,6 +209,7 @@ export type FieldDefinition = EditableDbDefinition & {
     transformer?:string
     table?:string
     inherited?:boolean
+    nameForUpsert?:string
 } & ({} | {
     sequence:SequenceDefinition
     nullable:true
@@ -290,6 +291,7 @@ export type TableDefinition = EditableDbDefinition & {
         }
         join?:string
         constraintsDeferred?:boolean
+        otherTableDefs?:Record<string,Partial<TableDefinition & {prefilledField:Record<string,any>}>>
     }
     foreignKeys?:ForeignKey[]
     softForeignKeys?:ForeignKey[]
@@ -316,6 +318,7 @@ export type TableDefinition = EditableDbDefinition & {
     saveAfter?:boolean
     selfRefresh?:boolean
 }
+export type OtherTableDefs = TableDefinition['sql']['otherTableDefs']
 export interface DetailTable { table?: string, fields: FieldsForConnectDetailTable, abr: string, label?: string, refreshParent?:boolean, refreshFromParent?:boolean, wScreen?:string, condition?:string }
 export type TableDefinitionFunction = (context: ContextForDump, opts?:any) => TableDefinition;
 export type TableItemDef=string|{name:string, path?:string, tableGenerator?:(context:TableContext)=>TableDefinition}
