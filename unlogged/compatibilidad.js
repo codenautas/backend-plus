@@ -48,6 +48,10 @@ var controles_de_compatibilidad={
     ,controlar:function(parametros){
         return !!window.addEventListener;
     }},
+    'soporte para WebSocket':{gravedad:'antiguo'
+    ,controlar:function(parametros){
+        return !!window.WebSocket;
+    }},
     'conectividad via fetch':{gravedad:'incompatible'
     ,controlar:function(params){
         return 'fetch' in window
@@ -60,10 +64,10 @@ var controles_de_compatibilidad={
     }}
 };
 
-function controlar_compatibilidad(ya){
+function controlar_compatibilidad(ya, id, idBoton){
 "use strict";
-    var boton=document.getElementById('login');
-    var id = 'resultado_incompatibilidad'
+    var boton=document.getElementById(idBoton || 'login');
+    id = id || 'resultado_incompatibilidad';
     var div=document.getElementById(id);
     if(!div){
         div = document.createElement('div');
@@ -72,7 +76,7 @@ function controlar_compatibilidad(ya){
         div.textContent='controlando la compatibilidad del navegador';
     }
     if(!ya){
-        boton.disabled=true;
+        if (boton) boton.disabled=true;
         setTimeout(function(){
             controlar_compatibilidad(true)
         },100)
@@ -100,17 +104,56 @@ function controlar_compatibilidad(ya){
         }
     };
     if(!hubo_errores_tipo['incompatible']){
-        boton.disabled=false;
+        if (boton) boton.disabled=false;
+    }
+    var attrsep = ": ";
+    var attr = function(base, prop, expected){
+        try {
+            if (!(base in window)) {
+                return attrsep + "sin "+base;
+            } else if (!(prop in (window[base]))) {
+                return attrsep + "sin "+base+"."+prop;
+            } else {
+                var mostrar = window[base][prop];
+                if (expected !== undefined) {
+                    if (mostrar == expected) return "";
+                }
+                try {
+                    mostrar = JSON.stringify(mostrar)
+                } catch (_) {
+                    mostrar = mostrar + ""
+                }
+                return attrsep + (base == "navigator" ? "" : base + ".") + prop + "=" + mostrar
+            }
+        } catch (err) {
+            return attrsep + "sin capacidad de detectar " + base + "." + prop;
+        } finally {
+            attrsep = ", ";
+        }
+    }
+    var bloque = function(elementoContenedor, text){
+        var elemento = document.createElement('div');
+        elementoContenedor.appendChild(elemento);
+        elemento.textContent = text;
     }
     if(hubo_errores){
         console.log('aca')
-        var alertDiv = document.createElement(hubo_errores_tipo[def_control.gravedad]?'h3':'div');
-        alertDiv.textContent="El sistema no fue probado en este modelo de navegador. Si experimenta problemas durante el uso cuando avise del problema incluya el nombre y versión del navegador. Se recomienda usar una versión actualizada del navegador Google Chrome";
-        if(hubo_errores_tipo[def_control.gravedad]){
+        var alertDiv = document.createElement(hubo_errores_tipo['incompatible']?'h3':'div');
+        bloque(alertDiv, "El sistema no fue probado en este modelo de navegador. Si experimenta problemas durante el uso cuando avise del problema incluya el nombre y versión del navegador. Se recomienda usar una versión actualizada del navegador Google Chrome o MS Edge");
+        bloque(alertDiv, "Caracteristicas detectadas en el navegador"+
+            attr('navigator','appName')+
+            attr('navigator','appVersion')+
+            attr('navigator','vendor')+
+            attr('navigator','vendorSub')+
+            attr('navigator','cookieEnabled', true)+
+            attr('navigator','onLine', true)+
+            "."
+        );
+        if(hubo_errores_tipo['incompatible']){
             var check = document.createElement('input');
             check.type='checkbox';
             check.onchange=function(){
-                boton.disabled=!check.checked
+                if (boton) boton.disabled=!check.checked
             }
             alertDiv.appendChild(check);
         }
