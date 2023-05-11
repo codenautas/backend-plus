@@ -1658,7 +1658,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
                 }
             }
             populateTableXLS(ws, grid.depotsToDisplay, fieldsDef2Export);
-            var sheet1name=grid.def.name;
+            var sheet1name=grid.def.name.length>27?grid.def.name.slice(0,27)+'...':grid.def.name;
             var sheet2name=grid.def.name!=="metadata"?"metadata":"meta-data";
             wb.SheetNames=[sheet1name,sheet2name];
             wb.Sheets[sheet1name]=ws;
