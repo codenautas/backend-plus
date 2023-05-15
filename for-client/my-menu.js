@@ -39,7 +39,7 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
 myOwn.wScreens.table = function(addrParams){
     setTimeout(function(){
         var layout = document.getElementById('main_layout');
-		var opts={tableDef:{}};
+		var opts={tableDef: addrParams.td ?? {}};
 		if(addrParams.ff){
             if(addrParams.ff instanceof Array){
                 opts.fixedFields=addrParams.ff;

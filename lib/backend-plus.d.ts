@@ -123,6 +123,7 @@ export type MenuInfoTable = {
     ff?:{fieldName:string, value:any}[]
     fc?:{fieldName:string, operator:string, value:any}[]
     pf?:any
+    td?:TableDefinition
     detailing?:any
 } & MenuInfoMinimo;
 export type MenuInfoProc={
@@ -135,7 +136,7 @@ export type MenuInfoPath={
     path:string
 } & MenuInfoMinimo;
 export interface ClientModuleDefinition{
-    type:'js'|'css'
+    type:'js'|'css'|'ttf'
     module?:string // module where to search in node_modules (node_modules/module/modPath/file) to serve
     modPath?:string // path inside module where to find file to serve
     src?:string  // full path where browser search file (path/file)
@@ -345,12 +346,14 @@ export type UnloggedRequest = {
         version?:string
     }
 }
-export type OptsClientPage = {
+export interface OptsClientPage {
     hideBEPlusInclusions?:boolean
     skipMenu?:boolean
     manifestPath?:string
+    webManifestPath?:string
     extraFiles?:ClientModuleDefinition[]
     icon?:string
+    icons?:Record<string,string>
 }
 
 export type DumpOptions={complete?:boolean, skipEnance?:boolean, disableDBFunctions?:boolean}
