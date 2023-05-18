@@ -1,5 +1,7 @@
 # novedades de _backend-plus_
 
+**v1.18.7** Se agrega la posibilidad de definir un `tablespace` a la configuracion de la base de datos si es necesario crear la base dentro de un tablespace específico
+
 **v1.18.0** Se agrega en la definición de columnas de las tablas `nameForUpsert`. Se usa en las tablas
 compuestas basadas en consultas complejas editables que actualizan más de una tabla, 
 cuando se quiere actualizar una columna cuyo nombre original no corresponde con el `'name'`. 

@@ -374,6 +374,7 @@ client-setup                 | opciones para el front-end
 db                           | opciones de la base de datos
 .motor                       | por ahora solo 'postgresql'
 .database                    |
+.tablespace                  | tablespace donde se crea la base (solo si corresponde)
 .user                        |
 .password                    |
 .port                        | 
