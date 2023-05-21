@@ -1417,7 +1417,10 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                 },
                 showWithMiniMenu,
                 messages,
-                grid
+                grid,
+                false,
+                false,
+                ['skipUnknownFieldsAtImport','simplificateSpaces','replaceNewLineWithSpace']
             )
         );
     }
@@ -1674,8 +1677,9 @@ myOwn.dialogDownload = function dialogDownload(grid){
     });
 };
 
-myOwn.dialogUpload = function dialogUpload(ajaxPath, ajaxParams, ajaxPrepareResultFun, showWithMiniMenu, messages, refresheable, acceptPhotos){
+myOwn.dialogUpload = function dialogUpload(ajaxPath, ajaxParams, ajaxPrepareResultFun, showWithMiniMenu, messages, refresheable, acceptPhotos, optsNames){
     messages = changing(my.messages, messages||{})
+    optsNames = optsNames || [];
     var doneFun = function doneFun(){
         var fileAttr={class:'import-button',type:'file',style:'min-width:400px'};
         if(acceptPhotos){
@@ -1683,11 +1687,15 @@ myOwn.dialogUpload = function dialogUpload(ajaxPath, ajaxParams, ajaxPrepareResu
         }
         var buttonFile=html.input(fileAttr).create();
         var buttonConfirmImport=html.input({class:'import-button',type:'button', value:messages.import}).create();
+        buttonConfirmImport.disabled = true;
         var laodingIndicator=html.div({class:'indicator'},' ').create();
         var loadingBar=html.div({class:'progress-bar', style:'width:400px; height:8px;'},[laodingIndicator]).create();
         var divProgress=html.div({class:'result-progress', style:'width:400px; height:20px; margin:0px;'}).create();
         var progressIndicator=html.div({class:'indicator'},' ').create();
         var progressBar=html.div({class:'progress-bar', style:'width:400px; height:8px;'},[progressIndicator]).create();
+        buttonFile.onchange = function(){
+            buttonConfirmImport.disabled = false;
+        }
         var displayProgressBar = function displayProgressBar(progress, progressIndicator){
             if(!progress){
                 return;
@@ -1733,7 +1741,6 @@ myOwn.dialogUpload = function dialogUpload(ajaxPath, ajaxParams, ajaxPrepareResu
                 }),{uploading:uploadingProgress, informProgress:informProgress}).then(eButton,eButton);
             }).then(ajaxPrepareResultFun).then(this.dialogPromiseDone,this.dialogPromiseDone);
         });
-        var optsNames = ['skipUnknownFieldsAtImport','simplificateSpaces','replaceNewLineWithSpace'];
         var buttons = {}
         optsNames.map((name, i)=>{
             var defValue = !!i;
