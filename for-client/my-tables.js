@@ -1419,7 +1419,6 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                 messages,
                 grid,
                 false,
-                false,
                 ['skipUnknownFieldsAtImport','simplificateSpaces','replaceNewLineWithSpace']
             )
         );
