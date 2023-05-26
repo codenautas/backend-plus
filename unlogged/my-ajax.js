@@ -315,12 +315,17 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
                 informProgress({start:true})
             }
         }, 500)
-        return AjaxBestPromise[procedureDef.method]({
+        var ajaxCall = AjaxBestPromise[procedureDef.method]({
             multipart:procedureDef.files,
             url:procedureDef.action,
             data:params,
-            uploading:opts.uploading
-        }).onLine(function(line,ender){
+            uploading:opts.uploading,
+            headers:opts.headers
+        });
+        if (opts.headersConsumer) {
+            ajaxCall = ajaxCall.onHeaders(opts.headersConsumer);
+        }
+        return ajaxCall.onLine(function(line,ender){
             controlLoggedIn(line);
             if(progress){
                 if(line.substr(0,2)=='--'){

@@ -563,6 +563,21 @@ function upadteNumberOfRows(depot,grid){
     depot.manager.dom.footInfo.displayTo.textContent=grid.depotsToDisplay.length;
 }
 
+var TIME_STAMP_PROP = Symbol('TIME_STAMP_PROP');
+myOwn.setTimeStamp = function setTimeStamp(row){
+    var timeStamp = new Date().getTime();
+    row[TIME_STAMP_PROP] = timeStamp;
+    console.log('SET=', timeStamp, row[TIME_STAMP_PROP], JSON4all.toUrl(row))
+    return timeStamp;
+}
+
+myOwn.skipTimeStamp = function skipTimeStamp(row, timeStamp){
+    var skip = (row[TIME_STAMP_PROP] || 0) > timeStamp;
+    console.log(skip ? 'SKIP' : 'PASS', timeStamp, row[TIME_STAMP_PROP], JSON4all.toUrl(row))
+    if (!skip) row[TIME_STAMP_PROP] = timeStamp;
+    return skip;
+}
+
 myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
     var my = this;
     var grid = new my.TableGrid({my: this}, mainElement);
@@ -587,6 +602,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
             })
         }
         grid.refreshAllRows = function(){
+            var timeStamp = new Date().getTime();
             grid.connector.my.ajax.table_data({
                 table:grid.connector.tableName,
                 fixedFields:grid.connector.fixedFields,
@@ -600,6 +616,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                 };
                 var tick = Math.random();
                 rows.forEach(function(row){
+                    if (my.skipTimeStamp(row, timeStamp)) return;
                     var primaryKeyValuesForRow = getPrimaryKeyValues(primaryKey, row);
                     var depot = grid.depots.find(function(depot){
                         var primaryKeyValuesForDepotRow = getPrimaryKeyValues(primaryKey, depot.row);
@@ -2295,7 +2312,9 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     return Promise.resolve(); // no grabo todavía
                 };
             }
+            var timeStamp = my.setTimeStamp(depot.row);
             return grid.connector.saveRecord(depot, opts).then(function(result){
+                if (my.skipTimeStamp(depot.row, timeStamp)) return;
                 grid.depotRefresh(depot,result);
             }).catch(function(err){
                 changeIoStatus(depot,'error',depot.rowPendingForUpdate,err.message);
