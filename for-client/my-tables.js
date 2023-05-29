@@ -615,6 +615,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                     })
                 };
                 var tick = Math.random();
+                var thereIsANewRecord = grid.depots.filter(depot => depot.status == 'new').length;
                 rows.forEach(function(row){
                     if (my.skipTimeStamp(row, timeStamp)) return;
                     var primaryKeyValuesForRow = getPrimaryKeyValues(primaryKey, row);
@@ -631,7 +632,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                             }
                         }
                         depot.tick = tick
-                    } else if (!depot) {
+                    } else if (!depot && !thereIsANewRecord) {
                         var depot = grid.createDepotFromRow(row);
                         grid.depots.push(depot);
                         grid.sortDepotsToDisplay(grid.depots);
@@ -644,13 +645,15 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                         },3000);
                     }
                 })
-                var i = 0;
-                while (i < grid.depots.length) {
-                    var depot = grid.depots[i];
-                    if (depot.tick != tick) {
-                        depot.manager.displayAsDeleted(depot);
-                    } else {
-                        i++;
+                if(!thereIsANewRecord){
+                    var i = 0;
+                    while (i < grid.depots.length) {
+                        var depot = grid.depots[i];
+                        if (depot.tick != tick) {
+                            depot.manager.displayAsDeleted(depot);
+                        } else {
+                            i++;
+                        }
                     }
                 }
             })
