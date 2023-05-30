@@ -586,7 +586,7 @@ function noChange(x){ return x; }
 
 myAjax.UriSearchToObjectParams={
 	i                :{ showInMenu:true , encode:function(value,menu){ return menu.name?(menu.parents||[]).concat(menu.name).join(','):value }},
-	fc               :{                   encode:function(x){ return JSON.stringify(x); }, U:function(x){ return JSON.parse(x)}  },
+	fc               :{                   encode:function(x){ return json4all.toUrl(x); }, decode:function(x){ return json4all.parse(x)}  },
 	ff               :{                   encode:function(x){ return json4all.toUrl(x); }, decode:function(x){ return json4all.parse(x)}  },
 	up               :{                   encode:function(x){ return json4all.toUrl(x); }, decode:function(x){ return json4all.parse(x)}  },
 	pf               :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return JSON.parse(x)}      },
@@ -599,7 +599,7 @@ myAjax.UriSearchToObjectParams={
     parents          :{ hide:true       },
     button           :{ hide:true       },
     fixedFields      :{ varName:'ff'    , encode:function(pairs){ return json4all.toUrl(likeAr.toPlainObject(pairs, 'fieldName')); }},
-	detailing        :{                   encode:function(x){ return JSON.toUrl(x); }, decode:function(x){ return JSON.parse(x)}  },
+	detailing        :{                   encode:function(x){ return json4all.toUrl(x); }, decode:function(x){ return json4all.parse(x)}  },
 }
 
 myAjax.UriSearchToObject = function UriSearchToObject(locationSearch){
