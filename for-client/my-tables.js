@@ -1686,7 +1686,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
             wb.Sheets[sheet1name]=ws;
             exportFileInformationWs["!ref"]="A1:F100";
             wb.Sheets[sheet2name]=exportFileInformationWs;
-            var wbFile = XLSX.write(wb, {bookType:'xlsx', bookSST:false, type: 'binary'});
+            var wbFile = XLSX.write(wb, {bookType:'xlsx', bookSST:false, type: 'binary', cellDates:true});
             var blob = new Blob([s2ab(wbFile)],{type:"application/octet-stream"});
             mainDiv.setAttribute("current-state", "ready");
             var url = URL.createObjectURL(blob); 
