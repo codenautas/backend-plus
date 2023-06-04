@@ -632,7 +632,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                             }
                         }
                         depot.tick = tick
-                    } else if (!depot && !thereIsANewRecord) {
+                    } else if (!depot && !thereIsANewRecord && !grid.vertical) {
                         var depot = grid.createDepotFromRow(row);
                         grid.depots.push(depot);
                         grid.sortDepotsToDisplay(grid.depots);
