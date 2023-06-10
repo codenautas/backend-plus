@@ -318,6 +318,7 @@ export type TableDefinition = EditableDbDefinition & {
     specialValidator?:string
     saveAfter?:boolean
     selfRefresh?:boolean
+    filterColumns?:{column:string, operatior:string, value:any}[]
 }
 export type OtherTableDefs = TableDefinition['sql']['otherTableDefs']
 export interface DetailTable { table?: string, fields: FieldsForConnectDetailTable, abr: string, label?: string, refreshParent?:boolean, refreshFromParent?:boolean, wScreen?:string, condition?:string }

@@ -2374,7 +2374,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         var retrievedRow = result.updatedRow;
         for(var fieldName in retrievedRow){
             if(!/^\$/.test(fieldName)){
-                if(!grid.def.field[fieldName].clientSide || grid.def.field[fieldName].serverSide && grid.def.field[fieldName].inTable!==false){
+                if(grid.def.field[fieldName] && (!grid.def.field[fieldName].clientSide || grid.def.field[fieldName].serverSide && grid.def.field[fieldName].inTable!==false)){
                     if(depot.rowControls[fieldName]){
                         var value = depot.rowControls[fieldName].getTypedValue();
                         if(!sameValue(depot.row[fieldName], value)){
