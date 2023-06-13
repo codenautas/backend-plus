@@ -393,6 +393,8 @@ export class AppBackend{
     addUnloggedServices(mainApp:ExpressPlus, baseUrl:string):void
     addLoggedServices():void
     getProcedures():Promise<ProcedureDef[]>
+    isAdmin():boolean
+    canChangePass():Promise<boolean>
     getMenu(context?:Context):MenuDefinition
     inDbClient<T>(req:Request|null, doThisWithDbClient:(client:Client)=>Promise<T>):Promise<T>
     inTransaction<T>(req:Request|null, doThisWithDbTransaction:(client:Client)=>Promise<T>):Promise<T>
