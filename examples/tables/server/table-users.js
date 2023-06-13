@@ -14,6 +14,7 @@ module.exports = function(context){
             {name:'rol'                   , typeName:'text'                   },
             {name:'mail'                  , typeName:'text'                   },
             {name:'mail2'                 , typeName:'text'                   },
+            {name:'clave_nueva'           , typeName:'text', clientSide:'newPass', allow:{select:admin, update:false, insert:false} },
         ],
         primaryKey:['username']
     });
