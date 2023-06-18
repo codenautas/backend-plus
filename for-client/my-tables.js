@@ -647,13 +647,16 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                 })
                 if(!thereIsANewRecord){
                     var i = 0;
-                    while (i < grid.depots.length) {
-                        var depot = grid.depots[i];
-                        if (depot.tick != tick) {
-                            depot.manager.displayAsDeleted(depot);
-                        } else {
-                            i++;
+                    var depotsToDelete = grid.depots.filter(depot => depot.tick != tick);
+                    var depot;
+                    if (myOwn.config.config['grid-row-retain-moved-or-deleted']) { 
+                        var depotsToRetain = grid.depots.filter(depot => depot.tick == tick);
+                        for (depot of depotsToRetain) {
+                            if (depot.tr.getAttribute('not-here')) depot.tr.removeAttribute('not-here')
                         }
+                    }
+                    while (depot = depotsToDelete.pop()) {
+                        depot.manager.displayAsDeleted(depot, 'unknown'); 
                     }
                 }
             })
@@ -1014,7 +1017,7 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
     var grid = this.grid;
     var fieldDef = this.fieldDef;
     var forInsert = false; // TODO: Verificar que esto está en desuso
-    var enabledInput=depot.allow.update !== false && grid.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
+    var enabledInput=depot.allow.update !== false && grid.def.allow.update /* && !grid.connector.fixedField[fieldDef.name] */ && (forInsert?fieldDef.allow.insert:fieldDef.allow.update);
     var directInput=true;
     var control;
     var td;
@@ -2261,7 +2264,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             return fieldDef.visible;
         }).forEach(function(fieldDef){
             var td = depot.rowControls[fieldDef.name];
-            var editable=depot.allow.update !== false && grid.connector.def.allow.update && !grid.connector.fixedField[fieldDef.name] && (forInsert?fieldDef.allow.insert:fieldDef.allow.update && grid.connector.def.field[fieldDef.name].allow.update);
+            var editable=depot.allow.update !== false && grid.connector.def.allow.update /* && !grid.connector.fixedField[fieldDef.name]*/ && (forInsert?fieldDef.allow.insert:fieldDef.allow.update && grid.connector.def.field[fieldDef.name].allow.update);
             td.disable(!editable);
             if(fieldDef.clientSide){
                 if(!td.clientSidePrepared){
@@ -2696,39 +2699,43 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
     grid.displayBody();
 };
 
-myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot){
+myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot, mode){
     var grid = this;
-    var position = Math.min(grid.depots.length,Math.max(0,depot.tr.sectionRowIndex));
-    if(grid.depots[position] !== depot){
-        position = grid.depots.indexOf(depot);
-    }
-    if(position>=0){
-        grid.depots.splice(position,1);
-    }
-    if(grid.vertical){
-        var compareColNumberFun = function compareColNumberFun(a, b) {
-            var colNumberA = a.colNumber;
-            var colNumberB = b.colNumber;
-            return(colNumberA > colNumberB)?1:((colNumberA < colNumberB)?-1:0)
+    if (mode == 'unknown' && myOwn.config.config['grid-row-retain-moved-or-deleted']) {
+        depot.tr.setAttribute('not-here', 'yes'); 
+    } else {
+        var position = Math.min(grid.depots.length,Math.max(0,depot.tr.sectionRowIndex));
+        if(grid.depots[position] !== depot){
+            position = grid.depots.indexOf(depot);
         }
-        var i = 0;
-        Array.prototype.forEach.call(grid.dom.table.rows,function(tr){
-            if(i < grid.dom.table.rows.length-1 && tr.childNodes[depot.colNumber]){
-                depot.my.fade(tr.childNodes[depot.colNumber]);
-            }
-            i++;
-        });
-        var depots = grid.depots.sort(compareColNumberFun);
-        for(var j = depot.colNumber; j <= depots.length; j++){
-            depots[j-1].colNumber = j;
+        if(position>=0){
+            grid.depots.splice(position,1);
         }
-    }else{
-        depot.my.fade(depot.tr);
-        for(var detailControl in depot.detailControls){
-            if(depot.detailControls[detailControl].tr){
-                depot.my.fade(depot.detailControls[detailControl].tr);
+        if(grid.vertical){
+            var compareColNumberFun = function compareColNumberFun(a, b) {
+                var colNumberA = a.colNumber;
+                var colNumberB = b.colNumber;
+                return(colNumberA > colNumberB)?1:((colNumberA < colNumberB)?-1:0)
             }
-        };
+            var i = 0;
+            Array.prototype.forEach.call(grid.dom.table.rows,function(tr){
+                if(i < grid.dom.table.rows.length-1 && tr.childNodes[depot.colNumber]){
+                    depot.my.fade(tr.childNodes[depot.colNumber]);
+                }
+                i++;
+            });
+            var depots = grid.depots.sort(compareColNumberFun);
+            for(var j = depot.colNumber; j <= depots.length; j++){
+                depots[j-1].colNumber = j;
+            }
+        }else{
+            depot.my.fade(depot.tr);
+            for(var detailControl in depot.detailControls){
+                if(depot.detailControls[detailControl].tr){
+                    depot.my.fade(depot.detailControls[detailControl].tr);
+                }
+            };
+        }
     }
     grid.updateTotals(grid.depots.length?1:0, grid.depots.length);
 };
@@ -2757,7 +2764,7 @@ myOwn.tableAction={
             return depot.my.confirmDelete(depot, opts).then(function(result){
                 if(result){
                     return depot.connector.deleteRecord(depot, changing({reject:false},opts)).then(function(){
-                        depot.manager.displayAsDeleted(depot);
+                        depot.manager.displayAsDeleted(depot, 'deleted');
                         depot.manager.refreshAggregates();
                     }).catch(depot.my.alertError);
                 }
