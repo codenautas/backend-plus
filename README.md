@@ -2,15 +2,15 @@
 
 # backend-plus
 
-Backend for typed-controls
+Backend for the anti Pareto rule.
 
 
 ![stable](https://img.shields.io/badge/stability-stable-blue.svg)
-[![npm-version](https://img.shields.io/npm/v/backend-plus.svg)](https://npmjs.org/package/backend-plus)
-[![downloads](https://img.shields.io/npm/dm/backend-plus.svg)](https://npmjs.org/package/backend-plus)
-[![build](https://img.shields.io/travis/codenautas/backend-plus/master.svg)](https://travis-ci.org/codenautas/backend-plus)
-[![coverage](https://img.shields.io/coveralls/codenautas/backend-plus/master.svg)](https://coveralls.io/r/codenautas/backend-plus)
-[![dependencies](https://img.shields.io/david/codenautas/backend-plus.svg)](https://david-dm.org/codenautas/backend-plus)
+[![npm-version](https://img.shields.io/npm/v/backend-star.svg)](https://npmjs.org/package/backend-star)
+[![downloads](https://img.shields.io/npm/dm/backend-star.svg)](https://npmjs.org/package/backend-star)
+[![build](https://img.shields.io/travis/codenautas/backend-star/master.svg)](https://travis-ci.org/codenautas/backend-star)
+[![coverage](https://img.shields.io/coveralls/codenautas/backend-star/master.svg)](https://coveralls.io/r/codenautas/backend-star)
+[![dependencies](https://img.shields.io/david/codenautas/backend-star.svg)](https://david-dm.org/codenautas/backend-star)
 
 
 language: ![English](https://raw.githubusercontent.com/codenautas/multilang/master/img/lang-en.png)
@@ -60,6 +60,7 @@ menuContent | A    |                | menu     | menu content
 table       | T    | `name`         | table    | table name
 label       | T    | `name`         |          | if you don't want to use default value to display in menu
 selectedByDefault | B |             |          | is the selected by default option
+autoproced  | B    | `false`        | proc     | if yo want to execute the procedure without clicking the proced button
 
 Integrating example:
 
