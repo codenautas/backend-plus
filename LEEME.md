@@ -393,7 +393,7 @@ entry                        | usage
 -----------------------------|---------------
 server                       |
 .port                        | port where is listening
-.base-rul                    | base url added to domain name
+.base-url                    | base url added to domain name
 .module-store                |
 install                      | (see Spanish)
 .dump                        | (see Spanish)

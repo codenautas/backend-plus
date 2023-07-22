@@ -418,6 +418,7 @@ export class AppBackend{
     i18n:{
         messages:Record<LangId,Record<string, string>>
     }
+    shootDownBackend():Promise<void>
 }
 
 }
