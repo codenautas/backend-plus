@@ -652,7 +652,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                     if (myOwn.config.config['grid-row-retain-moved-or-deleted']) { 
                         var depotsToRetain = grid.depots.filter(depot => depot.tick == tick);
                         for (depot of depotsToRetain) {
-                            if (depot.tr.getAttribute('not-here')) depot.tr.removeAttribute('not-here')
+                            if (depot.tr && depot.tr.getAttribute('not-here')) depot.tr.removeAttribute('not-here')
                         }
                     }
                     while (depot = depotsToDelete.pop()) {
