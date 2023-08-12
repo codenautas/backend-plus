@@ -573,7 +573,6 @@ myOwn.setTimeStamp = function setTimeStamp(row){
 
 myOwn.skipTimeStamp = function skipTimeStamp(row, timeStamp){
     var skip = (row[TIME_STAMP_PROP] || 0) > timeStamp;
-    console.log(skip ? 'SKIP' : 'PASS', timeStamp, row[TIME_STAMP_PROP], JSON4all.toUrl(row))
     if (!skip) row[TIME_STAMP_PROP] = timeStamp;
     return skip;
 }
@@ -2195,7 +2194,7 @@ myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElem
     }
     var depotForInsert = grid.createDepotFromRow({$allow:{delete:true, update:true}}, 'new');
     grid.connector.fixedFields.forEach(function(pair){
-        if(!pair.range){
+        if(!pair.range && grid.def.field[pair.fieldName].inTable !== false){
             depotForInsert.row[pair.fieldName] = pair.value;
             depotForInsert.rowPendingForUpdate[pair.fieldName] = pair.value;
         }
