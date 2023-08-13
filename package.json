@@ -81,7 +81,7 @@
     "@types/js-yaml": "^4.0.5",
     "@types/mocha": "^10.0.1",
     "@types/multiparty": "~0.0.33",
-    "@types/node": "^20.4.10",
+    "@types/node": "^20.5.0",
     "@types/nodemailer": "^6.4.9",
     "@types/numeral": "~2.0.2",
     "@types/session-file-store": "^1.2.2",
@@ -101,7 +101,7 @@
     "puppeteer": "^21.0.3",
     "sinon": "^15.2.0",
     "supertest": "^6.3.3",
-    "types.d.ts": "~0.6.17",
+    "types.d.ts": "~0.6.18",
     "typescript": "^5.1.6",
     "why-is-node-running": "^2.2.2"
   },

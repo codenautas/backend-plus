@@ -252,11 +252,11 @@ myOwn.log = function log(severity, message){
 };
 
 myOwn.fade = function fade(element, options){
-    if(element.tagName.toUpperCase()==='TR' && element.parentNode.replaceChild){
+    options=options||{};
+    if(element.tagName.toUpperCase()==='TR' && element.parentNode.replaceChild && !options.fast){
         var parent=element.parentNode;
         var dummyTr=document.createElement(element.tagName);
         dummyTr.className=element.className;
-        options=options||{};
         options.smooth=options.smooth||{};
         var spans=options.smooth.spans;
         var sourceRow;

@@ -284,6 +284,8 @@ myOwn.getStructuresToRegisterInLdb = function getStructuresToRegisterInLdb(paren
     return promiseChain;
 }
 
+myOwn.skipInFixedFields = Symbol("skipInFixedFields");
+
 myOwn.TableConnector = function(context, opts){
     var connector = this;
     for(var attr in context){
@@ -293,7 +295,7 @@ myOwn.TableConnector = function(context, opts){
     connector.fixedFields = connector.opts.fixedFields || [];
     connector.fixedField = {};
     connector.fixedFields.forEach(function(pair){
-        if(!pair.range){
+        if(!pair.range && pair.value != myOwn.skipInFixedFields){
             connector.fixedField[pair.fieldName] = pair.value;
         }
     });
@@ -442,7 +444,7 @@ myOwn.TableConnectorLocal = function(context, opts){
     connector.fixedFields = connector.opts.fixedFields || [];
     connector.fixedField = {};
     connector.fixedFields.forEach(function(pair){
-        if(!pair.range){
+        if(!pair.range && pair.value != myOwn.skipInFixedFields){
             connector.fixedField[pair.fieldName] = pair.value;
         }
     });
@@ -600,9 +602,9 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                 }
             })
         }
-        grid.refreshAllRows = function(){
+        grid.refreshAllRows = async function(force){
             var timeStamp = new Date().getTime();
-            grid.connector.my.ajax.table_data({
+            await grid.connector.my.ajax.table_data({
                 table:grid.connector.tableName,
                 fixedFields:grid.connector.fixedFields,
                 paramfun:grid.connector.parameterFunctions||{}
@@ -638,24 +640,26 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                         grid.createRowElements(grid.depots.findIndex((myDepot)=>myDepot===depot), depot);
                         grid.updateRowData(depot);
                         depot.tick = tick
-                        changeIoStatus(depot,'background-change', depot.row);
-                        setTimeout(function(){
-                            changeIoStatus(depot,'ok', depot.row);
-                        },3000);
+                        if (!force) {
+                            changeIoStatus(depot,'background-change', depot.row);
+                            setTimeout(function(){
+                                changeIoStatus(depot,'ok', depot.row);
+                            },3000);
+                        }
                     }
                 })
                 if(!thereIsANewRecord){
                     var i = 0;
                     var depotsToDelete = grid.depots.filter(depot => depot.tick != tick);
                     var depot;
-                    if (myOwn.config.config['grid-row-retain-moved-or-deleted']) { 
+                    if (myOwn.config.config['grid-row-retain-moved-or-deleted'] && !force) { 
                         var depotsToRetain = grid.depots.filter(depot => depot.tick == tick);
                         for (depot of depotsToRetain) {
                             if (depot.tr && depot.tr.getAttribute('not-here')) depot.tr.removeAttribute('not-here')
                         }
                     }
                     while (depot = depotsToDelete.pop()) {
-                        depot.manager.displayAsDeleted(depot, 'unknown'); 
+                        depot.manager.displayAsDeleted(depot, force ? 'change-ff' : 'unknown'); 
                     }
                 }
             })
@@ -1141,7 +1145,11 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
     }).create();
     var menuRef={w:'table', table:detailTableDef.table};
     var calculateFixedFields = function(){
-        return detailTableDef.fields.map(function(pair){
+        return detailTableDef.fields
+        .filter(function(pair){
+            return !pair.nullMeansAll || depot.row[pair.source] != null;
+        })
+        .map(function(pair){
             var fieldCondition={fieldName: pair.target, value:'value' in pair ? pair.value : depot.row[pair.source]}
             if(pair.range){
                 fieldCondition.range=pair.range;
@@ -1224,9 +1232,17 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
                             g.dom.main.addEventListener('deletedRowOk', refresh);
                             g.dom.main.addEventListener('savedRowOk', refresh);
                         }
-                        detailControl.refreshAllRowsInGrid=function(){
-                            if(detailTableDef.refreshFromParent){
-                                g.refreshAllRows();
+                        detailControl.refreshAllRowsInGrid=function(force){
+                            if(detailTableDef.refreshFromParent || force){
+                                if (force) {
+                                    g.dom.main.style.opacity=0.5;
+                                    fixedFields = calculateFixedFields()
+                                    g.connector.fixedFields = fixedFields
+                                }
+                                setTimeout(async ()=>{
+                                    await g.refreshAllRows(force);
+                                    g.dom.main.style.opacity=1;
+                                },1)
                             }
                         }
                         return g;
@@ -2700,6 +2716,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
 
 myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot, mode){
     var grid = this;
+    var fast = mode == 'change-ff'
     if (mode == 'unknown' && myOwn.config.config['grid-row-retain-moved-or-deleted']) {
         depot.tr.setAttribute('not-here', 'yes'); 
     } else {
@@ -2728,10 +2745,10 @@ myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot, mo
                 depots[j-1].colNumber = j;
             }
         }else{
-            depot.my.fade(depot.tr);
+            depot.my.fade(depot.tr, {fast});
             for(var detailControl in depot.detailControls){
                 if(depot.detailControls[detailControl].tr){
-                    depot.my.fade(depot.detailControls[detailControl].tr);
+                    depot.my.fade(depot.detailControls[detailControl].tr, {fast});
                 }
             };
         }

@@ -230,7 +230,7 @@ export type EditableDbDefinition = {
     }
 }
 export type FieldsForConnect = (string | {source:string, target:string})[]
-export type FieldsForConnectDetailTable = (string | {source:string, target:string} | {value:any, target:string})[]
+export type FieldsForConnectDetailTable = (string | {source:string, target:string, nullMeansAll?:boolean} | {value:any, target:string})[]
 
 export type FkActions = 'no action'|'restrict'|'cascade'|'set null'|'set default';
 export type ForeignKey = {
