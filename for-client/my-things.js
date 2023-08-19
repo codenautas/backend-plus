@@ -253,6 +253,7 @@ myOwn.log = function log(severity, message){
 
 myOwn.fade = function fade(element, options){
     options=options||{};
+    if (!element.parentNode) return
     if(element.tagName.toUpperCase()==='TR' && element.parentNode.replaceChild && !options.fast){
         var parent=element.parentNode;
         var dummyTr=document.createElement(element.tagName);

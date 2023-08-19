@@ -625,19 +625,25 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                         return sameValue(JSON.stringify(primaryKeyValuesForRow),JSON.stringify(primaryKeyValuesForDepotRow))
                     });
                     //chequeo que exista depot por las dudas
-                    if (depot) { 
-                        if (!sameValue(JSON.stringify(row),JSON.stringify(depot.row))) {
-                            //grid.retrieveRowAndRefresh(depot); 
-                            if(depot.tr){
-                                grid.depotRefresh(depot,{updatedRow:row, sendedForUpdate:{}},{noDispatchEvents:true});
-                            }
+                    if ((!depot || !depot.tr || !depot.tr.parentNode) && !thereIsANewRecord && !grid.vertical) {
+                        if (!depot) {
+                            var depot = grid.createDepotFromRow(row);
+                            grid.depots.push(depot);
+                            grid.sortDepotsToDisplay(grid.depots);
+                        } else if (depot.tr && !depot.tr.parentNode) {
+                            depot.tr = null
                         }
-                        depot.tick = tick
-                    } else if (!depot && !thereIsANewRecord && !grid.vertical) {
-                        var depot = grid.createDepotFromRow(row);
-                        grid.depots.push(depot);
-                        grid.sortDepotsToDisplay(grid.depots);
-                        grid.createRowElements(grid.depots.findIndex((myDepot)=>myDepot===depot), depot);
+                        var iRow = -1;
+                        var i = 0;
+                        while (i < grid.depots.length){
+                            var aDepot = grid.depots[i];
+                            if (depot == aDepot) break;
+                            if (aDepot && aDepot.tr && aDepot.tr.parentNode && aDepot.tr.rowIndex != null) {
+                                iRow = aDepot.tr.sectionRowIndex
+                            }
+                            i++;
+                        }
+                        grid.createRowElements(iRow + 1, depot);
                         grid.updateRowData(depot);
                         depot.tick = tick
                         if (!force) {
@@ -646,6 +652,14 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                                 changeIoStatus(depot,'ok', depot.row);
                             },3000);
                         }
+                    } else if (depot) { 
+                        if (!sameValue(JSON.stringify(row),JSON.stringify(depot.row))) {
+                            //grid.retrieveRowAndRefresh(depot); 
+                            if(depot.tr){
+                                grid.depotRefresh(depot,{updatedRow:row, sendedForUpdate:{}},{noDispatchEvents:true});
+                            }
+                        }
+                        depot.tick = tick
                     }
                 })
                 if(!thereIsANewRecord){
@@ -2720,7 +2734,7 @@ myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot, mo
     if (mode == 'unknown' && myOwn.config.config['grid-row-retain-moved-or-deleted']) {
         depot.tr.setAttribute('not-here', 'yes'); 
     } else {
-        var position = Math.min(grid.depots.length,Math.max(0,depot.tr.sectionRowIndex));
+        var position = depot.tr ? Math.min(grid.depots.length,Math.max(0,depot.tr.sectionRowIndex)) : 0;
         if(grid.depots[position] !== depot){
             position = grid.depots.indexOf(depot);
         }
@@ -2745,12 +2759,14 @@ myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot, mo
                 depots[j-1].colNumber = j;
             }
         }else{
-            depot.my.fade(depot.tr, {fast});
-            for(var detailControl in depot.detailControls){
-                if(depot.detailControls[detailControl].tr){
-                    depot.my.fade(depot.detailControls[detailControl].tr, {fast});
-                }
-            };
+            if(depot.tr){
+                depot.my.fade(depot.tr, {fast});
+                for(var detailControl in depot.detailControls){
+                    if(depot.detailControls[detailControl].tr){
+                        depot.my.fade(depot.detailControls[detailControl].tr, {fast});
+                    }
+                };
+            }
         }
     }
     grid.updateTotals(grid.depots.length?1:0, grid.depots.length);
