@@ -67,7 +67,7 @@ myOwn.wScreens.table = function(addrParams){
 myOwn.wScreens.procAux = {
     showParams:function(formDef, main_layout, addrParams, mainAction){
         var autoproced = addrParams.autoproced || false
-        addrParams.up=addrParams.up||{};
+        addrParams.up=addrParams.up||addrParams.ff||{};
         var params=addrParams.up;
         // var button = html.button(formDef.proceedLabel||my.messages.proceed).create();
         var label = formDef.proceedLabel||my.messages.proceed;

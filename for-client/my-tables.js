@@ -1157,7 +1157,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
         alt:'DETAIL',
         title:detailTableDef.label||my.messages.details
     }).create();
-    var menuRef={w:'table', table:detailTableDef.table};
+    var menuRef = detailTableDef.table ? {table:detailTableDef.table} : {w:detailTableDef.wScreen, autoproced:true};
     var calculateFixedFields = function(){
         return detailTableDef.fields
         .filter(function(pair){
