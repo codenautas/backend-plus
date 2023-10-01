@@ -120,7 +120,7 @@ export type MenuInfoMenu = {
 export type MenuInfoTable = {
     menuType:'table'
     table?:string
-    ff?:{fieldName:string, value:any}[]
+    ff?:{fieldName:string, value:any, show?:boolean}[]
     fc?:{fieldName:string, operator:string, value:any}[]
     pf?:any
     td?:TableDefinition
@@ -211,6 +211,7 @@ export type FieldDefinition = EditableDbDefinition & {
     table?:string
     inherited?:boolean
     nameForUpsert?:string
+    alwaysShow?:boolean /* show when appears in fixed fields */
 } & ({} | {
     sequence:SequenceDefinition
     nullable:true
@@ -419,6 +420,7 @@ export class AppBackend{
         messages:Record<LangId,Record<string, string>>
     }
     shootDownBackend():Promise<void>
+    setLog(opts:{until:string, results?:boolean})
 }
 
 }

@@ -294,9 +294,13 @@ myOwn.TableConnector = function(context, opts){
     connector.opts = opts||{};
     connector.fixedFields = connector.opts.fixedFields || [];
     connector.fixedField = {};
+    connector.hideBecauseRelated = {};
     connector.fixedFields.forEach(function(pair){
         if(!pair.range && pair.value != myOwn.skipInFixedFields){
             connector.fixedField[pair.fieldName] = pair.value;
+            if (!pair.show) {
+                connector.hideBecauseRelated[pair.fieldName] = true;
+            }
         }
     });
     connector.parameterFunctions=connector.opts.parameterFunctions||{};
@@ -443,9 +447,13 @@ myOwn.TableConnectorLocal = function(context, opts){
     connector.opts = opts||{};
     connector.fixedFields = connector.opts.fixedFields || [];
     connector.fixedField = {};
+    connector.hideBecauseRelated = {};
     connector.fixedFields.forEach(function(pair){
         if(!pair.range && pair.value != myOwn.skipInFixedFields){
             connector.fixedField[pair.fieldName] = pair.value;
+            if (!pair.show) {
+                connector.hideBecauseRelated[pair.fieldName] = true;
+            }
         }
     });
     connector.parameterFunctions=connector.opts.parameterFunctions||{};
@@ -921,11 +929,11 @@ myOwn.DataColumnGrid.prototype.cellAttributes = function cellAttributes(specific
             attr["my-mandatory"]="normal";
         }
     }
-    if(grid.connector.fixedField[fieldDef.name] != null){
+    if(grid.connector.hideBecauseRelated[fieldDef.name] && !fieldDef.alwaysShow){
         attr["inherited-pk-column"]="yes";
     }
     if(fieldDef.referencesField){
-        if(grid.connector.fixedField[fieldDef.referencesField] != null){
+        if(grid.connector.hideBecauseRelated[fieldDef.referencesField] && !fieldDef.alwaysShow){
             attr["inherited-pk-column"]="yes";
         }
         if(grid.def.field[fieldDef.referencesField].isPk){
