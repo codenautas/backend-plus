@@ -632,19 +632,27 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                         var primaryKeyValuesForDepotRow = getPrimaryKeyValues(primaryKey, depot.row);
                         return sameValue(JSON.stringify(primaryKeyValuesForRow),JSON.stringify(primaryKeyValuesForDepotRow))
                     });
+                    if (!depot) {
+                        var depot = grid.createDepotFromRow(row);
+                        var needToAddInGrid = true;
+                    }
+                    var needToDisplayDepot = !!grid.filterDepots([depot])[0];
+                    if (!needToDisplayDepot) return;
                     //chequeo que exista depot por las dudas
                     if ((!depot || !depot.tr || !depot.tr.parentNode) && !thereIsANewRecord && !grid.vertical) {
-                        if (!depot) {
+                        var depotsToDisplay = grid.filterDepots(grid.depots);
+                        if (needToAddInGrid) {
                             var depot = grid.createDepotFromRow(row);
                             grid.depots.push(depot);
-                            grid.sortDepotsToDisplay(grid.depots);
+                            var depotsToDisplay = grid.filterDepots(grid.depots);
+                            grid.sortDepotsToDisplay(depotsToDisplay);
                         } else if (depot.tr && !depot.tr.parentNode) {
                             depot.tr = null
                         }
                         var iRow = -1;
                         var i = 0;
-                        while (i < grid.depots.length){
-                            var aDepot = grid.depots[i];
+                        while (i < depotsToDisplay.length){
+                            var aDepot = depotsToDisplay[i];
                             if (depot == aDepot) break;
                             if (aDepot && aDepot.tr && aDepot.tr.parentNode && aDepot.tr.rowIndex != null) {
                                 iRow = aDepot.tr.sectionRowIndex
@@ -672,7 +680,8 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                 })
                 if(!thereIsANewRecord){
                     var i = 0;
-                    var depotsToDelete = grid.depots.filter(depot => depot.tick != tick);
+                    var depotsToDisplay = grid.filterDepots(grid.depots);
+                    var depotsToDelete = depotsToDisplay.filter(depot => depot.tick != tick);
                     var depot;
                     if (myOwn.config.config['grid-row-retain-moved-or-deleted'] && !force) { 
                         var depotsToRetain = grid.depots.filter(depot => depot.tick == tick);
@@ -2613,18 +2622,19 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         }
         return depot;
     };
-    grid.displayBody=function displayBody(){
+    grid.filterDepots = function filterDepots(depotsToFilter){
         var grid = this;
-        var depotsToDisplay;
         var filterRows = grid.view.filter;
+        var depotsToDisplay;
         if(filterRows && filterRows.length){
-            depotsToDisplay = grid.depots.filter(function(depot,i){
+            depotsToDisplay = depotsToFilter.filter(function(depot,i){
                 var iFilter=0;
                 while(iFilter<filterRows.length){
                     var filterData=filterRows[iFilter];
                     var partialOk=true;
                     var columnsCompared = 0;
                     for(var column in depot.row){
+                        // var compSymb = filterData.rowSymbols && filterData.rowSymbols[column] || filterData[column].operator;
                         var compSymb = filterData.rowSymbols[column];
                         if(compSymb && my.comparator[compSymb] && (my.comparatorParameterNull[compSymb] || filterData.row[column] != null)){
                             var isSatisfied=my.comparator[compSymb](depot.row[column],filterData.row[column]);
@@ -2642,8 +2652,13 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 return false;
             });
         }else{
-            depotsToDisplay = grid.depots;
+            depotsToDisplay = depotsToFilter;
         }
+        return depotsToDisplay;
+    }
+    grid.displayBody=function displayBody(){
+        var grid = this;
+        var depotsToDisplay = grid.filterDepots(grid.depots);
         grid.sortDepotsToDisplay = function sortDepotsToDisplay(depotsToDisplay){
             if(grid.view.sortColumns.length>0){
                 return depotsToDisplay.sort(function(depot1, depot2){ 
