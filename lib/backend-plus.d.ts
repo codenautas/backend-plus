@@ -420,7 +420,8 @@ export class AppBackend{
         messages:Record<LangId,Record<string, string>>
     }
     shootDownBackend():Promise<void>
-    setLog(opts:{until:string, results?:boolean})
+    setLog(opts:{until:string, results?:boolean}):void
+    getDataDumpTransformations(rawData:string):Promise<{rawData:string, prepareTransformationSql:string[], endTransformationSql:string[]}>
 }
 
 }
