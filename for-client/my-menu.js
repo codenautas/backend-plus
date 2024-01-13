@@ -56,6 +56,9 @@ myOwn.wScreens.table = function(addrParams){
         if(addrParams.detailing){
             opts.detailing=addrParams.detailing;
         }
+        if(addrParams.pick){
+            opts.pick=addrParams.pick;
+        }
         opts.detailingForUrl=opts.detailing||{};
         opts.detailingPath = [];
         var pageTitle = addrParams.label || addrParams.name || addrParams.table || my.config.config.title;

@@ -593,6 +593,7 @@ myAjax.UriSearchToObjectParams={
 	td               :{                   encode:function(x){ return json4all.toUrl(x); }, decode:function(x){ return json4all.parse(x)}  },
 	today            :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return bestGlobals.date.iso((x+'').substr(0,10))}  },
 	section          :{ showInMenu:true , encode:noChange                                , decode:noChange          },
+	pick             :{                   encode:noChange                                , decode:noChange          },
 	directUrl        :{ hide:true       },
 	selectedByDefault:{ hide:true       },
 	showParams       :{ hide:true       },

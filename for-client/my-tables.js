@@ -294,6 +294,7 @@ myOwn.TableConnector = function(context, opts){
     connector.opts = opts||{};
     connector.fixedFields = connector.opts.fixedFields || [];
     connector.fixedField = {};
+    connector.pick = connector.opts.pick;
     connector.hideBecauseRelated = {};
     connector.fixedFields.forEach(function(pair){
         if(!pair.range && pair.value != myOwn.skipInFixedFields){
@@ -360,7 +361,8 @@ myOwn.TableConnector.prototype.getData = function getData(){
     return connector.my.ajax.table_data({
         table:connector.tableName,
         fixedFields:connector.fixedFields,
-        paramfun:connector.parameterFunctions||{}
+        paramfun:connector.parameterFunctions||{},
+        pick:connector.pick
     }).then(function(rows){
         return connector.whenStructureReady.then(function(){
             if(connector.getElementToDisplayCount){
@@ -447,6 +449,7 @@ myOwn.TableConnectorLocal = function(context, opts){
     connector.opts = opts||{};
     connector.fixedFields = connector.opts.fixedFields || [];
     connector.fixedField = {};
+    connector.pick = connector.opts.pick;    
     connector.hideBecauseRelated = {};
     connector.fixedFields.forEach(function(pair){
         if(!pair.range && pair.value != myOwn.skipInFixedFields){
@@ -615,7 +618,8 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
             await grid.connector.my.ajax.table_data({
                 table:grid.connector.tableName,
                 fixedFields:grid.connector.fixedFields,
-                paramfun:grid.connector.parameterFunctions||{}
+                paramfun:grid.connector.parameterFunctions||{},
+                pick:grid.connector.pick
             }).then(function(rows){
                 var primaryKey = grid.def.primaryKey;
                 var getPrimaryKeyValues=function getPrimaryKeyValues(primaryKey, row){
@@ -2379,7 +2383,8 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             table:depot.def.name,
             fixedFields:grid.def.primaryKey.map(function(fieldName, i){ 
                 return {fieldName:fieldName, value:depot.primaryKeyValues[i]};
-            })
+            }),
+            pick:grid.def.pick
         }).then(function(result){
             grid.depotRefresh(depot,{updatedRow:result[0], sendedForUpdate:{}}, opts);
         })
