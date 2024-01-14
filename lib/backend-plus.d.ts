@@ -319,7 +319,8 @@ export type TableDefinition = EditableDbDefinition & {
     specialValidator?:string
     saveAfter?:boolean
     selfRefresh?:boolean
-    filterColumns?:{column:string, operator:string, value:any}[]
+    filterColumns?:{column:string, operator:string, value:any}[],
+    gridAlias?:string   /* front-end css my-table = gridAlias */
 }
 export type OtherTableDefs = TableDefinition['sql']['otherTableDefs']
 export interface DetailTable { table?: string, fields: FieldsForConnectDetailTable, abr: string, label?: string, refreshParent?:boolean, refreshFromParent?:boolean, wScreen?:string, condition?:string }

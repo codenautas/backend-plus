@@ -699,10 +699,11 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                 }
             })
         }
-        if(grid.def.refrescable){
+        if(grid.def.refrescable && !grid.def.forInsertOnlyMode){
+            if (window.currentAutofrefresh) clearInterval(window.currentAutofrefresh);
             window.currentAutofrefresh = setInterval(grid.refreshAllRows,8000);
         }
-        if (grid.def.selfRefresh) {
+        if (grid.def.selfRefresh && !grid.def.forInsertOnlyMode) {
             var refresh = function refresh(){
                 grid.refreshAllRows();
             }
