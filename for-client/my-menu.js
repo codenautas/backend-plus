@@ -74,15 +74,22 @@ myOwn.wScreens.procAux = {
         var params=addrParams.up;
         // var button = html.button(formDef.proceedLabel||my.messages.proceed).create();
         var label = formDef.proceedLabel||my.messages.proceed;
-        var button = my.createForkeableButton({}, label);
+        var refresUrl = formDef.method != 'post' || formDef.autoproced !== false 
+        var buttonOptions = {label}
+        if (formDef.method == 'post') {
+            buttonOptions.onclick = function(event){ event.preventDefault();  proceed(); }
+        }
+        var button = my.createForkeableButton({}, buttonOptions);
         var setHref = function(){
-            button.setForkeableHref({
-                ...addrParams, 
-                autoproced:true, 
-                directUrl:true,
-                ...(formDef && formDef.proceedLabel ? {label} : {}),
-                ...params
-            })
+            if (refresUrl) {
+                button.setForkeableHref({
+                    ...addrParams, 
+                    autoproced:true, 
+                    directUrl:true,
+                    ...(formDef && formDef.proceedLabel ? {label} : {}),
+                    // ...params
+                })
+            }
         }
         var divResult = html.div({class:formDef.resultClass||'result-pre'}).create();
         var id='progress'+Math.random();
@@ -114,7 +121,9 @@ myOwn.wScreens.procAux = {
             }
             control.addEventListener('update', function(){
                 params[parameterDef.name] = control.getTypedValue();
-                myOwn.replaceAddrParams(addrParams);
+                if (refresUrl) { 
+                    myOwn.replaceAddrParams(addrParams);
+                }   
                 setHref();
             });
             controls.push(control);
