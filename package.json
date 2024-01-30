@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for the anti Pareto rule",
-  "version": "2.0.0-rc.1",
+  "version": "2.0.0-rc.2",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
