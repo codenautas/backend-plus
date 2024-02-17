@@ -152,7 +152,7 @@ myOwn.wScreens.procAux = {
                 button.disabled=false;
                 divProgressOutside.style.opacity=0.33;
                 toggleProgress.disabled=false;
-                labelProgress.textContent=resultOk?my.messages.completed:'error';
+                labelProgress.textContent=typeof resultOk == "string" ? resultOk : resultOk !== false ? my.messages.completed : 'error';
             }).catch(function(err){
                 my.log(err);
                 divProgress.textContent=err.message;

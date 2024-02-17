@@ -35,7 +35,7 @@ export type UploadedFileInfo={
 
 }
 export type CoreFunction = ((context: ProcedureContext, parameters: CoreFunctionParameters) => Promise<any>)
-                         | ((context: ProcedureContext, parameters: CoreFunctionParameters, files?:UploadedFileInfo[]) => Promise<any>);
+                            | ((context: ProcedureContext, parameters: CoreFunctionParameters, files?:UploadedFileInfo[]) => Promise<any>);
 
 export interface ProcedureDef {
     action: string
@@ -252,6 +252,7 @@ export type Constraint = {constraintType:string, consName?:string} & (
     {constraintType:'unique', fields:string[], where?:string} |
     {constraintType:'check', expr?:string} 
 )
+export type OtherTableDefs = Record<string,Partial<TableDefinition & {prefilledField:Record<string,any>}>>
 export type TableDefinition = EditableDbDefinition & {
     name:string
     elementName?:string
@@ -293,7 +294,7 @@ export type TableDefinition = EditableDbDefinition & {
         }
         join?:string
         constraintsDeferred?:boolean
-        otherTableDefs?:Record<string,Partial<TableDefinition & {prefilledField:Record<string,any>}>>
+        otherTableDefs?:OtherTableDefs
     }
     foreignKeys?:ForeignKey[]
     softForeignKeys?:ForeignKey[]
@@ -322,7 +323,6 @@ export type TableDefinition = EditableDbDefinition & {
     filterColumns?:{column:string, operator:string, value:any}[],
     gridAlias?:string   /* front-end css my-table = gridAlias */
 }
-export type OtherTableDefs = TableDefinition['sql']['otherTableDefs']
 export interface DetailTable { table?: string, fields: FieldsForConnectDetailTable, abr: string, label?: string, refreshParent?:boolean, refreshFromParent?:boolean, wScreen?:string, condition?:string }
 export type TableDefinitionFunction = (context: ContextForDump, opts?:any) => TableDefinition;
 export type TableItemDef=string|{name:string, path?:string, tableGenerator?:(context:TableContext)=>TableDefinition}
