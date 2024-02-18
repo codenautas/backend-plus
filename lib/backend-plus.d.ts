@@ -286,11 +286,11 @@ export type TableDefinition = EditableDbDefinition & {
         viewBody?:string
         insertIfNotUpdate?:boolean
         policies?:{
-            all   ?:{using?:string, check?:string}
-            select?:{using?:string}
-            insert?:{               check?:string}
-            update?:{using?:string, check?:string}
-            delete?:{using?:string}
+            all   ?:{name?:string, using?:string, check?:string}
+            select?:{name?:string, using?:string}
+            insert?:{name?:string,                check?:string}
+            update?:{name?:string, using?:string, check?:string}
+            delete?:{name?:string, using?:string}
         }
         join?:string
         constraintsDeferred?:boolean
