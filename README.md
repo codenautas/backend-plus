@@ -6,11 +6,11 @@ Backend for the anti Pareto rule.
 
 
 ![stable](https://img.shields.io/badge/stability-stable-blue.svg)
-[![npm-version](https://img.shields.io/npm/v/backend-star.svg)](https://npmjs.org/package/backend-star)
-[![downloads](https://img.shields.io/npm/dm/backend-star.svg)](https://npmjs.org/package/backend-star)
-[![build](https://img.shields.io/travis/codenautas/backend-star/master.svg)](https://travis-ci.org/codenautas/backend-star)
-[![coverage](https://img.shields.io/coveralls/codenautas/backend-star/master.svg)](https://coveralls.io/r/codenautas/backend-star)
-[![dependencies](https://img.shields.io/david/codenautas/backend-star.svg)](https://david-dm.org/codenautas/backend-star)
+[![npm-version](https://img.shields.io/npm/v/backend-plus.svg)](https://npmjs.org/package/backend-plus)
+[![downloads](https://img.shields.io/npm/dm/backend-plus.svg)](https://npmjs.org/package/backend-plus)
+[![build](https://img.shields.io/travis/codenautas/backend-plus/master.svg)](https://travis-ci.org/codenautas/backend-plus)
+[![coverage](https://img.shields.io/coveralls/codenautas/backend-plus/master.svg)](https://coveralls.io/r/codenautas/backend-plus)
+[![dependencies](https://img.shields.io/david/codenautas/backend-plus.svg)](https://david-dm.org/codenautas/backend-plus)
 
 
 language: ![English](https://raw.githubusercontent.com/codenautas/multilang/master/img/lang-en.png)
@@ -205,7 +205,7 @@ entry                        | usage
 -----------------------------|---------------
 server                       |
 .port                        | port where is listening
-.base-rul                    | base url added to domain name
+.base-url                    | base url added to domain name
 .module-store                |
 install                      | (see Spanish)
 .dump                        | (see Spanish)
