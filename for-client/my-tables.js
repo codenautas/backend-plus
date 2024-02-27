@@ -690,11 +690,18 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                     if (myOwn.config.config['grid-row-retain-moved-or-deleted'] && !force) { 
                         var depotsToRetain = grid.depots.filter(depot => depot.tick == tick);
                         for (depot of depotsToRetain) {
+                            depot.row['$refreshed'] = false
                             if (depot.tr && depot.tr.getAttribute('not-here')) depot.tr.removeAttribute('not-here')
                         }
                     }
                     while (depot = depotsToDelete.pop()) {
                         depot.manager.displayAsDeleted(depot, force ? 'change-ff' : 'unknown'); 
+                        if (myOwn.config.config['grid-row-retain-moved-or-deleted']) { 
+                            if(!depot.row['$refreshed']){
+                                grid.retrieveRowAndRefresh(depot,{retrieveIgnoringWhere:true})
+                                depot.row['$refreshed'] = true
+                            }
+                        }
                     }
                 }
             })
@@ -2385,7 +2392,8 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             fixedFields:grid.def.primaryKey.map(function(fieldName, i){ 
                 return {fieldName:fieldName, value:depot.primaryKeyValues[i]};
             }),
-            pick:grid.def.pick
+            pick:grid.def.pick,
+            retrieveIgnoringWhere: opts.retrieveIgnoringWhere
         }).then(function(result){
             grid.depotRefresh(depot,{updatedRow:result[0], sendedForUpdate:{}}, opts);
         })
