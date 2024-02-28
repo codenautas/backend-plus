@@ -2393,7 +2393,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 return {fieldName:fieldName, value:depot.primaryKeyValues[i]};
             }),
             pick:grid.def.pick,
-            retrieveIgnoringWhere: opts.retrieveIgnoringWhere
+            retrieveIgnoringWhere: opts?opts.retrieveIgnoringWhere:false
         }).then(function(result){
             grid.depotRefresh(depot,{updatedRow:result[0], sendedForUpdate:{}}, opts);
         })
