@@ -1622,7 +1622,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
                     }else{
                         separator='|';
                         var trans={
-                            '|':'\\|',
+                            '|':'\\x7C',
                             '\\':'\\\\',
                             '\r':'\\r',
                             '\n':'\\n',
