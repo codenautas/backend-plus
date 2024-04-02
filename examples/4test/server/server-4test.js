@@ -11,16 +11,16 @@ var fs = require('fs-extra');
 
 server.start().then(function(){
     var thisInterval=setInterval(function(){
-        fs.rename('local-shootdown.yes','local-shootdown.done').then(function(){
+        fs.rename('local-shutdown.yes','local-shutdown.done').then(function(){
             console.log('shooting down...');
-            if(!server.shootDownBackend){
-                server.shootDownBackend=function(){ return Promise.resolve()};
+            if(!server.shutdownBackend){
+                server.shutdownBackend=function(){ return Promise.resolve()};
             }
-            return server.shootDownBackend().then(function(){
+            return server.shutdownBackend().then(function(){
                 clearInterval(thisInterval);
                 console.log('shooted down!');
             });
-        },function(){ "not shootdown yet"; }).catch(function(err){
+        },function(){ "not shutdown yet"; }).catch(function(err){
             console.log(err);
         });
     },1000);

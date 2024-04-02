@@ -240,7 +240,7 @@ describe("interactive ",function(){
         await client.done();
         await page.waitForTimeout(process.env.TRAVIS?10:1000);
         await browser.close()
-        await server.shootDownBackend();
+        await server.shutdownBackend();
     });
 });
 

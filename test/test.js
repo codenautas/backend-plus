@@ -124,7 +124,7 @@ describe('backend-plus', function describeBackendPlus(){
                 });
                 after(async function(){
                     console.log('cerrando el backend',i);
-                    await be.shootDownBackend();
+                    await be.shutdownBackend();
                     be=null;
                     console.log('cerrado! el backend',i);
                 });
