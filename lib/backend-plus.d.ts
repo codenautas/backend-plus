@@ -12,9 +12,7 @@ export type LangId = 'en'|'es'|'etc...';
 
 export type Server=net.Server;
 
-export interface CoreFunctionParameters{
-    [key:string]: any
-}
+export type CoreFunctionParameters<T extends Record<string, any>> = T;
 
 export type MarkdownDoc = 'markdown documentation with `` can content newlines. The identation of the first line is deleted in all others'|'etc...'; 
 
@@ -365,6 +363,126 @@ export interface Caches {
     procedures:Record<string, {timestamp:number, result:any}>
 }
 
+export interface AppConfigBin {                                    // executables in SO
+    "zip-password-parameter-flag": string // parameter to pass the password to the zipper
+    "zip-password-prefix": string         // password prefix
+    "zip-fixed-parameters":string         // fixed parameters to pass to zipper
+}
+
+export interface AppConfig {
+    server: {
+        "base-url": string                 // rool path in the url
+        port: number                       // port of the API services
+        "session-store": string            // strategies to store session info
+        "ip-replacer": string              // ip that can be not showed or deduced in logs
+        "silent-startup": boolean          // less logs when startup
+        "kill-9": string                   // a way to kill from URL with a token
+        bitacoraSchema: string
+        bitacoraTableName: string 
+    }
+    db: {
+        motor: 'postgresql'
+        database: string
+        user: string
+        password: string
+        schema: string
+        search_path: string
+        tablespace: string                 // for creation scripts
+        "min-version": string              // min version of the motor needed
+        nodb: boolean                      // if there is no database needed in the app
+        no_login: boolean                  // if no login is needed. Used only for all public sites
+        "downloadable-backup-path": string // OS path of the encrypted downloadable backup
+    }
+    login: {
+        schema: string                     // schema of the user table
+        table: string                      // user table
+        userFieldname: string              // fieldname in user table that stores the user name
+        passFieldname: string              // fieldname in user table that stores the password hash
+        rolFieldname: string               // fieldname in user table that stores the rol
+        unloggedLandPage: string           // land page when there is no user logged when the backend has public services
+        noLoggedUrlPath: string            // path of non logged users when the backend has no public services
+        "preserve-case": boolean           // preserve the case of the user name
+        activeClausule: string             // SQL expression over the user table to check if a user is active
+        lockedClausule: string             // SQL expression over the user table to check if a user is locked
+        disableChangePassword: boolean     // disallow password change
+        skipBitacora: boolean              // don't register logins
+        keepAlive: number                  // secs to keep alive a session if only keep alive request where received
+        plus: {
+            userFieldName:string
+            store:{
+                module: string
+            }
+        }
+        forget: {                          // forget password configurations:
+            urlPath: string                // url sent by mail. default: `/new-pass`
+            urlPathOk: string              // confirmation page
+            mailFields: string[]           // fields for the forget pass mail
+
+        }
+        "double-dragon": boolean           // app user must match db user
+    }
+    install: {
+        "table-data-dir": string           // SO path to the .tab files in the db creation script
+        dump: {                            // configuration of --dump-db, the db creation script
+            "drop-his": boolean            // include drop schema his in the db creation script
+            db: {                          
+                owner: string              
+                extensions: string[]       // extensions to be installed (gist, pg_trgm, pgcrypto)
+                enances: 'file'            // if the enances must be dumped in a separate file
+                // from here info to set the owner and replace owner and user used in devel when script creation
+                "owner4special-scripts": string
+                "user4special-scripts": string
+                "apply-generic-user-replaces": string
+            }
+            "admin-can-create-tables": boolean // for apps that allows the user to create tables
+            "skip-content": boolean        // don't create data from "table-data-dir"
+            folders: string                //
+            scripts: {
+                prepare: string            // SO path to the prepare scripts that will be run before the functions creations and inserts
+                "post-adapt": string       // SO path to the post-adapt scripts that will be run after data inserts (of .tab tables)
+            }
+        }
+    }
+    "client-setup": {                      // front-end config
+        title:string                       // title of the app (common sufix of the title bar)
+    }
+    log: {
+        "serve-content": never
+        req: {
+            "keep-alive": boolean
+        }
+        db: {
+            "last-error": boolean          // store last db error in a log file
+            devel: boolean                 //
+            "on-demand": string            // if log db level can be changed on the fly
+            until: string | Date           // full log until...
+            results: boolean               // if query results must be included in full db logs
+        }
+        session: boolean                   // if all session activity must be logged
+    }
+    devel: {
+        delay: number                      // msec avg random delay in API responses (to emulate slow nets)
+        "cache-content": boolean           // if the cache header must be sent to the client (when no devel config the default is true)
+        forceShowAsEditable: boolean       // force "editable" behavior in grids 
+    }
+    mailer: {                              // config to send mails
+        conn: string                       // connection string
+        "mail-info": {}                    // static mail config
+        supervise: {
+            to: string                     // email addres of the supervisor
+            event: {
+            }
+        }
+    }
+    bin: AppConfigBin 
+    data: {
+        transformers: {
+            text: string                   // define the inputTransformers for text comming from the fron-end via the API
+        }
+    }
+    skipUnknownFieldsAtImport: boolean     // if unknown fields must be skipped by default in import
+}
+
 export class AppBackend{
     procedures:ProcedureDef[]
     procedure:{ [key:string]:ProcedureDef }
@@ -372,7 +490,7 @@ export class AppBackend{
     getTableDefinition: TableDefinitionsGetters
     tableStructures: TableDefinitions
     db: MotorDb
-    config: any
+    config: AppConfig
     rootPath: string
     caches:Caches
     fieldDomain:{[k:string]:Partial<FieldDefinition>}
