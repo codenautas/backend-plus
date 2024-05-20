@@ -370,6 +370,9 @@ export interface AppConfigBin {                                    // executable
 }
 
 export interface AppConfig {
+    package: {
+        version: string
+    }
     server: {
         "base-url": string                 // rool path in the url
         port: number                       // port of the API services
