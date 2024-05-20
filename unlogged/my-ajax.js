@@ -495,11 +495,25 @@ function agregar_json_default_ubicaciones(div, o, a){
     var table = div2.laTabla;
     var row = table.insertRow(-1);
     var cellName = row.insertCell(-1);
-    cellName.className='attr-name';
-    cellName.textContent = a; 
+    agregar_class_textInDiv(cellName, 'attr-name', a)
     var cell = row.insertCell(-1);
     cell.colSpan=99;
     return {title:cellName, data:cell, skip:o[a] == null}
+}
+
+/**
+ * 
+ * @param {HTMLTableDataElement} td
+ * @param {string|number} text
+ * @param {string} className
+ */
+function agregar_class_textInDiv(td, className, text){
+    var div = document.createElement('div');
+    td.className = className;
+    div.className = 'json-container';
+    div.textContent = text;
+    td.innerHTML = '';
+    td.appendChild(div);
 }
 
 /**
@@ -524,9 +538,7 @@ function agregar_json(div, o, ubicaciones=agregar_json_default_ubicaciones){
                 if(o[a]!=null){
                     var row = table.insertRow(-1);
                     var cellName = row.insertCell(-1);
-                    cellName.className='row-num';
-                    // @ts-ignore numero y texto
-                    cellName.textContent = isNaN(a)?a:Number(a)+1; 
+                    agregar_class_textInDiv(cellName, 'row-num', isNaN(a)?a:Number(a)+1); 
                     agregar_json(row, o[a], function(div, _o, a){
                         // @ts-ignore sé que es Row
                         /** @type {HTMLTableRowElement} */
@@ -554,11 +566,9 @@ function agregar_json(div, o, ubicaciones=agregar_json_default_ubicaciones){
                 if(!cells.skip){
                     if(cells.title){
                         if(o instanceof Array && !isNaN(a)){
-                            cells.title.className='row-num';
-                            cells.title.textContent = Number(a) + 1; 
+                            agregar_class_textInDiv(cells.title, 'row-num', Number(a) + 1); 
                         }else{
-                            cells.title.className='attr-name';
-                            cells.title.textContent = a; 
+                            agregar_class_textInDiv(cells.title, 'attr-name', a); 
                         }
                     }
                     agregar_json(cells.data, o[a]);
@@ -566,13 +576,16 @@ function agregar_json(div, o, ubicaciones=agregar_json_default_ubicaciones){
             }
         }
     }else{
-        div.className='plain-content';
+        var textContent;
         if(typeof o == "boolean"){
-            div.textContent = o?'Sí':'No'
+            textContent = o ? 'Sí' : 'No'
         }else if(o && o instanceof Date && o.isRealDate){
-            div.textContent = o.toDmy();
+            textContent = o.toDmy();
         }else{
-            div.textContent = o.toLocaleString();
+            textContent = o.toLocaleString();
+        }
+        if (textContent) {
+            agregar_class_textInDiv(div, 'plain-content', textContent)
         }
     }
 }
