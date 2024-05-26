@@ -76,7 +76,7 @@ export interface ContextForDump extends Context {
     forDump?:boolean
 }
 
-export type InformProgressFunction=(opts:Error|{data:any}|{start:any}|{message:string}|{message?:string, lengthComputable:boolean, loaded:number, total:number, force?:boolean})=>void
+export type InformProgressFunction=(opts:Error|{data:any}|{start:any}|{message:string}|{idGroup?:string, message?:string, lengthComputable:boolean, loaded:number, total:number, force?:boolean})=>void
 
 export interface ProcedureContext extends Context{
     client:Client

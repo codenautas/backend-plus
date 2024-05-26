@@ -193,14 +193,17 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
         }
         var result=[];
         var progress=procedureDef.progress!==false;
+        /** @type {Record<string,{ divBar, progressBar, progresIndicator, divBarLabel }>} */
+        var progressStruct = {}
         var divProgress;
-        var divBarProgress;
-        var progressBar;
-        var progressIndicator;
-        var divBarProgressLabel;
+        // var divBarProgress = {};
+        // var progressBar;
+        // var progressIndicator;
+        // var divBarProgressLabel = {};
         var onClose=function(){}
         var defaultInformProgress = function defaultInformProgress(progressInfo){
             if(progressInfo.message || progressInfo.end || progressInfo.start || progressInfo.loaded){
+                // progressInfo.idGroup
                 if(!divProgress){
                     var idAutoClose='id-auto-close-'+Math.random();
                     var checkAutoClose=html.input({type:'checkbox', id:idAutoClose, checked:myAjax.ajaxPromise.autoClose}).create();
@@ -235,8 +238,12 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
                     }
                 }
             }
-            if(progressInfo.ephemeral && divBarProgressLabel){
-                divBarProgressLabel.textContent=progressInfo.message;
+            if (progressStruct[progressInfo.idGroup] == null) {
+                progressStruct[progressInfo.idGroup] = {}
+            }
+            var ps = progressStruct[progressInfo.idGroup];
+            if(progressInfo.ephemeral && ps.divBarLabel){
+                ps.divBarLabel.textContent = progressInfo.message;
             }else if(progressInfo.message || progressInfo.end){
                 var now=bestGlobals.datetime.now();
                 var elapsed = now.sub(tickTime);
@@ -265,23 +272,23 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
                     );
                 }
             }
-            if(progressInfo.loaded){
-                if(!divBarProgress){
-                    divBarProgressLabel = html.div().create();
-                    progressIndicator=html.div({class:'indicator'},' ').create();
-                    progressBar=html.div({class:'progress-bar', style:'width:400px; height:8px;'},[progressIndicator]).create();
-                    divBarProgress = html.div([
-                        divBarProgressLabel,
-                        progressBar
+            if(progressInfo.loaded != null){
+                if(!ps.divBar){
+                    ps.divBarLabel = html.div().create();
+                    ps.progressIndicator=html.div({class:'indicator'},' ').create();
+                    ps.progressBar=html.div({class:'progress-bar', style:'width:400px; height:8px;'},[ps.progressIndicator]).create();
+                    ps.divBar = html.div([
+                        ps.divBarLabel,
+                        ps.progressBar
                     ]).create();
-                    divProgress.parentNode.insertBefore(divBarProgress, divProgress);
+                    divProgress.parentNode.insertBefore(ps.divBar, divProgress);
                 }
                 if(progressInfo.lengthComputable){
-                    progressIndicator.style.width=progressInfo.loaded*100/progressInfo.total+'%';
-                    progressIndicator.title=Math.round(progressInfo.loaded*100/progressInfo.total)+'%';
+                    ps.progressIndicator.style.width=progressInfo.loaded*100/progressInfo.total+'%';
+                    ps.progressIndicator.title=Math.round(progressInfo.loaded*100/progressInfo.total)+'%';
                 }else{
-                    progressIndicator.style.backgroundColor='#D4D';
-                    progressIndicator.title='N/D %';
+                    ps.progressIndicator.style.backgroundColor='#D4D';
+                    ps.progressIndicator.title='N/D %';
                 }
             }
         }
@@ -304,7 +311,6 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
         }
         var controlLoggedIn = function controlLoggedIn(result, informNotLoggedIn){
             if(informNotLoggedIn || result && result[0]=="<" && result.match(/login/m)){
-                console.log('xxxxxxxxxxx',procedureDef.action)
                 my.informDetectedStatus('notLogged');
                 throw bestGlobals.changing(new Error(my.messages.notLogged),{displayed:true, isNotLoggedError:true});
             }
