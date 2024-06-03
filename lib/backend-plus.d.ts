@@ -184,7 +184,7 @@ export type FieldDefinition = EditableDbDefinition & {
     serverSide?:boolean        /* default:!clientSide if the value is retrived from the database */
     inTable?:boolean           /* default:!clientSide && !sql.fields[...].expr. Is a real fisical field in the table */
     /* sizeByte?:number  deprecated size in bytes for numbers */
-    allowEmtpyText?:boolean    /* if a text field accepts '' as a valid value */
+    allowEmptyText?:boolean    /* if a text field accepts '' as a valid value */
     mobileInputType?:string     
     extraRow?:number
     inexactNumber?:number      /* default:depends on typeName  if = means abs(x-v)<espilon
