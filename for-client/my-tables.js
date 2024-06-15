@@ -183,20 +183,15 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
 /** @param {string} text */
 function regex4search(text){
     return new RegExp(
-        text.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+        text.toString().trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
         // .replace(/"/g,"\\b")
         .replace(/[ñÑ]/g,'(?:gn|nn?i?|[ñÑ])')
-        .replace(/[cCçÇ]/g,'[cçÇ]')
-        .replace(/[áÁàÀäÄãÃ]/gi,'[AáÁàÀäÄãÃ]')
-        .replace(/[éÉèÈëË]/gi,'[EéÉèÈëË]')
-        .replace(/[íÍìÌïÏ]/gi,'[IíÍìÌïÏ]')
-        .replace(/[óÓòÒöÖõÕ]/gi,'[OóÓòÒöÖõÕ]')
-        .replace(/[úÚùÙüÜ]/gi,'[UúÚùÙüÜ]')
-        .replace(/a/gi,'[AáÁàÀäÄãÃ]')
-        .replace(/e/gi,'[EéÉèÈëË]')
-        .replace(/i/gi,'[IíÍìÌïÏ]')
-        .replace(/o/gi,'[OóÓòÒöÖõÕ]')
-        .replace(/u/gi,'[UúÚùÙüÜ]')
+        .replace(/[cCçÇ]/g,'[cCçÇ]')
+        .replace(/[AáÁàÀäÄãÃ]/gi,'[AáÁàÀäÄãÃ]')
+        .replace(/[EéÉèÈëË]/gi,'[EéÉèÈëË]')
+        .replace(/[IíÍìÌïÏ]/gi,'[IíÍìÌïÏ]')
+        .replace(/[OóÓòÒöÖõÕ]/gi,'[OóÓòÒöÖõÕ]')
+        .replace(/[UúÚùÙüÜ]/gi,'[UúÚùÙüÜ]')
         // .replace(/\s+/g,'.*\\s+.*') mas estricto, exige el espacio
         .replace(/\s+/g,'.*')
     , 'i');
@@ -212,9 +207,9 @@ myOwn.comparatorParameterNull={
     '!=\u2205':true,
 }
 myOwn.comparator={
-    '=':function(valueToCheck,condition){return valueToCheck == condition;},
-    '~':function(valueToCheck,condition){return condition==null || regex4search(condition.toString()).test(valueToCheck);},
-    '!~':function(valueToCheck,condition){return condition==null || !regex4search(condition.toString()).test(valueToCheck);},
+    '=':function(valueToCheck,condition){return sameValue(valueToCheck,condition);},
+    '~': function(valueToCheck,condition){return condition==null || condition instanceof Date ? Math.abs(condition-valueToCheck) <= 1000*60*60*24 : regex4search(condition).test(valueToCheck);},
+    '!~':function(valueToCheck,condition){return condition==null || condition instanceof Date ? Math.abs(condition-valueToCheck) >  1000*60*60*24 :!regex4search(condition).test(valueToCheck);},
     '/R/i':function(valueToCheck,condition){return condition==null || RegExp(condition,'i').test(valueToCheck);},
     '\u2205':function(valueToCheck,condition){return valueToCheck == null;},//\u2205 = conjunto vacío
     '!=\u2205':function(valueToCheck,condition){return valueToCheck != null;},//\u2205 = conjunto vacío
@@ -1005,7 +1000,7 @@ myOwn.DataColumnGrid.prototype.thFilter = function thFilter(depot, iColumn){
     var grid = this.grid;
     var fieldDef = this.fieldDef;
     var fieldName=fieldDef.name;
-    depot.rowSymbols[fieldDef.name]=depot.rowSymbols[fieldDef.name]||'~';
+    depot.rowSymbols[fieldDef.name]=depot.rowSymbols[fieldDef.name]||(fieldDef.typeName == 'text' ? '~' : '=');
     var filterImage=my.path.img+my.comparator.traductor[depot.rowSymbols[fieldDef.name]]+'.png';
     var th=html.td(this.cellAttributes({class:"autoFilter", "typed-controls-direct-input":true},{skipMandatory:true})).create();
     var symbolFilter=th;
