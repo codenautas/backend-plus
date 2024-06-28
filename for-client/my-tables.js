@@ -2248,7 +2248,8 @@ myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElem
     }
     var depotForInsert = grid.createDepotFromRow({$allow:{delete:true, update:true}}, 'new');
     grid.connector.fixedFields.forEach(function(pair){
-        if(!pair.range && grid.def.field[pair.fieldName].inTable !== false){
+        var fieldDef = grid.def.field[pair.fieldName];
+        if(!pair.range && (fieldDef.inTable !== false || fieldDef.isPk && pair.value !=null)){
             depotForInsert.row[pair.fieldName] = pair.value;
             depotForInsert.rowPendingForUpdate[pair.fieldName] = pair.value;
         }

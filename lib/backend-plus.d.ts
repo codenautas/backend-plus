@@ -293,6 +293,7 @@ export type TableDefinition = EditableDbDefinition & {
         join?:string
         constraintsDeferred?:boolean
         otherTableDefs?:OtherTableDefs
+        setExpectedPkValues?:boolean
     }
     foreignKeys?:ForeignKey[]
     softForeignKeys?:ForeignKey[]
