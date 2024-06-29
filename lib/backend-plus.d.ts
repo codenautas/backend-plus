@@ -257,16 +257,17 @@ export type TableDefinition = EditableDbDefinition & {
     tableName?:string
     schema?:string
     title?:string
-    fields:FieldDefinition[],
-    primaryKey:string[],
-    refrescable?: boolean;
+    fields:FieldDefinition[]
+    primaryKey:string[]
+    refrescable?: boolean
     sql?:{
+        primaryKey4Delete?:string[]
         isTable?:boolean
         from?:string
         where?:string
         postCreateSqls?:string
-        skipEnance?: boolean,
-        isReferable?: boolean,
+        skipEnance?: boolean
+        isReferable?: boolean
         logicalDeletes?:{
             fieldName:string
             valueToDelete:string
@@ -275,11 +276,12 @@ export type TableDefinition = EditableDbDefinition & {
             fieldName:string
         }
         tableName?:string
+        tableName4Delete?:string
         fields?:{
             [k:string]:{
                 expr:string
             }
-        },
+        }
         orderBy?:string[]
         viewBody?:string
         insertIfNotUpdate?:boolean
@@ -319,7 +321,7 @@ export type TableDefinition = EditableDbDefinition & {
     specialValidator?:string
     saveAfter?:boolean
     selfRefresh?:boolean
-    filterColumns?:{column:string, operator:string, value:any}[],
+    filterColumns?:{column:string, operator:string, value:any}[]
     gridAlias?:string   /* front-end css my-table = gridAlias */
 }
 export interface DetailTable { table?: string, fields: FieldsForConnectDetailTable, abr: string, label?: string, refreshParent?:boolean, refreshFromParent?:boolean, wScreen?:string, condition?:string }
