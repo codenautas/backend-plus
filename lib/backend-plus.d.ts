@@ -134,7 +134,7 @@ export type MenuInfoPath={
     path:string
 } & MenuInfoMinimo;
 export interface ClientModuleDefinition{
-    type:'js'|'css'|'ttf'
+    type:'js'|'css'|'ttf'|'mjs'
     module?:string // module where to search in node_modules (node_modules/module/modPath/file) to serve
     modPath?:string // path inside module where to find file to serve
     src?:string  // full path where browser search file (path/file)
