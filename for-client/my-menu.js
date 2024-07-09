@@ -291,9 +291,11 @@ myOwn.showPage = function showPage(pageDef){
         rightMenu.style.zIndex=300;
         totalLayout.appendChild(rightMenu);
     }
-    rightMenu.onclick=function(){
-        if(!my.offline.mode){
-            my.rightMenu();
+    if (rightMenu != null) {
+        rightMenu.onclick=function(){
+            if(!my.offline.mode){
+                my.rightMenu();
+            }
         }
     }
 };
@@ -539,9 +541,9 @@ myOwn.informDetectedStatus = function informDetectedStatus(statusCode, logged) {
     }
     if(statusCode==='notLogged'){
         var notLogged = document.getElementById('not-logged');
-        notLogged.style.display='inherit';
+        if (notLogged) notLogged.style.display='inherit';
         var activeUser = document.getElementById('active-user');
-        activeUser.style.display='none';
+        if (activeUser) activeUser.style.display='none';
     }
 }
 
@@ -558,11 +560,13 @@ myOwn.offlineModeRefresh = function offlineModeRefresh(){
     /** @type {HTMLImageElement} */
     // @ts-ignore
     var imgLight = document.getElementById('light-airplane');
-    var skin=((my.config||{}).config||{}).skin;
-    if(my.offline.mode){
-        imgLight.src=my.path.img+'airplane-on.png';
-    }else{
-        imgLight.src=my.path.img+'airplane-off.png';
+    if (imgLight != null) {
+        var skin=((my.config||{}).config||{}).skin;
+        if(my.offline.mode){
+            imgLight.src=my.path.img+'airplane-on.png';
+        }else{
+            imgLight.src=my.path.img+'airplane-off.png';
+        }
     }
 }
 
