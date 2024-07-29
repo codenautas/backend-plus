@@ -211,6 +211,7 @@ export type FieldDefinition = EditableDbDefinition & {
     nameForUpsert?:string
     alwaysShow?:boolean /* show when appears in fixed fields */
     suggestingKeys?:string[]
+    postInput?:'upperSpanish' | 'upperWithoutDiacritics' | 'parseDecimal'
 } & ({} | {
     sequence:SequenceDefinition
     nullable:true
