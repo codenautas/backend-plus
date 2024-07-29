@@ -1,5 +1,29 @@
 # novedades de _backend-plus_
 
+**v2.0.0-beta1** Se prepara una nueva versión de backend-plus con cambios que requieren 
+ajustes en los sistemas basados en la **v1**. Cambia la tabla bitácora de lugar
+(las tablas de bitácoras, históricos, tokens, estados del frontend, preferencias de usuario,
+y otras no asociadas a las reglas del _negocio_ hay que pasarlas al esquema _his_).
+
+La bitácora incluyee el registro de inicio de sesión `@login`.
+
+**v1.19.6** Las columnas de una subgrilla que relacionan con la grilla principal están ocultas.
+Desde esta versión esas columnas son editables (lo que permitiría cambiar un subregisto y 
+hacerlo depender de otro registro de la tabla principal). 
+
+**v1.19.3** Se agrega la posibilidad de definir programáticamente qué usuarios tienen permiso
+para cambiar la clave de otros usuarios. Por defecto son los que tiene rol=admin.
+La aplicación puede sobreescribir la función `canChangePass(context, user)` para indicar
+si el usuario del contexto actual puede cambiar la del usuario `user`. 
+
+**v1.19.0** Se arregla la exportación de fechas en XLSX.
+
+**v1.18.13** Se despliega la URL en modo "user friendly" (minimizando caracteres que necesitan encoding
+como las comillas).
+
+**v1.18.8** Se agrega el parámetro td a la URL para poder enviar configuraciónes de TableDef a las grillas.
+(configuraciones que se permitan desde el front-end).
+
 **v1.18.7** Se agrega la posibilidad de definir un `tablespace` a la configuracion de la base de datos si es necesario crear la base dentro de un tablespace específico
 
 **v1.18.0** Se agrega en la definición de columnas de las tablas `nameForUpsert`. Se usa en las tablas

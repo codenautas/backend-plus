@@ -210,6 +210,7 @@ export type FieldDefinition = EditableDbDefinition & {
     inherited?:boolean
     nameForUpsert?:string
     alwaysShow?:boolean /* show when appears in fixed fields */
+    suggestingKeys?:string[]
 } & ({} | {
     sequence:SequenceDefinition
     nullable:true

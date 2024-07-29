@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for the anti Pareto rule",
-  "version": "2.0.0-rc.20",
+  "version": "2.0.0-rc.22",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -82,7 +82,7 @@
     "@types/js-yaml": "^4.0.9",
     "@types/mocha": "^10.0.7",
     "@types/multiparty": "~0.0.36",
-    "@types/node": "^20.14.9",
+    "@types/node": "^22.0.0",
     "@types/nodemailer": "^6.4.15",
     "@types/numeral": "~2.0.5",
     "@types/session-file-store": "^1.2.5",
@@ -97,14 +97,14 @@
     "karma-ie-launcher": "^1.0.0",
     "karma-mocha": "^2.0.1",
     "kill-9": "~0.4.3",
-    "mocha": "^10.5.2",
+    "mocha": "^10.7.0",
     "nyc": "^17.0.0",
-    "puppeteer": "^22.12.1",
+    "puppeteer": "^22.14.0",
     "sinon": "^18.0.0",
     "supertest": "^7.0.0",
     "types.d.ts": "~0.6.21",
-    "typescript": "^5.5.2",
-    "why-is-node-running": "^2.2.2"
+    "typescript": "^5.5.4",
+    "why-is-node-running": "^3.2.0"
   },
   "engines": {
     "node": ">= 18"

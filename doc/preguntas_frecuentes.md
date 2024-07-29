@@ -370,7 +370,7 @@ clientIncludes(req:Request|null, opts:OptsClientPage):ClientModuleDefinition[]{
    * `module` se refiere a un módulo externo (mencionado en `package.json` y resuelto con el algoritmo de `require` de _Node.js_) si no se especifica se entiende que es un módulo propio de la aplicación
    * `file` se refiere al nombre del archivo que se va incluir (puede omitirse en módulos externos si el módulo tiene al archivo deseado como principal, eso no suele ocurrir en los archivos mimificados)
    * `modPath` sirve para corregir el _path_ del servidor cuando la carpeta a servir no es la que resuelve _Node.js_
-   * `fileDevelopment` el archivo a incluir en modo development. 
+   * `fileDevelopment` el archivo a incluir en modo development (que se habilita en el local config con `devel.useFileDevelopment`) 
    * `path` el _path_ en la URL donde se va a servir (si no se indica es `lib` para `js` y `css` para `css`)
 
 A veces con nuevas versiones de algunos paquetes las ubicaciones o nombres de los archivos mimificados pueden cambiar. 
