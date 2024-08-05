@@ -169,7 +169,7 @@ export type SequenceDefinition = {
     prefix?:string /* Prefix for the generated value */
 }
 export type ExportMetadataDefinition={ /* TODO: define */ }
-export type PostInput='upperSpanish' | 'upperWithoutDiacritics' | 'parseDecimal'
+export type PostInputOptions='upperSpanish' | 'upperWithoutDiacritics' | 'parseDecimal'
 export type FieldDefinition = EditableDbDefinition & {
     name:string
     typeName:PgKnownTypes|'ARRAY:text'
