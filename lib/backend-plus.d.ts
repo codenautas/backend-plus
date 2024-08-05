@@ -212,7 +212,7 @@ export type FieldDefinition = EditableDbDefinition & {
     nameForUpsert?:string
     alwaysShow?:boolean /* show when appears in fixed fields */
     suggestingKeys?:string[]
-    postInput?:PostInput
+    postInput?:PostInputOptions
 } & ({} | {
     sequence:SequenceDefinition
     nullable:true
