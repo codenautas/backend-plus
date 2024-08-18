@@ -32,14 +32,14 @@ export type UploadedFileInfo={
     path: string
 
 }
-export type CoreFunction = ((context: ProcedureContext, parameters: CoreFunctionParameters) => Promise<any>)
-                            | ((context: ProcedureContext, parameters: CoreFunctionParameters, files?:UploadedFileInfo[]) => Promise<any>);
+export type CoreFunction<T> = ((context: ProcedureContext, parameters: CoreFunctionParameters<T>) => Promise<any>)
+                            | ((context: ProcedureContext, parameters: CoreFunctionParameters<T>, files?:UploadedFileInfo[]) => Promise<any>);
 
-export interface ProcedureDef {
+export interface ProcedureDef<T = any> {
     action: string
     parameters: ProcedureParameter[]
     method?: 'get'|'post'
-    coreFunction: CoreFunction 
+    coreFunction: CoreFunction<T> 
     encoding?:'JSON4all'|'JSON'|'download'
     multipart?:true
     progress?:true
@@ -169,6 +169,7 @@ export type SequenceDefinition = {
     prefix?:string /* Prefix for the generated value */
 }
 export type ExportMetadataDefinition={ /* TODO: define */ }
+export type PostInputOptions = 'upperSpanish' | 'upperWithoutDiacritics' | 'parseDecimal'
 export type FieldDefinition = EditableDbDefinition & {
     name:string
     typeName:PgKnownTypes|'ARRAY:text'
@@ -211,7 +212,7 @@ export type FieldDefinition = EditableDbDefinition & {
     nameForUpsert?:string
     alwaysShow?:boolean /* show when appears in fixed fields */
     suggestingKeys?:string[]
-    postInput?:'upperSpanish' | 'upperWithoutDiacritics' | 'parseDecimal'
+    postInput?:PostInputOptions
 } & ({} | {
     sequence:SequenceDefinition
     nullable:true
@@ -527,7 +528,7 @@ export class AppBackend{
     inDbClient<T>(req:Request|null, doThisWithDbClient:(client:Client)=>Promise<T>):Promise<T>
     inTransaction<T>(req:Request|null, doThisWithDbTransaction:(client:Client)=>Promise<T>):Promise<T>
     inTransactionProcedureContext<T>(req:Request|null, coreFunction:(context:ProcedureContext)=>Promise<T>):Promise<T>
-    procedureDefCompleter(procedureDef:ProcedureDef):ProcedureDef
+    procedureDefCompleter<T>(procedureDef:ProcedureDef):ProcedureDef<T>
     tableDefAdapt(tableDef:TableDefinition, context:Context):TableDefinition
     pushApp(dirname:string):void
     dumpDbTableFields(tableDefinition:TableDefinition):string[]
