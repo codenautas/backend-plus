@@ -91,6 +91,11 @@ export interface Request extends express.Request {
     user?:User
     session:express.Request["session"]
 }
+export interface RequestDb {
+    user?:User
+    machineId?:string
+    userAgent?:{shortDescription?:string}
+}
 export {Response, Express} from "express";
 export interface ResponsePlus extends express.Response{}
 export interface ExpressPlus extends express.Express{}
@@ -525,8 +530,8 @@ export class AppBackend{
     isAdmin():boolean
     canChangePass():Promise<boolean>
     getMenu(context?:Context):MenuDefinition
-    inDbClient<T>(req:Request|null, doThisWithDbClient:(client:Client)=>Promise<T>):Promise<T>
-    inTransaction<T>(req:Request|null, doThisWithDbTransaction:(client:Client)=>Promise<T>):Promise<T>
+    inDbClient<T>(req:RequestDb|null, doThisWithDbClient:(client:Client)=>Promise<T>):Promise<T>
+    inTransaction<T>(req:RequestDb|null, doThisWithDbTransaction:(client:Client)=>Promise<T>):Promise<T>
     inTransactionProcedureContext<T>(req:Request|null, coreFunction:(context:ProcedureContext)=>Promise<T>):Promise<T>
     procedureDefCompleter<T>(procedureDef:ProcedureDef):ProcedureDef<T>
     tableDefAdapt(tableDef:TableDefinition, context:Context):TableDefinition
