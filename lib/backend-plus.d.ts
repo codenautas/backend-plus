@@ -166,7 +166,7 @@ export interface TableContext extends Context{
     superuser?:true
     forDump?:boolean
 }
-export type PgKnownTypes='decimal'|'text'|'boolean'|'integer'|'bigint'|'date'|'interval'|'timestamp'|'jsonb'|'double'|'bytea'|'jsona';
+export type PgKnownTypes='decimal'|'text'|'boolean'|'integer'|'bigint'|'date'|'interval'|'timestamp'|'jsonb'|'double'|'bytea'|'jsona'|'time';
 export type PgKnownDbValues='current_timestamp'|'current_user'|'session_user';
 export type SequenceDefinition = {
     name:string
