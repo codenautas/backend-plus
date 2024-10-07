@@ -166,7 +166,7 @@ export interface TableContext extends Context{
     superuser?:true
     forDump?:boolean
 }
-export type PgKnownTypes='decimal'|'text'|'boolean'|'integer'|'bigint'|'date'|'interval'|'timestamp'|'jsonb'|'double'|'bytea'|'jsona'|'time';
+export type PgKnownTypes='decimal'|'text'|'boolean'|'integer'|'bigint'|'date'|'interval'|'timestamp'|'jsonb'|'double'|'bytea'|'jsona'|'time'|'tsrange'|'time_range';
 export type PgKnownDbValues='current_timestamp'|'current_user'|'session_user';
 export type SequenceDefinition = {
     name:string
@@ -256,7 +256,8 @@ export type ForeignKey = {
 }
 export type Constraint = {constraintType:string, consName?:string} & (
     {constraintType:'unique', fields:string[], where?:string} |
-    {constraintType:'check', expr?:string} 
+    {constraintType:'check', expr?:string} |
+    {constraintType:'exclude', using:'GIST', fields:(string|{fieldName:string, operator:'='|'&&'})[]}
 )
 export type OtherTableDefs = Record<string,Partial<TableDefinition & {prefilledField:Record<string,any>}>>
 export type TableDefinition = EditableDbDefinition & {

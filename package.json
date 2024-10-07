@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for the anti Pareto rule",
-  "version": "2.0.0-rc.32",
+  "version": "2.0.1",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -69,7 +69,7 @@
     "sql-tools": "^0.1.2",
     "stack-trace": "^0.0.10",
     "stylus": "0.63.0",
-    "type-store": "^0.4.2",
+    "type-store": "^0.4.4",
     "typed-controls": "^0.12.1",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.2/xlsx-0.20.2.tgz"
   },
