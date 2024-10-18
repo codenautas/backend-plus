@@ -58,7 +58,7 @@ function mostrarGrillaComoResultado(nombreGrilla, divResult, filtro){
 }
 
 my.wScreens.proc.result.muestra_grilla_provincias=function(result, divResult){
-    var fitro=result;
+    var filtro=result;
     mostrarGrillaComoResultado('provincias',divResult,filtro)
 }
 
