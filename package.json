@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for the anti Pareto rule",
-  "version": "2.0.4",
+  "version": "2.0.6",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -55,9 +55,9 @@
     "mini-tools": "^1.12.2",
     "moment": "^2.30.1",
     "multiparty": "^4.2.3",
-    "nodemailer": "^6.9.15",
+    "nodemailer": "^6.9.16",
     "numeral": "^2.0.6",
-    "pg-promise-strict": "^1.4.1",
+    "pg-promise-strict": "^1.4.2",
     "pikaday": "^1.8.2",
     "pug": "^3.0.3",
     "read-yaml-promise": "^1.0.2",
@@ -68,7 +68,7 @@
     "session-file-store": "^1.5.0",
     "sql-tools": "^0.1.2",
     "stack-trace": "^0.0.10",
-    "stylus": "0.63.0",
+    "stylus": "0.64.0",
     "type-store": "^0.4.4",
     "typed-controls": "^0.12.2",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.2/xlsx-0.20.2.tgz"
@@ -82,7 +82,7 @@
     "@types/js-yaml": "^4.0.9",
     "@types/mocha": "^10.0.9",
     "@types/multiparty": "~4.2.1",
-    "@types/node": "^22.7.5",
+    "@types/node": "^22.9.0",
     "@types/nodemailer": "^6.4.16",
     "@types/numeral": "~2.0.5",
     "@types/session-file-store": "^1.2.5",
@@ -97,14 +97,14 @@
     "karma-ie-launcher": "^1.0.0",
     "karma-mocha": "^2.0.1",
     "kill-9": "~0.4.3",
-    "mocha": "^10.7.3",
+    "mocha": "^10.8.2",
     "nyc": "^17.1.0",
-    "puppeteer": "^23.5.2",
+    "puppeteer": "^23.7.1",
     "sinon": "^19.0.2",
     "supertest": "^7.0.0",
     "types.d.ts": "~0.6.21",
     "typescript": "^5.6.3",
-    "why-is-node-running": "^3.2.0"
+    "why-is-node-running": "^3.2.1"
   },
   "engines": {
     "node": ">= 18"

@@ -575,7 +575,6 @@ var TIME_STAMP_PROP = Symbol('TIME_STAMP_PROP');
 myOwn.setTimeStamp = function setTimeStamp(row){
     var timeStamp = new Date().getTime();
     row[TIME_STAMP_PROP] = timeStamp;
-    console.log('SET=', timeStamp, row[TIME_STAMP_PROP], JSON4all.toUrl(row))
     return timeStamp;
 }
 
