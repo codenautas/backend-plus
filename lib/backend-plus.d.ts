@@ -257,7 +257,7 @@ export type ForeignKey = {
 export type Constraint = {constraintType:string, consName?:string} & (
     {constraintType:'unique', fields:string[], where?:string} |
     {constraintType:'check', expr?:string} |
-    {constraintType:'exclude', using:'GIST', fields:(string|{fieldName:string, operator:'='|'&&'})[]}
+    {constraintType:'exclude', using:'GIST', fields:(string|{fieldName:string, operator:'='|'&&'})[], where?:string}
 )
 export type OtherTableDefs = Record<string,Partial<TableDefinition & {prefilledField:Record<string,any>}>>
 export type TableDefinition = EditableDbDefinition & {
