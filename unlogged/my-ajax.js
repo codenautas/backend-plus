@@ -522,6 +522,23 @@ function agregar_class_textInDiv(td, className, text){
     td.appendChild(div);
 }
 
+function containsObjectsWithTheSameColumns(o){
+    var keys = Object.keys(o);
+    if (!keys.length) return false;
+    var separator = Math.random();
+    var colNamesFirstObject = Object.keys(o[keys[0]]).join(separator);
+    return !keys.find(k => o[k] == null || !(o[k] instanceof Object) || Object.keys(o[k]).join(separator) != colNamesFirstObject);
+}
+/* test
+var cases = [
+    [false, {}],
+    [false, {a:"hola"}], 
+    [false, {a:{a:1, b:2, c:2}, b:{a:1, x:2, c:2}}], 
+    [true , {a:{a:1, b:2, c:2}, b:{a:1, b:2, c:2}}]
+];
+cases.forEach(([expected, param]) => console.log(param, containsObjectsWithTheSameColumns(param), containsObjectsWithTheSameColumns(param) == expected ? 'ok' : 'fail'))
+*/
+
 /**
  * 
  * @param {HTMLElement} div 
@@ -533,7 +550,7 @@ function agregar_json(div, o, ubicaciones=agregar_json_default_ubicaciones){
         return ;
     }
     if(typeof o == "object" && !(o instanceof Date) && !o.isRealDateTime){
-        if(o instanceof Array && o[0] && o[0] instanceof Object && !(o[0] instanceof Array) && !(o[0].isRealDateTime)){
+        if((o instanceof Array && o[0] || containsObjectsWithTheSameColumns(o)) && o[0] instanceof Object && !(o[0] instanceof Array) && !(o[0].isRealDateTime)){
             var table = document.createElement('table');
             div.appendChild(table);
             var titleRow = table.insertRow(-1);
