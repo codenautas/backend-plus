@@ -89,7 +89,12 @@ y deben partirse los renglones subsiguientes van identados. Ej:
 
 ```sql
   SELECT persona, nombre, apellido, documento, fecha_nacimiento,
-      oficina, cargo, nivel -- Acá hay doble identación para como excepción
+      oficina, cargo, nivel, -- Acá hay doble identación para como caso particular
+      CASE extract(DOW from fecha) -- cambia de renglón para empezar el case que es multi línea
+        WHEN 0 THEN 'fin de semana'
+        WHEN 1 THEN 'fin de semana'
+        ELSE 'día habil'
+      END as tipo_dia              -- el END del case va en la misma columna del CASE porque cierra el CASE
     FROM personas p
       INNER JOIN cargos c USING (cargo) -- El join es parte del FROM
       LEFT JOIN responsabilidades r 
@@ -104,3 +109,7 @@ y deben partirse los renglones subsiguientes van identados. Ej:
     ORDER BY persona; -- Está dentro del from o sea va a la altura del SELECT
 ```
 
+#### los campos del SELECT como caso particular
+
+Los campos del select van con doble identación (4 espacios si se estaba usando 2) 
+para separarlo de las estructuras internas que tiene el SELECT: FROM, WHILE, ORDER BY, etc...

@@ -527,7 +527,9 @@ function containsObjectsWithTheSameColumns(o){
     if (!keys.length) return false;
     var separator = Math.random();
     var colNamesFirstObject = Object.keys(o[keys[0]]).join(separator);
-    return !keys.find(k => o[k] == null || !(o[k] instanceof Object) || Object.keys(o[k]).join(separator) != colNamesFirstObject);
+    return !keys.find(k => 
+        o[k] == null || !(o[k] instanceof Object) || Object.keys(o[k]).join(separator) != colNamesFirstObject
+    );
 }
 /* test
 var cases = [
@@ -550,7 +552,7 @@ function agregar_json(div, o, ubicaciones=agregar_json_default_ubicaciones){
         return ;
     }
     if(typeof o == "object" && !(o instanceof Date) && !o.isRealDateTime){
-        if((o instanceof Array && o[0] || containsObjectsWithTheSameColumns(o)) && o[0] instanceof Object && !(o[0] instanceof Array) && !(o[0].isRealDateTime)){
+        if((o instanceof Array && o[0] && o[0] instanceof Object && !(o[0] instanceof Array) && !(o[0].isRealDateTime) || containsObjectsWithTheSameColumns(o)) ){
             var table = document.createElement('table');
             div.appendChild(table);
             var titleRow = table.insertRow(-1);
