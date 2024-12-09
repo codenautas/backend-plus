@@ -479,6 +479,7 @@ export interface AppConfig {
         delay: number                      // msec avg random delay in API responses (to emulate slow nets)
         "cache-content": boolean           // if the cache header must be sent to the client (when no devel config the default is true)
         forceShowAsEditable: boolean       // force "editable" behavior in grids 
+        "tests-can-delete-db": boolean
     }
     mailer: {                              // config to send mails
         conn: string                       // connection string
