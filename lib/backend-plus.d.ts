@@ -367,6 +367,7 @@ export interface OptsClientPage {
     extraFiles?:ClientModuleDefinition[]
     icon?:string
     icons?:Record<string,string>
+    baseUrlForRelativePaths?:boolean
 }
 
 export type DumpOptions={complete?:boolean, skipEnance?:boolean, disableDBFunctions?:boolean}
