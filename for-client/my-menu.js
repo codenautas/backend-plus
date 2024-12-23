@@ -547,9 +547,6 @@ window.addEventListener('load', function(){
         my.showPage();
     })
     document.body.appendChild(html.div({id:'cached-images'},[
-        html.img({src:my.path.img+'airplane-on.png'}),
-        html.img({src:my.path.img+'airplane-off.png'}),
-        html.img({src:my.path.img+'airplane.png'}),
         html.img({src:my.path.img+'server.png'}),
         html.img({src:my.path.img+'network-signal.png'}),
         html.img({src:my.path.img+'server-error.png'}),
