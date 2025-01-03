@@ -531,14 +531,29 @@ myOwn.informDetectedStatus = function informDetectedStatus(statusCode, logged) {
     }
 }
 
+var lastUrl = window.location.href;
+//TODO: desacoplar de BP
 window.addEventListener('popstate', function(){
-    if(!my.config){
-        my.autoSetup().then(function(){
-            my.showPage();
-        })
-    }else{
-        my.showPage();
+    function checkReactUrl(url){
+        const regex = /\/react(\/.*)?$/;
+        return regex.test(url);
     }
+    const currentUrl = window.location.href;
+    if(checkReactUrl(currentUrl)){
+        if(!checkReactUrl(lastUrl))
+            location.reload();
+    }else{
+        setTimeout(function(){
+            if(!my.config){
+                my.autoSetup().then(function(){
+                    my.showPage();
+                })
+            }else{
+                my.showPage();
+            }
+        },10)
+    }    
+    lastUrl = currentUrl;
 });
 
 window.addEventListener('load', function(){
