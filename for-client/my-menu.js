@@ -436,19 +436,6 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
                     {underElement:this}
                 );
             }),
-            my.light('airplane', function(){
-                if(my.ldb && my.offline){
-                    if(my.offline.mode && !my.server.connected){
-                        promptPromise("Si desea salir del modo avión puede forzarlo").then(function(texto){
-                            if (texto == 'forzar') {
-                                my.changeOfflineMode();
-                            }
-                        });
-                    }else{
-                        my.changeOfflineMode();
-                    }
-                }
-            }, {hidden:true})
         ]));
         elements.push(status);
     }
@@ -501,9 +488,6 @@ myOwn.displayMainMenu = function(addrParams){
         }
     }
     setTimeout(my.doMenuRealigns,10);
-    setTimeout(function(){
-        my.offlineModeRefresh();
-    },10);
     return menu;
 };
 
@@ -547,101 +531,37 @@ myOwn.informDetectedStatus = function informDetectedStatus(statusCode, logged) {
     }
 }
 
-myOwn.setOnlineOfflineUrl = function setOnlineOfflineUrl(){
-    var actualHref=location.href;
-    var hrefSplit = actualHref.split(my.menuSeparator)
-    var newHref = my.offline.mode?'ext':my.menuName;
-    newHref = (hrefSplit.length > 1)?newHref+my.menuSeparator+hrefSplit[1]:newHref;
-    history.pushState(null, null, newHref);
-}
-
-myOwn.offlineModeRefresh = function offlineModeRefresh(){
-    var my=this;
-    /** @type {HTMLImageElement} */
-    // @ts-ignore
-    var imgLight = document.getElementById('light-airplane');
-    if (imgLight != null) {
-        var skin=((my.config||{}).config||{}).skin;
-        if(my.offline.mode){
-            imgLight.src=my.path.img+'airplane-on.png';
-        }else{
-            imgLight.src=my.path.img+'airplane-off.png';
-        }
-    }
-}
-
-myOwn.changeOfflineMode = function changeOfflineMode(){
-    my.offline.mode=!my.offline.mode;
-    my.offlineModeRefresh();
-    my.setOnlineOfflineUrl();
-    if(my.offline.mode){
-        var fkToStoreData = [];
-        var promiseArray1 = [];
-        var promiseChain = my.ldb.getAllStructures().then(function(tablesDef){
-            tablesDef.forEach(function(tableDef){
-                promiseArray1.push(
-                    my.ldb.isEmpty(tableDef.name).then(function(isEmpty){
-                        if(!isEmpty){
-                            var fkToStoreSearch = tableDef.foreignKeys.filter(function(fk){
-                                return fk.fields.find(function(field){
-                                    return !tableDef.primaryKey.includes(field.source)
-                                })
-                            });
-                            fkToStoreData = fkToStoreData.concat(fkToStoreSearch);
-                        }
-                    })
-                );
-            });
-        });
-        var promiseArray2 = [];
-        promiseChain = promiseChain.then(function(){
-            return Promise.all(promiseArray1).then(function(){
-                return fkToStoreData.forEach(function(fk){
-                    var conn = new my.TableConnector({tableName: fk.references, my:my});
-                    var opts = { registerInLocalDB: false };
-                    conn.getStructure(opts)
-                    promiseArray2.push(
-                        Promise.resolve().then(function(){
-                            return conn.getData().then(function(rows){
-                                return my.ldb.putMany(fk.references, rows)
-                            })
-                        })
-                    );
-                });
-            });
-        });
-        promiseChain = promiseChain.then(function(){
-            Promise.all(promiseArray2).then(function(){
-                location.reload();
-            })
-        });
-    }else{
-        my.showPage();
-        location.reload();
-    }
-}
-
+var lastUrl = window.location.href;
+//TODO: desacoplar de BP
 window.addEventListener('popstate', function(){
-    if(!my.config){
-        my.autoSetup().then(function(){
-            my.setOnlineOfflineUrl();
-            my.showPage();
-        })
-    }else{
-        my.showPage();
+    function checkReactUrl(url){
+        const regex = /\/react(\/.*)?$/;
+        return regex.test(url);
     }
+    const currentUrl = window.location.href;
+    if(checkReactUrl(currentUrl)){
+        if(!checkReactUrl(lastUrl))
+            location.reload();
+    }else{
+        setTimeout(function(){
+            if(!my.config){
+                my.autoSetup().then(function(){
+                    my.showPage();
+                })
+            }else{
+                my.showPage();
+            }
+        },10)
+    }    
+    lastUrl = currentUrl;
 });
 
 window.addEventListener('load', function(){
     window.my = myOwn;
     my.autoSetup().then(function(){
-        my.setOnlineOfflineUrl();
         my.showPage();
     })
     document.body.appendChild(html.div({id:'cached-images'},[
-        html.img({src:my.path.img+'airplane-on.png'}),
-        html.img({src:my.path.img+'airplane-off.png'}),
-        html.img({src:my.path.img+'airplane.png'}),
         html.img({src:my.path.img+'server.png'}),
         html.img({src:my.path.img+'network-signal.png'}),
         html.img({src:my.path.img+'server-error.png'}),
