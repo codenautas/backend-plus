@@ -341,6 +341,7 @@ export interface TableDefinitions {
     [k: string]: TableDefinitionFunction
 }
 export interface ClientSetup {
+    config:AppConfigClientSetup
     setup:Record<string, any>
     procedures:ProcedureDef[]
 }
@@ -381,11 +382,8 @@ export interface AppConfigBin {                                    // executable
     "zip-fixed-parameters":string         // fixed parameters to pass to zipper
 }
 
-export interface AppConfig {
-    package: {
-        version: string
-    }
-    server: {
+export interface AppConfigServer 
+    {
         "base-url": string                 // rool path in the url
         port: number                       // port of the API services
         "session-store": string            // strategies to store session info
@@ -395,7 +393,8 @@ export interface AppConfig {
         bitacoraSchema: string
         bitacoraTableName: string 
     }
-    db: {
+export interface AppConfigDb 
+    {
         motor: 'postgresql'
         database: string
         user: string
@@ -408,7 +407,8 @@ export interface AppConfig {
         no_login: boolean                  // if no login is needed. Used only for all public sites
         "downloadable-backup-path": string // OS path of the encrypted downloadable backup
     }
-    login: {
+export interface AppConfigLogin 
+    {
         schema: string                     // schema of the user table
         table: string                      // user table
         userFieldname: string              // fieldname in user table that stores the user name
@@ -436,7 +436,8 @@ export interface AppConfig {
         }
         "double-dragon": boolean           // app user must match db user
     }
-    install: {
+export interface AppConfigInstall 
+    {
         "table-data-dir": string           // SO path to the .tab files in the db creation script
         dump: {                            // configuration of --dump-db, the db creation script
             "drop-his": boolean            // include drop schema his in the db creation script
@@ -458,9 +459,29 @@ export interface AppConfig {
             }
         }
     }
-    "client-setup": {                      // front-end config
+export interface AppConfigClientSetup // front-end config
+    {
         title:string                       // title of the app (common sufix of the title bar)
+        lang:string
+        version?:string
+        menu?:boolean
+        "background-img"?:string
+        devel?:boolean
+        deviceWidthForMobile?:string
+        "initial-scale"?:string
+        "minimum-scale"?:string
+        "maximum-scale"?:string
+        "user-scalable"?:string
     }
+export interface AppConfig {
+    package: {
+        version: string
+    }
+    server: AppConfigServer
+    db: AppConfigDb
+    login: AppConfigLogin
+    install: AppConfigInstall
+    "client-setup": AppConfigClientSetup
     log: {
         "serve-content": never
         req: {
