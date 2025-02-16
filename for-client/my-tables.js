@@ -13,6 +13,7 @@ var JSON4all = require('json4all');
 var TypedControls = require('typed-controls');
 var typeStore=require('type-store');
 var likeAr=require('like-ar');
+const { compareForOrder } = require('best-globals');
 
 var changing = bestGlobals.changing;
 var coalesce = bestGlobals.coalesce;
@@ -3106,9 +3107,11 @@ myOwn.ExpanderReferences={
                 return {
                     value:reference.getValue(row),
                     labels:reference.getLabels(row,true),
+                    textForOrder:reference.getLabels(row,false).join(', ')+'; '+reference.tableDef.primaryKey.join(', '),
                     img:reference.getImage(row)
                 };
             });
+            menu.sort(compareForOrder([{column:'textForOrder'}]));
             if(typeInfo.nullable){
                 menu.push({value:null, labels:['',TypedControls.messages.Null]});
             }

@@ -563,7 +563,7 @@ function agregar_json(div, o, ubicaciones=agregar_json_default_ubicaciones){
                 if(o[a]!=null){
                     var row = table.insertRow(-1);
                     var cellName = row.insertCell(-1);
-                    agregar_class_textInDiv(cellName, 'row-num', Array.isArray(o[a])?(isNaN(a)?a:Number(a)+1):a); 
+                    agregar_class_textInDiv(cellName, 'row-num', Array.isArray(o) && !isNaN(a) ? Number(a)+1 : a); 
                     agregar_json(row, o[a], function(div, _o, a){
                         // @ts-ignore sé que es Row
                         /** @type {HTMLTableRowElement} */
