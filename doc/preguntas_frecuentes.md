@@ -447,17 +447,22 @@ login:
     mailFields: [mail, mail_alternativo] #columnas de mail de la tabla usuarios
 ```
 
+**Si el proxy no deja pasar el hostname**
+Si el mail recibido en el vínculo para cambiar la contraseña no figura
+la dirección de la página (en vez dice `localhost://`)
+se debe indicar la URL completa en la configuración del `forget`, por ejemplo:
+```yaml
+    urlDomainAndRoot: https://www.nuestro-dominio.com/aplicacion/new-pass
+```
+
 
 **Ejemplo de conexión TSL, sin habilitación del recuperador de contraseña**
 
 ```yaml
 mailer:
   motor: smtp
-  mail-info:
-    from: '"Sistemas IDECBA" <sistemas@estadisticaciudad.gob.ar>'
-
   conn:
-    host: smtp.servidordecorreo.com
+    host: mail.servidordecorreo.com
     port: 587
     secure: false
     auth:
