@@ -416,3 +416,31 @@ Tabla estados
         sql:{fields:{ cant_tickets:{ expr: `(SELECT count(*) FROM tickets t WHERE t.estado = estados.estado)` }}}
     }
 ```
+
+## ¿Cómo se configura un correo smtp?
+
+En ``local-config.yaml`` agregar la siguiente configuración de [mailer](https://nodemailer.com/smtp/) teniendo en ceunta la configuración del servidor de correo saliente. 
+Tenga en cuenta que los datos son a modo ejemplo.
+
+```ts
+    mailer:
+      conn:
+        host: smtp.servidordecorreo.com
+        port: 465
+        secure: true
+        auth:
+          user: usuario@servidordecorreo.com
+          pass: **********
+      mail-info:
+        from: 'usuario <usuario@servidordecorreo.com>'
+    login:
+      forget:
+        urlPath: /forget
+        mailFields: [mail, mail_alternativo] #columnas de mail de la tabla usuarios
+        unloggedLandPage: /not-logged
+    db:
+      search_path: [acá_agregar_nombre_schema, his] #preferentemente agregar esta línea debajo de schema, revisar def-config.ts
+```
+## ¿Cómo aumentar el tamaño de carga de archivos en bp?
+
+En backendplus.js buscar ``mainApp.use(bodyParser.urlencoded({extended:true, limit: '50mb'}));`` y aumentar limit. Esto es en backendplus pero tenga en cuenta que también deberá aumentar el tamaño en el servidor web que tenga configurado (nginx, Apache).
