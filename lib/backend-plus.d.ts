@@ -332,6 +332,7 @@ export type TableDefinition = EditableDbDefinition & {
     selfRefresh?:boolean
     filterColumns?:{column:string, operator:string, value:any}[]
     gridAlias?:string   /* front-end css my-table = gridAlias */
+    lookupFields?:string[] /* fields that should be used in lookup dialogs; if not specified, fields with isName:true are used */
 }
 export interface DetailTable { table?: string, fields: FieldsForConnectDetailTable, abr: string, label?: string, refreshParent?:boolean, refreshFromParent?:boolean, wScreen?:string, condition?:string }
 export type TableDefinitionFunction = (context: ContextForDump, opts?:any) => TableDefinition;
@@ -432,6 +433,7 @@ export interface AppConfigLogin
         forget: {                          // forget password configurations:
             urlPath: string                // url sent by mail. default: `/new-pass`
             urlPathOk: string              // confirmation page
+            urlComplete: string            // the complete URL. To use when the proxy strips the req.hostname or shorts the path or ...
             mailFields: string[]           // fields for the forget pass mail
 
         }

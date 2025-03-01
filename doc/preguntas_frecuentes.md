@@ -417,30 +417,74 @@ Tabla estados
     }
 ```
 
-## ¿Cómo se configura un correo smtp?
+## ¿Cómo se configura un correo saliente?
 
-En ``local-config.yaml`` agregar la siguiente configuración de [mailer](https://nodemailer.com/smtp/) teniendo en ceunta la configuración del servidor de correo saliente. 
-Tenga en cuenta que los datos son a modo ejemplo.
+Las aplicaciones backend-plus pueden enviar corres desde cualquier lugar. 
+
+Está pensado para usar en los procedimientos o los servicios para avisar de situaciones excepcionales.
+
+Hay un procedimiento integrado a backend-plus para recuperar la contraseña. 
+
+En ``local-config.yaml`` en `mailer.conn` agregar la configuración de conexión según el format [mailer](https://nodemailer.com/smtp/). 
+
+**Ejemplo de conexión SSL y habilitación del recuperador de contraseña**
+
+```yaml
+mailer:
+  motor: smtp
+  conn:
+    host: smtp.servidordecorreo.com
+    port: 465
+    secure: true
+    auth:
+      user: usuario@servidordecorreo.com
+      pass: **********
+  mail-info:
+    from: 'usuario <usuario@servidordecorreo.com>'
+login:
+  forget:
+    urlPath: /forget
+    mailFields: [mail, mail_alternativo] #columnas de mail de la tabla usuarios
+```
+
+
+**Ejemplo de conexión TSL, sin habilitación del recuperador de contraseña**
+
+```yaml
+mailer:
+  motor: smtp
+  mail-info:
+    from: '"Sistemas IDECBA" <sistemas@estadisticaciudad.gob.ar>'
+
+  conn:
+    host: smtp.servidordecorreo.com
+    port: 587
+    secure: false
+    auth:
+      user: usuario@servidordecorreo.com
+      pass: **********
+    tls:
+      rejectUnauthorized: true,
+      minVersion: TLSv1.2
+      ciphers: SSLv3
+  mail-info:
+    from: 'usuario <usuario@servidordecorreo.com>'
+```
+
+**Ejemplo de uso dentro del backend**
 
 ```ts
-    mailer:
-      conn:
-        host: smtp.servidordecorreo.com
-        port: 465
-        secure: true
-        auth:
-          user: usuario@servidordecorreo.com
-          pass: **********
-      mail-info:
-        from: 'usuario <usuario@servidordecorreo.com>'
-    login:
-      forget:
-        urlPath: /forget
-        mailFields: [mail, mail_alternativo] #columnas de mail de la tabla usuarios
-        unloggedLandPage: /not-logged
-    db:
-      search_path: [acá_agregar_nombre_schema, his] #preferentemente agregar esta línea debajo de schema, revisar def-config.ts
+await be.sendMail({
+    to: "jefe-operativo@nuestro-dominio.com.ar",
+    subject: `El cálculo ${id_calculo} finalizó.
+    text:Hora de finalización: ${new Date().toJSON()}.
+    
+    Proceso: ${id_calculo}.
+    Resultado: ${resultado}.
+    `
+});
 ```
+
 ## ¿Cómo aumentar el tamaño de carga de archivos en bp?
 
 En backendplus.js buscar ``mainApp.use(bodyParser.urlencoded({extended:true, limit: '50mb'}));`` y aumentar limit. Esto es en backendplus pero tenga en cuenta que también deberá aumentar el tamaño en el servidor web que tenga configurado (nginx, Apache).
