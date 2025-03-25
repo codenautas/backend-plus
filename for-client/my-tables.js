@@ -293,7 +293,7 @@ myOwn.TableConnector = function(context, opts){
     connector.pick = connector.opts.pick;
     connector.hideBecauseRelated = {};
     connector.fixedFields.forEach(function(pair){
-        if(!pair.range && pair.value != myOwn.skipInFixedFields){
+        if(!pair.range && !pair.until && pair.value != myOwn.skipInFixedFields){
             connector.fixedField[pair.fieldName] = pair.value;
             if (!pair.show) {
                 connector.hideBecauseRelated[pair.fieldName] = true;
@@ -448,7 +448,7 @@ myOwn.TableConnectorLocal = function(context, opts){
     connector.pick = connector.opts.pick;    
     connector.hideBecauseRelated = {};
     connector.fixedFields.forEach(function(pair){
-        if(!pair.range && pair.value != myOwn.skipInFixedFields){
+        if(!pair.range && !pair.until && pair.value != myOwn.skipInFixedFields){
             connector.fixedField[pair.fieldName] = pair.value;
             if (!pair.show) {
                 connector.hideBecauseRelated[pair.fieldName] = true;
@@ -1191,6 +1191,9 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
             var fieldCondition={fieldName: pair.target, value:'value' in pair ? pair.value : depot.row[pair.source]}
             if(pair.range){
                 fieldCondition.range=pair.range;
+            }
+            if(pair.until){
+                fieldCondition.until=pair.until;
             }
             return fieldCondition;
         });
@@ -2249,7 +2252,7 @@ myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElem
     var depotForInsert = grid.createDepotFromRow({$allow:{delete:true, update:true}}, 'new');
     grid.connector.fixedFields.forEach(function(pair){
         var fieldDef = grid.def.field[pair.fieldName];
-        if(!pair.range && (fieldDef.inTable !== false || fieldDef.isPk && pair.value !=null)){
+        if(!pair.range && !pair.until && (fieldDef.inTable !== false || fieldDef.isPk && pair.value !=null)){
             depotForInsert.row[pair.fieldName] = pair.value;
             depotForInsert.rowPendingForUpdate[pair.fieldName] = pair.value;
         }
@@ -2360,7 +2363,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     return (specialMandatories[fieldDef.name] || fieldDef.nullable!==true && fieldDef.isPk || fieldDef.nullable===false) 
                         && depot.row[fieldDef.name]==null 
                         && (grid.connector.fixedFields.find(function(pair){
-                                return !pair.range && pair.fieldName===fieldDef.name
+                                return !pair.range && !pair.until && pair.fieldName===fieldDef.name
                             })||{}).value == null
                 }
                 //var cual=grid.def.fields.filter(mandatoryOmitted)

@@ -1,5 +1,36 @@
 # novedades de _backend-plus_
 
+**v2.2.2** _Los tres patitos_. Por error se ocultaban campos relacionados débilmente (en rango definido con `until`).
+
+**v2.0.8** se agrega la cláusula `where` a la `exclude` contraint.
+
+**v2.0.1** se agrega el tipo de contraint `exclude` igual que postgres
+
+**v2.0.0** Las principales incompatibilidades con las versiones 1.x son la ubicación de algunas tablas.
+bitacora, tokens, locks y summaries ahora están en el esquema _his_.
+Las aplicaciones basadas en _backend-plus_ deberían mover a _his_ tablas con logs,
+opciones de usuario y datos temporales (caches).
+Haciendo eso el esquema principal solo cambia con datos sustantivos.
+Un backup que exlcuya el esquema _his_ debería servir para funcionar correctamente
+(porque solo se exluye información temporaria o de auditoría).
+
+Los suguientes cambios vienen con la versión 2.0.0:
+   * Se agregar un registro de inicios de sesión (procedure = "@login" en la tabla bitácora).
+   * En local-config, _true_ en `install.dump["drop-his"]` implica agregar `drop schema his` en el `local-db-dump.psql`.
+   * Se agrega `fieldDef.allwaysShow` para que no se oculte en subgrillas cuando es el campo relacionado
+   * `be.getDataDumpTransformations(rawData)` sirve para transformar datos de un dump en el nuevo `local-db-dump.psql` 
+   en un deploy de una nueva versión que incluye cambios en la base de datos que necesitan cambios en los datos. 
+   * el parámetro `pick` procedimiento `table_data` recibe un string que busca en todos los campos (búsqueda global)
+   * incluye automáticamente todos los archivos `install/*-fun.sql`
+   * la función `be.shutdownCallbackListAdd(f)` sirve para agregar funciones de limpieza. 
+   Si bien una aplicación _Backend-Plus_ está destinada a correr por siempre, 
+   se podría tener una manera elegante de terminarla sin matar el servicio,
+   además se necesita poder apagar la aplicación cuando se están corriendo casos de prueba.
+   `be.shutDownBackend` es la función que se usa para apagar el servidor, 
+   esa función se encarga de llamar a todas las funciones de limpieza. 
+   * en `local-config` `install.dump.scripts.pre-adapt` se puede poner la lista de `.sql` que hay que correr después de insertar los datos.
+   * en `defConfig` se puede indicar la versión mínima necesaria de postgres en `db.min-version`
+
 **v2.0.0-beta1** Se prepara una nueva versión de backend-plus con cambios que requieren 
 ajustes en los sistemas basados en la **v1**. Cambia la tabla bitácora de lugar
 (las tablas de bitácoras, históricos, tokens, estados del frontend, preferencias de usuario,
