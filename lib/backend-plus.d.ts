@@ -266,6 +266,7 @@ export type TableDefinition = EditableDbDefinition & {
     tableName?:string
     schema?:string
     title?:string
+    prefix?:string // this prefix will be striped out from the fields name to compute the title of the column in the grid
     fields:FieldDefinition[]
     primaryKey:string[]
     refrescable?: boolean
@@ -553,7 +554,7 @@ export class AppBackend{
     addUnloggedServices(mainApp:ExpressPlus, baseUrl:string):void
     addLoggedServices():void
     getProcedures():Promise<ProcedureDef[]>
-    isAdmin():boolean
+    isAdmin(reqOrContext:Request|Context):boolean
     canChangePass():Promise<boolean>
     getMenu(context?:Context):MenuDefinition
     inDbClient<T>(req:RequestDb|null, doThisWithDbClient:(client:Client)=>Promise<T>):Promise<T>

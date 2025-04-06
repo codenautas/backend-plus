@@ -374,7 +374,7 @@ module.exports = function(context){
 import {TableDefinition, TableContext} from "backend-plus";
 
 export function table_with_otherfields(context:TableContext):TableDefinition {
-    var admin = context.user.rol==='boss';
+    var admin = context.user.rol==='boss' || context.be.isAdmin(context);
     return {
         name:'table_with_otherfields',
         allow:{
