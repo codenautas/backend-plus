@@ -373,7 +373,7 @@ export interface OptsClientPage {
     baseUrlForRelativePaths?:boolean
 }
 
-export type DumpOptions={complete?:boolean, skipEnance?:boolean, disableDBFunctions?:boolean}
+export type DumpOptions={complete?:boolean, skipEnance?:boolean, disableDBFunctions?:boolean, commonFunsToDisable?:string[]}
 
 export interface Caches {
     procedures:Record<string, {timestamp:number, result:any}>
