@@ -493,3 +493,101 @@ await be.sendMail({
 ## ¿Cómo aumentar el tamaño de carga de archivos en bp?
 
 En backendplus.js buscar ``mainApp.use(bodyParser.urlencoded({extended:true, limit: '50mb'}));`` y aumentar limit. Esto es en backendplus pero tenga en cuenta que también deberá aumentar el tamaño en el servidor web que tenga configurado (nginx, Apache).
+
+## ¿hay forma de ponerle estilos a las celdas o filas de una grilla?
+
+Si, cada celda tiene  agregados en su elemento HTML atributos especificos del nombre de la columna, además de las clases genéricas que indican que es una celda. Con esa información se puede utilizar para escribir selectores CSS que se ajusten a lo que se requiera darle estilos
+
+## ¿hay forma de modificar el comportamiento o estructura HTML de celdas de una grilla?
+
+Si, es utilizando un client Side.
+Por ejemplo si tenemos una tabla anotaciones (anotaciones de tickets) con una columna que se usará para poner un enlace a un ticket relacionado, entonces setearemos en dicho field clientSide:'link_a_ticket'
+
+En src/server/table-anotaciones.ts 
+```ts
+export function anotaciones(context:TableContext):TableDefinition{
+    const td:TableDefinition = {
+        editable: true,
+        name: 'anotaciones',
+        elementName: 'anotación',
+        fields: [
+            {name:'proyecto', typeName:'text'},
+            {name:'ticket', typeName:'bigint' },
+            {name:'anotacion', typeName:'bigint', nullable:true, title:'anotación', editable:false, defaultDbValue:'0'},
+            {name:'usuario', typeName:'text', editable:false, defaultValue: context.user.usuario  },
+            {name:'detalle', typeName:'text'},
+            {name:'proyecto_relacionado', typeName:'text', title:'link_proyecto'},
+            {name:'ticket_relacionado', typeName:'bigint', title:'link_ticket'},
+            {name:'link_a_ticket', typeName:'text', clientSide:'link_a_ticket', editable:false, title:'link'},
+...
+```
+
+Luego escribiremos la estructura HTML y el comportamiento TS
+En src/client/client.ts :
+```ts
+myOwn.clientSides.link_a_ticket = {
+    update:function(depot:myOwn.Depot, fieldName:string):void{
+        const td=depot.rowControls[fieldName];
+        td.innerHTML='';
+        if(depot.row.proyecto_relacionado && depot.row.ticket_relacionado){
+            td.appendChild(html.a({class:'link-descarga-archivo', href:`menu#w=ticket&autoproced=true&ff=,proyecto:${depot.row.proyecto_relacionado},ticket:${depot.row.ticket_relacionado}`},`${depot.row.proyecto_relacionado}-${depot.row.ticket_relacionado}`).create());            
+        }
+    },
+    prepare:function(_depot:myOwn.Depot, _fieldName:string):void{
+    }
+}
+```
+
+## ¿En una tabla que tiene una fk, como puedo mostrar un campo extra (además de la FK) de la tabla foranea?
+
+En la tabla foranea se tiene que setear el atributo isName:true en el fieldDefinition de cada campo que se desea mostrar al lado de la fk
+
+por ejemplo:
+
+tabla servidores:
+```ts
+    fields: [
+        { name: "servidor"           , typeName: 'text'    },
+        { name: "ip"                 , typeName: 'text', isName:true   },
+...
+```
+
+tabla aplicaciones:
+```ts
+    fields: [
+        { name: "aplicacion"         , typeName: 'text'    },
+        { name: "servidor"           , typeName: 'text'    },
+    ...
+    foreignKeys:[
+        {references: 'servidores'    , fields:['servidor']},
+    ...
+```
+Esto hará que en la tabla aplicaciones además de mostrarse el campo servidor (fk) se muestre una nueva columna a la derecha "ip" que contendrá el valor del campo ip de la tabla foranea
+
+
+## ¿Se puede cambiar atributos isName de tablas foraneas como si fueran atributos propios?
+
+Si, para eso hay que redefinir el atributo is name de la tabla foranea en la tabla que tiene la fk, la redefinición debe hacerse seteando el atributo nombre del fieldDefinition con el formato <tabla_foranea>__<nombre_campo_is_name> 
+
+por ejemplo:
+
+tabla databases:
+```ts
+    fields: [
+        { name: "database"           , typeName: 'text'    },
+        { name: "owner"              , typeName: 'text', isName:true   },
+...
+```
+
+tabla aplicaciones:
+```ts
+    fields: [
+        { name: "aplicacion"         , typeName: 'text'    },
+        { name: "database"           , typeName: 'text'    },
+        { name: "databases__owner"   , typeName: 'text'    , title:'owner_base_de_datos'},
+    ...
+    foreignKeys:[
+        {references: 'databases'    , fields:['database']},
+    ...
+```
+Como se puede ver en el ejemplo al redefinir el campo foraneo "owner" se pudo setear el title
