@@ -498,6 +498,38 @@ En backendplus.js buscar ``mainApp.use(bodyParser.urlencoded({extended:true, lim
 
 Si, cada celda tiene  agregados en su elemento HTML atributos especificos del nombre de la columna, además de las clases genéricas que indican que es una celda. Con esa información se puede utilizar para escribir selectores CSS que se ajusten a lo que se requiera darle estilos
 
+## ¿Como hago que un campo donde se guarda una url se muestre como link/enlace?
+
+Para eso hay que redefinir el atributo clientSide:'displayUrl' y serverSide:true
+
+En el siguiente ejemplo se muestran varias técnicas
+
+table-aplicacion:
+```ts
+    //seteo campos clientSide:'displayUrl', serverSide:true para que ese field se muestre como un link clickeable
+    fields: [
+        { name: "instancia"           , typeName: 'text'    },
+        { name: "base_url"            , typeName: 'text'    },
+        { name: "url_generada"        , typeName: 'text', inTable:false, clientSide:'displayUrl', serverSide:true, label:'server.base_url + instapp.base_url'},
+        { name: "servidor"            , typeName: 'text'    },
+    ...
+
+    // seteo fk a tabla servidores
+    foreignKeys:[
+            {references: 'servidores'   , fields:['servidor']},
+    ...
+
+    //seteo expresión que construirá campo url_generada juntando el campo "base_url" de la tabla foranea "servidores" con el campo propio "base_url"
+    sql:{
+        fields:{
+            url_generada:{
+                expr:"(NULLIF(COALESCE(servidores.base_url, '') || COALESCE(instapp.base_url, ''), ''))"
+            }
+        }
+    }
+
+```
+
 ## ¿hay forma de modificar el comportamiento o estructura HTML de celdas de una grilla?
 
 Si, es utilizando un client Side.
