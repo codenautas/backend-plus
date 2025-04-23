@@ -501,8 +501,7 @@ Si, cada celda tiene  agregados en su elemento HTML atributos especificos del no
 ## ¿Como hago que un campo donde se guarda una url se muestre como link/enlace?
 
 Para eso hay que redefinir el atributo clientSide:'displayUrl' y serverSide:true
-
-En el siguiente ejemplo se muestran varias técnicas
+En el siguiente ejemplo se muestra como un campo que contiene una url (generado en base a un campo de una tabla foranea (no presente en esta tabla) + un campo propio), se transforma en una url clickeable
 
 table-aplicacion:
 ```ts
@@ -530,9 +529,9 @@ table-aplicacion:
 
 ```
 
-## ¿hay forma de modificar el comportamiento o estructura HTML de celdas de una grilla?
+## Pero si quisiera que el texto del link no muestre la url sino otro texto, de hecho me gustaría poder modificar el html de la celda a mi antojo para tener un link customizable u otros elementos  html e incluso agregarle comportamiento con JS ¿hay forma de modificar el comportamiento o estructura HTML de celdas de una grilla?
 
-Si, es utilizando un client Side.
+Si, es programando un clientSide a medida o custom.
 Por ejemplo si tenemos una tabla anotaciones (anotaciones de tickets) con una columna que se usará para poner un enlace a un ticket relacionado, entonces setearemos en dicho field clientSide:'link_a_ticket'
 
 En src/server/table-anotaciones.ts 
