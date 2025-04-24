@@ -622,3 +622,22 @@ tabla aplicaciones:
     ...
 ```
 Como se puede ver en el ejemplo al redefinir el campo foraneo "owner" se pudo setear el title
+
+## ¿En una grilla como logro setear el orden por defecto?
+
+usando el atributo sortColumns a nivel de tabla:
+```
+...
+fields: [
+    { name: "database",               editable: false, typeName: 'text' },
+    { name: "servidor",               editable: false, typeName: 'text' },
+    { name: "port",                   editable: false, typeName: 'integer' },
+    { name: "fecha",                  editable: false, typeName: 'timestamp' },
+],
+foreignKeys:[
+    {references: 'databases'      , fields:['database','servidor','port']},
+],
+sortColumns:[{column:'fecha', order:-1}, {column:'servidor'}, {column:'port', order:1}, {column:'databases__owner', order:1}],
+...
+```
+En el ejemplo se ordenará por fecha mas reciente (-1), luego por servidor, port y por el campo owner (isName) de la tabla foranea databases
