@@ -641,3 +641,22 @@ sortColumns:[{column:'fecha', order:-1}, {column:'servidor'}, {column:'port', or
 ...
 ```
 En el ejemplo se ordenará por fecha mas reciente (-1), luego por servidor, port y por el campo owner (isName) de la tabla foranea databases
+
+## ¿Como veo que sql generó el error que veo en pantalla?
+en el root del proyecto ver archivo last-pg-error-local.sql
+
+## ¿Como hago para loggear todas las queries SQL incluso las que no generaron error?
+con la opción del local-config.yaml
+```log: 
+    db: 
+      on-demand: true ```
+
+Luego:
+1) Agregar a la url --log-db (quedaría URLbase/--log-db) para activar el logueo (dura solo unos minutos)
+2) volver a realizar el comportamiento que produce el error
+3) ir al root del proyecto y mirar el archivo local-log-all.sql
+4) si hay mucho sql, limpiar el archivo y realizar solo la última intervención que realiza el usuario justo antes del error 
+
+nota: por defecto para que no se llene el log dura solo unos minutos, si se quiere mas tiempo investigar la opción 
+```log: db: until```
+
