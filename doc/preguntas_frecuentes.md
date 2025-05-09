@@ -652,11 +652,11 @@ con la opción del local-config.yaml
       on-demand: true ```
 
 Luego:
-1) Agregar a la url --log-db (quedaría URLbase/--log-db) para activar el logueo (dura solo unos minutos)
+1) Agregar a la url base del sistema el sufijo "--log-db" (quedaría URLbase/--log-db) para activar el logueo (por defecto dura 5 minutos)
 2) volver a realizar el comportamiento que produce el error
 3) ir al root del proyecto y mirar el archivo local-log-all.sql
 4) si hay mucho sql, limpiar el archivo y realizar solo la última intervención que realiza el usuario justo antes del error 
 
-nota: por defecto para que no se llene el log dura solo unos minutos, si se quiere mas tiempo investigar la opción 
+nota: si se quiere mas tiempo que los 5 minutos por defecto, investigar la opción 
 ```log: db: until```
 
