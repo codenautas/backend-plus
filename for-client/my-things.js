@@ -914,6 +914,10 @@ myOwn.createSmartButton = function createSmartButton(opts){
     return button;
 };
 
+myOwn.registerPostInput = function registerPostInput(postInputName, postInputFunction){
+    TypeStore.type.text.postInputs[postInputName]=postInputFunction;
+}
+
 return myOwn;
 
 });

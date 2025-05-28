@@ -502,12 +502,6 @@ myOwn.TableConnectorLocal.prototype.getData = function getData(){
                     return bestGlobals.compareForOrder(connector.def.sortColumns)(a,b);
                 })
             }
-            /*
-            if(connector.def.sortColumns || connector.def.sortColumns == null){
-                var ordenator=bestGlobals.compareForOrder(connector.def.sortColumns || connector.def.primaryKey.map(function(k){ return {column:k}}));
-                return result.sort(ordenator)
-            }
-            */
             return result;
         })
     }).then(function(rows){

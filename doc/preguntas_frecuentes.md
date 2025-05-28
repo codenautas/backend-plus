@@ -660,3 +660,50 @@ Luego:
 nota: si se quiere mas tiempo que los 5 minutos por defecto, investigar la opción 
 ```log: db: until```
 
+## ¿Cómo evitar los saltos de línea cuando un usuario carga datos?
+
+En Backend-Plus se puede controlar qué juego de caracteres se puede almacenar en una columna.
+También se puede reemplazar lo que el usuario carga para remover los caracteres no deseados.
+
+Usando constraints se puede restringir los valores no deseados en las columnas de las tablas. 
+Si solo queremos evitar los saltos de línea se podrían usar expresiones regulares
+
+```ts
+  { 
+    constraintType: 'check', 
+    consName: `saltos de linea no validos en ${fieldName}`, 
+    expr: `${fieldName} !~ '[\n\t\u00a0]'`
+  }
+```
+
+Esa expresión evita saltos de línea `\n` tabulaciones `\t` y [pseudo espacios](https://es.wikipedia.org/wiki/Espacio_duro)
+que son difíciles de distinguir de los espacios comunes. 
+A veces aparecen al copiar y pegar textos que tienen espacios al final de la línea o espacios consecutivos.
+
+### experiencia de usuario
+
+A veces es preferible no espera a que el backend rechace el valor por inválido.
+Se puede instruir al frontend (de backend-plus) a eliminar o transformar esos valores. 
+
+Para eso se utiliza la propiedad `postInput` en la definición de campos (o parámetros).
+El fronetend de BP utiliza [type-store](https://github.com/codenautas/type-store/blob/HEAD/LEEME.md) 
+el manejo de los tipos en los inputs.
+
+Se debe definir un `postInput` con un nombre y una función de transformación.
+
+```ts
+function SinSobresaltos(text: string){
+    return text.replace(/[ \r\n\t\u00a0]+/g,' ').replace(/(^ +)| +$)/g,'');
+}
+
+myOwn.registerPostInput('sinSobresaltos', sinSobresaltos);
+```
+
+De esa manera se reemplazan series de caracteres no deseados en un espacio común 
+y se quitan los espacios delante y detrás del texto. 
+
+### Aterlantiva usando triggers
+
+Otra posibilidad es programar el reemplazo a nivel de triggers de la base de datos. 
+La ventaja es que el reemplazo se realiza independientemente del frontend que se use.
+
