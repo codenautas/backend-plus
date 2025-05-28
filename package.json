@@ -39,6 +39,7 @@
     "castellano": "^0.1.4",
     "connect-pg-simple": "^10.0.0",
     "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "dialog-promise": "^0.10.1",
     "discrepances": "^0.2.8",
     "express": "^4.21.2",

@@ -395,6 +395,7 @@ export interface AppConfigServer
         "kill-9": string                   // a way to kill from URL with a token
         bitacoraSchema: string
         bitacoraTableName: string 
+        allowedHosts:string[]              //API allowed hosts
     }
 export interface AppConfigDb 
     {
