@@ -218,11 +218,15 @@ export type FieldDefinition = EditableDbDefinition & {
     alwaysShow?:boolean /* show when appears in fixed fields */
     suggestingKeys?:string[]
     postInput?:PostInputOptions
-} & ({} | {
-    sequence:SequenceDefinition
-    nullable:true
-    editable:false
-})
+} & ({
+    sequence?: undefined
+    nullable?: boolean
+    editable?: boolean
+} | {
+    sequence: SequenceDefinition
+    nullable: true
+    editable: false
+});
 export type EditableDbDefinition = {
     editable?:boolean
     allow?:{
@@ -415,7 +419,6 @@ export interface AppConfigLogin
     {
         schema: string                     // schema of the user table
         table: string                      // user table
-        from: string                       // complete expression to get table or join where get the user
         userFieldname: string              // fieldname in user table that stores the user name
         passFieldname: string              // fieldname in user table that stores the password hash
         rolFieldname: string               // fieldname in user table that stores the rol
