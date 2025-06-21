@@ -172,6 +172,9 @@ export type SequenceDefinition = {
     name:string
     firstValue:number
     prefix?:string /* Prefix for the generated value */
+} 
+export type SequenceMadMaxDefinition = {
+    madMax: [] // Si se necesita una secuencia por grupo acá estará la lista de campos group by de la secuencia. Y habrá que modificar la funión de pg-triggers para que lo tome.
 }
 export type ExportMetadataDefinition={ /* TODO: define */ }
 export type PostInputOptions='upperSpanish' | 'upperWithoutDiacritics' | 'parseDecimal'
@@ -218,15 +221,21 @@ export type FieldDefinition = EditableDbDefinition & {
     alwaysShow?:boolean /* show when appears in fixed fields */
     suggestingKeys?:string[]
     postInput?:PostInputOptions
-} & ({
-    sequence?: undefined
-    nullable?: boolean
-    editable?: boolean
-} | {
-    sequence: SequenceDefinition
-    nullable: true
-    editable: false
-});
+} & (
+    {
+        sequence?: undefined
+        nullable?: boolean
+        editable?: boolean
+    } | {
+        sequence: SequenceDefinition
+        nullable: true
+        editable: false
+    } | {
+        sequence: SequenceMadMaxDefinition
+        nullable: true
+        editable: boolean
+    }
+);
 export type EditableDbDefinition = {
     editable?:boolean
     allow?:{
