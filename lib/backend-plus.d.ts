@@ -174,7 +174,8 @@ export type SequenceDefinition = {
     prefix?:string /* Prefix for the generated value */
 } 
 export type SequenceMadMaxDefinition = {
-    madMax: [] // Si se necesita una secuencia por grupo acá estará la lista de campos group by de la secuencia. Y habrá que modificar la funión de pg-triggers para que lo tome.
+    madMax: string[] // grouping of mad max sequences
+    firstValue: number
 }
 export type ExportMetadataDefinition={ /* TODO: define */ }
 export type PostInputOptions='upperSpanish' | 'upperWithoutDiacritics' | 'parseDecimal'
