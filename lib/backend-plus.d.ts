@@ -175,7 +175,7 @@ export type SequenceDefinition = {
 } 
 export type SequenceMadMaxDefinition = {
     madMax: string[] // grouping of mad max sequences
-    firstValue: number
+    firstValue?: number
 }
 export type ExportMetadataDefinition={ /* TODO: define */ }
 export type PostInputOptions='upperSpanish' | 'upperWithoutDiacritics' | 'parseDecimal'
@@ -189,7 +189,7 @@ export type FieldDefinition = EditableDbDefinition & {
     defaultValue?:any
     defaultDbValue?:PgKnownDbValues|string
     clientSide?:string         /* keyof: myOwn.clientSides */
-    isName?:boolean
+    isName?:boolean|'known'    /* is a name but it is a well known name (because the user uses it to thier code or because the code is enugh expresive)
     isPk?:number               /* internal: pos in the primaryKey array */
     serverSide?:boolean        /* default:!clientSide if the value is retrived from the database */
     inTable?:boolean           /* default:!clientSide && !sql.fields[...].expr. Is a real fisical field in the table */
