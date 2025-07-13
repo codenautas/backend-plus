@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for the anti Pareto rule",
-  "version": "2.5.2-betha.11",
+  "version": "2.5.2-betha.12",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -68,6 +68,7 @@
     "self-explain": "^0.11.0",
     "serve-content": "^0.4.0",
     "session-file-store": "^1.5.0",
+    "simple-git": "^3.18.0",
     "sql-tools": "^0.1.2",
     "stack-trace": "^0.0.10",
     "stylus": "0.64.0",
