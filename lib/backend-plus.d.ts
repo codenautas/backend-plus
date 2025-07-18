@@ -222,21 +222,8 @@ export type FieldDefinition = EditableDbDefinition & {
     alwaysShow?:boolean /* show when appears in fixed fields */
     suggestingKeys?:string[]
     postInput?:PostInputOptions
-} & (
-    {
-        sequence?: undefined
-        nullable?: boolean
-        editable?: boolean
-    } | {
-        sequence: SequenceDefinition
-        nullable: true
-        editable: false
-    } | {
-        sequence: SequenceMadMaxDefinition
-        nullable: true
-        editable: boolean
-    }
-);
+    sequence?: SequenceDefinition|SequenceMadMaxDefinition
+}
 export type EditableDbDefinition = {
     editable?:boolean
     allow?:{
