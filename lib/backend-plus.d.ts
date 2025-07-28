@@ -433,6 +433,9 @@ export interface AppConfigLogin
             store:{
                 module: string
             }
+            successRedirect: string // where to redirect after login
+            failureRedirect: string // where to redirect after login failure
+            failedLoginUrlPath: string // where to redirect after a failed login
         }
         forget: {                          // forget password configurations:
             urlPath: string                // url sent by mail. default: `/new-pass`
