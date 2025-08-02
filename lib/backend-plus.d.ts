@@ -188,6 +188,7 @@ export type FieldDefinition = EditableDbDefinition & {
     dbNullable?:boolean        /* dbNullable === false is not nullabla at DB level, but not at CLIENT LEVEL */
     defaultValue?:any
     defaultDbValue?:PgKnownDbValues|string
+    specialDefaultValue?:string /* keyof myOwn.specialDefaultValues and/or keyof AppBackend.prototype.specialSqlDefaultExpressions */
     clientSide?:string         /* keyof: myOwn.clientSides */
     isName?:boolean|'known'    /* is a name but it is a well known name (because the user uses it to thier code or because the code is enugh expresive)
     isPk?:number               /* internal: pos in the primaryKey array */
@@ -204,7 +205,6 @@ export type FieldDefinition = EditableDbDefinition & {
     references?:string         /* table name */ 
     referencesField?:string  
     aggregate?:'avg'|'sum'|'count'|'min'|'max'|'countTrue'          /* keyof myOwn.TableAggregates */
-    specialDefaultValue?:string /* keyof myOwn.specialDefaultValues
     defaultForOtherFields?:boolean   /* the field that stores the "other fields" of a flexible imported table */
     specialValueWhenInsert?:string 
     exportMetadata?:ExportMetadataDefinition 
@@ -548,6 +548,7 @@ export class AppBackend{
     dbUserNameExpr:string
     dbUserRolExpr:string
     specialValueWhenInsert:{[k:string]:(context:ProcedureContext, defField:FieldDefinition, parameters:object)=>any}
+    specialSqlDefaultExpressions:Record<string, string>
     clearCaches():void
     start(opts?: StartOptions):Promise<void>
     getTables():TableItemDef[]

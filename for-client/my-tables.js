@@ -2203,6 +2203,9 @@ myOwn.specialDefaultValue={
         return belowDepot.row[fieldName]?belowDepot.row[fieldName]+1:(
             aboveDepot.row[fieldName]?aboveDepot.row[fieldName]-1:1
         ); 
+    },
+    current_user: function specialDefaultValueCurrentUser(){
+        return my.config.username;
     }
 }
 

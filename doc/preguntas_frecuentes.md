@@ -545,7 +545,7 @@ export function anotaciones(context:TableContext):TableDefinition{
             {name:'proyecto', typeName:'text'},
             {name:'ticket', typeName:'bigint' },
             {name:'anotacion', typeName:'bigint', nullable:true, title:'anotación', editable:false, defaultDbValue:'0'},
-            {name:'usuario', typeName:'text', editable:false, defaultValue: context.user.usuario  },
+            {name:'usuario', typeName:'text', editable:false, specialDefaultValue: 'current_user' },
             {name:'detalle', typeName:'text'},
             {name:'proyecto_relacionado', typeName:'text', title:'link_proyecto'},
             {name:'ticket_relacionado', typeName:'bigint', title:'link_ticket'},
@@ -647,9 +647,11 @@ en el root del proyecto ver archivo last-pg-error-local.sql
 
 ## ¿Como hago para loggear todas las queries SQL incluso las que no generaron error?
 con la opción del local-config.yaml
-```log: 
+```yaml
+log: 
     db: 
-      on-demand: true ```
+      on-demand: true 
+```
 
 Luego:
 1) Agregar a la url base del sistema el sufijo "--log-db" (quedaría URLbase/--log-db) para activar el logueo (por defecto dura 5 minutos)
@@ -658,7 +660,7 @@ Luego:
 4) si hay mucho sql, limpiar el archivo y realizar solo la última intervención que realiza el usuario justo antes del error 
 
 nota: si se quiere mas tiempo que los 5 minutos por defecto, investigar la opción 
-```log: db: until```
+`log: db: until`
 
 ## ¿Cómo evitar los saltos de línea cuando un usuario carga datos?
 
@@ -707,3 +709,21 @@ y se quitan los espacios delante y detrás del texto.
 Otra posibilidad es programar el reemplazo a nivel de triggers de la base de datos. 
 La ventaja es que el reemplazo se realiza independientemente del frontend que se use.
 
+## ¿Cómo hacer que el valor predeterminado sea el usuario actual?
+
+Depende del contexto o lo que se quiera obtener. Lo mejor es usar el atributo de campo `specialDefaultValue` así:
+
+```ts
+    fields:[
+        { name: 'remitente', typeName: 'text', specialDefaultValue: 'current_user', editable: true}
+    ]
+```
+
+En ese caso la grilla mostrará el valor por defecto como el usuario actual logueado
+y le permitirá al usuario cambiar ese valor. 
+
+Los atributos que manejan los valores por defecto de los campos son: `defaultValue` (que sirve en caso de que sea una constante),
+`specialDefaultValue` que puede manejar situaciones donde no se conoce el valor en tiempo de compilación
+(esos valores se podrían aplicar en el frontend o backend dependiendo de cómo esté configurado cada uno), 
+`defaultDbValue` para valores predeterminados solo a nivel de la definición del campo en la base de datos
+y `specialspecialValueWhenInsert` que es un mecanismo de calcular un valor usando una función en el backend.

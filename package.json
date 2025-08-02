@@ -1,7 +1,7 @@
 {
   "name": "backend-plus",
   "description": "Backend for the anti Pareto rule",
-  "version": "2.5.2-betha.14",
+  "version": "2.5.2-betha.15",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/backend-plus",
@@ -106,7 +106,7 @@
     "sinon": "^21.0.0",
     "supertest": "^7.1.4",
     "types.d.ts": "~0.6.22",
-    "typescript": "^5.8.3",
+    "typescript": "^5.9.2",
     "why-is-node-running": "^3.2.2"
   },
   "engines": {
