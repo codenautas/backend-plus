@@ -587,7 +587,7 @@ export class AppBackend{
         messages:Record<LangId,Record<string, string>>
     }
     shutdownCallbackListAdd(param:{message:string, fun:()=>Promise<void>}):void
-    shutdownBackend():Promise<void>
+    shutdownBackend(opts?:{skipTurnOff?:boolean, onlyTurnOff?:boolean}):Promise<void>
     setLog(opts:{until:string, results?:boolean}):void
     getDataDumpTransformations(rawData:string):Promise<{rawData:string, prepareTransformationSql:string[], endTransformationSql:string[]}>
 }
