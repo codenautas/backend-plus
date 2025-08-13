@@ -1,5 +1,7 @@
 # novedades de _backend-plus_
 
+**2.5.2-betha.17** se agrega useCors para habilitar el uso de Cross-Origin Resource Sharing a nivel configuración en server, es necesario para usar los allowedHosts
+
 **2.5.2-betha.4** se agrega allowedHosts a nivel configuración en server, es un array de strings con los dominios permitidos para acceder por api, ej: localhost, undominio.com, etc
 
 **v2.2.2** _Los tres patitos_. Por error se ocultaban campos relacionados débilmente (en rango definido con `until`).
