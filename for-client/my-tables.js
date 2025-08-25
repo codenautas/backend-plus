@@ -903,7 +903,7 @@ myOwn.ActionColumnGrid.prototype.td = function td(depot){
             actionNamesList.forEach(function(actionName){
             var actionDef = my.tableAction[actionName];
             if(grid.def.allow[actionName] && depot.allow[actionName] !== false){
-                var buttonAction=html.button({class:'table-button', "skip-enter":true}, [
+                var buttonAction=html.button({class:'table-button', "skip-enter":true, "bp-action":actionDef.alt}, [
                     html.img({src:actionDef.img, alt:actionDef.alt, title:my.messages[actionDef.titleMsg]})
                 ]).create();
                 thActions.appendChild(buttonAction);
@@ -2711,7 +2711,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             if(iRow<depotsToDisplay.length){
                 var addButtonRest = function addButtonRest(toNextRowNumber){
                     var createRestButtonInto = function(domElement){
-                        var buttonRest=html.button({class:'foot-info', "enter-clicks":true},"+..."+toNextRowNumber).create();
+                        var buttonRest=html.button({class:'foot-info', "enter-clicks":true, "all-rows-displayed": "no"},"+..."+toNextRowNumber).create();
                         domElement.appendChild(html.span('  ').create());
                         domElement.appendChild(buttonRest);
                         return buttonRest;
@@ -2741,6 +2741,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 if(grid.dom.buttonInsert){
                     grid.dom.buttonInsert.style.visibility='visible';
                 }
+                grid.dom.headInfo.rowCount.setAttribute("all-rows-displayed", "yes")
             }
         };
         var linesToDisplay=(
