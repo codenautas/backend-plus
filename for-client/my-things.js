@@ -322,6 +322,7 @@ myOwn.insertRow = function insertRow(where){
             where.smooth={};
         }
         var trDummy = section.insertRow(iRow);
+        trDummy.setAttribute('dummy','inserting')
         tr.style.display='none';
         for(var i=0; i<(where.smooth.colCount||1); i++){
             var cell=trDummy.insertCell(-1);

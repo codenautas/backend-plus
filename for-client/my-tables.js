@@ -2312,7 +2312,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
     grid.updateRowData = function updateRowData(depot, skipUpdateStatus){
         var grid = this;
         var forInsert = false; // not define how to detect
-        var tr = depot;
+        var tr = depot.tr;
         grid.setRowStyle(depot,depot.row, skipUpdateStatus);
         grid.def.fields.filter(function(fieldDef){
             return fieldDef.visible;
@@ -2343,6 +2343,12 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             };
             depot.clientSidePrepared=true;
             grid.my.clientSides[grid.def.clientSide].update(depot);
+        }
+        if (depot.allow.update) {
+            tr.setAttribute('can-update','yes')
+        }
+        if (depot.allow.delete) {
+            tr.setAttribute('can-delete','yes')
         }
     };
     var saveRow = function(depot, opts){
@@ -2493,7 +2499,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                         }
                     }
                 }
-            }else if(!/^\$allow\./.test(fieldName)){
+            }else if(/^\$allow\./.test(fieldName)){
                 depot.allow[fieldName.replace(/^\$allow\./,'')] = retrievedRow[fieldName];
             }
         }
