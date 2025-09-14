@@ -179,7 +179,7 @@ export type SequenceMadMaxDefinition = {
 }
 export type ExportMetadataDefinition={ /* TODO: define */ }
 export type PostInputOptions='upperSpanish' | 'upperWithoutDiacritics' | 'parseDecimal'
-export type FieldDefinition = EditableDbDefinition & {
+export interface FieldDefinition extends EditableDbDefinition {
     name:string
     typeName:PgKnownTypes|'ARRAY:text'
     label?:string
@@ -224,7 +224,7 @@ export type FieldDefinition = EditableDbDefinition & {
     postInput?:PostInputOptions
     sequence?: SequenceDefinition|SequenceMadMaxDefinition
 }
-export type EditableDbDefinition = {
+export interface EditableDbDefinition {
     editable?:boolean
     allow?:{
         update?:boolean
@@ -241,7 +241,7 @@ export type FieldsForConnect = (string | {source:string, target:string})[]
 export type FieldsForConnectDetailTable = (string | {source:string, target:string, nullMeansAll?:boolean} | {value:any, target:string})[]
 
 export type FkActions = 'no action'|'restrict'|'cascade'|'set null'|'set default';
-export type ForeignKey = {
+export interface ForeignKey {
     references:string, 
     fields:FieldsForConnect, 
     onUpdate?: FkActions, 
