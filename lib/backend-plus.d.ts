@@ -247,7 +247,9 @@ export type ForeignKey = {
     onUpdate?: FkActions, 
     onDelete?: FkActions, 
     displayAllFields?: boolean, 
-    alias?:string, 
+    alias?:string,
+    abr?:string,
+    label?:string,
     displayFields?:string[], 
     consName?:string, 
     initiallyDeferred?:boolean
