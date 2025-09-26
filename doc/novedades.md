@@ -1,6 +1,6 @@
 # novedades de _backend-plus_
 
-**2.5.2-betha.4** se agrega allowedHosts a nivel configuración en server, es un array de strings con los dominios permitidos para acceder por api, ej: localhost, undominio.com, etc
+**2.5.2-betha.18** se agrega allowedHosts a nivel configuración en server para habilitar el uso de Cross-Origin Resource Sharing. La opción allowedHosts es un array de strings con los dominios permitidos para acceder por api, ej: localhost, undominio.com, etc
 
 **v2.2.2** _Los tres patitos_. Por error se ocultaban campos relacionados débilmente (en rango definido con `until`).
 
