@@ -56,6 +56,7 @@ export interface ProcedureDef<T = any> {
     forExport?:{
         fileName?:string
         csvFileName?:string
+        generarInmediato?:boolean
     }
 }
 
