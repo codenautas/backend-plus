@@ -401,6 +401,7 @@ export interface AppConfigServer
         bitacoraTableName: string 
         useCors: boolean                   //habilita Cross-Origin Resource Sharing
         allowedHosts:string[]              //determina API allowed hosts (necesita habilitar useCors)
+        policy?:string
     }
 export interface AppConfigDb 
     {
