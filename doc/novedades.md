@@ -1,5 +1,14 @@
 # novedades de _backend-plus_
 
+**2.5.2-betha.28** 
+
+passwords completamente compatibles con scram-sha-256 de postgres.
+
+se agregan login.passUpdatedAtFieldName y login.passAlgorithmFieldName (ambos optativos):
+.passUpdatedAtFieldName representa al nombre del campo de la tabla definida para almacenar los usuarios donde se guarda la fecha de última modificacion de contraseña (optativo) 
+
+.passAlgorithmFieldName representa al nombre del campo de la tabla definida para almacenar los usuarios donde se guarda el algoritmo de la contraseña (optativo) 
+
 **2.5.2-betha.18** se agrega allowedHosts a nivel configuración en server para habilitar el uso de Cross-Origin Resource Sharing. La opción allowedHosts es un array de strings con los dominios permitidos para acceder por api, ej: localhost, undominio.com, etc
 
 **v2.2.2** _Los tres patitos_. Por error se ocultaban campos relacionados débilmente (en rango definido con `until`).

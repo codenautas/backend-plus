@@ -351,6 +351,8 @@ login                        | opciones de login
 .userFieldName               | nombre del campo que contiene el usuario
 .passFieldName               | nombre del campo que contiene el md5(password+usuario)
 .rolFieldName                | nombre del campo donde está el rol del usuario 
+.passUpdatedAtFieldName      | nombre del campo donde se guarda la fecha de última modificacion de contraseña (optativo) 
+.passAlgorithmFieldName      | nombre del campo donde se guarda el algoritmo de la contraseña (optativo) 
 .infoFieldList               | array con los nombres de campo que van a al campo user
 .activeClausule              | expresión booleana SQL que determina si el usuario está activo
 .messages                    | mensajes a mostrar en la pantalla de login
