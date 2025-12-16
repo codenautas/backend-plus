@@ -510,6 +510,7 @@ export interface AppConfig {
             results: boolean               // if query results must be included in full db logs
         }
         session: boolean                   // if all session activity must be logged
+        "pass-migration"?: boolean
     }
     devel: {
         delay: number                      // msec avg random delay in API responses (to emulate slow nets)
