@@ -483,6 +483,7 @@ myOwn.displayMainMenu = function(addrParams){
         if(mtv){
             if(location.href.match(/^.{0,8}localhost/)){
                 mtv.style.backgroundImage='repeating-linear-gradient(-45deg, #FF8, #FF8 8px, #DDD 8px, #DDD 16px)'
+                mtv.setAttribute('dev-mode',true);
                 mtv.title = 'Warning! Using system in localhost!'
             }
         }
