@@ -1983,7 +1983,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         });
     }
     if(grid.def.allow.insert && !grid.def.forInsertOnlyMode){
-        buttonInsert=html.button({class:'table-button', "enter-clicks":true}, [
+        buttonInsert=html.button({class:'table-button', "enter-clicks":true, "bp-action": "INS"}, [
             html.img({
                 src:my.path.img+'insert.png',
                 alt:'INS',
