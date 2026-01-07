@@ -199,6 +199,7 @@ myOwn.wScreens.proc.result={
         }else{
             divResult.textContent = result;
             divResult.style.backgroundColor = '#9FA';
+            divResult.setAttribute('result','success');
         }
     },
     showGrid:function(result, divResult){
@@ -207,6 +208,8 @@ myOwn.wScreens.proc.result={
     showError:function(err, divResult){
         divResult.textContent = err.message;
         divResult.style.backgroundColor = 'orange';
+        divResult.setAttribute('result','error');
+
     },
     showDownloadUrl:function(result, divResult){
         divResult.innerHTML='';
