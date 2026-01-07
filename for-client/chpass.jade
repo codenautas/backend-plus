@@ -60,6 +60,7 @@ html(lang=lang)
         tr
           td
           td
+            a(href="./menu")=msgs.chpass.cancel
             input(type="submit", value=msgs.chpass.button)
         each errorLine in (flash.error||[])
           tr(style={color:'red'})
