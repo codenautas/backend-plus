@@ -59,7 +59,7 @@ html(lang=lang)
           td#resultDiff
         tr
           td
-          td
+          td.actions
             a(href="./menu")=msgs.chpass.cancel
             input(type="submit", value=msgs.chpass.button)
         each errorLine in (flash.error||[])
