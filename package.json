@@ -31,7 +31,7 @@
   "dependencies": {
     "@upgraded/locate-path": "^6.0.0-alfa.1",
     "ajax-best-promise": "^0.4.2",
-    "backend-skins": "^0.1.17",
+    "backend-skins": "^0.1.18",
     "best-globals": "^2.0.2",
     "big.js": "^7.0.1",
     "body-parser": "^2.2.1",
