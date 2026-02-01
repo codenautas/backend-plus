@@ -25,7 +25,7 @@ module.exports = function(config, preConfig) {
       'node_modules/js-to-html/lib/js-to-html.js',
       'node_modules/discrepances/lib/discrepances.js',
       'node_modules/ajax-best-promise/bin/ajax-best-promise.js',
-      'node_modules/express-useragent/lib/express-useragent.js',
+      'node_modules/express-useragent/dist/browser/express-useragent.global.js',
       'node_modules/esprima/dist/esprima.js',
       'node_modules/self-explain/dist/escodegen.browser.js',
       'node_modules/self-explain/lib/self-explain.js',
