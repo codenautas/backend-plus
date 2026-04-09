@@ -68,26 +68,44 @@ myAjax.parseStrCookies = function parseStrCookies(cookieString, prefix){
 
 myAjax.readProcedureDefinitions=function readProcedureDefinitions(){
     var my = this;
-    var promise;
-    var getStored=function(setupOrError){
-        if(setupOrError && !(setupOrError instanceof Error) && !setupOrError.isoffline){
-            localStorage.setItem('setup', JSON.stringify(setupOrError));
+    const NETWORK_TIMEOUT = 1800;
+    var cachedSetupStr = my.getLocalVar('setup');
+
+    var getStored = function(setupOrError) {
+        if (setupOrError && !(setupOrError instanceof Error) && !setupOrError.isoffline) {
+            my.setLocalVar('setup', setupOrError);
             return setupOrError;
         }
-        var setupJson=localStorage.getItem('setup');
-        if(setupJson){
-            return JSON.parse(setupJson);
+        if (cachedSetupStr) {
+            console.warn('setup obtenido de cache')
+            return cachedSetupStr;
         }
-        throw new Error("NOT CLIENT-CONFIGURED")
+        var finalError = setupOrError instanceof Error ? setupOrError : new Error("NOT CLIENT-CONFIGURED");
+        throw finalError;
+    };
+
+    var networkPromise = my.ajaxPromise({
+        action: 'client-setup',
+        method: 'get',
+        encoding: 'JSON',
+        parameters: [],
+        progress: false
+    });
+
+    var promise;
+
+    if (cachedSetupStr) {
+        var timeoutPromise = new Promise(function(_, reject) {
+            setTimeout(function() {
+                reject(new Error("NETWORK_TIMEOUT"));
+            }, NETWORK_TIMEOUT);
+        });
+        promise = Promise.race([networkPromise, timeoutPromise]);
+    } else {
+        promise = networkPromise;
     }
-    promise = my.ajaxPromise({
-        action:'client-setup',
-        method:'get',
-        encoding:'JSON',
-        parameters:[],
-        progress:false
-    }).then(getStored, getStored);
-    return promise.then(function(setup){
+
+    return promise.then(getStored,getStored).then(function(setup){
         my.config = setup;
         if(typeof document !== "undefined"){
             var backgroundUrl
