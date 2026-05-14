@@ -403,7 +403,7 @@ myOwn.cloneRow = function cloneRow(row){
 myOwn.TableConnector.prototype.saveRecord = function saveRecord(depot, opts){
     var sendedForUpdate = depot.my.cloneRow(depot.rowPendingForUpdate);
     return depot.my.ajax.table_record_save({
-        table: depot.def.name,
+        table: this.tableName,
         primaryKeyValues: depot.primaryKeyValues,
         newRow: depot.rowPendingForUpdate,
         oldRow: depot.retrievedRow,
