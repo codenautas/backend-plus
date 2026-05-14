@@ -596,6 +596,7 @@ export class AppBackend{
     shutdownBackend(opts?:{skipTurnOff?:boolean, onlyTurnOff?:boolean}):Promise<void>
     setLog(opts:{until:string, results?:boolean}):void
     getDataDumpTransformations(rawData:string):Promise<{rawData:string, prepareTransformationSql:string[], endTransformationSql:string[]}>
+    activeSkinFiles: Set<string>
 }
 
 }
