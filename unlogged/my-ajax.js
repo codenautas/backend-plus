@@ -645,7 +645,7 @@ myAjax.UriSearchToObjectParams={
 	fc               :{                   encode:function(x){ return json4all.toUrl(x); }, decode:function(x){ return json4all.parse(x)}  },
 	ff               :{                   encode:function(x){ return json4all.toUrl(x); }, decode:function(x){ return json4all.parse(x)}  },
 	up               :{                   encode:function(x){ return json4all.toUrl(x); }, decode:function(x){ return json4all.parse(x)}  },
-	pf               :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return JSON.parse(x)}      },
+	pf               :{                   encode:function(x){ return json4all.toUrl(x); }, decode:function(x){ return json4all.parse(x)}  },
 	td               :{                   encode:function(x){ return json4all.toUrl(x); }, decode:function(x){ return json4all.parse(x)}  },
 	today            :{                   encode:function(x){ return JSON.stringify(x); }, decode:function(x){ return bestGlobals.date.iso((x+'').substr(0,10))}  },
 	section          :{ showInMenu:true , encode:noChange                                , decode:noChange          },

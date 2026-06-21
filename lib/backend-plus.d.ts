@@ -338,6 +338,9 @@ export type TableDefinition = EditableDbDefinition & {
     filterColumns?:{column:string, operator:string, value:any}[]
     gridAlias?:string   /* front-end css my-table = gridAlias */
     lookupFields?:string[] /* fields that should be used in lookup dialogs; if not specified, fields with isName:true are used */
+    functionDef?:{
+        parameters?:ProcedureParameter[]
+    }
 }
 export interface DetailTable { table?: string, fields: FieldsForConnectDetailTable, abr: string, label?: string, refreshParent?:boolean, refreshFromParent?:boolean, wScreen?:string, condition?:string }
 export type TableDefinitionFunction = (context: ContextForDump, opts?:any) => TableDefinition;
