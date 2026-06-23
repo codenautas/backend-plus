@@ -224,6 +224,7 @@ export interface FieldDefinition extends EditableDbDefinition {
     suggestingKeys?:string[]
     postInput?:PostInputOptions
     sequence?: SequenceDefinition|SequenceMadMaxDefinition
+    format?: string
 }
 export interface EditableDbDefinition {
     editable?:boolean

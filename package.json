@@ -77,7 +77,7 @@
     "sql-tools": "^0.1.7",
     "stack-trace": "^1.0.0",
     "stylus": "0.64.0",
-    "type-store": "^0.4.11",
+    "type-store": "^0.4.12",
     "typed-controls": "^0.12.4",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.2/xlsx-0.20.2.tgz"
   },
