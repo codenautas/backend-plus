@@ -15,12 +15,11 @@ Backend for the anti Pareto rule.
 [!--lang:*-->
 
 <!-- cucardas -->
-![stable](https://img.shields.io/badge/stability-stable-blue.svg)
 [![npm-version](https://img.shields.io/npm/v/backend-plus.svg)](https://npmjs.org/package/backend-plus)
 [![downloads](https://img.shields.io/npm/dm/backend-plus.svg)](https://npmjs.org/package/backend-plus)
-[![build](https://img.shields.io/travis/codenautas/backend-plus/master.svg)](https://travis-ci.org/codenautas/backend-plus)
-[![coverage](https://img.shields.io/coveralls/codenautas/backend-plus/master.svg)](https://coveralls.io/r/codenautas/backend-plus)
-[![dependencies](https://img.shields.io/david/codenautas/backend-plus.svg)](https://david-dm.org/codenautas/backend-plus)
+[![build](https://github.com/codenautas/backend-plus/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/codenautas/backend-plus/actions/workflows/build-and-test.yml)
+[![security](https://socket.dev/api/badge/npm/package/backend-plus)](https://socket.dev/npm/package/backend-plus)
+[![qa-control](https://github.com/codenautas/backend-plus/actions/workflows/qa-control.yml/badge.svg)](https://github.com/codenautas/backend-plus/actions/workflows/qa-control.yml)
 
 <!--multilang buttons-->
 
@@ -41,7 +40,7 @@ Es un framework para desarrollar aplicaciones web basadas en base de datos Postg
       2. mecanismo de login
       3. menúes
       4. posibilidad de definir skins
-      
+
 <!--lang:en--]
 
 
@@ -94,13 +93,13 @@ menuType | uso
 menu     | menú o submenú
 table    | una grilla o tabla
 proc     | procedimientos
-    
+
 propiedad   | tipo | predeterminado | menuType | uso
 ------------|------|----------------|----------|---------
 menuType    | T    |                |          | tipo de menu
 name        | T    |                |          | nombre de la opción (id)
 menuContent | A    |                | menu     | contenido del menú
-table       | T    | `name`         | table    | nombre de la tabla 
+table       | T    | `name`         | table    | nombre de la tabla
 label       | T    | `name`         |          | lo que se ve en el menú
 selectedByDefault | B |             |          | si es la opción predeterminada
 autoproced  | B    | `false`        | proc     | si debe ejecutarse el procedimiento
@@ -113,7 +112,7 @@ menuType | use
 menu     | menu or submenu
 table    | grid or table
 proc     | procedures
-    
+
 property    | type | default value  | menuType | use
 ------------|------|----------------|----------|---------
 menuType    | T    |                |          | menu Type
@@ -240,16 +239,16 @@ Process definition example:
 ```js
     {
         action:'count_without_isotopes',
-        bitacora:{ 
-                   error:true, 
-                   always:true, 
-                   targetTable:'other_table', 
+        bitacora:{
+                   error:true,
+                   always:true,
+                   targetTable:'other_table',
                    targetTableBitacoraFields: {
-                                                init_date: 'fecha_hora_inicio', 
-                                                end_date: 'fecha_hora_final', 
-                                                has_error: 'hubo_error', 
+                                                init_date: 'fecha_hora_inicio',
+                                                end_date: 'fecha_hora_final',
+                                                has_error: 'hubo_error',
                                                 end_status: 'resultado'
-                                              }, 
+                                              },
                    targetTableUpdateFieldsCondition: ['id']
                  },
         parameters:[
@@ -258,8 +257,8 @@ Process definition example:
         ],
         coreFunction:function(context, parameters){
             return context.client.query(
-                `SELECT count(*) as number_of_elements 
-                   FROM ptable p left join isotopes i on p.atomic_number=i.atomic_number 
+                `SELECT count(*) as number_of_elements
+                   FROM ptable p left join isotopes i on p.atomic_number=i.atomic_number
                    WHERE i.atomic_number IS NULL
                      AND p.atomic_number between coalesce($1,0) and coalesce($2,999)`,
                 [parameters.first_atomic_number, parameters.last_atomic_number]
@@ -308,21 +307,21 @@ export function emergeMyApp<T extends Constructor<AppBackend>>(Base:T){
 ```
 
 <!--lang:es-->
-La configuración general de la aplicación debe pasarse a la función `setStaticConfig` en formato texto-yaml. 
-Las distintas instancias instaladas pueden cambiar las opciones poniéndolas en el archivo `local-config.yaml` 
-(por ejemplo se podrían tener dos instancias de testing en el mismo servidor colgado de puertos distintos 
+La configuración general de la aplicación debe pasarse a la función `setStaticConfig` en formato texto-yaml.
+Las distintas instancias instaladas pueden cambiar las opciones poniéndolas en el archivo `local-config.yaml`
+(por ejemplo se podrían tener dos instancias de testing en el mismo servidor colgado de puertos distintos
 apuntando a distntas bases de datos).
 
 La variable de ambiente `BACKEND_PLUS_LOCAL_CONFIG` puede especificar un tercer archivo de configuración yaml
-que será aplicado después de `setStaticConfig` y de `local-config.yaml`. 
-Eso permite tener dos instancias corriendo en la misma carpeta (pero para ello el sistema no debería usar el 
-sistema de archivos para almacenar ningún tipo de  información). 
+que será aplicado después de `setStaticConfig` y de `local-config.yaml`.
+Eso permite tener dos instancias corriendo en la misma carpeta (pero para ello el sistema no debería usar el
+sistema de archivos para almacenar ningún tipo de  información).
 
 <!--lang:en--]
-The general application config is setted with `setStaticConfig`. 
+The general application config is setted with `setStaticConfig`.
 Any option can be overwrited in `local-config.yaml` file.
 
-`BACKEND_PLUS_LOCAL_CONFIG` enviroment variable can be a `filename.yaml` with more config options. 
+`BACKEND_PLUS_LOCAL_CONFIG` enviroment variable can be a `filename.yaml` with more config options.
 
 <!--lang:es-->
 ### formato de la configuración:
@@ -351,9 +350,9 @@ login                        | opciones de login
 .schema                      | esquema donde se encuentra la tabla de usuarios
 .userFieldName               | nombre del campo que contiene el usuario
 .passFieldName               | nombre del campo que contiene el md5(password+usuario)
-.rolFieldName                | nombre del campo donde está el rol del usuario 
-.passUpdatedAtFieldName      | nombre del campo donde se guarda la fecha de última modificacion de contraseña (optativo) 
-.passAlgorithmFieldName      | nombre del campo donde se guarda el algoritmo de la contraseña (optativo) 
+.rolFieldName                | nombre del campo donde está el rol del usuario
+.passUpdatedAtFieldName      | nombre del campo donde se guarda la fecha de última modificacion de contraseña (optativo)
+.passAlgorithmFieldName      | nombre del campo donde se guarda el algoritmo de la contraseña (optativo)
 .infoFieldList               | array con los nombres de campo que van a al campo user
 .activeClausule              | expresión booleana SQL que determina si el usuario está activo
 .messages                    | mensajes a mostrar en la pantalla de login
@@ -380,7 +379,7 @@ db                           | opciones de la base de datos
 .tablespace                  | tablespace donde se crea la base (solo si corresponde)
 .user                        |
 .password                    |
-.port                        | 
+.port                        |
 .schema                      | esquema principal donde crear los objetos nuevos
 .search_path                 | array de nombres de esquemas, si no se especifica `search_path = [schema, 'public']`
 .log-last-error              | true si se desea que se deje en un archivo la última sentencia SQL que contuvo error (solo funciona si config.devel está especficiada)
@@ -453,14 +452,14 @@ db                           | database options
 imports                      | options for importing to the platform
 .allow-plain-xls             | whether it allows importing xlsx that don't have the #backend-plus signal in cell A1
 
-[!--lang:*-->  
-```yaml  
-install:  
+[!--lang:*-->
+```yaml
+install:
   dump:
     db:
       owner: user_owner
     scripts:
-      post-adapt: [special_triggers.sql, other_constraints.sql]      
+      post-adapt: [special_triggers.sql, other_constraints.sql]
 login:
   plus:
     allowHttpLogin: true
@@ -489,5 +488,3 @@ $ npm install backend-plus
 [MIT](LICENSE)
 
 ----------------
-
-
