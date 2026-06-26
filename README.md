@@ -19,7 +19,7 @@ also available in:
 
 
 
-It's a framework for developing web applications based on PostgreSQL database. It's main features are:
+It's a framework for developing web applications based on PostgreSQL database. Its main features are:
 
    1. It is based on centralized metadata that defines:
       1. The data structure (tables and views structure)
@@ -98,7 +98,7 @@ coreFunction| F    |                               | Function that implements th
 
 #### bitacoraDef:
 
-propiedad                         | tipo           | default value              | uso
+property                          | type           | default value              | use
 ----------------------------------|----------------|----------------------------|-------------------
 error                             | B              | false                      | If true, bitacora saves data of error ocurred during core function execution
 always                            | B              | false                      | If true, bitacora saves all data ocurred during core function execution (overrides error)
@@ -112,13 +112,13 @@ targetTableUpdateFieldsCondition  | A             | null                       |
 property      | type           | default value  | use
 --------------|----------------|----------------|-------------------
 name          | T              |                | name of the parameter that is sent to the procedure
-defaultValue  | según typeName |                | parameter default value
+defaultValue  | according to typeName |          | parameter default value
 typeName      | T              |                | to define the data type
 label         | T              | name           | if you don't want to use default value to display on screen
 
 #### coreFunction(context, parameters)
 
-context  | uso
+context  | use
 ---------|----------------------
 be       | backendApp object
 username | username
@@ -203,31 +203,64 @@ Any option can be overwrited in `local-config.yaml` file.
 
 entry                        | usage
 -----------------------------|---------------
-server                       |
-.port                        | port where is listening
+server                       | server level options
+.port                        | port where it is listening
 .base-url                    | base url added to domain name
-.module-store                |
-install                      | (see Spanish)
-.dump                        | (see Spanish)
-..db.owner                   | (see Spanish)
-..scripts.post-adapt         | (see Spanish)
-..scripts.parts-order        | (see Spanish)
-devel                        | (see Spanish)
-.delay                       | (see Spanish)
-.cache-content               | (see Spanish)
-.forceShowAsEditable         | (see Spanish)
-login                        | (see Spanish)
-.plus                        | (see Spanish)
-..allowHttpLogin             | (see Spanish)
-log                          | (see Spanish)
-.req                         | (see Spanish)
-.session                     | (see Spanish)
-client-setup                 | (see Spanish)
-.cursors                     | (see Spanish)
-.skin                        | (see Spanish)
-.menu                        | (see Spanish)
-.title                       | (see Spanish)
-.lang                        | (see Spanish)
+.module-store                | name of the module that stores sessions: file, memory (in devel mode it saves to disk from time to time)
+install                      | install options
+.table-data-dir              | directory or list of directories where the .tabs used by the dump-db command are located (it creates inserts into the local-db-dump.sql file)
+.dump                        | install dump options
+..db.owner                   | database owner user
+..scripts.post-adapt         | list of file names to adapt the database structure
+..scripts.parts-order        | order of the parts in which the dump-db is generated
+devel                        | set of options for the development and testing environment
+.delay                       | additional average wait time (to simulate a slow server)
+.cache-content               | caches images and files in general (when not in "devel" mode it always caches, the cache can't be turned off outside devel mode)
+.forceShowAsEditable         | forces grids to be shown as editable grids to show how the server prevents modification
+.useFileDevelopment          | uses the fileDevelopment versions instead of file coming from clientIncludes()
+login                        | login options
+.plus                        | options to pass to the login-plus module
+..allowHttpLogin             | whether it allows login from HTTP connections
+.table                       | name of the table where users are validated
+.schema                      | schema where the users table is located
+.userFieldName               | name of the field that contains the user
+.passFieldName               | name of the field that contains md5(password+user)
+.rolFieldName                | name of the field where the user role is
+.passUpdatedAtFieldName      | name of the field where the date of the last password change is stored (optional)
+.passAlgorithmFieldName      | name of the field where the password algorithm is stored (optional)
+.infoFieldList               | array with the field names that go to the user field
+.activeClausule              | SQL boolean expression that determines whether the user is active
+.messages                    | messages to show on the login screen
+.keepAlive                   | maximum logged-in duration if only keep-alive messages are received
+.preserve-case               | whether it accepts users with uppercase letters
+log                          | console log
+.req                         | shows each request
+.session                     | shows session info
+.serve-content               | whether it should log everything served with `serve-content`
+.db                          | database connection logs
+..last-error                 | whether it should always log the last error (saved in `last-pg-error-local.sql`)
+..until                      | whether it should log every executed SQL statement. In `until` you must specify how long since startup (e.g.: '1m30s') or until which day and time (e.g.: '2018-01-20 10:30')
+..on-demand                  | whether the logging of all executed SQL can be restarted with `URLbase/--log-db`
+..results                    | whether it includes the results in the log of all SQL
+client-setup                 | front-end options
+.cursors                     | (in preparation) tells whether it uses cursors to show where (with the cursor on which record) each user is
+.skin                        | skin name
+.menu                        | whether it uses the integrated menus
+.title                       | screen title
+.lang                        | frontend language (and locale), for now "es" or "en"
+db                           | database options
+.motor                       | for now only 'postgresql'
+.database                    |
+.tablespace                  | tablespace where the database is created (only if applicable)
+.user                        |
+.password                    |
+.port                        |
+.schema                      | main schema where to create the new objects
+.search_path                 | array of schema names, if not specified `search_path = [schema, 'public']`
+.log-last-error              | true if you want the last SQL statement that contained an error to be left in a file (only works if config.devel is specified)
+.allow_double_lodash_fields  | whether fields with double `_` underscore are allowed
+imports                      | options for importing to the platform
+.allow-plain-xls             | whether it allows importing xlsx that don't have the #backend-plus signal in cell A1
 
 ```yaml
 install:
