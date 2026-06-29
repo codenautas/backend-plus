@@ -2,7 +2,7 @@
 
 const _ = require('lodash');
 const util = require('util');
-var readYaml = require('read-yaml-promise');
+var jsYaml = require('js-yaml');
 var MiniTools = require('mini-tools');
 var fs = require('fs-promise');
 var Promises = require('best-promise');
@@ -109,7 +109,9 @@ class AppEncuesta extends backendPlus.AppBackend{
             formularios:{}
         };
         be.registrosVacios={};
-        return readYaml(fileName).then(function(estructura){
+        return fs.readFile(fileName,'utf8').then(function(data){
+            return jsYaml.load(data);
+        }).then(function(estructura){
             _.forEach(estructura.formularios, function(formulario, idFormulario){
                 // var nuevoArregloCeldas=[]; // comentada por no usada
                 be.registrosVacios[idFormulario]={};
