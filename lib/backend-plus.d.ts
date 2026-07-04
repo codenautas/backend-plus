@@ -43,7 +43,7 @@ export interface ProcedureDef<T = any> {
     encoding?:'JSON4all'|'JSON'|'download'
     multipart?:true
     progress?:true
-    files?:{count?:number}
+    files?:{count?:number, minCount?:number, maxCount?:number}
     roles?:string[]
     cacheable?:true
     resultOk?:string
