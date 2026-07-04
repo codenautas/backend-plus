@@ -211,6 +211,7 @@ export interface FieldDefinition extends EditableDbDefinition {
     exportMetadata?:ExportMetadataDefinition 
     description?:string
     dataLength?:number
+    dataDecimals?:number
     options?:(string|{option:string|number, label:string})[]
     inView?:boolean
     sortMethod?:string
