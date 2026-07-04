@@ -116,7 +116,7 @@ myAjax.readProcedureDefinitions=function readProcedureDefinitions(){
                     backgroundUrl = 'url("img/background-test.png")';
                 }else if(/(^|[-_0-9/])(capa|capacitacion)($|[-_0-9/])/.test(location.pathname)){
                     backgroundUrl = 'url("img/background-capa.png")';
-                }else if(/(^|[-_0-9/])(desa|devel)($|[-_0-9/])/.test(location.pathname)){
+                }else if(/(^|[-_0-9/])(desa|devel)($|[-_0-9/])/.test(location.pathname) || my.config.config && my.config.config['devel']){
                     backgroundUrl = 'url("img/background-devel.png")';
                 }else{
                     backgroundUrl = '';
