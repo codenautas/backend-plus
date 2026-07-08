@@ -1,5 +1,7 @@
 declare module "backend-plus"{
 
+type RequireSome<T, K extends keyof T> = T & Required<Pick<T, K>>;
+
 import * as net from "net";
 import * as express from "express";
 import {Client} from "pg-promise-strict";
@@ -227,6 +229,11 @@ export interface FieldDefinition extends EditableDbDefinition {
     sequence?: SequenceDefinition|SequenceMadMaxDefinition
     format?: string
 }
+export type FieldDefinitionInternal = RequireSome<FieldDefinition, 'allow'> & {
+    isPk:number|null
+    tableName:string
+    table:string
+}
 export interface EditableDbDefinition {
     editable?:boolean
     allow?:{
@@ -344,8 +351,14 @@ export type TableDefinition = EditableDbDefinition & {
         parameters?:ProcedureParameter[]
     }
 }
+export type TableDefinitionInternal = RequireSome<TableDefinition, 
+    'allow'|'sql'
+> & {
+    field:Record<string, FieldDefinitionInternal>
+    otherTableDefs:Record<string, TableDefinitionInternal>
+}
 export interface DetailTable { table?: string, fields: FieldsForConnectDetailTable, abr: string, label?: string, refreshParent?:boolean, refreshFromParent?:boolean, wScreen?:string, condition?:string }
-export type TableDefinitionFunction = (context: ContextForDump, opts?:any) => TableDefinition;
+export type TableDefinitionFunction = (context: ContextForDump, opts?:any) => TableDefinitionInternal;
 export type TableItemDef=string|{name:string, path?:string, tableGenerator?:(context:TableContext)=>TableDefinition}
 // {{name: string; path?:string; fileName?: string; source?: string; tableGenerator?:()=>void; title?:string; mixin?:any[]}} TableItem
 export interface TableDefinitions {
@@ -602,6 +615,8 @@ export class AppBackend{
     setLog(opts:{until:string, results?:boolean}):void
     getDataDumpTransformations(rawData:string):Promise<{rawData:string, prepareTransformationSql:string[], endTransformationSql:string[]}>
     activeSkinFiles: Set<string>
+    /****** internals: */
+    transformInput:<T>(fieldDefinition: FieldDefinitionInternal, value:T) => T
 }
 
 }

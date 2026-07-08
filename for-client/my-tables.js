@@ -2266,7 +2266,9 @@ myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElem
         }
         if(value!==null){
             depotForInsert.row[fieldDef.name] = value;
-            depotForInsert.rowPendingForUpdate[fieldDef.name] = value;
+            if (fieldDef.inTable) {
+                depotForInsert.rowPendingForUpdate[fieldDef.name] = value;
+            }
         }
     });
     //TODO: mejorar la posición dentro del splice o concluir que no sirve el splice
