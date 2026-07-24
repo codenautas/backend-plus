@@ -68,7 +68,7 @@
     "simple-git": "^3.36.0",
     "sql-tools": "^0.1.7",
     "stack-trace": "^1.0.0",
-    "tab-plus": "^0.1.7",
+    "tab-plus": "^0.1.8",
     "type-store": "^0.6.0",
     "typed-controls": "^0.12.7",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.2/xlsx-0.20.2.tgz"
