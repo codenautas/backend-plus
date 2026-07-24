@@ -68,6 +68,7 @@
     "simple-git": "^3.36.0",
     "sql-tools": "^0.1.7",
     "stack-trace": "^1.0.0",
+    "tab-plus": "^0.1.7",
     "type-store": "^0.6.0",
     "typed-controls": "^0.12.7",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.2/xlsx-0.20.2.tgz"
@@ -107,7 +108,7 @@
     "sinon": "^22.1.0",
     "supertest": "^7.2.2",
     "types.d.ts": "^0.6.22",
-    "typescript": "^7.0.2",
+    "typescript": "^5.9.2",
     "why-is-node-running": "^3.2.2"
   },
   "engines": {
@@ -118,7 +119,7 @@
     "test-ui": "(npm run prepublish || echo \"continue w/error\") && mocha --reporter spec --single-run --bail  test/test-*.js",
     "test-karma": "(npm run prepublish || echo \"continue w/error\") && mocha --reporter spec --bail  test/test-k*.js",
     "test-why": "node --expose-internals ./node_modules/mocha/bin/_mocha --reporter spec --bail  test/test*.js",
-    "test-ci": "npm test",
+    "test-ci": "mkdir -p coverage && > coverage/lcov.info && npm test",
     "test-cov": "(npm run prepublish || echo \"continue w/error\") && mocha --reporter spec --bail  test/test*.js",
     "test-good": "mocha --reporter spec --bail --check-leaks test/test*.js",
     "example-pu": "node test/puppeteer/first-step.js",
