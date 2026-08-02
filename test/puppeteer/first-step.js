@@ -7,8 +7,8 @@ const puppeteer = require('puppeteer');
     await page.setViewport({width:1360, height:768});
     await page.goto('http://localhost:3333');
     var rect = await page.evaluate(() => {
-        document.getElementById('username').value='bob'; 
-        document.getElementById('password').value='bobpass'; 
+        document.getElementById('username').value='bob';
+        document.getElementById('password').value='bobpass';
     });
     await page.click('[type=submit]');
     await page.waitForSelector('#light-network-signal')

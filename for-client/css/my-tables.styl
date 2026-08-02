@@ -6,7 +6,7 @@ gridColor = rgba(255,255,255,0.9)
 .my-grid caption
   background-color gridColor
 
-.my-grid 
+.my-grid
   td, th
     background-color gridColor
 
@@ -21,7 +21,7 @@ border-table-no-right()
 border-table()
   border-table-no-right()
   border-right  2px solid #997
-  
+
 .my-grid
   border-table-no-right()
 
@@ -40,12 +40,12 @@ nowrap()
 .my-grid td[my-colname]
   overflow hidden
 
-/*  
+/*
 .my-grid[my-orientation=vertical] td
   border-table()
   white-space wrap
   overflow scroll
-*/  
+*/
 
 .my-grid tr td x
   border-bottom   2px solid #666
@@ -68,20 +68,20 @@ nowrap()
 
 .my-grid thead th
   white-space nowrap
-  
+
 .th-name
   overflow hidden
-  
+
 .my-grid thead th.th-detail
   font-size 60%
   white-space wrap
 
 .my-grid td[io-status=pending]
   background-color #CDE
-  
+
 .my-grid td[io-status=updating]
   background-color #DEF
-  
+
 .my-grid td[io-status=error]
   background-color #DAA
 
@@ -105,7 +105,7 @@ nowrap()
 .table-button img
   height 16px
 
-[has-filter='1'] 
+[has-filter='1']
   [when-filter=no]
     display none
   [when-filter=yes]
@@ -121,7 +121,7 @@ nowrap()
   th
     padding 0px
     vertical-align bottom
-    
+
 .filter-line
   td
     padding 0px
@@ -159,14 +159,14 @@ nowrap()
 
 .number-decimals
   font-size 90%
- 
+
 .date-year
   font-size 90%
 
 .img-lupa
   height 16px
-  
-[my-orientation=vertical].my-grid 
+
+[my-orientation=vertical].my-grid
   td
     max-width 700px
     white-space inherit
@@ -179,17 +179,17 @@ nowrap()
   from {
     -webkit-transform: rotate(0deg);
   }
-  to { 
+  to {
     -webkit-transform: rotate(360deg);
   }
 }
-    
+
 rotate-infinite()
-  -webkit-animation-name rotate 
+  -webkit-animation-name rotate
   -webkit-animation-duration 2s
   -webkit-animation-iteration-count infinite
   -webkit-animation-timing-function linear
-  
+
 div.dialog-export
   text-align left
   .img-preparing
@@ -217,20 +217,20 @@ div.dialog-export[current-state="ready"]
     display none
   .state-ready
     display inherit
-  
+
 .dialog-menu .mini-menu-opt-img
   height 24px
   width  24px
   border 2px
   padding 2px
-  
+
 [inherited-pk-column=yes]
   display none
   background-color #CCC
-  
+
 [show-inherited-keys=yes] [inherited-pk-column=yes]
   display table-cell
-  
+
 .hide-or-menu
   min-width 100px
 
@@ -266,15 +266,15 @@ div.dialog-export[current-state="ready"]
 
 td[my-mandatory]:empty
     background url("../img/mandatory.png") top right no-repeat
-    background-size  12px 12px 
+    background-size  12px 12px
 
 td[my-mandatory=pk]:empty
     background url("../img/mandatory-pk.png") top right no-repeat
-    background-size  12px 12px 
+    background-size  12px 12px
 
 th.th-agg
   background-color #DDD
-  
+
 @media print
   .grid-th-actions
     display none
@@ -292,7 +292,7 @@ th.th-agg
 
 .my-grid td.my-detail-grid
   overflow-x visible
-  border-right none 
+  border-right none
 
 .my-grid[error-list=no-errors]
   >caption
@@ -310,19 +310,19 @@ th.th-agg
     background-color #F44
     white-space nowrap
 
-.my-grid > tbody > tr:hover 
+.my-grid > tbody > tr:hover
   >td, >th
     box-shadow inset 0 -1px 0 0 rgba(0,0,255,0.7)
     &.my-detail-grid
       box-shadow none
 
-.my-grid > tbody > tr[current_line] 
+.my-grid > tbody > tr[current_line]
   >td, >th
     box-shadow inset 0 -1px 0 0 rgba(0,0,0,0.7)
 
 .my-grid > thead > tr > th
   position sticky
-  background-clip  padding-box 
+  background-clip  padding-box
   outline 1px solid #997
   top 0
   &[my-pk-column], &[my-fixed2left-column]

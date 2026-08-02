@@ -44,7 +44,7 @@ function presentarPlaca(estado) {
     default:
         throw new Error('Estado inexistente: '+estado.estado);
     }
-    
+
     encContinuar.addEventListener('click', function() {
        postAction('set-status', {id:estado.id,estado:'pendiente'}).then(function(res) {
            window.location = 'continuar';

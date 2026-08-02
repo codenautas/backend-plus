@@ -19,10 +19,10 @@ también disponible en:
 
 <!--lang:es-->
 
-Se definen tablas, vistas (que correspondan a una VIEW de la base de datos) 
+Se definen tablas, vistas (que correspondan a una VIEW de la base de datos)
 o vistas (que son simplemente una query que conoce la aplicación pero que no generó una VIEW).
 
-En el futuro habrá tablas que no sean originadas en la base de datos, por ejemplo una lista de campos tendría que poder verse en una tabla. 
+En el futuro habrá tablas que no sean originadas en la base de datos, por ejemplo una lista de campos tendría que poder verse en una tabla.
 
 <!--lang:en--]
 
@@ -54,7 +54,7 @@ filterColumns     | [O]  | `[]`                  | lista de objetos de la forma 
 registerImports   | [O]  | (registerImportsDef)  | lista de objetos. Configura opciones para guardar la definicion de los "otros" campos al importar un archivo (*para que funcione **debe existir un campo seteado como "defaultForOtherFields"** (ver fieldDef)*)
 sortColumns       | [O]  | `[]`                  | ordenamiento predeterminado
 detailTables      | [O]  | `[]`                  | lista de tablas que permitirán desplegar subgrillas (estilo maestro/detalle)
-functionDef       | O    | `null`                | definición de SQL paramétrico o funcional 
+functionDef       | O    | `null`                | definición de SQL paramétrico o funcional
 lookupFields      | [T]  | `[f.isName]`          | lista de los nombres de campo que se muestran al desplegar la lista deplegable para elegir
 nameForUpsert     | T    | `null`                | nombre físico de la columna en la tabla usado para el `insert` o `update` en tablas basadas en consultas
 
@@ -80,7 +80,7 @@ orientation | x  |       | cambiar la orientación de la grilla de vertical/hori
 
 sql            | uso
 ---------------|----------------
-postCreateSqls | texto con una o varias sentencias SQL que deben ejecutarse después de la creación. Sirve para agregar constraints que el motor no soporta. 
+postCreateSqls | texto con una o varias sentencias SQL que deben ejecutarse después de la creación. Sirve para agregar constraints que el motor no soporta.
 constraintsDeferred|true equivale a ejecutar SET CONSTRAINTS ALL DEFERRED al comienzo de la transacción al hacer upload
 isTable        |true si es una tabla y por lo tanto hay que hacer el dump para el create table y si se le deben deducir los campos name de sus FK
 insertIfNotUpdate  | false para deshabilitar la inserción de nuevos filas en el archivo excel que se está importando (pk no presente en la BD)
@@ -233,7 +233,7 @@ property              | type | default value   | use
 ----------------------|------|-----------------|-------------------
 name                  | T    | null            | nombre de la secuencia
 firstValue            | Number | 1             | primer número de la secuencia
-prefix                | T    | null            | prefijo de la secuencia 
+prefix                | T    | null            | prefijo de la secuencia
 
 <!--lang:en--]
 
@@ -294,14 +294,14 @@ Y Llamamos que la tabla es funcional cuando el `tableName` es el nombre de una f
 
 propiedad  | tipo               | uso
 -----------|--------------------|-----
-parameters | [{name, typeName}] | 
+parameters | [{name, typeName}] |
 
 
 <!--lang:en--]
 
 property   | type               | usage
 -----------|--------------------|-----
-parameters | [{name, typeName}] | 
+parameters | [{name, typeName}] |
 
 
 [!--lang:*-->
@@ -316,7 +316,7 @@ propiedad | uso
 ----------|-------------------
 db        | la base de datos. En principo es solo para usar quoteIdent, y quoteNullable
 forDump   | indica si se pide la definición para hacer un dump de la base
-user      | objeto con la información del usuario una vez que está logueado. 
+user      | objeto con la información del usuario una vez que está logueado.
 
 
 <!--lang:en--]
@@ -340,7 +340,7 @@ module.exports = function(context){
             update:context.user.rol==='boss',
         },
         registerImports:{
-            inTable:'other_fields', 
+            inTable:'other_fields',
             fieldNames:{
                 originalFileName:'original_filename',
                 serverPath:'server_filepath',

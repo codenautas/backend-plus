@@ -1,4 +1,4 @@
-﻿create user beplus_example_user password 'beplus_example_3948812bdz';
+create user beplus_example_user password 'beplus_example_3948812bdz';
 create database beplus_example_db owner beplus_example_user;
 \c beplus_example_db
 
@@ -47,7 +47,7 @@ imagenatras    text       ,
 miniatura      text       ,
 observaciones  text       ,
 costo          integer    ,
-notas          text    
+notas          text
 );
 alter table fichas owner to beplus_example_user;
 

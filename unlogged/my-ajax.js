@@ -24,7 +24,7 @@
 var myAjax = {};
 /*jshint +W004 */
 
-/** 
+/**
  *  @param {any} x
  *  @returns {any}
  */
@@ -35,7 +35,7 @@ function requireIfExists(moduleName){
         return {}
     }
     try{
-        // eslint-disable-next-line 
+        // eslint-disable-next-line
         return require(moduleName);
     }catch(err){
         return {};
@@ -418,8 +418,8 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
 
 myAjax.encoders = {
     JSON: { parse: JSON.parse, stringify: JSON.stringify },
-    plain: { 
-        parse: function(x){return x;}, 
+    plain: {
+        parse: function(x){return x;},
         stringify: function(x){
             if(typeof x === "object" /* && !(x instanceof FileList)*/){
                 throw new Error("Invalid plain type "+(x==null?value:typeof x)+" detected");
@@ -497,10 +497,10 @@ myAjax.path={
 }
 
 /**
- * 
- * @param {HTMLElement} div 
- * @param {any} o 
- * @param {string} a 
+ *
+ * @param {HTMLElement} div
+ * @param {any} o
+ * @param {string} a
  */
 function agregar_json_default_ubicaciones(div, o, a){
     //@ts-ignore
@@ -526,7 +526,7 @@ function agregar_json_default_ubicaciones(div, o, a){
 }
 
 /**
- * 
+ *
  * @param {HTMLTableDataElement} td
  * @param {string|number} text
  * @param {string} className
@@ -545,25 +545,25 @@ function containsObjectsWithTheSameColumns(o){
     if (!keys.length) return false;
     var separator = Math.random();
     var colNamesFirstObject = Object.keys(o[keys[0]]).join(separator);
-    return !keys.find(k => 
+    return !keys.find(k =>
         o[k] == null || !(o[k] instanceof Object) || Object.keys(o[k]).join(separator) != colNamesFirstObject
     );
 }
 /* test
 var cases = [
     [false, {}],
-    [false, {a:"hola"}], 
-    [false, {a:{a:1, b:2, c:2}, b:{a:1, x:2, c:2}}], 
+    [false, {a:"hola"}],
+    [false, {a:{a:1, b:2, c:2}, b:{a:1, x:2, c:2}}],
     [true , {a:{a:1, b:2, c:2}, b:{a:1, b:2, c:2}}]
 ];
 cases.forEach(([expected, param]) => console.log(param, containsObjectsWithTheSameColumns(param), containsObjectsWithTheSameColumns(param) == expected ? 'ok' : 'fail'))
 */
 
 /**
- * 
- * @param {HTMLElement} div 
- * @param {any} o 
- * @param {(div:HTMLElement, o:any, a:string)=>{title:HTMLElement|null, data:HTMLElement, skip:boolean|null}=(div,o,a)} ubicaciones 
+ *
+ * @param {HTMLElement} div
+ * @param {any} o
+ * @param {(div:HTMLElement, o:any, a:string)=>{title:HTMLElement|null, data:HTMLElement, skip:boolean|null}=(div,o,a)} ubicaciones
  */
 function agregar_json(div, o, ubicaciones=agregar_json_default_ubicaciones){
     if(o == null){
@@ -581,7 +581,7 @@ function agregar_json(div, o, ubicaciones=agregar_json_default_ubicaciones){
                 if(o[a]!=null){
                     var row = table.insertRow(-1);
                     var cellName = row.insertCell(-1);
-                    agregar_class_textInDiv(cellName, 'row-num', Array.isArray(o) && !isNaN(a) ? Number(a)+1 : a); 
+                    agregar_class_textInDiv(cellName, 'row-num', Array.isArray(o) && !isNaN(a) ? Number(a)+1 : a);
                     agregar_json(row, o[a], function(div, _o, a){
                         // @ts-ignore sé que es Row
                         /** @type {HTMLTableRowElement} */
@@ -609,9 +609,9 @@ function agregar_json(div, o, ubicaciones=agregar_json_default_ubicaciones){
                 if(!cells.skip){
                     if(cells.title){
                         if(o instanceof Array && !isNaN(a)){
-                            agregar_class_textInDiv(cells.title, 'row-num', Number(a) + 1); 
+                            agregar_class_textInDiv(cells.title, 'row-num', Number(a) + 1);
                         }else{
-                            agregar_class_textInDiv(cells.title, 'attr-name', a); 
+                            agregar_class_textInDiv(cells.title, 'attr-name', a);
                         }
                     }
                     agregar_json(cells.data, o[a]);
@@ -728,7 +728,7 @@ myAjax.menuSeparator = '#';
 Object.defineProperty(myAjax, 'menup', {
     get:function(){
         var menuName = my.offline.mode?'ext':this.menuName;
-        return menuName+this.menuSeparator; 
+        return menuName+this.menuSeparator;
     }
 });
 

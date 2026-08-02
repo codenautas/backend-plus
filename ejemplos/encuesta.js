@@ -32,7 +32,7 @@ class AppEncuesta extends backendPlus.AppBackend{
         return {
             titulo:{
                 completar: function completar(){
-                    
+
                 }
             },
             pregunta:{
@@ -95,13 +95,13 @@ class AppEncuesta extends backendPlus.AppBackend{
             },
             matriz:{
                 completar: function completar(){
-                    
+
                 }
             },
             especial:{
                 completar: function completar(){}
             }
-        }; 
+        };
     }
     readStructure(fileName){
         var be = this;
@@ -120,7 +120,7 @@ class AppEncuesta extends backendPlus.AppBackend{
                 }else{
                     be.almacenVacio.formularios[idFormulario]={registro: be.registrosVacios[idFormulario]};
                 }
-                
+
                 formulario.celdas = formulario.celdas.reduce(function(nuevoArreglo ,celda){
                     if(!celda.tipo){
                         for(var tipoCelda in be.tipoCeldas()){
@@ -132,7 +132,7 @@ class AppEncuesta extends backendPlus.AppBackend{
                         }
                     }
                     var defTipoCelda = be.tipoCeldas()[celda.tipo];
-                    
+
                     if(!defTipoCelda){
                         if(!celda.tipo){
                             /*jshint forin: false */
@@ -156,7 +156,7 @@ class AppEncuesta extends backendPlus.AppBackend{
             });
             estructura.registrosVacios=be.registrosVacios;
             return estructura;
-            
+
         });
     };
     postConfig(){
@@ -171,7 +171,7 @@ class AppEncuesta extends backendPlus.AppBackend{
             return client.query("BEGIN TRANSACTION").execute();
         }).then(function() {
             return client.query("LOCK TABLE bep.datos").execute();
-        }).then(function() {            
+        }).then(function() {
             return client.query("SELECT id, contenido, estado FROM bep.datos WHERE id = $1",[id]).fetchOneRowIfExists();
         }).then(function(data) {
             if(data.rowCount == 0) {
@@ -321,7 +321,7 @@ class AppEncuesta extends backendPlus.AppBackend{
             }).catch(function(err){
                 console.log(err.message);
             });
-            
+
         });
         this.app.post('/metadatos/reescribir',function(req,res){
             var contenido=req.body.contenido;

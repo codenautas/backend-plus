@@ -71,7 +71,7 @@ sql                | usage
 -------------------|----------------
 postCreateSqls     | (see Spanish)
 isTable            | (see Spanish)
-insertIfNotUpdate  | for excel import you can *disable insertion of new rows present in excel* (pk not in DB) by setting in false this property 
+insertIfNotUpdate  | for excel import you can *disable insertion of new rows present in excel* (pk not in DB) by setting in false this property
 
 
 ## fieldDef
@@ -146,7 +146,7 @@ module.exports = function(context){
             update:context.user.rol==='boss',
         },
         registerImports:{
-            inTable:'other_fields', 
+            inTable:'other_fields',
             fieldNames:{
                 originalFileName:'original_filename',
                 serverPath:'server_filepath',

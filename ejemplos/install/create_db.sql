@@ -1,4 +1,4 @@
-﻿create user beplus_example_user password 'beplus_example_3948812bdz';
+create user beplus_example_user password 'beplus_example_3948812bdz';
 create database beplus_example_db owner beplus_example_user;
 \c beplus_example_db
 
@@ -24,15 +24,15 @@ CREATE TABLE bep.datos(
   modif timestamp default current_timestamp,
   modiu text default user
 );
-ALTER TABLE bep.datos 
+ALTER TABLE bep.datos
   OWNER TO beplus_example_user;
 
-  
-insert into bep.users 
+
+insert into bep.users
   select 'ejemplo'||n, md5(n||'ejemplo'||n), 'test', ('{"enc":'||n||',"for":"EJEMPLO"}')::jsonb
     from generate_series(1,200) n;
 
-insert into bep.users 
+insert into bep.users
   select 'trac'||n, md5(n||'trac'||n), 'test', ('{"enc":'||n||',"for":"TRAC"}')::jsonb
     from generate_series(1,200) n;
 

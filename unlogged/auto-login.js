@@ -50,4 +50,4 @@ window.addEventListener('load',function(){
     }else{
         controlar_compatibilidad();
     }
-})    
+})

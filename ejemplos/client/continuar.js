@@ -5,7 +5,7 @@ function classToggle(element,clase, sacoAgrego ){
         element.classList.add(clase);
     }else{
         element.classList.remove(clase);
-    } 
+    }
 }
 
 function dropAllChilds(element){
@@ -141,7 +141,7 @@ function presentarFormulario(result, idFormulario, orden){
             if(celda.aclaracion){
                 contenidoCelda.push(html.div({"class":"aclaracion"},celda.aclaracion));
             }
-                
+
         }
         var divCelda;
         if(celda.tipo=='pregunta'){
@@ -221,7 +221,7 @@ function presentarFormulario(result, idFormulario, orden){
     pantalla.appendChild(divFormulario);
     pantalla.appendChild(html.input({
         type:"button",
-        id:"botonFin", 
+        id:"botonFin",
         value:result.status.siguiente.formulario?"Continuar":"Finalizar"
     }).create());
     return luego.then(function(){
@@ -353,4 +353,3 @@ function alCargarOCambiarHash(event){
 window.addEventListener("load",alCargarOCambiarHash);
 window.addEventListener("hashchange",alCargarOCambiarHash);
 window.addEventListener("popstate",alCargarOCambiarHash);
-

@@ -248,7 +248,7 @@ myOwn.getStructuresToRegisterInLdb = function getStructuresToRegisterInLdb(paren
                 var dummyElement = html.div().create();
                 var Connector = my.TableConnector;
                 var connector = new Connector({
-                    my:my, 
+                    my:my,
                     tableName: tableName,
                     getElementToDisplayCount:function(){ return dummyElement }
                 });
@@ -264,7 +264,7 @@ myOwn.getStructuresToRegisterInLdb = function getStructuresToRegisterInLdb(paren
             var dummyElement = html.div().create();
             var Connector = my.TableConnector;
             var connector = new Connector({
-                my:my, 
+                my:my,
                 tableName: foreignKey.references,
                 getElementToDisplayCount:function(){ return dummyElement }
             });
@@ -305,8 +305,8 @@ myOwn.TableConnector = function(context, opts){
 
 myOwn.TableConnector.prototype.getStructure = function getStructure(opts){
     var opts = changing({
-        registerInLocalDB: false, 
-        waitForFreshStructure: false 
+        registerInLocalDB: false,
+        waitForFreshStructure: false
     }, opts || {});
     var connector = this;
     var my = connector.my;
@@ -337,7 +337,7 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(opts){
         connector.whenStructureReady = canContinue.then(function(){
             return my.getStructureFromLocalDb(connector.tableName);
         }).then(function(tableDef){
-            if(!tableDef){ 
+            if(!tableDef){
                 return structureFromBackend;
             }
             connector.localDef = connector.def = changing(tableDef, connector.opts.tableDef||{});
@@ -384,7 +384,7 @@ myOwn.TableConnector.prototype.deleteRecord = function deleteRecord(depot, opts)
     return (depot.primaryKeyValues===false?
         Promise.resolve():
         depot.my.ajax.table_record_delete({
-            table:depot.def.name, 
+            table:depot.def.name,
             primaryKeyValues:depot.primaryKeyValues,
             launcher:opts.launcher
         }).then(function(){
@@ -419,7 +419,7 @@ myOwn.TableConnector.prototype.recordEnter = function recordEnter(depot){
     return (!this.my.config.cursor || depot.primaryKeyValues===false?
         Promise.resolve():
         depot.my.ajax.table_record_enter({
-            table:depot.def.name, 
+            table:depot.def.name,
             primaryKeyValues:depot.primaryKeyValues
         })
     );
@@ -428,7 +428,7 @@ myOwn.TableConnector.prototype.recordLeave = function recordLeave(depot){
     return (!this.my.config.cursor || depot.primaryKeyValues===false?
         Promise.resolve():
         depot.my.ajax.table_record_leave({
-            table:depot.def.name, 
+            table:depot.def.name,
             primaryKeyValues:depot.primaryKeyValues
         })
     );
@@ -445,7 +445,7 @@ myOwn.TableConnectorLocal = function(context, opts){
     connector.opts = opts||{};
     connector.fixedFields = connector.opts.fixedFields || [];
     connector.fixedField = {};
-    connector.pick = connector.opts.pick;    
+    connector.pick = connector.opts.pick;
     connector.hideBecauseRelated = {};
     connector.fixedFields.forEach(function(pair){
         if(!pair.range && !pair.until && pair.value != myOwn.skipInFixedFields){
@@ -461,7 +461,7 @@ myOwn.TableConnectorLocal = function(context, opts){
 myOwn.TableConnectorLocal.prototype.getStructure = function getStructure(){
     var connector = this;
     connector.whenStructureReady = my.getStructureFromLocalDb(connector.tableName).then(function(tableDef){
-        if(!tableDef){ 
+        if(!tableDef){
             var err = new Error();
             err.code='NO-STRUCTURE';
             throw err;
@@ -587,8 +587,8 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
     grid.detailingPath=opts.detailingPath;
     var Connector = my.offline.mode?my.TableConnectorLocal:my.TableConnector;
     grid.connector = new Connector({
-        my:this, 
-        tableName: tableName, 
+        my:this,
+        tableName: tableName,
         getElementToDisplayCount:function(){ return (grid.dom.footInfo||{}).displayTo||html.div().create(); }
     }, opts);
     var preparing = grid.prepareAndDisplayGrid().then(function(){
@@ -661,9 +661,9 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                                 changeIoStatus(depot,'ok', depot.row);
                             },3000);
                         }
-                    } else if (depot) { 
+                    } else if (depot) {
                         if (!sameValue(JSON.stringify(row),JSON.stringify(depot.row))) {
-                            //grid.retrieveRowAndRefresh(depot); 
+                            //grid.retrieveRowAndRefresh(depot);
                             if(depot.tr){
                                 grid.depotRefresh(depot,{updatedRow:row, sendedForUpdate:{}},{noDispatchEvents:true});
                             }
@@ -676,7 +676,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                     var depotsToDisplay = grid.filterDepots(grid.depots);
                     var depotsToDelete = depotsToDisplay.filter(depot => depot.tick != tick);
                     var depot;
-                    if (myOwn.config.config['grid-row-retain-moved-or-deleted'] && !force) { 
+                    if (myOwn.config.config['grid-row-retain-moved-or-deleted'] && !force) {
                         var depotsToRetain = grid.depots.filter(depot => depot.tick == tick);
                         for (depot of depotsToRetain) {
                             depot['$refreshed'] = false
@@ -684,8 +684,8 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                         }
                     }
                     while (depot = depotsToDelete.pop()) {
-                        depot.manager.displayAsDeleted(depot, force ? 'change-ff' : 'unknown'); 
-                        if (myOwn.config.config['grid-row-retain-moved-or-deleted']) { 
+                        depot.manager.displayAsDeleted(depot, force ? 'change-ff' : 'unknown');
+                        if (myOwn.config.config['grid-row-retain-moved-or-deleted']) {
                             if(!depot['$refreshed']){
                                 grid.retrieveRowAndRefresh(depot,{retrieveIgnoringWhere:true})
                                 depot['$refreshed'] = true
@@ -744,7 +744,7 @@ myOwn.TableGrid.prototype.createDepotFromRow = function createDepotFromRow(row, 
     var depot = {
         my: grid.my,
         def: grid.def,
-        connector: grid.connector, 
+        connector: grid.connector,
         manager: grid,
         rowControls:{},
         row: row,
@@ -956,7 +956,7 @@ myOwn.DataColumnGrid.prototype.cellAttributes = function cellAttributes(specific
     }
     return attr;
 }
-    
+
 myOwn.DataColumnGrid.prototype.th = function th(){
     var fieldDef = this.fieldDef;
     var grid = this.grid;
@@ -1098,11 +1098,11 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
                 if (fieldDef.references) {
                     promiseChain = promiseChain.then(
                         grid.setInheritedFields(depot, function(fkDef){
-                            return fkDef.references == fieldDef.references && 
+                            return fkDef.references == fieldDef.references &&
                             fkDef.fields.find(function(field){
                                 return field.source == fieldDef.name
                             }) &&
-                            fkDef.displayFields.length >= 0 
+                            fkDef.displayFields.length >= 0
                         }
                     ));
                 }
@@ -1205,7 +1205,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
         if(!event.ctrlKey && event.button!=1){
             event.preventDefault();
         }
-        detailControl.displayDetailGrid({fixedFields:fixedFields, detailing:{}},event);    
+        detailControl.displayDetailGrid({fixedFields:fixedFields, detailing:{}},event);
     }
     detailControl.forceDisplayDetailGrid = function(opts){
         if(detailControl.show){
@@ -1217,7 +1217,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
     detailControl.refreshDetailGrid = function(opts){
         var detailControl=this;
         if(detailControl.show){
-            
+
         }
     }
     detailControl.displayDetailGrid = function(opts,event){
@@ -1253,8 +1253,8 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
                     wScreen.mainAction(params,divGrid);
                 }else{
                     result = grid.my.tableGrid(detailTableDef.table, divGrid, {
-                        fixedFields: fixedFields, 
-                        detailing:opts.detailing, 
+                        fixedFields: fixedFields,
+                        detailing:opts.detailing,
                         detailingForUrl:grid.detailingForUrl,
                         detailingPath:(grid.detailingPath||[]).concat(depot.lastsPrimaryKeyValues),
                         parentDepot: depot
@@ -1415,7 +1415,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                 grid.hideColumnsViaCss();
             });
             selectColumnsToShowElement.addEventListener('change',function(){
-                var listOptionsToShow=Array.prototype.slice.call(selectColumnsToShowElement.selectedOptions); 
+                var listOptionsToShow=Array.prototype.slice.call(selectColumnsToShowElement.selectedOptions);
                 listOptionsToShow.forEach(function(option) {
                     grid.view.hiddenColumns.splice(grid.view.hiddenColumns.indexOf(option.value),1);
                     selectColumnsToShowElement.removeChild(option);
@@ -1450,9 +1450,9 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
         var messages = {};
         menuOptions.push(
             myOwn.dialogUpload(
-                'table_upload', 
+                'table_upload',
                 {
-                    table:grid.def.name, 
+                    table:grid.def.name,
                     prefilledFields:grid.connector.fixedFields,
                     skipUnknownFieldsAtImport:null
                 },
@@ -1533,8 +1533,8 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
         })
     );
     menuOptions.push({
-        img:my.path.img+'filtered-complete-table.png', 
-        label:my.messages.filteredCompleteTable, 
+        img:my.path.img+'filtered-complete-table.png',
+        label:my.messages.filteredCompleteTable,
         href:urlFilteredCompleteTable,
         showPage:my.showPage,
     });
@@ -1577,14 +1577,14 @@ myOwn.dialogDownload = function dialogDownload(grid){
             html.div({class:'state-preparing'}, [
                 html.div(my.messages.preparingForExport),
                 html.img({
-                    class:'img-preparing', 
-                    src:'img/preparing.png', 
-                    alt:my.messages.preparingForExport, 
-                    title:my.messages.preparingForExport, 
+                    class:'img-preparing',
+                    src:'img/preparing.png',
+                    alt:my.messages.preparingForExport,
+                    title:my.messages.preparingForExport,
                 }),
             ]),
             html.div({class:'state-ready'}, [downloadElement]),
-            html.div('.'), 
+            html.div('.'),
         ]).create();
         dialogWindow.appendChild(mainDiv);
         var fieldsDef2Export=[];
@@ -1596,9 +1596,9 @@ myOwn.dialogDownload = function dialogDownload(grid){
         var prepare=function(){
             mainDiv.setAttribute("current-state", "preparing");
             setTimeout(function(){
-                fieldsDef2Export=grid.def.fields.filter(function(fieldDef){ 
-                    return (fieldDef.inTable!==false || input.fromOtherTables.checked) 
-                        && fieldDef.visible 
+                fieldsDef2Export=grid.def.fields.filter(function(fieldDef){
+                    return (fieldDef.inTable!==false || input.fromOtherTables.checked)
+                        && fieldDef.visible
                         && (fieldDef.allow.update || input.readOnly.checked || fieldDef.isPk)
                         && (!grid.view.hiddenColumns.includes(fieldDef.name) || input.hiddens.checked);
                 });
@@ -1607,7 +1607,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
                 }else{
                     if(input.csv.checked){
                         separator=',';
-                        replacer=function(txt){ 
+                        replacer=function(txt){
                             return /[\n,"]/.test(txt)?'"'+txt.replace(/"/g,'""')+'"':txt
                         }
                         dotExtension='.csv';
@@ -1619,7 +1619,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
                             '\r':'\\r',
                             '\n':'\\n',
                         }
-                        replacer=function(txt){ 
+                        replacer=function(txt){
                             return txt.replace(/[|\\\r\n]/g,function(char){
                                 return trans[char];
                             })
@@ -1651,7 +1651,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
                 }));
             });
             var blob = new Blob([data.map(function(line){return line.map(replacer).join(separator)}).join('\r\n')], {type: 'text/plain'});
-            var url = URL.createObjectURL(blob); 
+            var url = URL.createObjectURL(blob);
             downloadElement.href=url;
             downloadElement.setAttribute("download", grid.def.name+dotExtension);
             mainDiv.setAttribute("current-state", "ready");
@@ -1742,7 +1742,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
             var wbFile = XLSX.write(wb, {bookType:'xlsx', bookSST:false, type: 'binary', cellDates:true});
             var blob = new Blob([s2ab(wbFile)],{type:"application/octet-stream"});
             mainDiv.setAttribute("current-state", "ready");
-            var url = URL.createObjectURL(blob); 
+            var url = URL.createObjectURL(blob);
             downloadElement.href=url;
             downloadElement.setAttribute("download", grid.def.name+".xlsx");
         };
@@ -1824,7 +1824,7 @@ myOwn.dialogUpload = function dialogUpload(ajaxPath, ajaxParams, ajaxPrepareResu
         });
         simpleFormPromise({elementsList:[
             messages.importDataFromFile,
-            buttonFile, 
+            buttonFile,
             ...(optsNames.map(name => html.label([html.br(), buttons[name], messages[name]]).create())),
             html.br().create(),
             buttonConfirmImport,
@@ -2052,7 +2052,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     ]).create();
     grid.prepareMenu(buttonMenu);
     grid.columns=[new my.ActionColumnGrid({
-        grid:grid, 
+        grid:grid,
         actions:[
             /*buttonInsert,*//*buttonSaveMode,*/buttonCreateFilter,buttonCreateFilterAdd,buttonDestroyFilter,
             buttonOrientation,
@@ -2069,8 +2069,8 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     //     [new my.SpecialColumnGrid({class:"empty-right-column"})]
     );
     if(grid.modes.withColumnDetails==null){
-        grid.modes.withColumnDetails=grid.def.fields.some(function(fieldDef){ 
-            return fieldDef.label!=fieldDef.title; 
+        grid.modes.withColumnDetails=grid.def.fields.some(function(fieldDef){
+            return fieldDef.label!=fieldDef.title;
         });
     }
     if(grid.vertical){
@@ -2087,7 +2087,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
             elementInfo[info.name] = html.span(info.value).create();
             elementInfo.appendChild(elementInfo[info.name]);
         });
-        elementInfo.displayTo.textContent = my.messages.loading;    
+        elementInfo.displayTo.textContent = my.messages.loading;
     }
     grid.dom.headInfo = html.th({class: 'head-info', colspan:grid.columns.length-1, "is-processing":"1"}).create();
     createInfoColumnStructure(grid.dom.headInfo);
@@ -2116,11 +2116,11 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
         grid.dom.table = html.table({"class":"my-grid", "my-table": grid.actualName},[
             grid.dom.caption,
             html.tbody(
-                grid.columns.map(function(column){ 
+                grid.columns.map(function(column){
                     return html.tr([
                         column.th(),
                         grid.modes.withColumnDetails?html.tr(grid.columns.map(function(column){ return column.thDetail(); })):null
-                    ]); 
+                    ]);
                 })
             ),
             html.tfoot([
@@ -2159,7 +2159,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
             var dummyElement = html.div().create();
             var Connector = my.offline.mode?my.TableConnectorLocal:my.TableConnector;
             var myConnector = new Connector({
-                my:my, 
+                my:my,
                 tableName: fkDef.references,
                 getElementToDisplayCount:function(){ return dummyElement }
             }, {fixedFields: fixedFields});
@@ -2187,7 +2187,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
 
 myOwn.specialDefaultValue={
     current_date:function(){ return myOwn.config.currentDate||bestGlobals.date.today(); },
-    next_number:function(fieldName, aboveDepot, belowDepot){ 
+    next_number:function(fieldName, aboveDepot, belowDepot){
         var manager = aboveDepot.manager ?? belowDepot.manager
         if(!manager){
             return 1;
@@ -2202,7 +2202,7 @@ myOwn.specialDefaultValue={
         }
         return belowDepot.row[fieldName]?belowDepot.row[fieldName]+1:(
             aboveDepot.row[fieldName]?aboveDepot.row[fieldName]-1:1
-        ); 
+        );
     },
     current_user: function specialDefaultValueCurrentUser(){
         return my.config.username;
@@ -2239,7 +2239,7 @@ myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElem
         }
         /*
         while(
-            position<grid.dom.table.tBodies[0].rows.length && 
+            position<grid.dom.table.tBodies[0].rows.length &&
             grid.dom.table.tBodies[0].rows[position].isDetail
         ){
             position++;
@@ -2296,10 +2296,10 @@ var changeIoStatus = function changeIoStatus(depot,newStatus, objectWithFieldsOr
     var fieldNames=typeof objectWithFieldsOrListOfFieldNames === "string"?[objectWithFieldsOrListOfFieldNames]:(
         objectWithFieldsOrListOfFieldNames instanceof Array?objectWithFieldsOrListOfFieldNames:Object.keys(objectWithFieldsOrListOfFieldNames)
     );
-    fieldNames.forEach(function(name){ 
+    fieldNames.forEach(function(name){
         if(depot.rowControls[name]){
             var td=depot.rowControls[name];
-            td.setAttribute('io-status', newStatus); 
+            td.setAttribute('io-status', newStatus);
             if(title){
                 td.title=title;
             }else{
@@ -2365,8 +2365,8 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             if(depot.status==='new'){
                 var specialMandatories=grid.def.specialValidator?myOwn.validators[grid.def.specialValidator].getMandatoryMap(depot.row):{};
                 var mandatoryOmitted=function(fieldDef){
-                    return (specialMandatories[fieldDef.name] || fieldDef.nullable!==true && fieldDef.isPk || fieldDef.nullable===false) 
-                        && depot.row[fieldDef.name]==null 
+                    return (specialMandatories[fieldDef.name] || fieldDef.nullable!==true && fieldDef.isPk || fieldDef.nullable===false)
+                        && depot.row[fieldDef.name]==null
                         && (grid.connector.fixedFields.find(function(pair){
                                 return !pair.range && !pair.until && pair.fieldName===fieldDef.name
                             })||{}).value == null
@@ -2393,7 +2393,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         // var sendedForUpdate = depot.my.cloneRow(depot.rowPendingForUpdate);
         return my.ajax.table_data({
             table:depot.def.name,
-            fixedFields:grid.def.primaryKey.map(function(fieldName, i){ 
+            fixedFields:grid.def.primaryKey.map(function(fieldName, i){
                 return {fieldName:fieldName, value:depot.primaryKeyValues[i]};
             }),
             pick:grid.def.pick,
@@ -2405,8 +2405,8 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
     grid.setRowStyle = function setRowStyle(depot, row, skipUpdateStatus){
         if(!skipUpdateStatus){
             depot.status = 'loaded';
-            depot.primaryKeyValues = grid.def.primaryKey.map(function(fieldName){ 
-                return depot.row[fieldName]; 
+            depot.primaryKeyValues = grid.def.primaryKey.map(function(fieldName){
+                return depot.row[fieldName];
             });
             /*
             depot.lastsPrimaryKeyValues = depot.primaryKeyValues.slice(0);
@@ -2423,7 +2423,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 depot.lastsPrimaryKeyValues=JSON.stringify(depot.lastsPrimaryKeyValues);
             }
             depot.tr.setAttribute('pk-values',JSON.stringify(depot.primaryKeyValues));
-            grid.def.layout.styleColumns.forEach(function(fieldName){ 
+            grid.def.layout.styleColumns.forEach(function(fieldName){
                 depot.tr.setAttribute('column-'+fieldName,JSON.stringify(depot.row[fieldName]));
             });
         }
@@ -2464,15 +2464,15 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                         },3000,fieldName);
                         /*jshint loopfunc: false */
                     }else if(sameValue(retrievedRow[fieldName], source[fieldName])){
-                        // ok, si bien lo que viene no coincide con lo pendiente que sigue pendiente, 
-                        // sí coincide con lo que estaba antes de mandar a grabar, 
+                        // ok, si bien lo que viene no coincide con lo pendiente que sigue pendiente,
+                        // sí coincide con lo que estaba antes de mandar a grabar,
                         // entonces no hay conflicto el usuario sabe sobre qué está modificando
                         //REVISAR SI SE QUIERE REVERTIR
                     }else{
-                        // no coincide con lo pendiente ni con lo anterior, 
+                        // no coincide con lo pendiente ni con lo anterior,
                         // hay un conflicto con el conocimiento del usuario que modificó algo que estaba en otro estado
-                        changeIoStatus(depot,'write-read-conflict', 
-                            fieldName, 
+                        changeIoStatus(depot,'write-read-conflict',
+                            fieldName,
                             myOwn.messages.anotherUserChangedTheRow+'. \n'+
                             myOwn.messages.oldValue+': '+source[fieldName]+(
                                 whenMergeOverride?'':'\n'+myOwn.messages.actualValueInDB+': '+retrievedRow[fieldName]
@@ -2513,7 +2513,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         }
         grid.refreshAggregates();
         for(var detailControl in depot.detailControls){
-            if(depot.detailControls[detailControl].tr){                
+            if(depot.detailControls[detailControl].tr){
                 depot.detailControls[detailControl].refreshAllRowsInGrid()
             }
         };
@@ -2532,7 +2532,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             tr=grid.dom.table.rows[0];
             depot.colNumber = grid.dom.table.rows[0].childNodes.length;
         }else{
-            tr = grid.my.insertRow({section:tbody, iRow:iRow, smooth:depot.status==='new'?{ 
+            tr = grid.my.insertRow({section:tbody, iRow:iRow, smooth:depot.status==='new'?{
                 colCount:grid.def.detailTables.length + grid.def.fields.length
             }:false});
         }
@@ -2542,11 +2542,11 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             return column.fieldDef?column.fieldDef.visible:true
         }).forEach(function(column, iColumn){
             tr.appendChild(column.td(depot, iColumn, tr, saveRow));
-            if(grid.vertical){ 
+            if(grid.vertical){
                 tr = tr.nextSibling;
             }
         });
-        if(!grid.vertical){ 
+        if(!grid.vertical){
             tr.addEventListener('focusout', function(event){
                 tr.removeAttribute('current_line');
                 if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
@@ -2611,7 +2611,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             special: 'filter',
             my: grid.my,
             def: grid.def,
-            connector: grid.connector, 
+            connector: grid.connector,
             manager: grid,
             rowControls:{},
             row: {},
@@ -2679,7 +2679,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         var depotsToDisplay = grid.filterDepots(grid.depots);
         grid.sortDepotsToDisplay = function sortDepotsToDisplay(depotsToDisplay){
             if(grid.view.sortColumns.length>0){
-                return depotsToDisplay.sort(function(depot1, depot2){ 
+                return depotsToDisplay.sort(function(depot1, depot2){
                     grid.view.sortColumns.forEach(function(orderColumn){
                         if(!grid.def.field[orderColumn.column]){
                             my.log(orderColumn.column+' order no está en '+grid.def.name);
@@ -2774,7 +2774,7 @@ myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot, mo
     var grid = this;
     var fast = mode == 'change-ff'
     if (mode == 'unknown' && myOwn.config.config['grid-row-retain-moved-or-deleted']) {
-        depot.tr.setAttribute('not-here', 'yes'); 
+        depot.tr.setAttribute('not-here', 'yes');
     } else {
         var position = depot.tr ? Math.min(grid.depots.length,Math.max(0,depot.tr.sectionRowIndex)) : 0;
         if(grid.depots[position] !== depot){
@@ -2816,7 +2816,7 @@ myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot, mo
 
 myOwn.confirmDelete=function confirmDelete(depot, opts){
     return depot.my.showQuestion(
-        depot.my.messages.Delete+' '+(depot.primaryKeyValues === false ? depot.my.messages.newUnsavedRow : JSON.stringify(depot.primaryKeyValues))+' ?', 
+        depot.my.messages.Delete+' '+(depot.primaryKeyValues === false ? depot.my.messages.newUnsavedRow : JSON.stringify(depot.primaryKeyValues))+' ?',
         {askForNoRepeat:depot.my.messages.Delete+', '+depot.def.name}
     );
 }
@@ -2982,10 +2982,10 @@ myOwn.getReference = function getReference(referenceName, opts){
     var reference={};
     if(!my.references[referenceName] || opts.fixedFields.length){
         var dummyElement = html.div().create();
-        var Connector = my.offline.mode?my.TableConnectorLocal:my.TableConnector; 
+        var Connector = my.offline.mode?my.TableConnectorLocal:my.TableConnector;
         var connector=new Connector({
-            my:my, 
-            tableName: referenceName, 
+            my:my,
+            tableName: referenceName,
             getElementToDisplayCount:function(){ return dummyElement; },
             activeOnly: true
         }, {fixedFields:opts.fixedFields});
@@ -3024,7 +3024,7 @@ myOwn.autoSetupFunctions.push(function autoSetupMyTables(){
 myOwn.ExpanderJsonReadOnly={
     autoExpand:true,
     whenReadOnly:true,
-    whenType: function(typedControl){ 
+    whenType: function(typedControl){
         var typeInfo = typedControl.controledType.typeInfo;
         return typeInfo.typeName === 'jsonb';
     },
@@ -3055,7 +3055,7 @@ myOwn.ExpanderJsonReadOnly={
 }
 myOwn.ExpanderReferences={
     autoExpand:true,
-    whenType: function(typedControl){ 
+    whenType: function(typedControl){
         var typeInfo = typedControl.controledType.typeInfo;
         return typeInfo.references && !typeInfo.skipReferenceLookup;
     },
@@ -3140,7 +3140,7 @@ myOwn.ExpanderReferences={
                             attributes: {'allow-write': true}
                         }
                     }).then(function(text){
-                        typedControl.setTypedValue(text||null, true);    
+                        typedControl.setTypedValue(text||null, true);
                     }).catch(function(err){
                         if(!DialogPromise){
                             return alertPromise(err.message);

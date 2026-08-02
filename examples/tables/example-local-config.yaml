@@ -8,11 +8,11 @@ login:
     secret: false
     allowHttpLogin: true
 devel:
-  forceShowAsEditable: true    
+  forceShowAsEditable: true
 client-setup:
   skin: "confort"
   lang: es
-server:  
+server:
   skins:
     confort:
       local-path: ../backend-skins/dist/

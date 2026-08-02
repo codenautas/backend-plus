@@ -17,7 +17,7 @@ const bestGlobals = require("best-globals");
         status: 'retrieved'
     },
     expected: {
-        command: 'UPDATE', 
+        command: 'UPDATE',
         row: {id_type: 'passport',id: 123456,first_name: 'Bob' ,last_name: 'Smith',birth_date: null ,salary: null },
     }
 },{
@@ -32,7 +32,7 @@ const bestGlobals = require("best-globals");
         status: 'retrieved'
     },
     expected: {
-        command: 'UPDATE', 
+        command: 'UPDATE',
         row: {id_type: 'passport',id: 123456,first_name: 'Bob' ,last_name: 'Smith',birth_date: bestGlobals.date.ymd(1990,1,8),salary: null },
     },
     then:[
@@ -43,7 +43,7 @@ const bestGlobals = require("best-globals");
                 {id_type: "card"    , id: 654213,first_name: "Mary",last_name: "Gomez",birth_date: null                          , salary: null },
                 {id_type: 'passport', id: 123456,first_name: 'Bob' ,last_name: 'Smith',birth_date: bestGlobals.date.ymd(1990,1,8), salary: null },
             ]
-        }        
+        }
     ]
 },{
     // skip: '#25',
@@ -58,7 +58,7 @@ const bestGlobals = require("best-globals");
                 {id_type: "card"    , id: 654213,first_name: "Mary",last_name: "Gomez",birth_date: null                          , salary: null },
                 {id_type: 'passport', id: 123456,first_name: 'Bob' ,last_name: 'Smith',birth_date: bestGlobals.date.ymd(1990,1,8), salary: null },
             ]
-        }        
+        }
     ]
 },{
     action: 'table_record_save',
@@ -70,7 +70,7 @@ const bestGlobals = require("best-globals");
         status: 'retrieved'
     },
     expected: {
-        command: 'UPDATE', 
+        command: 'UPDATE',
         row: {idn:1, idj:{uno:'dos', tres:'cuatro'}, data: '1,2,3,4'},
     }
 }]

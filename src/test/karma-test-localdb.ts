@@ -301,7 +301,7 @@ describe("websql-db", function(){
         })
     })
 });
-    
+
 
 //
 //describe("local-db-transaction", function(){

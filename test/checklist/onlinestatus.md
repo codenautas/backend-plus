@@ -5,7 +5,7 @@ Los resultados específicos de los tests hechos en javascript para los navegador
 1. Verifique que su pc tenga instalado el software correspondiente:
   * git
   * node
-  * [PostgreSQL server](https://www.postgresql.org/download/ "Descargar PostgreSQL") 
+  * [PostgreSQL server](https://www.postgresql.org/download/ "Descargar PostgreSQL")
 2. Descargue y prepare el proyecto:
   1. git clone https://github.com/codenautas/backend-plus.git
   2. *npm install*
@@ -20,7 +20,7 @@ Los resultados específicos de los tests hechos en javascript para los navegador
   * Elija un botón para ver una grilla, por ejemplo "ptable"
   * Este es el "**Estado A**"
 5. **Lista de estados**
-  
+
   Estado | Descripción | Cómo generarlo | Cómo eliminarlo | Mensaje esperado | Link esperado
   ----|----|----|----|----|----
   **A** | Sin error | El navegador puede ver los datos y modificarlos | n/a | n/a | n/a

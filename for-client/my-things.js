@@ -3,7 +3,7 @@
 /// <reference path="../node_modules/types.d.ts/modules/typed-controls/index.d.ts" />
 //no/ <reference path="../node_modules/types.d.ts/modules/dialog-promise/index.d.ts" />
 /// <reference path="../node_modules/types.d.ts/modules/codenautas-umd/index.d.ts" />
-/* No sabemos cómo referenciar a los tipos escritos en mwOwn/index.d.ts */ 
+/* No sabemos cómo referenciar a los tipos escritos en mwOwn/index.d.ts */
 //NO/ <reference path="../node_modules/types.d.ts/modules/myOwn/index.d.ts" />
 /// <reference path="../node_modules/types.d.ts/modules/myOwn/in-myOwn.d.ts" />
 /// <reference path="./in-backend-plus.d.ts" />
@@ -88,7 +88,7 @@ var LocalDb = require('./my-localdb').LocalDb;
 var WebSqlDb = require('./my-websqldb').WebsqlDb;
 
 
-/** @param {string} name 
+/** @param {string} name
   * @param {number|undefined} version
   * @returns {Promise<IDBDatabase>}
   */
@@ -181,9 +181,9 @@ myOwn.deleteLocalDb = function deleteLocalDb(){
         try{
             switch(gridBuffer) {
                 case 'idbx':
-                  return LocalDb.deleteDatabase(my.appName+my.clientVersion);              
+                  return LocalDb.deleteDatabase(my.appName+my.clientVersion);
                 case 'wsql':
-                  return WebSqlDb.deleteDatabase(my.appName+my.clientVersion);              
+                  return WebSqlDb.deleteDatabase(my.appName+my.clientVersion);
                 default:
                   throw new Error('grid buffer name is bad defined')
               }
@@ -191,7 +191,7 @@ myOwn.deleteLocalDb = function deleteLocalDb(){
             my.log(err);
         }
     }
-    
+
 }
 myOwn.autoSetup = function autoSetup(){
     var my=this;
@@ -206,12 +206,12 @@ myOwn.autoSetup = function autoSetup(){
     my.promiseChainAutoSetup=promiseChain;
     return promiseChain;
 }
-    
+
 myOwn["log-severities"] = {
     error:{permanent:true },
     log  :{permanent:false},
 };
-    
+
 myOwn.log = function log(severity, message){
     var my=this;
     var consoleMessage;
@@ -318,7 +318,7 @@ myOwn.insertRow = function insertRow(where){
     }
     var tr = section.insertRow(iRow);
     if(where.smooth){
-        if(where.smooth===true){ 
+        if(where.smooth===true){
             where.smooth={};
         }
         var trDummy = section.insertRow(iRow);
@@ -404,7 +404,7 @@ myOwn.alertError = function(err){
         dialogWindow.appendChild(html.table([html.tr([
             html.td({class:'dialog-error-img'}, [html.img({src:my.path.img+'warning128.png'})]),
             html.td([
-                html.pre(myOwn.propertiesWhiteList.map(function(name){ 
+                html.pre(myOwn.propertiesWhiteList.map(function(name){
                     return err[name]?err[name]+'\n':'';
                 }).join('')),
                 html.div([button])
@@ -441,9 +441,9 @@ myOwn.testKeepAlive = function testKeepAlive(){
             }
             var speed=1000/(1+new Date().getTime()-startTime);
             if(isNaN(lightServer.result.speed)){
-                lightServer.result.speed = speed; 
+                lightServer.result.speed = speed;
             }
-            lightServer.result.speed = Math.ceil((lightServer.result.speed*7 + speed)/8); 
+            lightServer.result.speed = Math.ceil((lightServer.result.speed*7 + speed)/8);
             lightServer.title = lightServer.result.speed;
         }
     }).then(function(){
@@ -483,10 +483,10 @@ myOwn.scrollToTop = function(element, to, duration) {
         change = to - start,
         increment = 20;
     var me = this;
-    var animateScroll = function(elapsedTime) {        
+    var animateScroll = function(elapsedTime) {
         elapsedTime += increment;
-        var position = me.easeInOut(elapsedTime, start, change, duration);                        
-        element.scrollTop = position; 
+        var position = me.easeInOut(elapsedTime, start, change, duration);
+        element.scrollTop = position;
         if (elapsedTime < duration) {
             setTimeout(function() {
                 animateScroll(elapsedTime);
@@ -505,7 +505,7 @@ myOwn["connection-status"]={
    noNetwork: { show: true , mustAsk: false, id:'light-network-signal', img:'network-no-signal'},
 };
 
-myOwn.debuggingStatus=false;  // /* 
+myOwn.debuggingStatus=false;  // /*
 if(new Date()<bestGlobals.datetime.ymdHms(2016,10,25,14,50,0)){
     myOwn.debuggingStatus=function(statusCode){
         myOwn.debuggingStatus.count=(myOwn.debuggingStatus.count||0)+1
@@ -714,7 +714,7 @@ myOwn.captureKeys = function captureKeys() {
         }
         if(evento.which==115 && !evento.shiftKey  && !evento.ctrlKey  && !evento.altKey  && !evento.metaKey){ // F4
             /** @type {HTMLElement} */
-            var activeElement = this.activeElement && this.activeElement.tagName!='BODY' && this.activeElement || document.mayBeRepetibleButton; 
+            var activeElement = this.activeElement && this.activeElement.tagName!='BODY' && this.activeElement || document.mayBeRepetibleButton;
             var info=tableInfo(activeElement);
             if(info.table){
                 var abovePos=info.tr.rowIndex-1;
@@ -880,9 +880,9 @@ myOwn.createSmartButton = function createSmartButton(opts){
     var button=opts.button || html.button(opts.buttonProperties||{}, opts.buttonContent||opts.buttonLabel).create();
     Object.defineProperty(button, 'smartState', {
         get:function(){ return this.getAttribute('smart-button'); },
-        set:function(value){ 
+        set:function(value){
             this.disabled=value!='active';
-            this.setAttribute('smart-button',value); 
+            this.setAttribute('smart-button',value);
         }
     })
     button.smartState=opts.initialState||'unkown';

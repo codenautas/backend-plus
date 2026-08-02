@@ -16,11 +16,11 @@ export type Server=net.Server;
 
 export type CoreFunctionParameters<T extends Record<string, any>> = T;
 
-export type MarkdownDoc = 'markdown documentation with `` can content newlines. The identation of the first line is deleted in all others'|'etc...'; 
+export type MarkdownDoc = 'markdown documentation with `` can content newlines. The identation of the first line is deleted in all others'|'etc...';
 
 export interface ProcedureParameter {
     name: string
-    encoding?: string 
+    encoding?: string
     defaultValue?: any
     typeName?: string
     references?: string
@@ -41,7 +41,7 @@ export interface ProcedureDef<T = any> {
     action: string
     parameters: ProcedureParameter[]
     method?: 'get'|'post'
-    coreFunction: CoreFunction<T> 
+    coreFunction: CoreFunction<T>
     encoding?:'JSON4all'|'JSON'|'download'
     multipart?:true
     progress?:true
@@ -67,11 +67,11 @@ export interface User {
 }
 
 export interface Context {
-    be:AppBackend, 
-    user:User, 
-    session:{[K:string]:any}, 
-    username:string, 
-    machineId:string, 
+    be:AppBackend,
+    user:User,
+    session:{[K:string]:any},
+    username:string,
+    machineId:string,
     navigator:string
 }
 
@@ -175,7 +175,7 @@ export type SequenceDefinition = {
     name:string
     firstValue:number
     prefix?:string /* Prefix for the generated value */
-} 
+}
 export type SequenceMadMaxDefinition = {
     madMax: string[] // grouping of mad max sequences
     firstValue?: number
@@ -199,18 +199,18 @@ export interface FieldDefinition extends EditableDbDefinition {
     inTable?:boolean           /* default:!clientSide && !sql.fields[...].expr. Is a real fisical field in the table */
     /* sizeByte?:number  deprecated size in bytes for numbers */
     allowEmptyText?:boolean    /* if a text field accepts '' as a valid value */
-    mobileInputType?:string     
+    mobileInputType?:string
     extraRow?:number
     inexactNumber?:number      /* default:depends on typeName  if = means abs(x-v)<espilon
     /* ------------ For client: -------------- */
     visible?:boolean
     width?:number              /* Width in pixels for the grid */
-    references?:string         /* table name */ 
-    referencesField?:string  
+    references?:string         /* table name */
+    referencesField?:string
     aggregate?:'avg'|'sum'|'count'|'min'|'max'|'countTrue'          /* keyof myOwn.TableAggregates */
     defaultForOtherFields?:boolean   /* the field that stores the "other fields" of a flexible imported table */
-    specialValueWhenInsert?:string 
-    exportMetadata?:ExportMetadataDefinition 
+    specialValueWhenInsert?:string
+    exportMetadata?:ExportMetadataDefinition
     description?:string
     dataLength?:number
     dataDecimals?:number
@@ -252,16 +252,16 @@ export type FieldsForConnectDetailTable = (string | {source:string, target:strin
 
 export type FkActions = 'no action'|'restrict'|'cascade'|'set null'|'set default';
 export interface ForeignKey {
-    references:string, 
-    fields:FieldsForConnect, 
-    onUpdate?: FkActions, 
-    onDelete?: FkActions, 
-    displayAllFields?: boolean, 
+    references:string,
+    fields:FieldsForConnect,
+    onUpdate?: FkActions,
+    onDelete?: FkActions,
+    displayAllFields?: boolean,
     alias?:string,
     abr?:string,
     label?:string,
-    displayFields?:string[], 
-    consName?:string, 
+    displayFields?:string[],
+    consName?:string,
     initiallyDeferred?:boolean
     displayAfterFieldName?:string|boolean
     forceDeferrable?:boolean
@@ -325,7 +325,7 @@ export type TableDefinition = EditableDbDefinition & {
     constraints?:Constraint[]
     detailTables?:DetailTable[]
     offline?:{
-        mode:'reference'|'master'|'detail' 
+        mode:'reference'|'master'|'detail'
         details:string[]
     }
     clientSide?:string         /* keyof: myOwn.clientSides */
@@ -351,7 +351,7 @@ export type TableDefinition = EditableDbDefinition & {
         parameters?:ProcedureParameter[]
     }
 }
-export type TableDefinitionInternal = RequireSome<TableDefinition, 
+export type TableDefinitionInternal = RequireSome<TableDefinition,
     'allow'|'sql'
 > & {
     field:Record<string, FieldDefinitionInternal>
@@ -370,7 +370,7 @@ export interface ClientSetup {
     procedures:ProcedureDef[]
 }
 export type StartOptions={
-    readConfig?:{whenNotExist:'ignore'}, 
+    readConfig?:{whenNotExist:'ignore'},
     config?:string|object
     "dump-db"?:boolean
     testing?:true
@@ -407,7 +407,7 @@ export interface AppConfigBin {                                    // executable
     "zip-fixed-parameters":string         // fixed parameters to pass to zipper
 }
 
-export interface AppConfigServer 
+export interface AppConfigServer
     {
         "base-url": string                 // rool path in the url
         port: number                       // port of the API services
@@ -416,12 +416,12 @@ export interface AppConfigServer
         "silent-startup": boolean          // less logs when startup
         "kill-9": string                   // a way to kill from URL with a token
         bitacoraSchema: string
-        bitacoraTableName: string 
+        bitacoraTableName: string
         useCors: boolean                   //habilita Cross-Origin Resource Sharing
         allowedHosts:string[]              //determina API allowed hosts (necesita habilitar useCors)
         policy?:string
     }
-export interface AppConfigDb 
+export interface AppConfigDb
     {
         motor: 'postgresql'
         database: string
@@ -435,7 +435,7 @@ export interface AppConfigDb
         no_login: boolean                  // if no login is needed. Used only for all public sites
         "downloadable-backup-path": string // OS path of the encrypted downloadable backup
     }
-export interface AppConfigLogin 
+export interface AppConfigLogin
     {
         schema: string                     // schema of the user table
         table: string                      // user table
@@ -469,13 +469,13 @@ export interface AppConfigLogin
         }
         "double-dragon": boolean           // app user must match db user
     }
-export interface AppConfigInstall 
+export interface AppConfigInstall
     {
         "table-data-dir": string           // SO path to the .tab files in the db creation script
         dump: {                            // configuration of --dump-db, the db creation script
             "drop-his": boolean            // include drop schema his in the db creation script
-            db: {                          
-                owner: string              
+            db: {
+                owner: string
                 extensions: string[]       // extensions to be installed (gist, pg_trgm, pgcrypto)
                 enances: 'file'            // if the enances must be dumped in a separate file
                 // from here info to set the owner and replace owner and user used in devel when script creation
@@ -533,7 +533,7 @@ export interface AppConfig {
     devel: {
         delay: number                      // msec avg random delay in API responses (to emulate slow nets)
         "cache-content": boolean           // if the cache header must be sent to the client (when no devel config the default is true)
-        forceShowAsEditable: boolean       // force "editable" behavior in grids 
+        forceShowAsEditable: boolean       // force "editable" behavior in grids
         "tests-can-delete-db": boolean
     }
     mailer: {                              // config to send mails
@@ -545,7 +545,7 @@ export interface AppConfig {
             }
         }
     }
-    bin: AppConfigBin 
+    bin: AppConfigBin
     data: {
         transformers: {
             text: string                   // define the inputTransformers for text comming from the fron-end via the API
@@ -595,7 +595,7 @@ export class AppBackend{
     tableDefAdapt(tableDef:TableDefinition, context:Context):TableDefinition
     pushApp(dirname:string):void
     dumpDbTableFields(tableDefinition:TableDefinition):string[]
-    dumpDbSchemaPartial(partialTableStructures:TableDefinitions, opts?:DumpOptions):Promise<{mainSql:string; enancePart:string}> 
+    dumpDbSchemaPartial(partialTableStructures:TableDefinitions, opts?:DumpOptions):Promise<{mainSql:string; enancePart:string}>
     getContextForDump(): ContextForDump
     getClientSetupForSendToFrontEnd(req:Request):Promise<ClientSetup>
     configList(): (object|string)[]

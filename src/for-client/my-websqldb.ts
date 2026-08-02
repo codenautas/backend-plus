@@ -194,7 +194,7 @@ export class WebsqlDb{
                 notSupportedFields.forEach(function(notSupportedField){
                     var fieldName = notSupportedField.name;
                     row[fieldName]=JSON.parse(row[fieldName]);
-                })    
+                })
             }
         })
         return records
@@ -207,7 +207,7 @@ export class WebsqlDb{
         }
     }
     async getOne<T>(tableName:string, key:Key, ignoreDetectFeatures?:boolean):Promise<T>{
-        ignoreDetectFeatures=ignoreDetectFeatures||false; 
+        ignoreDetectFeatures=ignoreDetectFeatures||false;
         var tableDef = await this.getStructure(tableName);
         var jsonbFields = this.getNotSupportedFields(tableDef);
         var fieldNames=tableDef.primaryKey;
@@ -215,8 +215,8 @@ export class WebsqlDb{
         fieldNames.forEach(function(fieldName, i){
             whereExpr.push(fieldName + '=' + SqlTools.quoteLiteral(key[i]))
         })
-        var sql = 
-            `SELECT * 
+        var sql =
+            `SELECT *
                 from `+SqlTools.quoteIdent(tableName)+`
                 where ` + whereExpr.join(' and ');
         var result = await this.executeQuery(sql,[]);
@@ -347,7 +347,7 @@ export class WebsqlDb{
     }
     async close():Promise<void>{
         //TODO
-        return Promise.resolve()    
+        return Promise.resolve()
     }
     async clear(tableName:string):Promise<void>{
         await this.executeQuery(

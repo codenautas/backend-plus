@@ -29,7 +29,7 @@ client-setup:
   cursors: true
   menu: true
   title: app for test
-logo: 
+logo:
   path: client/img
 test:
   view-chrome: false

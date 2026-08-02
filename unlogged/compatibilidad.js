@@ -1,4 +1,4 @@
-﻿/* UTF-8:Sí
+/* UTF-8:Sí
    compatibilidad.js
 */
 "use strict";

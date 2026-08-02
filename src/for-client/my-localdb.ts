@@ -17,18 +17,18 @@
  * https://caniuse.com/#feat=indexeddb ocurren dos cosas trágicas:
  *   1) en IE y EDGE no hay claves de tipo array
  *   2) en iOS de 8 a 9.3 hay un error que no permite que en dos objetos distintos haya una misma Pk
- * 
+ *
  * más explicaciones en:
  *   1) https://stackoverflow.com/questions/14283257/dataerror-when-creating-an-index-with-a-compound-key-in-ie-10
  *   2) https://www.raymondcamden.com/2014/09/25/IndexedDB-on-iOS-8-Broken-Bad/
- * 
+ *
  * hay un test en:
  *   a) https://codepen.io/cemerick/pen/Itymi
- * 
+ *
  * workarround para contemplar IE, y iOS viejos:
  *   1) se transforman las claves antes de usarlas en un string (JSON.stringify del array para el problema del IE)
  *   2) se prefija el string con el nombre del objectStore (para que todas las claves sean distintas y no haya problemas con el iOS viejo)
- * 
+ *
  * detección
  *   1) por ahora solo probamos la detección del problema del array de claves
  *   2) TODO: Falta programar la detección del problema de iOS viejo, quizás haya que ser explícito, hay que probarlo con varios iPad
@@ -49,11 +49,11 @@ export interface TableDefinition{
     foreignKeys?:ForeignKey[]
     softForeignKeys?:ForeignKey[]
     fields:FieldDefinition[]
-} 
+}
 
 type VersionInfo = {
     var:'version',
-    num:1, 
+    num:1,
     timestamp:string,
     stores:StoreDefs
 }
@@ -80,7 +80,7 @@ export class LocalDb{
         };
         var initialVersionInfo:VersionInfo={
             var:'version',
-            num:1, 
+            num:1,
             timestamp:new Date().toJSON(),
             stores:initialStores
         }
@@ -137,7 +137,7 @@ export class LocalDb{
         var wait4dbCurrent=this.wait4db;
         var registerTask=this.registerStructureInside(tableDef, wait4dbCurrent);
         this.wait4db = registerTask.then(result=>result.wait4db);
-        var result=await registerTask; 
+        var result=await registerTask;
         return result.result;
     }
     async detectFeatures(store:IDBObjectStore):Promise<DetectFeatures>{
@@ -252,7 +252,7 @@ export class LocalDb{
         var db=await ldb.wait4db
         var rows:T[]=[];
         var internalKey:string|Key;
-        
+
         if(detectedFeatures.needToUnwrapArrayKeys){
             internalKey=tableName+JSON.stringify(parentKey);
             internalKey=internalKey.substr(0,internalKey.length-1);
@@ -265,8 +265,8 @@ export class LocalDb{
                 // @ts-ignore target no conoce result en la definición de TS. Verificar dentro de un tiempo si TS mejoró
                 var cursor:IDBCursorWithValue = event.target.result;
                 if(cursor && ((parentKey == null) || (
-                    detectedFeatures.needToUnwrapArrayKeys ? 
-                        internalKey == (cursor.key as string).slice(0,internalKey.length) : 
+                    detectedFeatures.needToUnwrapArrayKeys ?
+                        internalKey == (cursor.key as string).slice(0,internalKey.length) :
                         ! parentKey.find(function(expectedValue,i){
                             var storedValue = (cursor.key as any[])[i]
                             return expectedValue != storedValue
@@ -359,7 +359,7 @@ export class LocalDb{
         var ldb=this;
         var db=await ldb.wait4db
         var tableDef=await ldb.getStructure(tableName);
-        
+
         var transaction=db.transaction(tableName,"readwrite");
         var objectStore=transaction.objectStore(tableName);
         var i = 0;
@@ -378,7 +378,7 @@ export class LocalDb{
             }else{
                 return Promise.resolve();
             }
-        } 
+        }
     }
     async close():Promise<void>{
         var db=await this.wait4db;
@@ -414,12 +414,12 @@ export class LocalDbTransaction {
                 try{
                     await ldb.close();
                     if(previousError){
-                        // @ts-ignore 
+                        // @ts-ignore
                         previousError.ldbWasClosed=true;
                     }
                 }catch(errClose){
                     if(previousError){
-                        // @ts-ignore 
+                        // @ts-ignore
                         previousError.ldbWasNotClosedBecause=errClose;
                     }else{
                         throw errClose;

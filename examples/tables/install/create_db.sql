@@ -1,4 +1,4 @@
-﻿create user beplus_example_user password 'beplus_example_3948812bdz';
+create user beplus_example_user password 'beplus_example_3948812bdz';
 create database beplus_example_db owner beplus_example_user;
 \c beplus_example_db
 
@@ -273,7 +273,7 @@ create table ext.element_images(
 );
 alter table ext.element_images owner to beplus_example_user;
 
-insert into ext.element_images(atomic_number, kind, url) values 
+insert into ext.element_images(atomic_number, kind, url) values
   (1,'atom','https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Protium.svg/170px-Protium.svg.png'),
   (1,'spectrum','https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Emission_spectrum-H.svg/500px-Emission_spectrum-H.svg.png'),
   (2,'spectrum','https://upload.wikimedia.org/wikipedia/commons/c/c3/Helium_spectra.jpg'),
@@ -285,7 +285,7 @@ insert into ext.element_images(atomic_number, kind, url) values
   (3,'crystal','https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Cubic-body-centered.svg/50px-Cubic-body-centered.svg.png'),
   (4,'crystal','https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Hexagonal_close_packed.svg/50px-Hexagonal_close_packed.svg.png');
 
-insert into ext.element_images(atomic_number, kind, mass_number, url) values 
+insert into ext.element_images(atomic_number, kind, mass_number, url) values
   (1,'tube',1,'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Hydrogen_discharge_tube.jpg/220px-Hydrogen_discharge_tube.jpg'),
   (2,'tube',2,'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Deuterium_discharge_tube.jpg/220px-Deuterium_discharge_tube.jpg');
 

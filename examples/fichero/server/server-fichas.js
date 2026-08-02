@@ -36,7 +36,7 @@ class AppExample extends backendPlus.AppBackend{
         var be = this;
         var indexOpts = {};
         ['index.js'].forEach(function(fileName){
-            mainApp.use(baseUrl+'/'+fileName, 
+            mainApp.use(baseUrl+'/'+fileName,
                 MiniTools.serveFile(Path.join(be.rootPath+'/client/',fileName))
             );
         });

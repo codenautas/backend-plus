@@ -3,27 +3,27 @@
     // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [
-        {   
-            "identifier": "tsc-client", 
-            "label": "tsc-client", 
+        {
+            "identifier": "tsc-client",
+            "label": "tsc-client",
             "type": "typescript",
             "tsconfig": "tsconfig-client.json",
             "problemMatcher": [
                 "$tsc"
             ]
         },
-        {   
-            "identifier": "tsc-server", 
-            "label": "tsc-server", 
+        {
+            "identifier": "tsc-server",
+            "label": "tsc-server",
             "type": "typescript",
             "tsconfig": "tsconfig-server.json",
             "problemMatcher": [
                 "$tsc"
             ]
         },
-        {   
-            "identifier": "tsc-test", 
-            "label": "tsc-test", 
+        {
+            "identifier": "tsc-test",
+            "label": "tsc-test",
             "type": "typescript",
             "tsconfig": "tsconfig-test.json",
             "problemMatcher": [

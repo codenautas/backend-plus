@@ -10,7 +10,7 @@ module.exports = function(context){
             update:context.user.rol==='boss',
         },
         registerImports:{
-            inTable:'other_fields', 
+            inTable:'other_fields',
             fieldNames:{
                 originalFileName:'original_filename',
                 serverPath:'server_filepath',

@@ -5,4 +5,3 @@
 ver (buscar en el código):
   * // apertura de las detail grillas por URL
   * hay que encontrar los displayDetailGrid que es donde se abren las subgrillas
-

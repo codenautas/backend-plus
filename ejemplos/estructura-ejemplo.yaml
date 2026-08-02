@@ -1,9 +1,9 @@
 main-form: EJEMPLO
-formularios: 
-  EJEMPLO: 
+formularios:
+  EJEMPLO:
     celdas:
     - titulo: Encuesta de ejemplo
-    - pregunta: P1, 
+    - pregunta: P1,
       texto: ¿Cuál es su tipo de ejemplo preferido?
       aclaracion: no considerar este ejemplo
       opciones:
@@ -15,17 +15,17 @@ formularios:
         texto: uno didáctico
         salta: P3
       - opcion: 4
-        texto: otro tipo 
+        texto: otro tipo
         especifique: true
     - pregunta: P2
-      texto: ¿Cuánto tiempo le llevó decidirse a contestar la respuesta anterior? 
+      texto: ¿Cuánto tiempo le llevó decidirse a contestar la respuesta anterior?
       alcaración: exprese el tiempo en minutos
-      typeInfo: 
+      typeInfo:
         typeName: number
         minValue: 0
     - pregunta: P3
-      texto: ¿Alguna vez había contestado una encuesta autoreferente? 
-      typeInfo: 
+      texto: ¿Alguna vez había contestado una encuesta autoreferente?
+      typeInfo:
         typeName: boolean
     - pregunta: P4
       texto: Por favor describa el proceso que usó para tomar la decisión
@@ -54,4 +54,3 @@ textos:
     bienvenido-pendiente: Desea continuar con la encuesta que tiene pendiente o comenzar una nueva?
     bienvenido-ingresado: Ud. ya ha completado una encuesta, desea comenzar una nueva?
     fin-ingreso: Gracias por completar la encuesta
-    

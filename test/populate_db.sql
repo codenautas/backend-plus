@@ -18,7 +18,7 @@ alter table tst."users" owner to test_user;
 
 insert into tst."users" (username, md5pass) values
   ('prueba', md5('prueba1prueba'));
-  
+
 create table tst."table 1"(
   id1      bigint primary key,
   "Text 1" text,
@@ -37,14 +37,14 @@ create table employees(
   birth_date  date   ,
   salary      numeric,
   primary key (id_type, id)
-);  
+);
 
 alter table tst.employees owner to test_user;
 
 insert into employees(id_type, id, first_name, last_name)
   values ('card', 654213, 'Mary', 'Gomez'),
          ('card', 123456, 'Bob', 'Smith');
-         
+
 create table conjson(
   idj jsonb,
   idn integer,

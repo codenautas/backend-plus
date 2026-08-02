@@ -1,4 +1,4 @@
-﻿set search_path = ext;
+set search_path = ext;
 
 
 insert into ext."users" (username, md5pass, rol, active_until)
@@ -182,7 +182,7 @@ insert into ext.isotopes(atomic_number, "order", mass_number) values
 (9  ,1,19);
 
 
-insert into ext.element_images(atomic_number, mass_number, kind, url) values 
+insert into ext.element_images(atomic_number, mass_number, kind, url) values
   (1,1,'atom','https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Protium.svg/170px-Protium.svg.png'),
   (1,1,'spectrum','https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Emission_spectrum-H.svg/500px-Emission_spectrum-H.svg.png'),
   (2,4,'spectrum','https://upload.wikimedia.org/wikipedia/commons/c/c3/Helium_spectra.jpg'),
@@ -194,6 +194,6 @@ insert into ext.element_images(atomic_number, mass_number, kind, url) values
   (3,7,'crystal','https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Cubic-body-centered.svg/50px-Cubic-body-centered.svg.png'),
   (4,9,'crystal','https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Hexagonal_close_packed.svg/50px-Hexagonal_close_packed.svg.png');
 
-insert into ext.element_images(atomic_number, kind, mass_number, url) values 
+insert into ext.element_images(atomic_number, kind, mass_number, url) values
   (1,'tube',1,'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Hydrogen_discharge_tube.jpg/220px-Hydrogen_discharge_tube.jpg'),
   (2,'tube',2,'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Deuterium_discharge_tube.jpg/220px-Deuterium_discharge_tube.jpg');

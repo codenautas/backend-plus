@@ -54,7 +54,7 @@ class AppExample extends backendPlus.AppBackend{
           install:
             dump:
               scripts:
-                post-adapt: 
+                post-adapt:
                 - ../examples/tables/install/data_db.sql
               skip-content: true
           client-setup:
@@ -63,8 +63,8 @@ class AppExample extends backendPlus.AppBackend{
             formTitle: example-tables
             menu: true
             title: periodic table
-          logo: 
-            path: client/img        
+          logo:
+            path: client/img
         `);
     }
     get rootPath(){ return Path.resolve(__dirname,'..'); }

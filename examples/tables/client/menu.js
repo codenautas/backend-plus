@@ -105,4 +105,3 @@ myOwn.autoSetupFunctions.push(
 
 myOwn.messages.showImage='show image';
 myOwn.i18n.messages.es.showImage='mostrar imagen';
-

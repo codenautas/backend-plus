@@ -6,4 +6,4 @@ login:
   plus:
     secret: false
 devel:
-  forceShowAsEditable: true    
+  forceShowAsEditable: true

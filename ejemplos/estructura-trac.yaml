@@ -1,8 +1,8 @@
 main-form: TRAC
-formularios: 
-  TRAC: 
+formularios:
+  TRAC:
     celdas:
-    - { 
+    - {
         titulo: "EVALUACION DE SOPORTE INFORMATICO"
       }
     - {pregunta: "1", variable: "v1", texto: "Tiempo transcurrido entre el pedido y la asistencia", opciones:[
@@ -40,4 +40,3 @@ textos:
     bienvenido-pendiente: Desea continuar con la encuesta que tiene pendiente o comenzar una nueva?
     bienvenido-ingresado: Ud. ya ha completado una encuesta, desea comenzar una nueva?
     fin-ingreso: Gracias por completar la encuesta
-    

@@ -7,6 +7,6 @@ login:
     secret: false
     allowHttpLogin: true
 devel:
-  forceShowAsEditable: true    
+  forceShowAsEditable: true
 client-setup:
   lang: es

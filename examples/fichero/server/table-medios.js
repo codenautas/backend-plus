@@ -26,11 +26,9 @@ module.exports = function(context){
         primaryKey:['medionro'],
         foreignKeys:[
             {references: 'tipos_medios', fields:['tipo_medio']}
-        ], 
+        ],
         detailTables:[
             {table: 'apariciones-fichas', fields:['medionro'], abr:'F', label:'fichas'}
         ],
     });
 }
-
-

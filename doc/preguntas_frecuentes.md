@@ -2,13 +2,13 @@
 
 ## ¿Cómo hago para dibujar una pantalla cualquiera después de ejecutar un procedimiento?
 
-Si al final de la ejecución exitosa de un procedimiento se desea mostrar 
-algo mejor que el texto del resutlado, por ejemplo dibujando una pantalla bonita, 
+Si al final de la ejecución exitosa de un procedimiento se desea mostrar
+algo mejor que el texto del resutlado, por ejemplo dibujando una pantalla bonita,
 se le puede indicar al procedimiento que tiene un comportamiento especial
-el resultado ok. 
+el resultado ok.
 
 Se debe definir un `wScreen` en `my.wScreens.proc.result`.
-En la definición del procedimiento se debe indicar en `resultOk` el nombre de la definición. 
+En la definición del procedimiento se debe indicar en `resultOk` el nombre de la definición.
 
 ```js
 my.wScreens.proc.result.dibujar_grafico_resulados=function(result, divResult){
@@ -34,16 +34,16 @@ my.wScreens.proc.result.dibujar_grafico_resulados=function(result, divResult){
 
 ## ¿Cómo hago para abrir una grilla después de ejecutar un procedimiento?
 
-Si al final de la ejecución exitosa de un procedimiento se desea mostrar 
-una grilla (basada en table-algo.js, ya sea tabla o vista), 
+Si al final de la ejecución exitosa de un procedimiento se desea mostrar
+una grilla (basada en table-algo.js, ya sea tabla o vista),
 se le puede indicar al procedimiento que tiene un comportamiento especial
-el resultado ok. 
+el resultado ok.
 
 En la definición del procedimiento poner: `resultOk: 'showGrid'`, y en
 el return definir un objeto de tipo `MenuInfoTable`
 
 Otra alternativa es: definir un `wScreen` en `my.wScreens.proc.result`.
-En la definición del procedimiento se debe indicar en `resultOk` el nombre de la definición. 
+En la definición del procedimiento se debe indicar en `resultOk` el nombre de la definición.
 
 **Del lado del cliente poner (podría ser en `menu.js`)**
 ```js
@@ -92,7 +92,7 @@ En el ejemplo se puede:
 ## ¿Cómo hago para ejecutar un procedimiento automáticamente desde el menú (sin presionar el botón)?
 
 En la definición del procedimiento hay que poner valores predeterminados a los parámetros obligatorios
-(salvo que no haya parámetros). 
+(salvo que no haya parámetros).
 
 ```ts
 {
@@ -103,7 +103,7 @@ En la definición del procedimiento hay que poner valores predeterminados a los 
     proceedLabel:'refrescar',
     coreFunction:async function(context, parameters){
         var {row} = await context.client.query(
-            'select count(*) filter (where es_inconsistente) as inconsistencias', 
+            'select count(*) filter (where es_inconsistente) as inconsistencias',
             [parameters.regiones]
         ).fetchUniqueRow();
         return row;
@@ -118,18 +118,18 @@ En el menú hay que poner `autoproced:true`:
 
 ## ¿Cómo hago para refrescar una grilla hija desde el padre cuando sé que los datos cambiaron?
 
-Por ejemplo si en la grilla padre al modifiar el valor de un campo se disparará un trigger 
+Por ejemplo si en la grilla padre al modifiar el valor de un campo se disparará un trigger
 que actualice algún dato en los registros relacionados, si la grilla hija se está visualizando
-se querrá que se actualice. 
+se querrá que se actualice.
 
-Esto se puede hacer cuando el cambio se realiza en la misma pantalla (no cuando otro usuario 
+Esto se puede hacer cuando el cambio se realiza en la misma pantalla (no cuando otro usuario
 o el mismo usuario en otra sesión haga el cambio).
 
-En la definición del detail hay que poner `refreshFromParent:true` 
+En la definición del detail hay que poner `refreshFromParent:true`
 
 ## ¿Cómo hago para tener una sección o página pública que no necesite login? (y que sea la predeterminada)
 
-Si se quiere que cuando se ponga la `base-url` en el navegador y no haya usuario logueado 
+Si se quiere que cuando se ponga la `base-url` en el navegador y no haya usuario logueado
 el sistema redireccione hacia ella:
 
 En en el `defConfig` o en el archivo `local-config.yaml`:
@@ -140,26 +140,26 @@ login:
     noLoggedUrlPath: /pub
 ```
 
-De este modo se redireccionará a la dirección **_base-url_/pub**. 
+De este modo se redireccionará a la dirección **_base-url_/pub**.
 
-Para que se vea debe haber un archivo `pub.jade` o un servicio `/pub`. 
+Para que se vea debe haber un archivo `pub.jade` o un servicio `/pub`.
 
 Si se quieren tener servicios que puedan leer la base de datos y devolver datos sin estar logueado el usuario.
-Se pueden utilizar las funciones `addUnloggedServices` o `addSchrödingerServices` 
+Se pueden utilizar las funciones `addUnloggedServices` o `addSchrödingerServices`
 o bien definir un procedimiento como `unlogged: true`. Las diferencias son:
    1. **procedimiento `unlogged: true`**, en forma predeterminada contestan al verbo `'POST'` y están
    diseñados para usarse mediante una llamada AJAX. Si bien pueden enviar y modificar `cookies`
    no pueden cambiar el resto de los headers ni indicar que se está devolviendo un `text/HTML`.
    2. **addUnloggedServices**, tiene acceso al objeto `application` de `Express` y por lo tanto puede
    llamar a `use` o `get` o lo que se necesite. Pueden por lo tanto modificar los headers de la manera que deseen.
-   Esos servicios no pueden acceder a los datos de sesión del usuario aún cuando haya alguien logueado. 
+   Esos servicios no pueden acceder a los datos de sesión del usuario aún cuando haya alguien logueado.
    3. **addSchrödingerServices**, similar a _addUnloggedServices_ pero tiene acceso a la sesión del usuario
-   si hubiera uno logueado (en `req.user`). 
-   Dentro de la ejeución de un servicio Schrödinger el usuario podría o no estar logueado. 
+   si hubiera uno logueado (en `req.user`).
+   Dentro de la ejeución de un servicio Schrödinger el usuario podría o no estar logueado.
 
 ## ¿Cómo hago para modificar la estructura de una tabla heredada?
 
-Se usa la función **appendToTableDefinition** desde dentro de la función **prepareGetTables** 
+Se usa la función **appendToTableDefinition** desde dentro de la función **prepareGetTables**
 como se ve en este ejemplo:
 
 ```ts
@@ -187,7 +187,7 @@ prepareGetTables(){
 
 ## ¿Cómo hago para extender los tipos, por ejemplo Context?
 
-Por ejemplo si queremos agregar campos a Context para usar en `getContext(req)` 
+Por ejemplo si queremos agregar campos a Context para usar en `getContext(req)`
 y que `context.be` sea del tipo de tu app hay que usar el archivo `types-my-app.ts`
 y agregar ahí algo como:
 
@@ -201,7 +201,7 @@ export * from "pg-promise-strict";
 declare module "backend-plus"{
     interface Context {
         forDump?:boolean
-        esAdmin:boolean, 
+        esAdmin:boolean,
         esOficina:boolean
     }
     interface ProcedureContext {
@@ -216,17 +216,17 @@ y asegurarse de importar los tipos desde `types-my-app.ts` en vez de `backend-pl
 
 ## ¿Cómo hago para especificar columnas obligatorias en condicionadas al resto?
 
-A nivel de los datos, lo mejor es utilizar una serie de check constraints en la definición de la tabla. 
+A nivel de los datos, lo mejor es utilizar una serie de check constraints en la definición de la tabla.
 ```ts
 var provinciasConstraints = [
     {
-        constraintType:'check', 
-        expr:`provincia = 'CABA' or localidad is not null`, 
+        constraintType:'check',
+        expr:`provincia = 'CABA' or localidad is not null`,
         consName:`debe especificar la localidad (salvo en CABA')`
     },
     {
-        constraintType:'check', 
-        expr:`provincia <> 'CABA' or comuna is not null`, 
+        constraintType:'check',
+        expr:`provincia <> 'CABA' or comuna is not null`,
         consName:`en CABA debe especificar la comuna`
     }
 ]
@@ -234,17 +234,17 @@ var provinciasConstraints = [
 Recordar que al consName se muestra como error de validación cuando se viola la constraint
 (por eso es recomendable usar más de una constraint según la complejidad de la condición).
 
-Si la lógica es más compleja también se puede utilizar un trigger que 
-rechace el registro si falta completar un campo en la ciercunstancia dada. 
+Si la lógica es más compleja también se puede utilizar un trigger que
+rechace el registro si falta completar un campo en la ciercunstancia dada.
 
 ### La experiencia de usuario (el front end)
 
-Backend plus muestra los campos obligatorios `nullable: false` con una estrella 
+Backend plus muestra los campos obligatorios `nullable: false` con una estrella
 (eso se puede cambiar en el css con el estilo `my-mandatory`).
 
 Cuando las columnas condicionales dependen de condiciones debidas a lo cargado previamente
-se debe indicar un `specialValidator` en la definición de la tabla, 
-y programar el comportamiento a nivel del backend el miembro `validators`. 
+se debe indicar un `specialValidator` en la definición de la tabla,
+y programar el comportamiento a nivel del backend el miembro `validators`.
 
 En el backend:
 ```ts
@@ -260,7 +260,7 @@ function personas(context:TableContext):TableDefinition{
             {name:'localidad', typeName:'text'},
             {name:'comuna', typeName:'text'},
         ],
-        primaryKey:['id'], 
+        primaryKey:['id'],
         constraints: provinciasConstraints,
         specialValidator: 'provincias'
     }
@@ -291,8 +291,8 @@ td[my-special]:empty {
 ## ¿Cómo hago para anular en algunas filas el detail tables de alguna columna?
 
 Si por ejemplo hay una columna de details para expandir las localidades de una provincia
-pero no se quiere el desplegable para la Ciudad de Buenos Aires se puede 
-declarar una condición del lado del backend y definirla del lado del frontend. 
+pero no se quiere el desplegable para la Ciudad de Buenos Aires se puede
+declarar una condición del lado del backend y definirla del lado del frontend.
 
 En el backend:
 ```ts
@@ -310,7 +310,7 @@ myOwn.conditions.noCABA = function(depot:Depot){
 
 ## ¿Cómo hacer un procedimiento que devuelva un archivo excel o csv?
 
-Al procedimiento se le puede agregar en la definición la propiedad `forExport`. 
+Al procedimiento se le puede agregar en la definición la propiedad `forExport`.
 Y se pueden poner el nombre del archivo excel o del csv (o de ambos).
 El procedimiento tiene que devolver un arreglo de tablas (una por hoja del excel)
 o un arreglo con una sola tabla (para el CSV).
@@ -319,7 +319,7 @@ o un arreglo con una sola tabla (para el CSV).
 (por ser muy grande) el archivo .CSV se genera igual (o sea es la opción más segura).
 
 Si el procedimiento se llama dos veces seguidas (con menos de 10 minutos de diferencia)
-se ofrece el archivo generado con anterioridad y no se vuelve a generar. 
+se ofrece el archivo generado con anterioridad y no se vuelve a generar.
 
 ```ts
     {
@@ -351,8 +351,8 @@ se ofrece el archivo generado con anterioridad y no se vuelve a generar.
 ## ¿Cómo funciona clientIncludes? ¿qué hacer si en el navegador no aparece un .js de un módulo incluido?
 
 La función clientIncludes se encargar de informar al backend la lista de módulos que deben servirse e
-incluirse en los tags `<script ...>` y `<link ... rel=stylesheet>` de la página principal. 
-Cada aplicación debe sobreescribir esta función para incluir sus propios módulos. 
+incluirse en los tags `<script ...>` y `<link ... rel=stylesheet>` de la página principal.
+Cada aplicación debe sobreescribir esta función para incluir sus propios módulos.
 
 Por ejemplo en
 ```ts
@@ -370,11 +370,11 @@ clientIncludes(req:Request|null, opts:OptsClientPage):ClientModuleDefinition[]{
    * `module` se refiere a un módulo externo (mencionado en `package.json` y resuelto con el algoritmo de `require` de _Node.js_) si no se especifica se entiende que es un módulo propio de la aplicación
    * `file` se refiere al nombre del archivo que se va incluir (puede omitirse en módulos externos si el módulo tiene al archivo deseado como principal, eso no suele ocurrir en los archivos mimificados)
    * `modPath` sirve para corregir el _path_ del servidor cuando la carpeta a servir no es la que resuelve _Node.js_
-   * `fileDevelopment` el archivo a incluir en modo development (que se habilita en el local config con `devel.useFileDevelopment`) 
+   * `fileDevelopment` el archivo a incluir en modo development (que se habilita en el local config con `devel.useFileDevelopment`)
    * `path` el _path_ en la URL donde se va a servir (si no se indica es `lib` para `js` y `css` para `css`)
 
-A veces con nuevas versiones de algunos paquetes las ubicaciones o nombres de los archivos mimificados pueden cambiar. 
-Cuando el navegador no encuentra el archivo `.js` o `.css` o el que sea 
+A veces con nuevas versiones de algunos paquetes las ubicaciones o nombres de los archivos mimificados pueden cambiar.
+Cuando el navegador no encuentra el archivo `.js` o `.css` o el que sea
 se puede arrancar la aplicación pidiéndole que muestre la lista de módulos incluidos
 
 ```sh
@@ -395,7 +395,7 @@ Tabla tickets
         name: 'tickets',
         fields: [
             {name:'ticket', type: 'text'},
-            {name:'estado', typeName: "text"}, 
+            {name:'estado', typeName: "text"},
         ],
         primaryKey: ['ticket'],
         foreignKeys: [
@@ -410,7 +410,7 @@ Tabla estados
         name: 'estados',
         fields: [
             {name:'estado', type: 'text'},
-            {name:'cant_tickets', typeName: "bigint", inTable:false, editable:false}, 
+            {name:'cant_tickets', typeName: "bigint", inTable:false, editable:false},
         ],
         primaryKey: ['pk'],
         sql:{fields:{ cant_tickets:{ expr: `(SELECT count(*) FROM tickets t WHERE t.estado = estados.estado)` }}}
@@ -419,13 +419,13 @@ Tabla estados
 
 ## ¿Cómo se configura un correo saliente?
 
-Las aplicaciones backend-plus pueden enviar corres desde cualquier lugar. 
+Las aplicaciones backend-plus pueden enviar corres desde cualquier lugar.
 
 Está pensado para usar en los procedimientos o los servicios para avisar de situaciones excepcionales.
 
-Hay un procedimiento integrado a backend-plus para recuperar la contraseña. 
+Hay un procedimiento integrado a backend-plus para recuperar la contraseña.
 
-En ``local-config.yaml`` en `mailer.conn` agregar la configuración de conexión según el format [mailer](https://nodemailer.com/smtp/). 
+En ``local-config.yaml`` en `mailer.conn` agregar la configuración de conexión según el format [mailer](https://nodemailer.com/smtp/).
 
 **Ejemplo de conexión SSL y habilitación del recuperador de contraseña**
 
@@ -483,7 +483,7 @@ await be.sendMail({
     to: "jefe-operativo@nuestro-dominio.com.ar",
     subject: `El cálculo ${id_calculo} finalizó.
     text:Hora de finalización: ${new Date().toJSON()}.
-    
+
     Proceso: ${id_calculo}.
     Resultado: ${resultado}.
     `
@@ -534,7 +534,7 @@ table-aplicacion:
 Si, es programando un clientSide a medida o custom.
 Por ejemplo si tenemos una tabla anotaciones (anotaciones de tickets) con una columna que se usará para poner un enlace a un ticket relacionado, entonces setearemos en dicho field clientSide:'link_a_ticket'
 
-En src/server/table-anotaciones.ts 
+En src/server/table-anotaciones.ts
 ```ts
 export function anotaciones(context:TableContext):TableDefinition{
     const td:TableDefinition = {
@@ -561,7 +561,7 @@ myOwn.clientSides.link_a_ticket = {
         const td=depot.rowControls[fieldName];
         td.innerHTML='';
         if(depot.row.proyecto_relacionado && depot.row.ticket_relacionado){
-            td.appendChild(html.a({class:'link-descarga-archivo', href:`menu#w=ticket&autoproced=true&ff=,proyecto:${depot.row.proyecto_relacionado},ticket:${depot.row.ticket_relacionado}`},`${depot.row.proyecto_relacionado}-${depot.row.ticket_relacionado}`).create());            
+            td.appendChild(html.a({class:'link-descarga-archivo', href:`menu#w=ticket&autoproced=true&ff=,proyecto:${depot.row.proyecto_relacionado},ticket:${depot.row.ticket_relacionado}`},`${depot.row.proyecto_relacionado}-${depot.row.ticket_relacionado}`).create());
         }
     },
     prepare:function(_depot:myOwn.Depot, _fieldName:string):void{
@@ -598,7 +598,7 @@ Esto hará que en la tabla aplicaciones además de mostrarse el campo servidor (
 
 ## ¿Se puede cambiar atributos isName de tablas foraneas como si fueran atributos propios?
 
-Si, para eso hay que redefinir el atributo is name de la tabla foranea en la tabla que tiene la fk, la redefinición debe hacerse seteando el atributo nombre del fieldDefinition con el formato <tabla_foranea>__<nombre_campo_is_name> 
+Si, para eso hay que redefinir el atributo is name de la tabla foranea en la tabla que tiene la fk, la redefinición debe hacerse seteando el atributo nombre del fieldDefinition con el formato <tabla_foranea>__<nombre_campo_is_name>
 
 por ejemplo:
 
@@ -648,18 +648,18 @@ en el root del proyecto ver archivo last-pg-error-local.sql
 ## ¿Como hago para loggear todas las queries SQL incluso las que no generaron error?
 con la opción del local-config.yaml
 ```yaml
-log: 
-    db: 
-      on-demand: true 
+log:
+    db:
+      on-demand: true
 ```
 
 Luego:
 1) Agregar a la url base del sistema el sufijo "--log-db" (quedaría URLbase/--log-db) para activar el logueo (por defecto dura 5 minutos)
 2) volver a realizar el comportamiento que produce el error
 3) ir al root del proyecto y mirar el archivo local-log-all.sql
-4) si hay mucho sql, limpiar el archivo y realizar solo la última intervención que realiza el usuario justo antes del error 
+4) si hay mucho sql, limpiar el archivo y realizar solo la última intervención que realiza el usuario justo antes del error
 
-nota: si se quiere mas tiempo que los 5 minutos por defecto, investigar la opción 
+nota: si se quiere mas tiempo que los 5 minutos por defecto, investigar la opción
 `log: db: until`
 
 ## ¿Cómo evitar los saltos de línea cuando un usuario carga datos?
@@ -667,28 +667,28 @@ nota: si se quiere mas tiempo que los 5 minutos por defecto, investigar la opci�
 En Backend-Plus se puede controlar qué juego de caracteres se puede almacenar en una columna.
 También se puede reemplazar lo que el usuario carga para remover los caracteres no deseados.
 
-Usando constraints se puede restringir los valores no deseados en las columnas de las tablas. 
+Usando constraints se puede restringir los valores no deseados en las columnas de las tablas.
 Si solo queremos evitar los saltos de línea se podrían usar expresiones regulares
 
 ```ts
-  { 
-    constraintType: 'check', 
-    consName: `saltos de linea no validos en ${fieldName}`, 
+  {
+    constraintType: 'check',
+    consName: `saltos de linea no validos en ${fieldName}`,
     expr: `${fieldName} !~ '[\n\t\u00a0]'`
   }
 ```
 
 Esa expresión evita saltos de línea `\n` tabulaciones `\t` y [pseudo espacios](https://es.wikipedia.org/wiki/Espacio_duro)
-que son difíciles de distinguir de los espacios comunes. 
+que son difíciles de distinguir de los espacios comunes.
 A veces aparecen al copiar y pegar textos que tienen espacios al final de la línea o espacios consecutivos.
 
 ### experiencia de usuario
 
 A veces es preferible no espera a que el backend rechace el valor por inválido.
-Se puede instruir al frontend (de backend-plus) a eliminar o transformar esos valores. 
+Se puede instruir al frontend (de backend-plus) a eliminar o transformar esos valores.
 
 Para eso se utiliza la propiedad `postInput` en la definición de campos (o parámetros).
-El fronetend de BP utiliza [type-store](https://github.com/codenautas/type-store/blob/HEAD/LEEME.md) 
+El fronetend de BP utiliza [type-store](https://github.com/codenautas/type-store/blob/HEAD/LEEME.md)
 el manejo de los tipos en los inputs.
 
 Se debe definir un `postInput` con un nombre y una función de transformación.
@@ -701,12 +701,12 @@ function SinSobresaltos(text: string){
 myOwn.registerPostInput('sinSobresaltos', sinSobresaltos);
 ```
 
-De esa manera se reemplazan series de caracteres no deseados en un espacio común 
-y se quitan los espacios delante y detrás del texto. 
+De esa manera se reemplazan series de caracteres no deseados en un espacio común
+y se quitan los espacios delante y detrás del texto.
 
 ### Aterlantiva usando triggers
 
-Otra posibilidad es programar el reemplazo a nivel de triggers de la base de datos. 
+Otra posibilidad es programar el reemplazo a nivel de triggers de la base de datos.
 La ventaja es que el reemplazo se realiza independientemente del frontend que se use.
 
 ## ¿Cómo hacer que el valor predeterminado sea el usuario actual?
@@ -720,10 +720,10 @@ Depende del contexto o lo que se quiera obtener. Lo mejor es usar el atributo de
 ```
 
 En ese caso la grilla mostrará el valor por defecto como el usuario actual logueado
-y le permitirá al usuario cambiar ese valor. 
+y le permitirá al usuario cambiar ese valor.
 
 Los atributos que manejan los valores por defecto de los campos son: `defaultValue` (que sirve en caso de que sea una constante),
 `specialDefaultValue` que puede manejar situaciones donde no se conoce el valor en tiempo de compilación
-(esos valores se podrían aplicar en el frontend o backend dependiendo de cómo esté configurado cada uno), 
+(esos valores se podrían aplicar en el frontend o backend dependiendo de cómo esté configurado cada uno),
 `defaultDbValue` para valores predeterminados solo a nivel de la definición del campo en la base de datos
 y `specialspecialValueWhenInsert` que es un mecanismo de calcular un valor usando una función en el backend.

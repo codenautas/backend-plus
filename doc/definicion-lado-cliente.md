@@ -51,7 +51,7 @@ ts                | T    |                       | especifica el path que se tie
 
 ### casos
   * type, module: cuando todo se puede deducir del package.json del módulo a través del "main"
-  * type, module, modPath, file: cuando el archivo que se necesita está en un módulo pero no es el "main" del módulo ni está en la carpeta por defecto. 
+  * type, module, modPath, file: cuando el archivo que se necesita está en un módulo pero no es el "main" del módulo ni está en la carpeta por defecto.
 
 <!--lang:en--]
 

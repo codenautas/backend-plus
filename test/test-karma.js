@@ -3,8 +3,8 @@
 var karma = require('karma');
 var karmaConfig = require('./karma.conf.js');
 var options;
-karmaConfig({set:function(opts){ 
-    options=opts; 
+karmaConfig({set:function(opts){
+    options=opts;
     var posBrowsers = process.argv.indexOf('--browsers')
     if(posBrowsers>0){
         options.browsers=(process.argv[posBrowsers+1]||'').split(',');

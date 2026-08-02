@@ -32,8 +32,8 @@ describe("interactive ",function(){
         var slowMo = headless ? 12 : 50;
         browser = await puppeteer.launch(process.env.TRAVIS?{}:{headless, slowMo});
         page = await browser.newPage();
-        page.on('console', msg => { 
-            console.log('console.'+msg.type(), msg.text(), msg.args(), msg.location()) 
+        page.on('console', msg => {
+            console.log('console.'+msg.type(), msg.text(), msg.args(), msg.location())
         });
         await page.setViewport({width:1024, height:768});
         await page.goto('http://localhost:3333');
@@ -205,7 +205,7 @@ describe("interactive ",function(){
             });
             it.skip("FUTURO LEJANO. inserts one record with fk data", async function(){
                 // la idea de esta funcionalidad es poder ingresar un texto en el nombre en vez del código
-                // no sé si tiene una utilidad clara ahora. No insistir con esto. 
+                // no sé si tiene una utilidad clara ahora. No insistir con esto.
                 this.timeout(38000);
                 console.log('tengo el menu')
                 await page.click('[menu-name=tables]');
@@ -226,7 +226,7 @@ describe("interactive ",function(){
                 discrepances.showAndThrow(result,'3');
                 return ;
                 await page.keyboard.type(pkValue);
-                await page.keyboard.press('Enter'); 
+                await page.keyboard.press('Enter');
                 // await page.screenshot({path: 'local-capture2.png'});
                 await page.keyboard.press('Enter');
                 var result = await client.query("select * from with_fk where wf_code = $1",['A1']).fetchUniqueRow();

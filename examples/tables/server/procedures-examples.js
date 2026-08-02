@@ -26,8 +26,8 @@ ProceduresExamples = [
         ],
         coreFunction:function(context, parameters){
             return context.client.query(
-                `SELECT count(*) as number_of_elements 
-                   FROM ptable p left join isotopes i on p.atomic_number=i.atomic_number 
+                `SELECT count(*) as number_of_elements
+                   FROM ptable p left join isotopes i on p.atomic_number=i.atomic_number
                    WHERE i.atomic_number IS NULL
                      AND p.atomic_number between coalesce($1,0) and coalesce($2,999)`,
                 [parameters.first_atomic_number, parameters.last_atomic_number]
@@ -63,8 +63,8 @@ ProceduresExamples = [
         bitacora:{error:true, always:true},
         coreFunction:function(context, parameters){
             return context.client.query(
-                `SELECT count(*) as number_of_elements 
-                   FROM ptable p left join isotopes i on p.atomic_number=i.atomic_number 
+                `SELECT count(*) as number_of_elements
+                   FROM ptable p left join isotopes i on p.atomic_number=i.atomic_number
                    WHERE i.atomic_number IS NULL
                      AND p.atomic_number between coalesce($1,0) and coalesce($2,999)`,
                 [parameters.first_atomic_number, parameters.last_atomic_number]

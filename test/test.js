@@ -113,7 +113,7 @@ describe('backend-plus', function describeBackendPlus(){
                 var agent;
                 before(function (done) {
                     this.timeout(50000);
-                    createServerGetAgent({server:{"base-url":opt.base}}).then(function(_be){ 
+                    createServerGetAgent({server:{"base-url":opt.base}}).then(function(_be){
                         be=_be;
                         return be.inDbClient({}, function(client){
                             return client.executeSqlScript('./test/populate_db.sql');
@@ -201,8 +201,8 @@ describe('backend-plus', function describeBackendPlus(){
             //describe('loggin in', function(){
             //    var agent;
             //    before(function (done) {
-            //        createServerGetAgent({baseUrl:opt.base, successRedirect:'/loggedin'}).then(function(_agent){ 
-            //            agent=_agent; 
+            //        createServerGetAgent({baseUrl:opt.base, successRedirect:'/loggedin'}).then(function(_agent){
+            //            agent=_agent;
             //        }).then(done,done);
             //    });
             //    if(!opt.root){
@@ -242,14 +242,14 @@ describe('backend-plus', function describeBackendPlus(){
             //        });
             //    });
             //    it("serve the internal files",function(done){
-            //        createServerGetAgent(opt.param==null?null:{baseUrl:opt.base}).then(function(agent){ 
+            //        createServerGetAgent(opt.param==null?null:{baseUrl:opt.base}).then(function(agent){
             //            return agent
             //            .get(opt.base+'/auto-login.js')
             //            .expect(200, /^"use strict";/);
             //        }).then(done.bind(null,null),done);
             //    });
             //    it("serve the default login page",function(done){
-            //        createServerGetAgent(opt.param==null?null:{baseUrl:opt.base}).then(function(agent){ 
+            //        createServerGetAgent(opt.param==null?null:{baseUrl:opt.base}).then(function(agent){
             //            return agent
             //            .get(opt.base+'/login')
             //            .expect(200, /label.*Username/)
@@ -259,7 +259,7 @@ describe('backend-plus', function describeBackendPlus(){
             //    });
             //    it("serve the parametrized default login page",function(done){
             //        var loginForm=changing(loginPlus.spanishLoginForm,{formImg:'this.png'});
-            //        createServerGetAgent({baseUrl:opt.base, loginForm}).then(function(agent){ 
+            //        createServerGetAgent({baseUrl:opt.base, loginForm}).then(function(agent){
             //            return agent
             //            .get(opt.base+'/login')
             //            .expect(200, /usuario.*name="username"/);
@@ -270,14 +270,14 @@ describe('backend-plus', function describeBackendPlus(){
             //    var agent;
             //    before(function (done) {
             //        createServerGetAgent({
-            //            baseUrl:opt.base, 
+            //            baseUrl:opt.base,
             //            loginPageServe:simpleLoginPageServe,
             //            php:{
             //                varLogged:'abcd_usu_nombre',
             //                save_path:'./test/temp-session'
             //            }
-            //        }).then(function(_agent){ 
-            //            agent=_agent; 
+            //        }).then(function(_agent){
+            //            agent=_agent;
             //        }).then(done,done);
             //    });
             //    it('must reject if php session is not active', function(done){

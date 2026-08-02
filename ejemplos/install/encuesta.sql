@@ -1,7 +1,7 @@
-﻿-- DROP TABLE bep.datos;
+-- DROP TABLE bep.datos;
 
 /*
-insert into bep.datos (id, contenido) 
+insert into bep.datos (id, contenido)
   values ('{"id":4}', '{"v1": "a"}');
 
 select * from bep.datos;

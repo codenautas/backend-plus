@@ -11,16 +11,16 @@ set client_encoding = 'UTF8';
 
 
 create table "bitacora" (
-  "id" integer, 
-  "procedure_name" text, 
-  "parameters_definition" text, 
-  "parameters" text, 
-  "username" text, 
-  "machine_id" text, 
-  "navigator" text, 
-  "init_date" timestamp, 
-  "end_date" timestamp, 
-  "has_error" boolean, 
+  "id" integer,
+  "procedure_name" text,
+  "parameters_definition" text,
+  "parameters" text,
+  "username" text,
+  "machine_id" text,
+  "navigator" text,
+  "init_date" timestamp,
+  "end_date" timestamp,
+  "has_error" boolean,
   "end_status" text
 , primary key ("id")
 );
@@ -32,10 +32,10 @@ ALTER TABLE "bitacora" ALTER COLUMN "id" SET DEFAULT nextval('secuencia_bitacora
 GRANT USAGE, SELECT ON SEQUENCE "secuencia_bitacora" TO "test_user";
 
 create table "users" (
-  "username" text, 
-  "md5pass" text, 
-  "active_until" date, 
-  "locked_since" date, 
+  "username" text,
+  "md5pass" text,
+  "active_until" date,
+  "locked_since" date,
   "rol" text
 , primary key ("username")
 );
@@ -44,7 +44,7 @@ grant select, insert, update, delete on "users" to "test_user";
 
 
 create table "simple" (
-  "simple_code" text, 
+  "simple_code" text,
   "simple_name" text
 , primary key ("simple_code")
 );
@@ -56,8 +56,8 @@ ALTER TABLE "simple" ALTER COLUMN "simple_code" SET DEFAULT nextval('simpe_seq':
 GRANT USAGE, SELECT ON SEQUENCE "simpe_seq" TO "test_user";
 
 create table "with_fk" (
-  "simple_code" text, 
-  "wf_code" text, 
+  "simple_code" text,
+  "wf_code" text,
   "wf_name" text
 , primary key ("simple_code", "wf_code")
 );
@@ -88,9 +88,9 @@ select setseed(0.123456789);
 
 insert into with_fk (simple_code,wf_code,wf_name) values ('2','A','único elemento');
 
-insert into with_fk (simple_code,wf_code,wf_name) 
-  select 1, num, 
-         case round(random()::decimal*7,0) 
+insert into with_fk (simple_code,wf_code,wf_name)
+  select 1, num,
+         case round(random()::decimal*7,0)
            when 1 then 'Hacer'
            when 2 then 'Controlar'
            when 3 then 'Verificar'
@@ -98,7 +98,7 @@ insert into with_fk (simple_code,wf_code,wf_name)
            when 5 then 'Suministrar'
            when 6 then 'Revisar'
            else 'Realizar'
-         end || ' ' || case round(random()::decimal*8,0) 
+         end || ' ' || case round(random()::decimal*8,0)
            when 1 then 'el procedimiento'
            when 2 then 'la serie de taeras'
            when 3 then 'el plan'
@@ -106,7 +106,7 @@ insert into with_fk (simple_code,wf_code,wf_name)
            when 5 then 'la planificación'
            when 6 then 'la secuencia'
            else 'el objetivo'
-         end || ' ' || case round(random()::decimal*9,0) 
+         end || ' ' || case round(random()::decimal*9,0)
            when 1 then 'número '||num
            when 2 then 'N '||num
            when 3 then '#'||num
@@ -128,4 +128,3 @@ alter table "bitacora" alter column "navigator" set not null;
 alter table "bitacora" alter column "init_date" set not null;
 alter table "users" alter column "username" set not null;-- FKs
 alter table "with_fk" add constraint  "with_fk simple REL" foreign key ("simple_code") references "simple" ("simple_code")  on update cascade;
-

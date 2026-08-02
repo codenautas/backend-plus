@@ -74,7 +74,7 @@ myOwn.wScreens.procAux = {
         var params=addrParams.up;
         // var button = html.button(formDef.proceedLabel||my.messages.proceed).create();
         var label = formDef.proceedLabel||my.messages.proceed;
-        var refresUrl = formDef.method != 'post' || formDef.autoproced !== false 
+        var refresUrl = formDef.method != 'post' || formDef.autoproced !== false
         var buttonOptions = {label}
         if (formDef.method == 'post') {
             buttonOptions.onclick = function(event){ event.preventDefault();  proceed(); }
@@ -83,8 +83,8 @@ myOwn.wScreens.procAux = {
         var setHref = function(){
             if (refresUrl) {
                 button.setForkeableHref({
-                    ...addrParams, 
-                    autoproced:true, 
+                    ...addrParams,
+                    autoproced:true,
                     directUrl:true,
                     ...(formDef && formDef.proceedLabel ? {label} : {}),
                     // ...params
@@ -113,7 +113,7 @@ myOwn.wScreens.procAux = {
             )
             if(parameterDef.references || parameterDef.options){
                 setTimeout(()=>control.ponerLupa(true), 500)
-                
+
             }
             if(value!==undefined){
                 params[parameterDef.name] = value;
@@ -121,13 +121,13 @@ myOwn.wScreens.procAux = {
             }
             control.addEventListener('update', function(){
                 params[parameterDef.name] = control.getTypedValue();
-                if (refresUrl) { 
+                if (refresUrl) {
                     myOwn.replaceAddrParams(addrParams);
-                }   
+                }
                 setHref();
             });
             controls.push(control);
-            return html.tr({"parameter-name":parameterDef.name},[ 
+            return html.tr({"parameter-name":parameterDef.name},[
                 html.td(parameterDef.label||parameterDef.name.replace(/_/g,' ')),
                 control,
                 html.td(parameterDef.description||''),
@@ -161,7 +161,7 @@ myOwn.wScreens.procAux = {
         if(autoproced){
             proceed();
         }else{
-            main_layout.appendChild(parameterForm.create());                
+            main_layout.appendChild(parameterForm.create());
         }
         main_layout.appendChild(divResult);
         main_layout.appendChild(divProgressOutside);
@@ -556,7 +556,7 @@ window.addEventListener('popstate', function(){
                 my.showPage();
             }
         },10)
-    }    
+    }
     lastUrl = currentUrl;
 });
 

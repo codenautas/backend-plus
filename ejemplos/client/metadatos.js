@@ -16,7 +16,7 @@ function leer(){
         preDiv.value=result;
         contenidoOriginal=result;
     });
-    
+
 }
 function reescribir(){
     document.getElementById('reescrbirMetadatos').addEventListener('click',function(){
@@ -34,7 +34,7 @@ function reescribir(){
                 html.pre(err.stack)
             ]).create());
         });
-       
+
     })
 }
 function alFormulario(){
