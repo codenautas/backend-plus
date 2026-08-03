@@ -1,6 +1,6 @@
 "use strict";
 
-/*global myOwn, my, XLSX, Pikaday  */
+/*global myOwn, my, xlsxNowBrowser, Pikaday  */
 /*global miniMenuPromise, dialogPromise, alertPromise, confirmPromise, promptPromise, simpleFormPromise */
 /*global Blob, document, CustomEvent, URL  */
 
@@ -1656,32 +1656,70 @@ myOwn.dialogDownload = function dialogDownload(grid){
             downloadElement.setAttribute("download", grid.def.name+dotExtension);
             mainDiv.setAttribute("current-state", "ready");
         }
-        var STYLE_HEADER={ font: {bold:true, underline:true}/*, alignment:{horizontal:'center'}*/};
-        var STYLE_EXTRA_HEADER={ font: {bold:true, underline:true, color:{rgb: "800040"}}/*, alignment:{horizontal:'center'}*/};
-        var STYLE_PK={font:{bold:true}};
-        var STYLE_LOOKUP={font:{color:{ rgb: "5588DD" }}};
-        var populateTableXLS = function populateTableXLS(ws, depots, fieldDefs, topRow, leftColumn){
-            topRow=topRow||0;
+        var XLSX_STYLES={
+            header      : {bold:true},
+            extraHeader : {bold:true, color:"404040"},
+            pk          : {bold:true},
+            lookup      : {color:"404040"},
+            interval    : {numFmt:'[h]:mm:ss'},
+            intervalPk  : {base:'pk'    , numFmt:'[h]:mm:ss'},
+            intervalLookup:{base:'lookup', numFmt:'[h]:mm:ss'},
+        };
+        // Las columnas que salen de exportJsonFieldAsColumns aparecen recién al
+        // recorrer las filas, pero el encabezado se escribe antes que ellas: con
+        // escritura secuencial hay que conocerlas de entrada, y esta pasada las junta.
+        var collectExtraColumns = function collectExtraColumns(depots, fieldDefs, firstColumn){
+            var lastColumn=firstColumn-1;
+            if(grid.def.exportJsonFieldAsColumns){
+                depots.forEach(function(depot){
+                    fieldDefs.forEach(function(fieldDef){
+                        if(grid.def.exportJsonFieldAsColumns == fieldDef.name){
+                            var value=depot.row[fieldDef.name];
+                            var fields = typeof value == "string" ? JSON.parse(value) : value;
+                            for(var name in fields){
+                                if(extraColumns[name]==null){
+                                    extraColumns[name] = ++lastColumn;
+                                }
+                            }
+                        }
+                    });
+                });
+            }
+            return lastColumn;
+        }
+        var styleForField = function styleForField(fieldDef, depot){
+            var isInterval = fieldDef.typeName == 'interval';
+            if(fieldDef.isPk){
+                return isInterval?'intervalPk':'pk';
+            }
+            if(!fieldDef.allow || !fieldDef.allow.update || depot.allow.update === false){
+                return isInterval?'intervalLookup':'lookup';
+            }
+            return isInterval?'interval':undefined;
+        }
+        // Las filas de una tabla, como las toma xlsx-now: la primera es el
+        // encabezado y cada una de las demás es un array donde la posición es la
+        // columna. `leftColumn` corre la tabla entera hacia la derecha.
+        var tableRowsXLS = function tableRowsXLS(depots, fieldDefs, leftColumn){
             leftColumn=leftColumn||0;
-            fieldDefs.forEach(function(field,iColumn){
-                ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:topRow})]={t:'s',v:field.name, s:STYLE_HEADER};
-                lastColumnExported = Math.max(lastColumnExported, iColumn);
+            var lastColumn=collectExtraColumns(depots, fieldDefs, fieldDefs.length);
+            lastColumnExported = Math.max(lastColumnExported, lastColumn);
+            var pad=new Array(leftColumn);
+            var headerRow=pad.concat(fieldDefs.map(function(field){
+                return {v:field.name, s:'header'};
+            }));
+            likeAr(extraColumns).forEach(function(pos, name){
+                headerRow[pos+leftColumn]={v:name, s:'extraHeader'};
             });
-            depots.forEach(function(depot, iRow){
+            var rows=[headerRow];
+            depots.forEach(function(depot){
+                var row=pad.concat([]);
                 var addCell = function addCell(value, fieldDef, iColumn){
                     if(value!=null){
-                        var excelValue=typeStore.typerFrom(fieldDef).toExcelValue(value);
-                        var valueType=typeStore.typerFrom(fieldDef).toExcelType(value);
-                        var cell={t:valueType,v:excelValue};
-                        if(fieldDef.typeName == 'interval'){
-                            cell.z='[h]:mm:ss';
-                        }
-                        if(fieldDef.isPk){
-                            cell.s=STYLE_PK;
-                        }else if(!fieldDef.allow || !fieldDef.allow.update || depot.allow.update === false){
-                            cell.s=STYLE_LOOKUP;
-                        }
-                        ws[XLSX.utils.encode_cell({c:iColumn+leftColumn,r:iRow+1+topRow})]=cell;
+                        row[iColumn+leftColumn]={
+                            v:typeStore.typerFrom(fieldDef).toExcelValue(value),
+                            s:styleForField(fieldDef, depot),
+                        };
                     }
                 }
                 fieldDefs.forEach(function(fieldDef, iColumn){
@@ -1689,33 +1727,33 @@ myOwn.dialogDownload = function dialogDownload(grid){
                     if(grid.def.exportJsonFieldAsColumns == fieldDef.name){
                         var fields = typeof value == "string" ? JSON.parse(value) : value;
                         for(var name in fields){
-                            var pos = extraColumns[name];
-                            if(pos==null){
-                                lastColumnExported++;
-                                extraColumns[name] = lastColumnExported;
-                                ws[XLSX.utils.encode_cell({c:lastColumnExported+leftColumn,r:topRow})]={t:'s',v:name, s:STYLE_EXTRA_HEADER};
-                                pos = lastColumnExported;
-                            }
-                            addCell(fields[name], {typeName:typeof fields[name] == 'number'? 'decimal':'text'}, pos)
+                            addCell(fields[name], {typeName:typeof fields[name] == 'number'? 'decimal':'text'}, extraColumns[name])
                         }
                     }else{
                         addCell(value, fieldDef, iColumn);
                     }
                 });
+                rows.push(row);
             });
-            ws["!ref"]="A1:"+XLSX.utils.encode_cell({c:lastColumnExported+leftColumn,r:grid.depotsToDisplay.length+topRow});
+            return rows;
         }
         var excelExport = function(){
-            var wb = XLSX.utils.book_new();
-            var ws = {};
-            var exportFileInformationWs={};
-            var i=0;
-            exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'table',s:STYLE_HEADER};
-            exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:  i})]={t:'s',v:grid.def.name};
-            exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'date',s:STYLE_HEADER};
-            exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:  i})]={t:'s',v:new Date().toISOString()};
-            exportFileInformationWs[XLSX.utils.encode_cell({c:0,r:++i})]={t:'s',v:'user',s:STYLE_HEADER};
-            exportFileInformationWs[XLSX.utils.encode_cell({c:1,r:  i})]={t:'s',v:my.config.username};
+            var sheet1name=grid.def.name.length>27?grid.def.name.slice(0,27)+'...':grid.def.name;
+            var sheet2name=grid.def.name!=="metadata"?"metadata":"meta-data";
+            var rows=[{
+                '#worksheet':sheet1name+'b',
+                freezeRows: 1,
+                freezeColumns: grid.def.primaryKey?.length ?? 0,
+                autoWidthMax: 40,
+            }];
+            rows=rows.concat(tableRowsXLS(grid.depotsToDisplay, fieldsDef2Export));
+            rows.push({'#worksheet':sheet2name, autoWidthMax: 40});
+            // La primera fila de metadata queda en blanco, como cuando las
+            // celdas se escribían por dirección arrancando en la fila 2.
+            rows.push([]);
+            rows.push([{v:'table',s:'header'}, grid.def.name]);
+            rows.push([{v:'date' ,s:'header'}, new Date().toISOString()]);
+            rows.push([{v:'user' ,s:'header'}, my.config.username]);
             // grid.def.allow.forEach(function(action,iAction){
             //     exportFileInformationWs[XLSX.utils.encode_cell({c:iAction,r:2})]={t:'s',v:action};
             // })
@@ -1729,22 +1767,22 @@ myOwn.dialogDownload = function dialogDownload(grid){
                     }).map(function(fieldDef){
                         return {row:fieldDef};
                     });
-                    populateTableXLS(exportFileInformationWs, fieldPropertiesDepot,fieldPropertiesDefs,i+1,1);
+                    extraColumns={};
+                    rows=rows.concat(tableRowsXLS(fieldPropertiesDepot,fieldPropertiesDefs,1));
                 }
             }
-            populateTableXLS(ws, grid.depotsToDisplay, fieldsDef2Export);
-            var sheet1name=grid.def.name.length>27?grid.def.name.slice(0,27)+'...':grid.def.name;
-            var sheet2name=grid.def.name!=="metadata"?"metadata":"meta-data";
-            wb.SheetNames=[sheet1name,sheet2name];
-            wb.Sheets[sheet1name]=ws;
-            exportFileInformationWs["!ref"]="A1:F100";
-            wb.Sheets[sheet2name]=exportFileInformationWs;
-            var wbFile = XLSX.write(wb, {bookType:'xlsx', bookSST:false, type: 'binary', cellDates:true});
-            var blob = new Blob([s2ab(wbFile)],{type:"application/octet-stream"});
-            mainDiv.setAttribute("current-state", "ready");
-            var url = URL.createObjectURL(blob);
-            downloadElement.href=url;
-            downloadElement.setAttribute("download", grid.def.name+".xlsx");
+            xlsxNowBrowser.createXlsxBlob({
+                rows,
+                styles:XLSX_STYLES
+            }).then(function(blob){
+                mainDiv.setAttribute("current-state", "ready");
+                var url = URL.createObjectURL(blob);
+                downloadElement.href=url;
+                downloadElement.setAttribute("download", grid.def.name+".xlsx");
+            }).catch(function(err){
+                mainDiv.setAttribute("current-state", "chossing");
+                alertPromise(err.message);
+            });
         };
     });
 };
