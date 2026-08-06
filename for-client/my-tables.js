@@ -1740,23 +1740,23 @@ myOwn.dialogDownload = function dialogDownload(grid){
         var excelExport = function(){
             var sheet1name=grid.def.name.length>27?grid.def.name.slice(0,27)+'...':grid.def.name;
             var sheet2name=grid.def.name!=="metadata"?"metadata":"meta-data";
-            var rows=[{
-                '#worksheet':sheet1name+'b',
+            var dataSheet = {
+                name: sheet1name,
                 freezeRows: 1,
                 freezeColumns: grid.def.primaryKey?.length ?? 0,
                 autoWidthMax: 40,
-            }];
-            rows=rows.concat(tableRowsXLS(grid.depotsToDisplay, fieldsDef2Export));
-            rows.push({'#worksheet':sheet2name, autoWidthMax: 40});
-            // La primera fila de metadata queda en blanco, como cuando las
-            // celdas se escribían por dirección arrancando en la fila 2.
-            rows.push([]);
-            rows.push([{v:'table',s:'header'}, grid.def.name]);
-            rows.push([{v:'date' ,s:'header'}, new Date().toISOString()]);
-            rows.push([{v:'user' ,s:'header'}, my.config.username]);
-            // grid.def.allow.forEach(function(action,iAction){
-            //     exportFileInformationWs[XLSX.utils.encode_cell({c:iAction,r:2})]={t:'s',v:action};
-            // })
+                rows: tableRowsXLS(grid.depotsToDisplay, fieldsDef2Export)
+            };
+            var metadataSheet = {
+                name:sheet2name,
+                autoWidthMax: 40,
+                rows: [
+                    [],
+                    [{v:'table',s:'header'}, grid.def.name],
+                    [{v:'date' ,s:'header'}, new Date().toISOString()],
+                    [{v:'user' ,s:'header'}, my.config.username],
+                ]
+            };
             if(grid.def.exportMetadata){
                 if(grid.def.exportMetadata.fieldProperties){
                     var fieldPropertiesDefs=grid.def.exportMetadata.fieldProperties.map(function(propName, i){
@@ -1768,11 +1768,11 @@ myOwn.dialogDownload = function dialogDownload(grid){
                         return {row:fieldDef};
                     });
                     extraColumns={};
-                    rows=rows.concat(tableRowsXLS(fieldPropertiesDepot,fieldPropertiesDefs,1));
+                    metadataSheet.rows.push(...(tableRowsXLS(fieldPropertiesDepot,fieldPropertiesDefs,1)));
                 }
             }
             xlsxNowBrowser.createXlsxBlob({
-                rows,
+                sheets: [dataSheet, metadataSheet],
                 styles:XLSX_STYLES
             }).then(function(blob){
                 mainDiv.setAttribute("current-state", "ready");
