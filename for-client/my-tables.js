@@ -687,7 +687,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                         depot.manager.displayAsDeleted(depot, force ? 'change-ff' : 'unknown');
                         if (myOwn.config.config['grid-row-retain-moved-or-deleted']) {
                             if(!depot['$refreshed']){
-                                grid.retrieveRowAndRefresh(depot,{retrieveIgnoringWhere:true})
+                                grid.retrieveRowAndRefresh(depot,{retrieveWithBroadWhere:true})
                                 depot['$refreshed'] = true
                             }
                         }
@@ -2435,7 +2435,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 return {fieldName:fieldName, value:depot.primaryKeyValues[i]};
             }),
             pick:grid.def.pick,
-            retrieveIgnoringWhere: opts?opts.retrieveIgnoringWhere:false
+            retrieveWithBroadWhere : opts?.retrieveWithBroadWhere ?? false
         }).then(function(result){
             grid.depotRefresh(depot,{updatedRow:result[0], sendedForUpdate:{}}, opts);
         })

@@ -284,10 +284,12 @@ export type TableDefinition = EditableDbDefinition & {
     primaryKey:string[]
     refrescable?: boolean
     sql?:{
+        select: string[]
         primaryKey4Delete?:string[]
         isTable?:boolean
         from?:string
         where?:string
+        broadWhere?:string
         postCreateSqls?:string
         skipEnance?: boolean
         isReferable?: boolean
@@ -338,6 +340,7 @@ export type TableDefinition = EditableDbDefinition & {
     policy?:string
     firstDisplayCount?:number
     firstDisplayOverLimit?:number
+    forInsertOnlyMode?:boolean
     description?:MarkdownDoc
     exportJsonFieldAsColumns?:string
     importCuidado?:boolean
@@ -350,6 +353,7 @@ export type TableDefinition = EditableDbDefinition & {
     functionDef?:{
         parameters?:ProcedureParameter[]
     }
+
 }
 export type TableDefinitionInternal = RequireSome<TableDefinition,
     'allow'|'sql'
