@@ -284,7 +284,7 @@ export type TableDefinition = EditableDbDefinition & {
     primaryKey:string[]
     refrescable?: boolean
     sql?:{
-        select: string[]
+        select?: string[]
         primaryKey4Delete?:string[]
         isTable?:boolean
         from?:string
