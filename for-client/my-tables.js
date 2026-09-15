@@ -1742,8 +1742,8 @@ myOwn.dialogDownload = function dialogDownload(grid){
             var sheet2name=grid.def.name!=="metadata"?"metadata":"meta-data";
             var dataSheet = {
                 name: sheet1name,
-                freezeRows: 1,
-                freezeColumns: grid.def.primaryKey?.length ?? 0,
+                freezeRows: my.config.config?.['unfreeze-excel-rows'] ? 0 : 1,
+                freezeColumns: my.config.config?.['unfreeze-excel-columns'] ? 0 : (grid.def.primaryKey?.length ?? 0),
                 autoWidthMax: 40,
                 rows: tableRowsXLS(grid.depotsToDisplay, fieldsDef2Export)
             };

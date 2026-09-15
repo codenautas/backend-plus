@@ -509,6 +509,8 @@ export interface AppConfigClientSetup // front-end config
         "minimum-scale"?:string
         "maximum-scale"?:string
         "user-scalable"?:string
+        "unfreeze-excel-rows"?:boolean
+        "unfreeze-excel-columns"?:boolean
     }
 export interface AppConfig {
     package: {
