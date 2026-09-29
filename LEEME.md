@@ -373,6 +373,7 @@ client-setup                 | opciones para el front-end
 .menu                        | si usa los menúes integrados
 .title                       | título de la pantalla
 .lang                        | idioma (y locale) del frontend, por ahora "es" o "en"
+.tab-plus                    | "only": los `.tab` de `install` se leen con [tab-plus](https://npmjs.org/package/tab-plus) y la opción `.txt "\|"` de exportar la grilla usa tab-plus (pudiendo pegar la primera línea de un `.tab` para respetar sus columnas esparsas)
 db                           | opciones de la base de datos
 .motor                       | por ahora solo 'postgresql'
 .database                    |
@@ -438,6 +439,7 @@ client-setup                 | front-end options
 .menu                        | whether it uses the integrated menus
 .title                       | screen title
 .lang                        | frontend language (and locale), for now "es" or "en"
+.tab-plus                    | "only": the `.tab` files in `install` are read with [tab-plus](https://npmjs.org/package/tab-plus) and the `.txt "\|"` option of the grid export uses tab-plus (the first line of a `.tab` can be pasted to keep its sparse columns)
 db                           | database options
 .motor                       | for now only 'postgresql'
 .database                    |

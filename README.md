@@ -247,6 +247,7 @@ client-setup                 | front-end options
 .menu                        | whether it uses the integrated menus
 .title                       | screen title
 .lang                        | frontend language (and locale), for now "es" or "en"
+.tab-plus                    | "only": the `.tab` files in `install` are read with [tab-plus](https://npmjs.org/package/tab-plus) and the `.txt "\|"` option of the grid export uses tab-plus (the first line of a `.tab` can be pasted to keep its sparse columns)
 db                           | database options
 .motor                       | for now only 'postgresql'
 .database                    |

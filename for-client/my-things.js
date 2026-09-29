@@ -919,6 +919,22 @@ myOwn.registerPostInput = function registerPostInput(postInputName, postInputFun
     TypeStore.type.text.postInputs[postInputName]=postInputFunction;
 }
 
+// Cómo se escribe y se lee en un .tab (tab-plus) un campo sin contenido: vale '' si el campo acepta '' y no
+// acepta null, y null en cualquier otro caso. La usan tanto quien genera el .tab (exportar desde la grilla)
+// como quien lo lee (el instalador), por eso no se escribe en el archivo.
+myOwn.tabPlusEmptyField = function tabPlusEmptyField(fieldDef){
+    return fieldDef.allowEmptyText && ('nullable' in fieldDef) && !fieldDef.nullable ? 'string' : 'null';
+}
+
+// el emptyField de cada campo, en el formato de options.columnDefs de tab-plus
+myOwn.tabPlusColumnDefs = function tabPlusColumnDefs(fieldDefs){
+    var columnDefs = {};
+    fieldDefs.forEach(function(fieldDef){
+        columnDefs[fieldDef.name] = {emptyField: myOwn.tabPlusEmptyField(fieldDef)};
+    });
+    return columnDefs;
+}
+
 return myOwn;
 
 });

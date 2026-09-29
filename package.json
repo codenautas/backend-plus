@@ -72,11 +72,11 @@
     "simple-git": "^3.36.0",
     "sql-tools": "^0.1.7",
     "stack-trace": "^1.0.0",
-    "tab-plus": "^0.1.8",
+    "tab-plus": "^0.2.0",
     "type-store": "^0.6.1",
     "typed-controls": "^0.12.7",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.2/xlsx-0.20.2.tgz",
-    "xlsx-now": "^0.2.1"
+    "xlsx-now": "^0.4.2"
   },
   "devDependencies": {
     "@types/big.js": "^7.0.0",

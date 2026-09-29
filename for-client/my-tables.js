@@ -104,6 +104,8 @@ myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     skippedColumns:'skipped columns',
     skipUnknownFieldsAtImport:'skip unknown fields at import',
     table: "table",
+    tabPlusHeader: "first line of a .tab to keep its column order and its sparse columns (optional)",
+    tabPlusHeaderUnknownFields: "Nothing was exported. These columns of the pasted line are not among the exported ones: ",
     thereAreNot: "no",
     uploadFile: "upload file $1",
     verticalEdit: "vertical edit",
@@ -174,6 +176,8 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     skippedColumns:'Columnas salteadas',
     skipUnknownFieldsAtImport:'saltear columnas que no existan',
     table: "tabla",
+    tabPlusHeader: "primera línea de un .tab para respetar su orden de columnas y sus columnas esparsas (opcional)",
+    tabPlusHeaderUnknownFields: "No se exportó nada. Estas columnas de la línea pegada no están entre las exportadas: ",
     thereAreNot: "no hay",
     uploadFile: "subir el archivo $1",
     verticalEdit: "edición en forma de ficha",
@@ -1550,8 +1554,10 @@ myOwn.INCLUDE_LOOKUP_COLUMNS_IN_TXT_EXPORT=true;
 
 myOwn.dialogDownload = function dialogDownload(grid){
     return dialogPromise(function(dialogWindow, closeWindow){
-        var prepareDownloadElement=html.button({class:'export-a'},my.messages.prepare).create();
-        var downloadElement=html.a({class:'export-a'},my.messages.download).create();
+        var downloadElement=html.a({class:'export-a', href:'#'},my.messages.download).create();
+        var useTabPlus = my.config.config?.['tab-plus'] == 'only';
+        var tabPlusHeader=html.textarea({rows:3, style:'width:100%; box-sizing:border-box'}).create();
+        var tabPlusHeaderDiv=html.div([html.div(my.messages.tabPlusHeader), tabPlusHeader]).create();
         var input={
             xlsx : html.input({class:'export-radio',type:'radio', value:'xlsx', name:'format', checked:true}).create(),
             txt  : html.input({class:'export-radio',type:'radio', value:'txt' , name:'format'}).create(),
@@ -1572,7 +1578,8 @@ myOwn.dialogDownload = function dialogDownload(grid){
                 html.div([html.label([input.readOnly        , html.span(my.messages.readOnly)])]),
                 html.div([html.label([input.hiddens         , html.span(my.messages.hiddens)])]),
                 html.br(),
-                // html.div([prepareDownloadElement]),
+                tabPlusHeaderDiv,
+                html.div([downloadElement]),
             ]),
             html.div({class:'state-preparing'}, [
                 html.div(my.messages.preparingForExport),
@@ -1583,59 +1590,88 @@ myOwn.dialogDownload = function dialogDownload(grid){
                     title:my.messages.preparingForExport,
                 }),
             ]),
-            html.div({class:'state-ready'}, [downloadElement]),
             html.div('.'),
         ]).create();
         dialogWindow.appendChild(mainDiv);
-        var fieldsDef2Export=[];
-        var extraColumns={}
         var lastColumnExported=-1;
-        var separator=';';
-        var replacer=function(x){ return x};
-        var dotExtension='.txt';
-        var prepare=function(){
-            mainDiv.setAttribute("current-state", "preparing");
-            setTimeout(function(){
-                fieldsDef2Export=grid.def.fields.filter(function(fieldDef){
-                    return (fieldDef.inTable!==false || input.fromOtherTables.checked)
-                        && fieldDef.visible
-                        && (fieldDef.allow.update || input.readOnly.checked || fieldDef.isPk)
-                        && (!grid.view.hiddenColumns.includes(fieldDef.name) || input.hiddens.checked);
-                });
-                if(input.xlsx.checked){
-                    excelExport();
-                }else{
-                    if(input.csv.checked){
-                        separator=',';
-                        replacer=function(txt){
-                            return /[\n,"]/.test(txt)?'"'+txt.replace(/"/g,'""')+'"':txt
-                        }
-                        dotExtension='.csv';
-                    }else{
-                        separator='|';
-                        var trans={
-                            '|':'\\x7C',
-                            '\\':'\\\\',
-                            '\r':'\\r',
-                            '\n':'\\n',
-                        }
-                        replacer=function(txt){
-                            return txt.replace(/[|\\\r\n]/g,function(char){
-                                return trans[char];
-                            })
-                        }
-                        dotExtension='.tab';
+        var showTabPlusHeader=function(){
+            tabPlusHeaderDiv.style.display = useTabPlus && input.txt.checked ? '' : 'none';
+        }
+        input.xlsx.onchange=showTabPlusHeader;
+        input.txt.onchange=showTabPlusHeader;
+        input.csv.onchange=showTabPlusHeader;
+        showTabPlusHeader();
+        var textUrl=null;
+        var exporting=false;
+        // El archivo se genera recién al hacer clic en descargar, con las opciones elegidas en ese momento.
+        // El xlsx se escribe mientras se genera (downloadXlsx debe llamarse durante el clic, porque puede abrir
+        // el diálogo de guardar del navegador); el texto se arma entero y lo descarga el propio enlace.
+        downloadElement.onclick=function(event){
+            if(exporting){
+                event.preventDefault();
+                return;
+            }
+            var fieldsDef2Export=grid.def.fields.filter(function(fieldDef){
+                return (fieldDef.inTable!==false || input.fromOtherTables.checked)
+                    && fieldDef.visible
+                    && (fieldDef.allow.update || input.readOnly.checked || fieldDef.isPk)
+                    && (!grid.view.hiddenColumns.includes(fieldDef.name) || input.hiddens.checked);
+            });
+            if(input.xlsx.checked){
+                event.preventDefault();
+                exporting=true;
+                mainDiv.setAttribute("current-state", "preparing");
+                excelExport(fieldsDef2Export).then(function(){
+                    exporting=false;
+                    mainDiv.setAttribute("current-state", "chossing");
+                }, function(err){
+                    exporting=false;
+                    mainDiv.setAttribute("current-state", "chossing");
+                    // AbortError: el usuario cerró el diálogo de guardar sin elegir un archivo
+                    if(err.name!=='AbortError'){
+                        alertPromise(err.message);
                     }
-                    txtExport();
+                });
+                return;
+            }
+            var text;
+            var dotExtension;
+            try{
+                if(input.csv.checked){
+                    text=txtExport(fieldsDef2Export, ',', function(txt){
+                        return /[\n,"]/.test(txt)?'"'+txt.replace(/"/g,'""')+'"':txt
+                    });
+                    dotExtension='.csv';
+                }else if(useTabPlus){
+                    text=tabPlusExport(fieldsDef2Export);
+                    dotExtension='.tab';
+                }else{
+                    var trans={
+                        '|':'\\x7C',
+                        '\\':'\\\\',
+                        '\r':'\\r',
+                        '\n':'\\n',
+                    }
+                    text=txtExport(fieldsDef2Export, '|', function(txt){
+                        return txt.replace(/[|\\\r\n]/g,function(char){
+                            return trans[char];
+                        })
+                    });
+                    dotExtension='.tab';
                 }
-            },100)
+            }catch(err){
+                event.preventDefault();
+                alertPromise(err.message);
+                return;
+            }
+            if(textUrl!=null){
+                URL.revokeObjectURL(textUrl);
+            }
+            textUrl = URL.createObjectURL(new Blob([text], {type: 'text/plain'}));
+            downloadElement.href=textUrl;
+            downloadElement.setAttribute("download", grid.def.name+dotExtension);
         }
-        prepareDownloadElement.onclick=prepare;
-        if("auto prepare"){
-            likeAr(input).forEach(function(input){ input.onclick=prepare; })
-            setTimeout(prepare,200);
-        }
-        var txtExport = function(){
+        var txtExport = function(fieldsDef2Export, separator, replacer){
             var data=[];
             var titles = fieldsDef2Export.map(function(fieldDef){
                 if(fieldDef.inTable===false && !input.fromOtherTables.checked) return '';
@@ -1650,11 +1686,44 @@ myOwn.dialogDownload = function dialogDownload(grid){
                     return value!=null?typeStore.typerFrom(fieldDef).toPlainString(value):'';
                 }));
             });
-            var blob = new Blob([data.map(function(line){return line.map(replacer).join(separator)}).join('\r\n')], {type: 'text/plain'});
-            var url = URL.createObjectURL(blob);
-            downloadElement.href=url;
-            downloadElement.setAttribute("download", grid.def.name+dotExtension);
-            mainDiv.setAttribute("current-state", "ready");
+            return data.map(function(line){return line.map(replacer).join(separator)}).join('\r\n');
+        }
+        // Con tab-plus. Si se pegó la primera línea de un .tab, se respeta su orden de columnas y sus columnas
+        // esparsas: las columnas que no estaban en esa línea van después de las que sí estaban, esparsas si
+        // la línea ya tenía alguna esparsa, y si no, esparsas o comunes según lo que convenga.
+        var tabPlusExport = function(fieldsDef2Export){
+            var tabPlus = require('tab-plus');
+            var autoTabPlus = require('auto-tab-plus');
+            var options = {eol:'\r\n', columnDefs: myOwn.tabPlusColumnDefs(fieldsDef2Export)};
+            var exportedNames = fieldsDef2Export.map(function(fieldDef){ return fieldDef.name; });
+            var rows = grid.depotsToDisplay.map(function(depot){
+                var row = {};
+                fieldsDef2Export.forEach(function(fieldDef){
+                    var value=depot.row[fieldDef.name];
+                    row[fieldDef.name] = value!=null?typeStore.typerFrom(fieldDef).toPlainString(value):null;
+                });
+                return row;
+            });
+            // si se pegó un archivo entero solo interesa su primera línea
+            var headerLine = tabPlusHeader.value.split(/\r?\n/).find(function(line){ return line.trim()!=''; });
+            if(headerLine==null){
+                return tabPlus.generateTab({fields:exportedNames, rows:rows}, options);
+            }
+            var header = tabPlus.parseTab(headerLine, {columnDefs: options.columnDefs});
+            var unknownNames = header.fields.filter(function(name){ return !exportedNames.includes(name); });
+            if(unknownNames.length){
+                throw new Error(my.messages.tabPlusHeaderUnknownFields + unknownNames.join(', '));
+            }
+            var newNames = exportedNames.filter(function(name){ return !header.fields.includes(name); });
+            var fields = header.fields.concat(newNames);
+            var decided = autoTabPlus.decideSparseColumns(
+                fields,
+                rows.map(function(row){ return fields.map(function(name){ return row[name]; }); }),
+                header.columnDefs,
+                header.columnDefs ? {under: autoTabPlus.defaultThreshold, sparse: newNames}
+                    : {under: autoTabPlus.defaultThreshold, fixed: header.fields, auto: newNames}
+            );
+            return tabPlus.generateTab({fields:decided.fields, columnDefs:decided.columnDefs, rows:rows}, options);
         }
         var XLSX_STYLES={
             header      : {bold:true},
@@ -1668,7 +1737,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
         // Las columnas que salen de exportJsonFieldAsColumns aparecen recién al
         // recorrer las filas, pero el encabezado se escribe antes que ellas: con
         // escritura secuencial hay que conocerlas de entrada, y esta pasada las junta.
-        var collectExtraColumns = function collectExtraColumns(depots, fieldDefs, firstColumn){
+        var collectExtraColumns = function collectExtraColumns(depots, fieldDefs, firstColumn, extraColumns){
             var lastColumn=firstColumn-1;
             if(grid.def.exportJsonFieldAsColumns){
                 depots.forEach(function(depot){
@@ -1700,9 +1769,11 @@ myOwn.dialogDownload = function dialogDownload(grid){
         // Las filas de una tabla, como las toma xlsx-now: la primera es el
         // encabezado y cada una de las demás es un array donde la posición es la
         // columna. `leftColumn` corre la tabla entera hacia la derecha.
-        var tableRowsXLS = function tableRowsXLS(depots, fieldDefs, leftColumn){
+        // Es un generador para que xlsx-now pida cada fila recién cuando la va a escribir.
+        var tableRowsXLS = function* tableRowsXLS(depots, fieldDefs, leftColumn){
             leftColumn=leftColumn||0;
-            var lastColumn=collectExtraColumns(depots, fieldDefs, fieldDefs.length);
+            var extraColumns={};
+            var lastColumn=collectExtraColumns(depots, fieldDefs, fieldDefs.length, extraColumns);
             lastColumnExported = Math.max(lastColumnExported, lastColumn);
             var pad=new Array(leftColumn);
             var headerRow=pad.concat(fieldDefs.map(function(field){
@@ -1711,8 +1782,8 @@ myOwn.dialogDownload = function dialogDownload(grid){
             likeAr(extraColumns).forEach(function(pos, name){
                 headerRow[pos+leftColumn]={v:name, s:'extraHeader'};
             });
-            var rows=[headerRow];
-            depots.forEach(function(depot){
+            yield headerRow;
+            for(var depot of depots){
                 var row=pad.concat([]);
                 var addCell = function addCell(value, fieldDef, iColumn){
                     if(value!=null){
@@ -1733,11 +1804,10 @@ myOwn.dialogDownload = function dialogDownload(grid){
                         addCell(value, fieldDef, iColumn);
                     }
                 });
-                rows.push(row);
-            });
-            return rows;
+                yield row;
+            }
         }
-        var excelExport = function(){
+        var excelExport = function(fieldsDef2Export){
             var sheet1name=grid.def.name.length>27?grid.def.name.slice(0,27)+'...':grid.def.name;
             var sheet2name=grid.def.name!=="metadata"?"metadata":"meta-data";
             var dataSheet = {
@@ -1745,11 +1815,15 @@ myOwn.dialogDownload = function dialogDownload(grid){
                 freezeRows: my.config.config?.['unfreeze-excel-rows'] ? 0 : 1,
                 freezeColumns: my.config.config?.['unfreeze-excel-columns'] ? 0 : (grid.def.primaryKey?.length ?? 0),
                 autoWidthMax: 40,
+                autoWidthMin: 5,
+                autoWidthRows: 16384,
                 rows: tableRowsXLS(grid.depotsToDisplay, fieldsDef2Export)
             };
             var metadataSheet = {
                 name:sheet2name,
                 autoWidthMax: 40,
+                autoWidthMin: 5,
+                autoWidthRows: 16384,
                 rows: [
                     [],
                     [{v:'table',s:'header'}, grid.def.name],
@@ -1767,21 +1841,12 @@ myOwn.dialogDownload = function dialogDownload(grid){
                     }).map(function(fieldDef){
                         return {row:fieldDef};
                     });
-                    extraColumns={};
                     metadataSheet.rows.push(...(tableRowsXLS(fieldPropertiesDepot,fieldPropertiesDefs,1)));
                 }
             }
-            xlsxNowBrowser.createXlsxBlob({
+            return xlsxNowBrowser.downloadXlsx(grid.def.name+".xlsx", {
                 sheets: [dataSheet, metadataSheet],
                 styles:XLSX_STYLES
-            }).then(function(blob){
-                mainDiv.setAttribute("current-state", "ready");
-                var url = URL.createObjectURL(blob);
-                downloadElement.href=url;
-                downloadElement.setAttribute("download", grid.def.name+".xlsx");
-            }).catch(function(err){
-                mainDiv.setAttribute("current-state", "chossing");
-                alertPromise(err.message);
             });
         };
     });

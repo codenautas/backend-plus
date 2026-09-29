@@ -511,6 +511,7 @@ export interface AppConfigClientSetup // front-end config
         "user-scalable"?:string
         "unfreeze-excel-rows"?:boolean
         "unfreeze-excel-columns"?:boolean
+        "tab-plus"?:"only"|"compare"      // "only": the installer reads the .tab with tab-plus and the grid exports "|" with tab-plus
     }
 export interface AppConfig {
     package: {
