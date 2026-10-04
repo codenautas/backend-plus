@@ -248,6 +248,9 @@ client-setup                 | front-end options
 .title                       | screen title
 .lang                        | frontend language (and locale), for now "es" or "en"
 .tab-plus                    | "only": the `.tab` files in `install` are read with [tab-plus](https://npmjs.org/package/tab-plus) and the `.txt "\|"` option of the grid export uses tab-plus (the first line of a `.tab` can be pasted to keep its sparse columns)
+.tab-plus-table-options      | per table, options for the `.tab` exported by the grid with `tab-plus: only`: a string is the first line of a `.tab` (it is shown in the "options" box, where it can be edited); an object `{fields, columnDefs}` is used if the box is left empty. At startup it is completed with the first line of the `.tab` of each table not defined there
+.downloads.method            | how the grid export saves the file: `SaveFilePicker` (default) uses the "save as" dialog if the browser has `showSaveFilePicker` (otherwise "confirm" and the "download" link); `legacy` always uses "confirm" and the "download" link
+.downloads.close-retries     | with `SaveFilePicker`, how many times it retries (0 to 5, default 0) if replacing the file fails when closing it, waiting 200 ms and doubling on each retry
 db                           | database options
 .motor                       | for now only 'postgresql'
 .database                    |

@@ -512,6 +512,11 @@ export interface AppConfigClientSetup // front-end config
         "unfreeze-excel-rows"?:boolean
         "unfreeze-excel-columns"?:boolean
         "tab-plus"?:"only"|"compare"      // "only": the installer reads the .tab with tab-plus and the grid exports "|" with tab-plus
+        downloads?:{
+            method?:"legacy"|"SaveFilePicker"
+            "close-retries"?:0|1|2|3|4|5
+        }
+        "tab-plus-table-options"?:Record<string, string|{fields:string[], columnDefs?:Record<string, {position:number, sparseDefault?:string|null}>}>
     }
 export interface AppConfig {
     package: {

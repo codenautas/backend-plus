@@ -919,11 +919,20 @@ myOwn.registerPostInput = function registerPostInput(postInputName, postInputFun
     TypeStore.type.text.postInputs[postInputName]=postInputFunction;
 }
 
-// Cómo se escribe y se lee en un .tab (tab-plus) un campo sin contenido: vale '' si el campo acepta '' y no
-// acepta null, y null en cualquier otro caso. La usan tanto quien genera el .tab (exportar desde la grilla)
-// como quien lo lee (el instalador), por eso no se escribe en el archivo.
+// Cómo se lee en un .tab (tab-plus) un campo sin contenido: vale '' si el campo acepta '' y no acepta null,
+// y null en cualquier otro caso. La usan quienes leen un .tab (el instalador y el diálogo de exportar al
+// leer la línea de opciones), por eso no se escribe en el archivo.
 myOwn.tabPlusEmptyField = function tabPlusEmptyField(fieldDef){
     return fieldDef.allowEmptyText && ('nullable' in fieldDef) && !fieldDef.nullable ? 'string' : 'null';
+}
+
+var tabPlusSparseEmptyField = Symbol('tab-plus sparse empty field');
+
+myOwn.tabPlusGenerateEmptyField = function tabPlusGenerateEmptyField(fieldDef, sparse){
+    if(sparse){
+        return tabPlusSparseEmptyField;
+    }
+    return fieldDef.typeName=='text' && fieldDef.nullable!==false && fieldDef.allowEmptyText ? 'null' : 'both';
 }
 
 // el emptyField de cada campo, en el formato de options.columnDefs de tab-plus

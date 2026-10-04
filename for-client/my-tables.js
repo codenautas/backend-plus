@@ -1,6 +1,6 @@
 "use strict";
 
-/*global myOwn, my, xlsxNowBrowser, Pikaday  */
+/*global myOwn, my, xlsxNow, xlsxNowBrowser, Pikaday  */
 /*global miniMenuPromise, dialogPromise, alertPromise, confirmPromise, promptPromise, simpleFormPromise */
 /*global Blob, document, CustomEvent, URL  */
 
@@ -50,6 +50,7 @@ myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     allTWillDelete: "(ALL {$t} records will be deleted)",
     anotherUserChangedTheRow: "The data was changed in the database",
     confirmDeleteAll: "Do you want to delete these records?",
+    confirmExport: "confirm",
     deleteAllRecords: "delete all records",
     deleteRecord: "delete record",
     details: "details",
@@ -94,6 +95,8 @@ myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     orientationToggle: "toggle orientation (vertical vs horizontal)",
     prepare: "prepare",
     preparingForExport: "preparing for export",
+    saveToDiskError: "The file could not be saved",
+    saveToDiskEmptied: "The file could not be saved and it was left empty (the browser empties it when it is chosen)",
     recordsReimaining: "{$r} records remains in the table",
     refresh: "refresh - retrive data from database",
     replaceNewLineWithSpace: 'replace new lines with spaces',
@@ -105,6 +108,7 @@ myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     skipUnknownFieldsAtImport:'skip unknown fields at import',
     table: "table",
     tabPlusHeader: "first line of a .tab to keep its column order and its sparse columns (optional)",
+    tabPlusOptions: "options",
     tabPlusHeaderUnknownFields: "Nothing was exported. These columns of the pasted line are not among the exported ones: ",
     thereAreNot: "no",
     uploadFile: "upload file $1",
@@ -122,6 +126,7 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     allTWillDelete: "(se borrarán todos los registros: {$t} registros)",
     anotherUserChangedTheRow: "Hubo un cambio en la base de datos para este registro",
     confirmDeleteAll: "¿Desea borrar estos registros?",
+    confirmExport: "confirmar",
     deleteAllRecords: "borrar todos los registros",
     deleteRecord: "borrar este registro",
     details: "detalles",
@@ -166,6 +171,8 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     orientationToggle: "cambiar la orientación de la tabla (por fila o por columna)",
     prepare: "preparar",
     preparingForExport: "preparando para exportar",
+    saveToDiskError: "No se pudo guardar el archivo",
+    saveToDiskEmptied: "No se pudo guardar el archivo y quedó vacío (el navegador lo vacía al elegirlo)",
     recordsReimaining: "quedan {$r} registros en la tabla",
     refresh: "refrescar la grilla desde la base de datos",
     replaceNewLineWithSpace: 'replazar saltos de línea por espacios',
@@ -177,6 +184,7 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
     skipUnknownFieldsAtImport:'saltear columnas que no existan',
     table: "tabla",
     tabPlusHeader: "primera línea de un .tab para respetar su orden de columnas y sus columnas esparsas (opcional)",
+    tabPlusOptions: "opciones",
     tabPlusHeaderUnknownFields: "No se exportó nada. Estas columnas de la línea pegada no están entre las exportadas: ",
     thereAreNot: "no hay",
     uploadFile: "subir el archivo $1",
@@ -1554,10 +1562,17 @@ myOwn.INCLUDE_LOOKUP_COLUMNS_IN_TXT_EXPORT=true;
 
 myOwn.dialogDownload = function dialogDownload(grid){
     return dialogPromise(function(dialogWindow, closeWindow){
-        var downloadElement=html.a({class:'export-a', href:'#'},my.messages.download).create();
+        var downloadsConfig = my.config.config?.downloads || {};
+        var canSaveToDisk = downloadsConfig.method != 'legacy' && !!window.showSaveFilePicker;
+        var actionElement=html.button({class:'export-a'},canSaveToDisk ? my.messages.download : my.messages.confirmExport).create();
+        var downloadElement=html.a({class:'export-a'},my.messages.download).create();
         var useTabPlus = my.config.config?.['tab-plus'] == 'only';
+        var tabPlusTableOptions = (my.config.config?.['tab-plus-table-options'] || {})[grid.def.name];
         var tabPlusHeader=html.textarea({rows:3, style:'width:100%; box-sizing:border-box'}).create();
-        var tabPlusHeaderDiv=html.div([html.div(my.messages.tabPlusHeader), tabPlusHeader]).create();
+        if(typeof tabPlusTableOptions == 'string'){
+            tabPlusHeader.value = tabPlusTableOptions;
+        }
+        var tabPlusHeaderDiv=html.div([html.div({title:my.messages.tabPlusHeader}, my.messages.tabPlusOptions), tabPlusHeader]).create();
         var input={
             xlsx : html.input({class:'export-radio',type:'radio', value:'xlsx', name:'format', checked:true}).create(),
             txt  : html.input({class:'export-radio',type:'radio', value:'txt' , name:'format'}).create(),
@@ -1579,7 +1594,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
                 html.div([html.label([input.hiddens         , html.span(my.messages.hiddens)])]),
                 html.br(),
                 tabPlusHeaderDiv,
-                html.div([downloadElement]),
+                html.div([actionElement]),
             ]),
             html.div({class:'state-preparing'}, [
                 html.div(my.messages.preparingForExport),
@@ -1590,6 +1605,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
                     title:my.messages.preparingForExport,
                 }),
             ]),
+            html.div({class:'state-ready'}, [downloadElement]),
             html.div('.'),
         ]).create();
         dialogWindow.appendChild(mainDiv);
@@ -1597,18 +1613,161 @@ myOwn.dialogDownload = function dialogDownload(grid){
         var showTabPlusHeader=function(){
             tabPlusHeaderDiv.style.display = useTabPlus && input.txt.checked ? '' : 'none';
         }
-        input.xlsx.onchange=showTabPlusHeader;
-        input.txt.onchange=showTabPlusHeader;
-        input.csv.onchange=showTabPlusHeader;
-        showTabPlusHeader();
-        var textUrl=null;
+        var fileUrl=null;
         var exporting=false;
-        // El archivo se genera recién al hacer clic en descargar, con las opciones elegidas en ese momento.
-        // El xlsx se escribe mientras se genera (downloadXlsx debe llamarse durante el clic, porque puede abrir
-        // el diálogo de guardar del navegador); el texto se arma entero y lo descarga el propio enlace.
-        downloadElement.onclick=function(event){
+        // cuenta los cambios de opciones: lo que se terminó de armar con opciones viejas no se ofrece
+        var optionsVersion=0;
+        // Al cambiar una opción, lo que estaba listo para descargar ya no corresponde: se vuelve a "confirmar"
+        var optionsChanged=function(){
+            optionsVersion++;
+            showTabPlusHeader();
+            if(fileUrl!=null){
+                URL.revokeObjectURL(fileUrl);
+                fileUrl=null;
+            }
+            downloadElement.removeAttribute("href");
+            downloadElement.removeAttribute("download");
+            if(!exporting){
+                mainDiv.setAttribute("current-state", "chossing");
+            }
+        }
+        likeAr(input).forEach(function(element){ element.onchange=optionsChanged; });
+        tabPlusHeader.oninput=optionsChanged;
+        showTabPlusHeader();
+        // El texto se arma entero. En dos tiempos: al llamarla valida las opciones (instantáneo, lanza el error si
+        // no sirven) y devuelve {dotExtension, generate}; generate() arma el texto.
+        var textExport=function(fieldsDef2Export){
+            if(input.csv.checked){
+                return {dotExtension:'.csv', generate:function(){
+                    return txtExport(fieldsDef2Export, ',', function(txt){
+                        return /[\n,"]/.test(txt)?'"'+txt.replace(/"/g,'""')+'"':txt
+                    });
+                }};
+            }else if(useTabPlus){
+                var header=tabPlusExportHeader(fieldsDef2Export);
+                return {dotExtension:'.tab', generate:function(){
+                    return tabPlusExport(fieldsDef2Export, header);
+                }};
+            }else{
+                var trans={
+                    '|':'\\x7C',
+                    '\\':'\\\\',
+                    '\r':'\\r',
+                    '\n':'\\n',
+                }
+                return {dotExtension:'.tab', generate:function(){
+                    return txtExport(fieldsDef2Export, '|', function(txt){
+                        return txt.replace(/[|\\\r\n]/g,function(char){
+                            return trans[char];
+                        })
+                    });
+                }};
+            }
+        }
+        var saveToDisk=function(fieldsDef2Export){
+            var step='showSaveFilePicker';
+            var setStep=function(newStep){ step=newStep; };
+            var file;
+            if(input.xlsx.checked){
+                var options=excelOptions(fieldsDef2Export);
+                file={dotExtension:'.xlsx', write:function(writable){
+                    var currentOptions=options||excelOptions(fieldsDef2Export);
+                    options=null;
+                    setStep('write');
+                    return xlsxNow.createXlsxStream(currentOptions).pipeTo(writable, {preventClose:true, preventAbort:true});
+                }};
+            }else{
+                var textFile=textExport(fieldsDef2Export);
+                var text=null;
+                file={dotExtension:textFile.dotExtension, write:function(writable){
+                    if(text==null){
+                        setStep('generate');
+                        text=textFile.generate();
+                    }
+                    setStep('write');
+                    return writable.write(text);
+                }};
+            }
+            var writeOnce=function(handle){
+                setStep('createWritable');
+                return handle.createWritable().then(function(writable){
+                    return Promise.resolve().then(function(){
+                        return file.write(writable);
+                    }).then(function(){
+                        setStep('close');
+                        return writable.close();
+                    }, function(err){
+                        return writable.abort().then(function(){
+                            throw err;
+                        }, function(abortErr){
+                            console.error(abortErr);
+                            throw err;
+                        });
+                    });
+                });
+            }
+            var closeRetries=downloadsConfig['close-retries'] || 0;
+            var writeWithRetries=function(handle, attempt){
+                return writeOnce(handle).catch(function(err){
+                    if(step==='close' && err.name==='InvalidStateError' && attempt<closeRetries){
+                        console.error('saveToDisk retry', attempt+1, err);
+                        return new Promise(function(resolve){
+                            setTimeout(resolve, 200 * Math.pow(2, attempt));
+                        }).then(function(){
+                            return writeWithRetries(handle, attempt+1);
+                        });
+                    }
+                    throw err;
+                });
+            }
+            var mimeTypes={'.xlsx':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', '.csv':'text/csv', '.tab':'text/plain'};
+            var accept={};
+            accept[mimeTypes[file.dotExtension]]=[file.dotExtension];
+            return window.showSaveFilePicker({
+                suggestedName: grid.def.name+file.dotExtension,
+                types: [{description: file.dotExtension, accept: accept}]
+            }).then(function(handle){
+                return writeWithRetries(handle, 0).then(function(){
+                    return 'saved';
+                });
+            }, function(err){
+                if(err.name==='AbortError'){
+                    return 'cancelled';
+                }
+                throw err;
+            }).catch(function(err){
+                console.error('saveToDisk', step, err);
+                // showSaveFilePicker vacía el archivo elegido antes de devolverlo: si falla después, quedó vacío
+                var message=step==='showSaveFilePicker' ? my.messages.saveToDiskError : my.messages.saveToDiskEmptied;
+                throw new Error(message+' ('+step+') '+err.name+': '+err.message);
+            });
+        }
+        var prepareDownload=function(fieldsDef2Export){
+            var version=optionsVersion;
+            if(fileUrl!=null){
+                URL.revokeObjectURL(fileUrl);
+                fileUrl=null;
+            }
+            return Promise.resolve().then(function(){
+                if(input.xlsx.checked){
+                    return xlsxNowBrowser.createXlsxBlob(excelOptions(fieldsDef2Export)).then(function(blob){
+                        return {blob:blob, dotExtension:'.xlsx'};
+                    });
+                }
+                var textFile=textExport(fieldsDef2Export);
+                return {blob:new Blob([textFile.generate()], {type: 'text/plain'}), dotExtension:textFile.dotExtension};
+            }).then(function(file){
+                if(version!=optionsVersion){
+                    return 'chossing';
+                }
+                fileUrl = URL.createObjectURL(file.blob);
+                downloadElement.href=fileUrl;
+                downloadElement.setAttribute("download", grid.def.name+file.dotExtension);
+                return 'ready';
+            });
+        }
+        actionElement.onclick=function(){
             if(exporting){
-                event.preventDefault();
                 return;
             }
             var fieldsDef2Export=grid.def.fields.filter(function(fieldDef){
@@ -1617,59 +1776,24 @@ myOwn.dialogDownload = function dialogDownload(grid){
                     && (fieldDef.allow.update || input.readOnly.checked || fieldDef.isPk)
                     && (!grid.view.hiddenColumns.includes(fieldDef.name) || input.hiddens.checked);
             });
-            if(input.xlsx.checked){
-                event.preventDefault();
-                exporting=true;
-                mainDiv.setAttribute("current-state", "preparing");
-                excelExport(fieldsDef2Export).then(function(){
-                    exporting=false;
-                    mainDiv.setAttribute("current-state", "chossing");
-                }, function(err){
-                    exporting=false;
-                    mainDiv.setAttribute("current-state", "chossing");
-                    // AbortError: el usuario cerró el diálogo de guardar sin elegir un archivo
-                    if(err.name!=='AbortError'){
-                        alertPromise(err.message);
-                    }
-                });
-                return;
-            }
-            var text;
-            var dotExtension;
+            var exportPromise;
             try{
-                if(input.csv.checked){
-                    text=txtExport(fieldsDef2Export, ',', function(txt){
-                        return /[\n,"]/.test(txt)?'"'+txt.replace(/"/g,'""')+'"':txt
-                    });
-                    dotExtension='.csv';
-                }else if(useTabPlus){
-                    text=tabPlusExport(fieldsDef2Export);
-                    dotExtension='.tab';
-                }else{
-                    var trans={
-                        '|':'\\x7C',
-                        '\\':'\\\\',
-                        '\r':'\\r',
-                        '\n':'\\n',
-                    }
-                    text=txtExport(fieldsDef2Export, '|', function(txt){
-                        return txt.replace(/[|\\\r\n]/g,function(char){
-                            return trans[char];
-                        })
-                    });
-                    dotExtension='.tab';
-                }
+                exportPromise = canSaveToDisk ? saveToDisk(fieldsDef2Export).then(function(){ return 'chossing'; })
+                    : prepareDownload(fieldsDef2Export);
             }catch(err){
-                event.preventDefault();
                 alertPromise(err.message);
                 return;
             }
-            if(textUrl!=null){
-                URL.revokeObjectURL(textUrl);
-            }
-            textUrl = URL.createObjectURL(new Blob([text], {type: 'text/plain'}));
-            downloadElement.href=textUrl;
-            downloadElement.setAttribute("download", grid.def.name+dotExtension);
+            exporting=true;
+            mainDiv.setAttribute("current-state", "preparing");
+            exportPromise.then(function(state){
+                exporting=false;
+                mainDiv.setAttribute("current-state", state);
+            }, function(err){
+                exporting=false;
+                mainDiv.setAttribute("current-state", "chossing");
+                alertPromise(err.message);
+            });
         }
         var txtExport = function(fieldsDef2Export, separator, replacer){
             var data=[];
@@ -1688,13 +1812,28 @@ myOwn.dialogDownload = function dialogDownload(grid){
             });
             return data.map(function(line){return line.map(replacer).join(separator)}).join('\r\n');
         }
-        // Con tab-plus. Si se pegó la primera línea de un .tab, se respeta su orden de columnas y sus columnas
-        // esparsas: las columnas que no estaban en esa línea van después de las que sí estaban, esparsas si
-        // la línea ya tenía alguna esparsa, y si no, esparsas o comunes según lo que convenga.
-        var tabPlusExport = function(fieldsDef2Export){
+        var tabPlusExportHeader = function(fieldsDef2Export){
+            var tabPlus = require('tab-plus');
+            var exportedNames = fieldsDef2Export.map(function(fieldDef){ return fieldDef.name; });
+            // si se pegó un archivo entero solo interesa su primera línea
+            var headerLine = tabPlusHeader.value.split(/\r?\n/).find(function(line){ return line.trim()!=''; });
+            var header = null;
+            if(headerLine!=null){
+                header = tabPlus.parseTab(headerLine, {columnDefs: myOwn.tabPlusColumnDefs(fieldsDef2Export)});
+            }else if(tabPlusTableOptions!=null && typeof tabPlusTableOptions == 'object'){
+                header = tabPlusTableOptions;
+            }
+            if(header!=null){
+                var unknownNames = header.fields.filter(function(name){ return !exportedNames.includes(name); });
+                if(unknownNames.length){
+                    throw new Error(my.messages.tabPlusHeaderUnknownFields + unknownNames.join(', '));
+                }
+            }
+            return header;
+        }
+        var tabPlusExport = function(fieldsDef2Export, header){
             var tabPlus = require('tab-plus');
             var autoTabPlus = require('auto-tab-plus');
-            var options = {eol:'\r\n', columnDefs: myOwn.tabPlusColumnDefs(fieldsDef2Export)};
             var exportedNames = fieldsDef2Export.map(function(fieldDef){ return fieldDef.name; });
             var rows = grid.depotsToDisplay.map(function(depot){
                 var row = {};
@@ -1704,26 +1843,33 @@ myOwn.dialogDownload = function dialogDownload(grid){
                 });
                 return row;
             });
-            // si se pegó un archivo entero solo interesa su primera línea
-            var headerLine = tabPlusHeader.value.split(/\r?\n/).find(function(line){ return line.trim()!=''; });
-            if(headerLine==null){
-                return tabPlus.generateTab({fields:exportedNames, rows:rows}, options);
+            var tab;
+            if(header==null){
+                tab = {fields:exportedNames, rows:rows};
+            }else{
+                var newNames = exportedNames.filter(function(name){ return !header.fields.includes(name); });
+                var fields = header.fields.concat(newNames);
+                var decided = autoTabPlus.decideSparseColumns(
+                    fields,
+                    rows.map(function(row){ return fields.map(function(name){ return row[name]; }); }),
+                    header.columnDefs,
+                    header.columnDefs ? {under: autoTabPlus.defaultThreshold, sparse: newNames}
+                        : {under: autoTabPlus.defaultThreshold, fixed: header.fields, auto: newNames}
+                );
+                tab = {fields:decided.fields, columnDefs:decided.columnDefs, rows:rows};
             }
-            var header = tabPlus.parseTab(headerLine, {columnDefs: options.columnDefs});
-            var unknownNames = header.fields.filter(function(name){ return !exportedNames.includes(name); });
-            if(unknownNames.length){
-                throw new Error(my.messages.tabPlusHeaderUnknownFields + unknownNames.join(', '));
-            }
-            var newNames = exportedNames.filter(function(name){ return !header.fields.includes(name); });
-            var fields = header.fields.concat(newNames);
-            var decided = autoTabPlus.decideSparseColumns(
-                fields,
-                rows.map(function(row){ return fields.map(function(name){ return row[name]; }); }),
-                header.columnDefs,
-                header.columnDefs ? {under: autoTabPlus.defaultThreshold, sparse: newNames}
-                    : {under: autoTabPlus.defaultThreshold, fixed: header.fields, auto: newNames}
-            );
-            return tabPlus.generateTab({fields:decided.fields, columnDefs:decided.columnDefs, rows:rows}, options);
+            var fieldDefByName = {};
+            fieldsDef2Export.forEach(function(fieldDef){ fieldDefByName[fieldDef.name] = fieldDef; });
+            var columnDefs = {};
+            tab.fields.forEach(function(name){
+                var sparse = tab.columnDefs?.[name]?.sparseDefault !== undefined;
+                var emptyField = myOwn.tabPlusGenerateEmptyField(fieldDefByName[name], sparse);
+                columnDefs[name] = {emptyField: emptyField};
+                if(tab.columnDefs){
+                    tab.columnDefs[name] = {...tab.columnDefs[name], emptyField: emptyField};
+                }
+            });
+            return tabPlus.generateTab(tab, {eol:'\r\n', columnDefs: columnDefs});
         }
         var XLSX_STYLES={
             header      : {bold:true},
@@ -1807,7 +1953,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
                 yield row;
             }
         }
-        var excelExport = function(fieldsDef2Export){
+        var excelOptions = function(fieldsDef2Export){
             var sheet1name=grid.def.name.length>27?grid.def.name.slice(0,27)+'...':grid.def.name;
             var sheet2name=grid.def.name!=="metadata"?"metadata":"meta-data";
             var dataSheet = {
@@ -1844,10 +1990,10 @@ myOwn.dialogDownload = function dialogDownload(grid){
                     metadataSheet.rows.push(...(tableRowsXLS(fieldPropertiesDepot,fieldPropertiesDefs,1)));
                 }
             }
-            return xlsxNowBrowser.downloadXlsx(grid.def.name+".xlsx", {
+            return {
                 sheets: [dataSheet, metadataSheet],
                 styles:XLSX_STYLES
-            });
+            };
         };
     });
 };

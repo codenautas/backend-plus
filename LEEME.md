@@ -374,6 +374,9 @@ client-setup                 | opciones para el front-end
 .title                       | título de la pantalla
 .lang                        | idioma (y locale) del frontend, por ahora "es" o "en"
 .tab-plus                    | "only": los `.tab` de `install` se leen con [tab-plus](https://npmjs.org/package/tab-plus) y la opción `.txt "\|"` de exportar la grilla usa tab-plus (pudiendo pegar la primera línea de un `.tab` para respetar sus columnas esparsas)
+.tab-plus-table-options      | por tabla, opciones del `.tab` que exporta la grilla con `tab-plus: only`: un string es la primera línea de un `.tab` (aparece en el cuadro "opciones", donde se puede editar); un objeto `{fields, columnDefs}` se usa si el cuadro queda vacío. Al arrancar se completa con la primera línea del `.tab` de cada tabla que no esté definida
+.downloads.method            | cómo guarda el archivo la exportación de la grilla: `SaveFilePicker` (default) usa el diálogo "Guardar como" si el navegador tiene `showSaveFilePicker` (y si no, "confirmar" y el enlace "descargar"); `legacy` usa siempre "confirmar" y el enlace "descargar"
+.downloads.close-retries     | con `SaveFilePicker`, cuántas veces se reintenta (de 0 a 5, default 0) si falla el reemplazo del archivo al cerrarlo, esperando 200 ms y el doble en cada reintento
 db                           | opciones de la base de datos
 .motor                       | por ahora solo 'postgresql'
 .database                    |
@@ -440,6 +443,9 @@ client-setup                 | front-end options
 .title                       | screen title
 .lang                        | frontend language (and locale), for now "es" or "en"
 .tab-plus                    | "only": the `.tab` files in `install` are read with [tab-plus](https://npmjs.org/package/tab-plus) and the `.txt "\|"` option of the grid export uses tab-plus (the first line of a `.tab` can be pasted to keep its sparse columns)
+.tab-plus-table-options      | per table, options for the `.tab` exported by the grid with `tab-plus: only`: a string is the first line of a `.tab` (it is shown in the "options" box, where it can be edited); an object `{fields, columnDefs}` is used if the box is left empty. At startup it is completed with the first line of the `.tab` of each table not defined there
+.downloads.method            | how the grid export saves the file: `SaveFilePicker` (default) uses the "save as" dialog if the browser has `showSaveFilePicker` (otherwise "confirm" and the "download" link); `legacy` always uses "confirm" and the "download" link
+.downloads.close-retries     | with `SaveFilePicker`, how many times it retries (0 to 5, default 0) if replacing the file fails when closing it, waiting 200 ms and doubling on each retry
 db                           | database options
 .motor                       | for now only 'postgresql'
 .database                    |
