@@ -2240,6 +2240,8 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
             })
         ]).create();
         grid.dom.buttonInsert=buttonInsert;
+        // hidden until displayBody shows it (when depots are loaded and all rows are displayed)
+        buttonInsert.style.visibility='hidden';
         buttonInsert.addEventListener('click', function(){
             var tr=grid.createRowInsertElements();
         });
