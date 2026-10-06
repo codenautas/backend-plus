@@ -1379,7 +1379,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
         grid.dom.table.parentNode.setAttribute('show-inherited-keys', grid.view.showInheritedKeys?'yes':'no');
         return Promise.resolve(true);
     }});
-    menuOptions.push({img:my.path.img+'show-hide-columns.png', value:true, label: my.messages.hideOrShow, doneFun:function(){
+    menuOptions.push({img:my.path.img+'show-hide-columns.png', value:true, id:'menu-hide-or-show', label: my.messages.hideOrShow, doneFun:function(){
         dialogPromise(function(dialogWindow, closeWindow){
             var button=html.button({class:'hide-or-show'},'ok').create();
             var createSelectElement=function createSelectElement(columns,hideOrShowId,disabledItems){
@@ -2294,7 +2294,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
             grid.dom.table.setAttribute("my-orientation",grid.vertical?'vertical':'horizontal');
         });
     }
-    buttonMenu=html.button({class:'table-button', "skip-enter":true}, [
+    buttonMenu=html.button({class:'table-button', "skip-enter":true, "bp-action":"MENU"}, [
         html.img({
             src:my.path.img+'menu-dots.png',
         })
