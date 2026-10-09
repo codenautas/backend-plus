@@ -2347,12 +2347,16 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
     grid.actualName = (grid.def.gridAlias || grid.def.name) + (grid.connector.fixedFields.length ? '-' + JSON4all.toUrl(grid.connector.fixedFields.map(function(pair){ return pair.value; })) : '')
     var captionTitle = grid.def.title;
     grid.connector.fixedFields.forEach(function(pair){
-        var toCaption = grid.def.field[pair.fieldName].toCaption ?? my.config.config['grid-smart-caption']
+        var fixedFieldDef = grid.def.field[pair.fieldName] ?? (grid.def.functionDef?.parameters ?? []).find(function(parameter){ return parameter.name == pair.fieldName; });
+        if(fixedFieldDef == null){
+            throw new Error('the grid '+grid.def.name+' is filtered by '+pair.fieldName+' that is not a field nor a parameter of the table');
+        }
+        var toCaption = fixedFieldDef.toCaption ?? my.config.config['grid-smart-caption']
         if(toCaption && pair.value != null){
-            var typeName = grid.def.field[pair.fieldName].typeName;
+            var typeName = fixedFieldDef.typeName;
             captionTitle += ' '
             if(toCaption == 'labeled' || toCaption != 'alone' && (typeName == 'boolean' || typeName == 'integer' || typeName == 'bigint' || typeName == 'decimal')){
-                captionTitle += grid.def.field[pair.fieldName].title + ':'
+                captionTitle += (fixedFieldDef.title ?? fixedFieldDef.name) + ':'
             }
             if(typeName == 'date'){
                 var date = bestGlobals.date(new Date(pair.value))
@@ -2613,8 +2617,8 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             if(!Object.keys(depot.rowPendingForUpdate).length){
                 return Promise.resolve();
             }
+            var specialMandatories=grid.def.specialValidator?myOwn.validators[grid.def.specialValidator].getMandatoryMap(depot.row):{};
             if(depot.status==='new'){
-                var specialMandatories=grid.def.specialValidator?myOwn.validators[grid.def.specialValidator].getMandatoryMap(depot.row):{};
                 var mandatoryOmitted=function(fieldDef){
                     return (specialMandatories[fieldDef.name] || fieldDef.nullable!==true && fieldDef.isPk || fieldDef.nullable===false)
                         && depot.row[fieldDef.name]==null
@@ -2630,6 +2634,17 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     }
                     return Promise.resolve(); // no grabo todavía
                 };
+            }else{
+                // en una modificación solo se controlan los obligatorios especiales (campos que son obligatorios según lo cargado en otros)
+                var specialOmitted=grid.def.fields.filter(function(fieldDef){
+                    return specialMandatories[fieldDef.name] && depot.row[fieldDef.name]==null;
+                });
+                if(specialOmitted.length){
+                    if(depot.tr){
+                        depot.tr.title = myOwn.messages.mandatoryFieldOmited + specialOmitted.map(f=>f.name).join(', ');
+                    }
+                    return Promise.resolve(); // no grabo todavía
+                }
             }
             var timeStamp = my.setTimeStamp(depot.row);
             return grid.connector.saveRecord(depot, opts).then(function(result){

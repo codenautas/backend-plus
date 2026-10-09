@@ -424,6 +424,7 @@ export interface AppConfigServer
         useCors: boolean                   //habilita Cross-Origin Resource Sharing
         allowedHosts:string[]              //determina API allowed hosts (necesita habilitar useCors)
         policy?:string
+        environment?:string                // 'production' or other (to choose defaults, for example the background)
     }
 export interface AppConfigDb
     {
@@ -503,6 +504,7 @@ export interface AppConfigClientSetup // front-end config
         version?:string
         menu?:boolean
         "background-img"?:string
+        environment?:string                // copied from server.environment
         devel?:boolean
         deviceWidthForMobile?:string
         "initial-scale"?:string

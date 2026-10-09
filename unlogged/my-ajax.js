@@ -111,6 +111,8 @@ myAjax.readProcedureDefinitions=function readProcedureDefinitions(){
             var backgroundUrl
             if(my.config.config && my.config.config['background-img']){
                 backgroundUrl = 'url("'+my.path.img+my.config.config['background-img']+'")'
+            }else if(my.config.config && my.config.config.environment == 'production'){
+                backgroundUrl = '';
             }else{
                 if(/(^|[-_0-9/])(test|pru|prueba)($|[-_0-9/])/.test(location.pathname)){
                     backgroundUrl = 'url("img/background-test.png")';
@@ -119,10 +121,13 @@ myAjax.readProcedureDefinitions=function readProcedureDefinitions(){
                 }else if(/(^|[-_0-9/])(desa|devel)($|[-_0-9/])/.test(location.pathname) || my.config.config && my.config.config['devel']){
                     backgroundUrl = 'url("img/background-devel.png")';
                 }else{
-                    backgroundUrl = '';
+                    // unknown environment: better to see a missing image than no background (declare server.environment)
+                    backgroundUrl = 'url("img/background-unknown.png")';
                 }
             }
             document.body.style.backgroundImage=backgroundUrl;
+            // for the apps that need the background in other elements
+            my.backgroundUrl=backgroundUrl;
         }
     }).then(function(){
         my.config.procedure=my.config.procedure||{};
