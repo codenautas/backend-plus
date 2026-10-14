@@ -126,10 +126,10 @@ export type MenuInfoMenu = {
 export type MenuInfoTable = {
     menuType:'table'
     table?:string
-    ff?:{fieldName:string, value:any, show?:boolean}[]
-    fc?:{fieldName:string, operator:string, value:any}[]
+    ff?:{fieldName:string, value:any, show?:boolean}[] | {[fieldName:string]:any} // as object: {fieldName: value} (my-menu.js converts it to the array form)
+    fc?:{column:string, operator:string, value:any}[] // goes to tableDef.filterColumns (see grid.createRowFilter in my-tables.js)
     pf?:any
-    td?:TableDefinition
+    td?:Partial<TableDefinition> // merged into the tableDef of the grid
     detailing?:any
 } & MenuInfoMinimo;
 export type MenuInfoProc={
@@ -504,6 +504,7 @@ export interface AppConfigClientSetup // front-end config
         version?:string
         menu?:boolean
         "background-img"?:string
+        skin?:string                       // name of the skin folder (see activeSkinFiles)
         environment?:string                // copied from server.environment
         devel?:boolean
         deviceWidthForMobile?:string
@@ -600,7 +601,7 @@ export class AppBackend{
     addLoggedServices():void
     getProcedures():Promise<ProcedureDef[]>
     isAdmin(reqOrContext:Request|Context):boolean
-    canChangePass():Promise<boolean>
+    canChangePass(reqOrContext?:Request|Context, userToChangePass?:string|null):Promise<boolean>
     getMenu(context?:Context):MenuDefinition
     inDbClient<T>(req:RequestDb|null, doThisWithDbClient:(client:Client)=>Promise<T>):Promise<T>
     inTransaction<T>(req:RequestDb|null, doThisWithDbTransaction:(client:Client)=>Promise<T>):Promise<T>
