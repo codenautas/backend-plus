@@ -630,7 +630,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                 };
                 var tick = Math.random();
                 var thereIsANewRecord = grid.depots.filter(depot => depot.status == 'new').length;
-                rows.forEach(function(row){
+                rows.forEach(function(row){ // eslint-disable-line max-statements
                     if (my.skipTimeStamp(row, timeStamp)) return;
                     var primaryKeyValuesForRow = getPrimaryKeyValues(primaryKey, row);
                     var depot = grid.depots.find(function(depot){
@@ -695,7 +695,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                             if (depot.tr && depot.tr.getAttribute('not-here')) depot.tr.removeAttribute('not-here')
                         }
                     }
-                    while (depot = depotsToDelete.pop()) {
+                    while (depot = depotsToDelete.pop()) { // eslint-disable-line no-cond-assign
                         depot.manager.displayAsDeleted(depot, force ? 'change-ff' : 'unknown');
                         if (myOwn.config.config['grid-row-retain-moved-or-deleted']) {
                             if(!depot['$refreshed']){
@@ -1060,7 +1060,7 @@ myOwn.DataColumnGrid.prototype.thAgg = function thAgg(){
     return th;
 };
 
-myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){
+myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){ // eslint-disable-line max-statements
     var grid = this.grid;
     var fieldDef = this.fieldDef;
     var forInsert = false; // TODO: Verificar que esto está en desuso
@@ -1229,10 +1229,10 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
     detailControl.refreshDetailGrid = function(opts){
         var detailControl=this;
         if(detailControl.show){
-
+            // no es necesario refrescar
         }
     }
-    detailControl.displayDetailGrid = function(opts,event){
+    detailControl.displayDetailGrid = function(opts,event){ // eslint-disable-line max-statements
         var result;
         event=event||{};
         if(!('fixedFields' in opts)){
@@ -1561,7 +1561,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
 myOwn.INCLUDE_LOOKUP_COLUMNS_IN_TXT_EXPORT=true;
 
 myOwn.dialogDownload = function dialogDownload(grid){
-    return dialogPromise(function(dialogWindow, closeWindow){
+    return dialogPromise(function(dialogWindow, closeWindow){ // eslint-disable-line max-statements
         var downloadsConfig = my.config.config?.downloads || {};
         var canSaveToDisk = downloadsConfig.method != 'legacy' && !!window.showSaveFilePicker;
         var actionElement=html.button({class:'export-a'},canSaveToDisk ? my.messages.download : my.messages.confirmExport).create();
@@ -1931,7 +1931,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
             yield headerRow;
             for(var depot of depots){
                 var row=pad.concat([]);
-                var addCell = function addCell(value, fieldDef, iColumn){
+                var addCell = function addCell(value, fieldDef, iColumn){ // eslint-disable-line no-loop-func
                     if(value!=null){
                         row[iColumn+leftColumn]={
                             v:typeStore.typerFrom(fieldDef).toExcelValue(value),
@@ -1939,7 +1939,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
                         };
                     }
                 }
-                fieldDefs.forEach(function(fieldDef, iColumn){
+                fieldDefs.forEach(function(fieldDef, iColumn){ // eslint-disable-line no-loop-func
                     var value=depot.row[fieldDef.name];
                     if(grid.def.exportJsonFieldAsColumns == fieldDef.name){
                         var fields = typeof value == "string" ? JSON.parse(value) : value;
@@ -2202,7 +2202,7 @@ myOwn.TableGrid.prototype.refreshAggregates = function refreshAggregates(){
     }
 };
 
-myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){
+myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){ // eslint-disable-line max-statements
     var grid = this;
     var my = grid.my;
     grid.view.hiddenColumns=grid.view.hiddenColumns||grid.def.hiddenColumns||[];
@@ -2455,9 +2455,6 @@ myOwn.specialDefaultValue={
             }
             return max + 1;
         }
-        return belowDepot.row[fieldName]?belowDepot.row[fieldName]+1:(
-            aboveDepot.row[fieldName]?aboveDepot.row[fieldName]-1:1
-        );
     },
     current_user: function specialDefaultValueCurrentUser(){
         return my.config.username;
@@ -2468,8 +2465,8 @@ myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElem
     var grid = this;
     if(!belowDepot){
         if(aboveDepot){
-            if(belowDepot=aboveDepot.tr.previousSibling){
-                belowDepot=aboveDepot.tr.previousSibling.depot;
+            if(belowDepot = aboveDepot.tr.previousSibling){ // eslint-disable-line no-cond-assign
+                belowDepot = aboveDepot.tr.previousSibling.depot;
             }
         }else{
             var lastTBody=grid.dom.table.tBodies[grid.dom.table.tBodies.length-1];
@@ -2597,7 +2594,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         if(grid.def.clientSide){
             if(!depot.clientSidePrepared && grid.my.clientSides[grid.def.clientSide].prepare){
                 grid.my.clientSides[grid.def.clientSide].prepare(depot);
-            };
+            }
             depot.clientSidePrepared=true;
             grid.my.clientSides[grid.def.clientSide].update(depot);
         }
@@ -2633,7 +2630,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                         where.title = myOwn.messages.mandatoryFieldOmited + grid.def.fields.filter(mandatoryOmitted).map(f=>f.name).join(', ');
                     }
                     return Promise.resolve(); // no grabo todavía
-                };
+                }
             }else{
                 // en una modificación solo se controlan los obligatorios especiales (campos que son obligatorios según lo cargado en otros)
                 var specialOmitted=grid.def.fields.filter(function(fieldDef){
@@ -2700,7 +2697,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             tdActions.style.backgroundRepeat='no-repeat'
         }
     }
-    grid.depotRefresh = function depotRefresh(depot,result,opts){
+    grid.depotRefresh = function depotRefresh(depot,result,opts){ // eslint-disable-line max-statements
         // ¡ATENCIÓN!: esta función no debe despleegar, llama a updateRowData, ahí se despliega
         opts=opts||{};
         upadteNumberOfRows(depot,grid);
@@ -2782,7 +2779,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             if(depot.detailControls[detailControl].tr){
                 depot.detailControls[detailControl].refreshAllRowsInGrid()
             }
-        };
+        }
     }
     grid.createExtraRow = function createExtraRow(depot, tbody){
         var tr = html.tr({class:'extra-row'}, [html.td().create()]).create();
@@ -3073,7 +3070,7 @@ myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot, mo
                     if(depot.detailControls[detailControl].tr){
                         depot.my.fade(depot.detailControls[detailControl].tr, {fast});
                     }
-                };
+                }
             }
         }
     }
@@ -3423,20 +3420,6 @@ myOwn.ExpanderReferences={
 myOwn.TableGrid.prototype.captureKeys = function captureKeys() {
     document.addEventListener('keypress', function(evento){
         return;
-        if(evento.which==13){ // Enter
-            var enfoco=this.activeElement;
-            var este=this.activeElement;
-            if(enter_hace_tab_en_este_elemento(este)){
-                var no_me_voy_a_colgar=2000;
-                while(este && this.activeElement===enfoco && no_me_voy_a_colgar--){
-                    este=proximo_elemento_que_sea(este,isInteracive);
-                    este.focus();
-                }
-                if(este){
-                    evento.preventDefault();
-                }
-            }
-        }
     });
 };
 

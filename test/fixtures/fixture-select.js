@@ -1,6 +1,6 @@
-const bestGlobals = require("best-globals");
+const bestGlobals = require("best-globals");  // eslint-disable-line strict
 
-[{
+[{  // eslint-disable-line no-unused-expressions -- para casos de prueba
     action: 'table_data',
     parameters: {table: 'employees', fixedFields:[]},
     expected: [

@@ -1,3 +1,5 @@
+"use strict";
+
 window.myOwn = require('./my-ajax.js')
 
 myOwn.offline={

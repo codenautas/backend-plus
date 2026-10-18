@@ -17,7 +17,7 @@
         root[root.globalModuleName] = factory();
     }
     root.globalModuleName = null;
-})(/*jshint -W040 */this, 'myAjax', function() {
+})(/*jshint -W040 */this, 'myAjax', function() { // eslint-disable-line max-statements
 /*jshint +W040 */
 
 /*jshint -W004 */
@@ -224,7 +224,7 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
         // var progressIndicator;
         // var divBarProgressLabel = {};
         var onClose=function(){}
-        var defaultInformProgress = function defaultInformProgress(progressInfo){
+        var defaultInformProgress = function defaultInformProgress(progressInfo){ // eslint-disable-line max-statements
             if(progressInfo.message || progressInfo.end || progressInfo.start || progressInfo.loaded){
                 // progressInfo.idGroup
                 if(!divProgress){
@@ -402,7 +402,7 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
             if(!err.isNotLoggedError) {
                 if(!window.navigator.onLine) {
                     my.informDetectedStatus('noNetwork');
-                }else if(!!err.originalError) {
+                }else if(err.originalError) {
                     my.informDetectedStatus('noServer');
                     if(my.server.connected){
                         my.server.connected = false

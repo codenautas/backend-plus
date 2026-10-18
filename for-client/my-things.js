@@ -32,7 +32,7 @@
         root[root.globalModuleName] = factory();
     }
     root.globalModuleName = null;
-})(/*jshint -W040 */this, 'myOwn', function() {
+})(/*jshint -W040 */this, 'myOwn', function() { // eslint-disable-line max-statements
 /*jshint +W040 */
 
 /*jshint -W004 */
@@ -533,7 +533,6 @@ myOwn.informDetectedStatus = function informDetectedStatus(statusCode, logged) {
 };
 
 function isInteracive(element){
-"use strict";
     return (
         (element instanceof HTMLInputElement || element instanceof HTMLButtonElement || element instanceof HTMLTextAreaElement)
         && !element.disabled
@@ -546,7 +545,6 @@ function isInteracive(element){
 }
 
 function nextElement(elemento, noGoDownWhen){
-"use strict";
     var proximo=elemento;
     var no_me_voy_a_colgar=200;
     if(elemento.children.length && !noGoDownWhen(proximo)){
@@ -566,7 +564,6 @@ function nextElement(elemento, noGoDownWhen){
 }
 
 function proximo_elemento_que_sea(elemento, controlador){
-"use strict";
     var proximo=nextElement(elemento,controlador);
     var no_me_voy_a_colgar=2000;
     while(proximo && !controlador(proximo) && no_me_voy_a_colgar--){
@@ -639,7 +636,7 @@ myOwn.captureKeys = function captureKeys() {
         throw new Error('captureKeysInstaled');
     }
     this.captureKeysInstaled=true;
-    document.addEventListener('keydown', function(evento){
+    document.addEventListener('keydown', function(evento){ // eslint-disable-line max-statements, complexity
         // document.title=evento.which+','+evento.shiftKey+','+evento.ctrlKey+','+evento.altKey+','+evento.metaKey;
         if(evento.which==37 && !evento.shiftKey  && !evento.ctrlKey  && !evento.altKey  && !evento.metaKey){ // KeyLeft
             var info=tableInfo(this.activeElement);
@@ -779,7 +776,7 @@ myOwn.captureKeys = function captureKeys() {
         document.mayBeRepetibleButton = null;
         previousKey=evento.which;
     });
-    document.addEventListener('keypress', function(evento){
+    document.addEventListener('keypress', function(evento){ // eslint-disable-line max-statements
         if(my.config.useragent.isiPad && evento.which==231){ // F4
             var info=tableInfo(this.activeElement);
             if(info.table){
@@ -849,20 +846,6 @@ myOwn.getUniqueDomId = function getUniqueDomId(){
 }
 
 myOwn.prepareFloating3dots = function prepareFloating3dots(){
-    if(!my.imgFloating3dots && false){
-        var img = html.img({src:my.path.img+'floating-3dots.png', class:'floating-img'}).create();
-        my.imgFloating3dots=img;
-        var rePosition = function(){
-            img.style.visibility=window.scrollY || window.scrollX?'visible':'hidden';
-            img.style.top = window.innerHeight - 40 + 'px';
-            img.style.left = window.innerWidth - 40 + 'px';
-        }
-        img.style.position='fixed';
-        document.body.appendChild(img);
-        setTimeout(rePosition,100);
-        window.addEventListener('scroll', rePosition);
-        window.addEventListener('resize', rePosition);
-    }
 }
 
 myOwn.inlineCss = function inlineCss(id){

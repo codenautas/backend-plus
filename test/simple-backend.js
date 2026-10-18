@@ -34,8 +34,8 @@ class AppExample extends backendPlus.AppBackend{
         return super.getProcedures().then(function(procedures){
             return procedures.concat(localProcedures.map(be.procedureDefCompleter, be));
         });
-    };
-};
+    }
+}
 
 var localProcedures=[
     {

@@ -59,13 +59,14 @@ var controles_de_compatibilidad={
     'funciones => sin this':{gravedad:'incompatible'
     ,controlar:function(params){
         try{
-            return eval("[1].map((x)=>x+1)")[0] == 2;
-        }finally{}
+            return eval("[1].map((x)=>x+1)")[0] == 2; // eslint-disable-line no-eval -- es un control conocido de compatibilidad, no se evalúa código arbitrario
+        }finally{
+            // no falla, simplemente retorna false
+        }
     }}
 };
 
-function controlar_compatibilidad(ya, id, idBoton){
-"use strict";
+function controlar_compatibilidad(ya, id, idBoton){ // eslint-disable-line max-statements
     var boton=document.getElementById(idBoton || 'login');
     id = id || 'resultado_incompatibilidad';
     var div=document.getElementById(id);
@@ -91,6 +92,7 @@ function controlar_compatibilidad(ya, id, idBoton){
         try{
             ok=def_control.controlar({div:div});
         }catch(err){
+            // si el control de compatibilidad da error lo va a capturar el !ok
         }
         if(!ok){
             var mensaje=document.createElement('div');
@@ -102,7 +104,7 @@ function controlar_compatibilidad(ya, id, idBoton){
             hubo_errores=true;
             hubo_errores_tipo[def_control.gravedad]=true;
         }
-    };
+    }
     if(!hubo_errores_tipo['incompatible']){
         if (boton) boton.disabled=false;
     }

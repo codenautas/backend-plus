@@ -1,4 +1,6 @@
-myOwn.informDetectedStatus = function informDetectedStatus(statusCode, logged) {
+"use strict";
+
+myOwn.informDetectedStatus = function informDetectedStatus(statusCode, logged) { // eslint-disable-line max-statements
     var my=this;
     if(my.debuggingStatus){ my.debuggingStatus(statusCode); }
     if(my.previousStatusCode!=statusCode){

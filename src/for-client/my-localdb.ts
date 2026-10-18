@@ -427,7 +427,7 @@ export class LocalDbTransaction {
                 }
             }
             try{
-                var result=await callback(ldb);
+                var result = await callback(ldb); // eslint-disable-line callback-return -- se devuelve el result más abajo
             }catch(err){
                 await closeLdb(err);
                 throw err;

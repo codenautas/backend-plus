@@ -2,7 +2,6 @@
 /*jshint eqnull:true */
 /*jshint globalstrict:true */
 /*jshint node:true */
-/*eslint-env node*/
 
 var request = require('supertest');
 
@@ -32,7 +31,7 @@ async function testAFixture(be, fixture, agent, opt){
         ):(
             agent.post(opt.base+'/'+fixture.action).type('form').send(parameters)
         ))
-        .expect(function(res){
+        .expect(function(res){ // eslint-disable-line max-statements
             var result;
             var chunks = res.text || res._body.toString('utf8');
             var error;
@@ -159,7 +158,7 @@ describe('backend-plus', function describeBackendPlus(){
                     .expect('echo',done);
                 });
                 'fixture-select'.split(',').forEach(function(fixtureListName){
-                    var fixtures = eval(fsSync.readFileSync('test/fixtures/'+fixtureListName+'.js', {encoding:'utf8'}));
+                    var fixtures = eval(fsSync.readFileSync('test/fixtures/'+fixtureListName+'.js', {encoding:'utf8'})); // eslint-disable-line no-eval -- esto solo aplica a los casos de prueba de fixtures propios; no hay datos de usuario
                     fixtures.forEach(function(fixture,i){
                         var nameIt='execute procedure for fixture:'+fixtureListName+'['+i+'] '+(fixture.name||fixture.action);
                         if(fixture.skip){

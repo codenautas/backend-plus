@@ -231,7 +231,7 @@ myOwn.preDisplayPage = function preDisplayPage(addrParams, wScreen, w){
     main_layout.setAttribute('my_w',w);
 }
 
-myOwn.showPage = function showPage(pageDef){
+myOwn.showPage = function showPage(pageDef){ // eslint-disable-line max-statements
     my.prepareFloating3dots();
     var newHash;
     if(!location.hash){
