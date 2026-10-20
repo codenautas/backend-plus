@@ -1257,12 +1257,28 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
             tdGrid.style.overflowX='visible';
             if(!detailControl.divDetail){
                 if(detailTableDef.wScreen){
-                    var params=likeAr.toPlainObject(fixedFields,'fieldName','value');
                     var wScreen=my.wScreens[detailTableDef.wScreen];
                     if(!wScreen.parameters){
                         alertPromise('error lack of parameters in wScreen '+detailTableDef.wScreen);
                     }
-                    wScreen.mainAction(params,divGrid);
+                    var runWScreen = function runWScreen(){
+                        var params=likeAr.toPlainObject(fixedFields,'fieldName','value');
+                        divGrid.innerHTML='';
+                        return wScreen.mainAction(params,divGrid);
+                    }
+                    runWScreen();
+                    detailControl.refreshAllRowsInGrid=function(force){
+                        if(detailTableDef.refreshFromParent || force){
+                            if (force) {
+                                fixedFields = calculateFixedFields()
+                            }
+                            divGrid.style.opacity=0.5;
+                            setTimeout(async ()=>{
+                                await runWScreen();
+                                divGrid.style.opacity=1;
+                            },1)
+                        }
+                    }
                 }else{
                     result = grid.my.tableGrid(detailTableDef.table, divGrid, {
                         fixedFields: fixedFields,
@@ -2776,7 +2792,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         }
         grid.refreshAggregates();
         for(var detailControl in depot.detailControls){
-            if(depot.detailControls[detailControl].tr){
+            if(depot.detailControls[detailControl].tr && typeof depot.detailControls[detailControl].refreshAllRowsInGrid === 'function'){
                 depot.detailControls[detailControl].refreshAllRowsInGrid()
             }
         }
