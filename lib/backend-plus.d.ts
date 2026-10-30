@@ -343,6 +343,7 @@ export type TableDefinition = EditableDbDefinition & {
     forInsertOnlyMode?:boolean
     description?:MarkdownDoc
     exportJsonFieldAsColumns?:string
+    exportLabelsRow?:boolean /* the excel export adds a row with the field labels, marking A1 with "#bp-labels", which the importer recognizes */
     importCuidado?:boolean
     specialValidator?:string
     saveAfter?:boolean

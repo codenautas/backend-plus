@@ -84,6 +84,7 @@ postCreateSqls | texto con una o varias sentencias SQL que deben ejecutarse desp
 constraintsDeferred|true equivale a ejecutar SET CONSTRAINTS ALL DEFERRED al comienzo de la transacción al hacer upload
 isTable        |true si es una tabla y por lo tanto hay que hacer el dump para el create table y si se le deben deducir los campos name de sus FK
 insertIfNotUpdate  | false para deshabilitar la inserción de nuevos filas en el archivo excel que se está importando (pk no presente en la BD)
+exportLabelsRow | true para que el excel exportado incluya una fila con los labels de los campos (con la marca `#bp-labels` en A1, que el importador reconoce; las celdas vacías se siguen importando como null)
 <!--lang:en--]
 
 property          | type | default value         | use

@@ -390,6 +390,21 @@ db                           | opciones de la base de datos
 imports                      | opciones de importación a la plataforma
 .allow-plain-xls             | si permite importar xlsx que no tienen la señal #backend-plus en la celda A1
 
+#### Formato del xlsx al importar y exportar
+
+El importador lee la primera hoja y decide cómo interpretarla según los tags de la celda A1 (se pueden combinar, en cualquier orden, separados por espacios):
+
+A1 | nombres de campo | datos desde | celda vacía
+---|------------------|-------------|------------
+(sin tag, archivo plano) | fila 1, desde la columna A | fila 2 | se importa como null
+`#bp-labels` | fila 2, desde la columna B | fila 3 | se importa como null
+`#backend-plus` | fila 2, desde la columna B | fila 3 | se ignora (no pisa el valor existente; para poner null usar `#null` si `imports.hashConverters` está activo)
+
+Con `#bp-labels` la fila 1 (de la columna B en adelante) se ignora al importar: tiene los labels de los campos, solo para quien lee el archivo.
+La tabla puede pedir ese formato al exportar con `exportLabelsRow: true` en su definición. Sin ese flag el archivo se exporta como siempre (plano).
+Los archivos sin tag, como los de sistemas de terceros, se siguen importando igual que antes, tenga o no el flag la tabla.
+Si se edita un archivo exportado con `#bp-labels`, la marca de A1 y la posición de la fila de campos tienen que coincidir: o se dejan las dos o se sacan las dos (se borra la fila 1 y la columna A).
+
 
 <!--lang:en--]
 ### config format:
@@ -458,6 +473,21 @@ db                           | database options
 .allow_double_lodash_fields  | whether fields with double `_` underscore are allowed
 imports                      | options for importing to the platform
 .allow-plain-xls             | whether it allows importing xlsx that don't have the #backend-plus signal in cell A1
+
+#### xlsx format on import and export
+
+The importer reads the first sheet and decides how to interpret it according to the tags in cell A1 (they can be combined, in any order, separated by spaces):
+
+A1 | field names | data from | empty cell
+---|-------------|-----------|-----------
+(no tag, plain file) | row 1, from column A | row 2 | imported as null
+`#bp-labels` | row 2, from column B | row 3 | imported as null
+`#backend-plus` | row 2, from column B | row 3 | ignored (does not overwrite the existing value; to set null use `#null` if `imports.hashConverters` is on)
+
+With `#bp-labels` row 1 (from column B onwards) is ignored on import: it holds the field labels, only for people reading the file.
+A table can ask for this format on export with `exportLabelsRow: true` in its definition. Without that flag the file is exported as always (plain).
+Files without a tag, such as those from third party systems, are still imported as before, whether or not the table has the flag.
+If a file exported with `#bp-labels` is edited, the A1 tag and the position of the field row must match: keep both or remove both (delete row 1 and column A).
 
 [!--lang:*-->
 ```yaml

@@ -72,6 +72,7 @@ sql                | usage
 postCreateSqls     | (see Spanish)
 isTable            | (see Spanish)
 insertIfNotUpdate  | for excel import you can *disable insertion of new rows present in excel* (pk not in DB) by setting in false this property
+exportLabelsRow    | set to true for the exported excel to include a row with the field labels (with the `#bp-labels` tag in A1, which the importer recognizes; empty cells are still imported as null)
 
 
 ## fieldDef

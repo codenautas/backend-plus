@@ -1916,8 +1916,11 @@ myOwn.dialogDownload = function dialogDownload(grid){
         // encabezado y cada una de las demás es un array donde la posición es la
         // columna. `leftColumn` corre la tabla entera hacia la derecha.
         // Es un generador para que xlsx-now pida cada fila recién cuando la va a escribir.
-        var tableRowsXLS = function* tableRowsXLS(depots, fieldDefs, leftColumn){
-            leftColumn=leftColumn||0;
+        // Con `labelsRow` la tabla sale con la marca "#bp-labels" que reconoce el
+        // importador (lib/xlsx-layout.js): A1 con la marca, los labels en el resto de la fila 1, los nombres
+        // de campo en la fila 2 (desde la columna B) y los datos desde la fila 3.
+        var tableRowsXLS = function* tableRowsXLS(depots, fieldDefs, leftColumn, labelsRow){
+            leftColumn=labelsRow ? 1 : (leftColumn||0);
             var extraColumns={};
             var lastColumn=collectExtraColumns(depots, fieldDefs, fieldDefs.length, extraColumns);
             lastColumnExported = Math.max(lastColumnExported, lastColumn);
@@ -1928,6 +1931,15 @@ myOwn.dialogDownload = function dialogDownload(grid){
             likeAr(extraColumns).forEach(function(pos, name){
                 headerRow[pos+leftColumn]={v:name, s:'extraHeader'};
             });
+            if(labelsRow){
+                var labels=[{v:'#bp-labels', s:'extraHeader'}].concat(fieldDefs.map(function(field){
+                    return {v:field.label||field.name, s:'extraHeader'};
+                }));
+                likeAr(extraColumns).forEach(function(pos, name){
+                    labels[pos+leftColumn]={v:name, s:'extraHeader'};
+                });
+                yield labels;
+            }
             yield headerRow;
             for(var depot of depots){
                 var row=pad.concat([]);
@@ -1958,12 +1970,12 @@ myOwn.dialogDownload = function dialogDownload(grid){
             var sheet2name=grid.def.name!=="metadata"?"metadata":"meta-data";
             var dataSheet = {
                 name: sheet1name,
-                freezeRows: my.config.config?.['unfreeze-excel-rows'] ? 0 : 1,
-                freezeColumns: my.config.config?.['unfreeze-excel-columns'] ? 0 : (grid.def.primaryKey?.length ?? 0),
+                freezeRows: my.config.config?.['unfreeze-excel-rows'] ? 0 : (grid.def.exportLabelsRow ? 2 : 1),
+                freezeColumns: my.config.config?.['unfreeze-excel-columns'] ? 0 : ((grid.def.primaryKey?.length ?? 0) + (grid.def.exportLabelsRow ? 1 : 0)),
                 autoWidthMax: 40,
                 autoWidthMin: 5,
                 autoWidthRows: 16384,
-                rows: tableRowsXLS(grid.depotsToDisplay, fieldsDef2Export)
+                rows: tableRowsXLS(grid.depotsToDisplay, fieldsDef2Export, 0, grid.def.exportLabelsRow)
             };
             var metadataSheet = {
                 name:sheet2name,
