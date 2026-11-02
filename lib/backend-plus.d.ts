@@ -207,6 +207,9 @@ export interface FieldDefinition extends EditableDbDefinition {
     width?:number              /* Width in pixels for the grid */
     references?:string         /* table name */
     referencesField?:string
+    referencesFields?:{source:string, target:string}[]  /* internal: set by tableDefAdapt on the source field of a FK or softFK (the pairs of the FK) */
+    referencesAlias?:string    /* internal: alias of the FK that references (set by tableDefAdapt) */
+    skipReferenceLookup?:boolean /* the client does not offer the list of the referenced table for this field (the FK's or the referenced table's skipReferenceLookup) */
     aggregate?:'avg'|'sum'|'count'|'min'|'max'|'countTrue'          /* keyof myOwn.TableAggregates */
     defaultForOtherFields?:boolean   /* the field that stores the "other fields" of a flexible imported table */
     specialValueWhenInsert?:string
@@ -266,6 +269,7 @@ export interface ForeignKey {
     displayAfterFieldName?:string|boolean
     forceDeferrable?:boolean
     noInherit?:boolean
+    skipReferenceLookup?:boolean /* the client does not offer the list of the referenced table (F9) for the source field */
 }
 export type Constraint = {constraintType:string, consName?:string} & (
     {constraintType:'unique', fields:string[], where?:string} |
@@ -351,6 +355,9 @@ export type TableDefinition = EditableDbDefinition & {
     filterColumns?:{column:string, operator:string, value:any}[]
     gridAlias?:string   /* front-end css my-table = gridAlias */
     lookupFields?:string[] /* fields that should be used in lookup dialogs; if not specified, fields with isName:true are used */
+    nameFields?:string[]   /* internal: the fields with isName (set by tableDefAdapt) */
+    activeRecords?:{fieldName:string} /* the lookups offer only the rows where this field is true */
+    skipReferenceLookup?:boolean /* the FKs to this table do not offer the list of its rows (F9) */
     functionDef?:{
         parameters?:ProcedureParameter[]
     }
