@@ -609,6 +609,10 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                 var goIntoDetail=opts.detailing[(/^\w/.test(depot.lastsPrimaryKeyValues)?"":"=")+depot.lastsPrimaryKeyValues]||opts.detailing["*"];
                 if(goIntoDetail){
                     likeAr(goIntoDetail).forEach(function(detailing, actionName){
+                        if(!depot.detailControls[actionName]){
+                            console.warn('detail not found:', actionName);
+                            return;
+                        }
                         depot.detailControls[actionName].displayDetailGrid({detailing:detailing});
                     })
                 }
@@ -1159,11 +1163,13 @@ myOwn.DetailColumnGrid.prototype.th = function th(){
     var grid = this.grid;
     var detailTableDef = this.detailTableDef;
     grid.detailNames = grid.detailNames || {};
-    var detailName = detailTableDef.table;
+    var baseName = detailTableDef.table || detailTableDef.wScreen;
+    var detailName = baseName;
     if(grid.detailNames[detailName]){
-        detailName = detailTableDef.table+' '+detailTableDef.abr;
-        if(grid.detailNames[detailName]){
-            detailName = likeAr(grid.detailNames[detailName]).array().length;
+        detailName = baseName+' '+detailTableDef.abr;
+        var i = 2;
+        while(grid.detailNames[detailName]){
+            detailName = baseName+' '+detailTableDef.abr+' '+i++;
         }
     }
     grid.detailNames[detailName]={};
@@ -1257,14 +1263,32 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
             tdGrid.style.overflowX='visible';
             if(!detailControl.divDetail){
                 if(detailTableDef.wScreen){
-                    var params=likeAr.toPlainObject(fixedFields,'fieldName','value');
                     var wScreen=my.wScreens[detailTableDef.wScreen];
                     if(!wScreen.parameters){
                         alertPromise('error lack of parameters in wScreen '+detailTableDef.wScreen);
                     }
-                    wScreen.mainAction(params,divGrid);
+                    var runWScreen = function runWScreen(){
+                        var params=likeAr.toPlainObject(fixedFields,'fieldName','value');
+                        divGrid.innerHTML='';
+                        return wScreen.mainAction(params,divGrid);
+                    }
+                    var wScreenRunning = Promise.resolve(runWScreen());
+                    detailControl.refreshAllRowsInGrid=function(force){
+                        if(detailTableDef.refreshFromParent || force){
+                            if (force) {
+                                fixedFields = calculateFixedFields()
+                            }
+                            divGrid.style.opacity=0.5;
+                            wScreenRunning = wScreenRunning.catch(function(){}).then(function(){
+                                return runWScreen();
+                            }).finally(function(){
+                                divGrid.style.opacity=1;
+                            });
+                            return wScreenRunning;
+                        }
+                    }
                 }else{
-                    result = grid.my.tableGrid(detailTableDef.table, divGrid, {
+                    var gridReady = grid.my.tableGrid(detailTableDef.table, divGrid, {
                         fixedFields: fixedFields,
                         detailing:opts.detailing,
                         detailingForUrl:grid.detailingForUrl,
@@ -1279,21 +1303,21 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
                             g.dom.main.addEventListener('deletedRowOk', refresh);
                             g.dom.main.addEventListener('savedRowOk', refresh);
                         }
-                        detailControl.refreshAllRowsInGrid=function(force){
-                            if(detailTableDef.refreshFromParent || force){
-                                if (force) {
-                                    g.dom.main.style.opacity=0.5;
-                                    fixedFields = calculateFixedFields()
-                                    g.connector.fixedFields = fixedFields
-                                }
-                                setTimeout(async ()=>{
-                                    await g.refreshAllRows(force);
-                                    g.dom.main.style.opacity=1;
-                                },1)
-                            }
-                        }
                         return g;
                     });
+                    result = gridReady;
+                    detailControl.refreshAllRowsInGrid=async function(force){
+                        if(detailTableDef.refreshFromParent || force){
+                            var g = await gridReady;
+                            if (force) {
+                                g.dom.main.style.opacity=0.5;
+                                fixedFields = calculateFixedFields()
+                                g.connector.fixedFields = fixedFields
+                            }
+                            await g.refreshAllRows(force);
+                            g.dom.main.style.opacity=1;
+                        }
+                    }
                 }
             }else{
                 divGrid.appendChild(detailControl.divDetail);
@@ -2314,6 +2338,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){ // eslint-disabl
         })
     ]).create();
     grid.prepareMenu(buttonMenu);
+    grid.detailNames = {};
     grid.columns=[new my.ActionColumnGrid({
         grid:grid,
         actions:[
@@ -2788,7 +2813,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         }
         grid.refreshAggregates();
         for(var detailControl in depot.detailControls){
-            if(depot.detailControls[detailControl].tr){
+            if(depot.detailControls[detailControl].tr && typeof depot.detailControls[detailControl].refreshAllRowsInGrid === 'function'){
                 depot.detailControls[detailControl].refreshAllRowsInGrid()
             }
         }
