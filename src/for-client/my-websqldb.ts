@@ -59,7 +59,7 @@ export class WebsqlDb{
             await this.registerStructure(tableDef);
             await this.putOne('_detect', detectElement);
             await this.getOne('_detect',['need_to_copy_results'], true);
-        }catch(err){
+        }catch(err){ // eslint-disable-line sonarjs/no-ignored-exceptions -- the error is the detection: this browser needs to copy the results
             detectElement.value=true;
             detectedFeatures.needToCopyResults = true;
             await this.putOne('_detect', detectElement);

@@ -148,7 +148,7 @@ export class LocalDb{
                 // @ts-ignore
                 var version: number = Number.parseInt(window.myOwn.config.useragent.version.split('.')[0]);
             }catch(err){
-                throw new Error("unknowed OS or version");
+                throw new Error("unknowed OS or version: "+err.message);
             }
             if(os === 'OS X' && version < 11){
                 detectedFeatures.needToUnwrapArrayKeys=true
