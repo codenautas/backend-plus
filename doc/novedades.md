@@ -1,5 +1,13 @@
 # novedades de _backend-plus_
 
+**2.9.0** se agrega `install.pg-triggers: all` para incluir en el dump los scripts de _pg-triggers_ que crean el historial de cambios
+(esquema _his_, tabla _his.changes_, su trigger y `enance_table`), antes de los `post-adapt`.
+Reemplaza a listar `../node_modules/pg-triggers/lib/*.sql` en `install.dump.scripts.post-adapt`; si se hacen las dos cosas el dump falla.
+Se quita `req.session.loginReturnTo`, que se guardaba desde `?return-to` y nadie usaba.
+
+El nombre de la cookie de sesión agrega un identificador de la instalación (un hash de su carpeta), para que no se mezclen
+las sesiones de dos instalaciones de la misma aplicación en el mismo host. Al actualizar, los usuarios tienen que volver a iniciar sesión.
+
 **2.5.2-betha.28**
 
 passwords completamente compatibles con scram-sha-256 de postgres.

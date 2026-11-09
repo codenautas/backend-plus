@@ -158,7 +158,7 @@ describe('backend-plus', function describeBackendPlus(){
                     .expect('echo',done);
                 });
                 'fixture-select'.split(',').forEach(function(fixtureListName){
-                    var fixtures = eval(fsSync.readFileSync('test/fixtures/'+fixtureListName+'.js', {encoding:'utf8'})); // eslint-disable-line no-eval -- esto solo aplica a los casos de prueba de fixtures propios; no hay datos de usuario
+                    var fixtures = eval(fsSync.readFileSync('test/fixtures/'+fixtureListName+'.js', {encoding:'utf8'})); // eslint-disable-line no-eval, sonarjs/code-eval -- esto solo aplica a los casos de prueba de fixtures propios; no hay datos de usuario
                     fixtures.forEach(function(fixture,i){
                         var nameIt='execute procedure for fixture:'+fixtureListName+'['+i+'] '+(fixture.name||fixture.action);
                         if(fixture.skip){

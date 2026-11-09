@@ -485,6 +485,7 @@ export interface AppConfigLogin
 export interface AppConfigInstall
     {
         "table-data-dir": string           // SO path to the .tab files in the db creation script
+        "pg-triggers"?: 'all'              // include in the db creation script the scripts of pg-triggers that create the history of changes (before post-adapt)
         dump: {                            // configuration of --dump-db, the db creation script
             "drop-his": boolean            // include drop schema his in the db creation script
             db: {

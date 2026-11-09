@@ -210,6 +210,7 @@ install                      | install options
 .dump                        | install dump options
 ..db.owner                   | database owner user
 ..scripts.post-adapt         | list of file names to adapt the database structure
+.pg-triggers                 | `all`: includes in the dump the scripts of _pg-triggers_ that create the history of changes (before the post-adapt ones)
 ..scripts.parts-order        | order of the parts in which the dump-db is generated
 devel                        | set of options for the development and testing environment
 .delay                       | additional average wait time (to simulate a slow server)

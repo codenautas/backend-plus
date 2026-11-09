@@ -526,12 +526,6 @@ if(new Date()<bestGlobals.datetime.ymdHms(2016,10,25,14,50,0)){
     };
 }
 
-myOwn.informDetectedStatus = function informDetectedStatus(statusCode, logged) {
-    if(!logged){
-        window.location.href='login';
-    }
-};
-
 function isInteracive(element){
     return (
         (element instanceof HTMLInputElement || element instanceof HTMLButtonElement || element instanceof HTMLTextAreaElement)

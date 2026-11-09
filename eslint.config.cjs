@@ -1,6 +1,7 @@
 "use strict";
 
 const tseslint = require("typescript-eslint");
+const sonarjs = require("eslint-plugin-sonarjs");
 
 module.exports = [
     {
@@ -15,6 +16,16 @@ module.exports = [
             "src/for-client/my-localdb.ts",
             "src/for-client/my-websqldb.ts"
         ]
+    },
+    {
+        // SonarQube rules (the ones silenced in the code)
+        files: ["lib/**/*.js", "test/**/*.js"],
+        plugins: { sonarjs },
+        rules: {
+            "sonarjs/code-eval": 2,
+            "sonarjs/hashing": 2,
+            "sonarjs/no-clear-text-protocols": 2
+        }
     },
     {
         languageOptions: {

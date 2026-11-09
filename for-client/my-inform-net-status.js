@@ -30,6 +30,10 @@ myOwn.informDetectedStatus = function informDetectedStatus(statusCode, logged) {
                     my.statusDiv.appendChild(my.statusDiv.askLink);
                 }
                 my.statusDiv.askLink.href=status.mustAsk.url;
+                my.statusDiv.askLink.onclick=function(){
+                    // the hash is the state of the page: it goes along to the login to come back to it
+                    this.href=status.mustAsk.url+window.location.hash;
+                };
                 my.statusDiv.askLink.textContent=my.messages[status.mustAsk.idMessage];
             }else{
                 if(my.statusDiv.askLink){
