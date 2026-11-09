@@ -1,5 +1,6 @@
 //import { TableDefinition } from "backend-plus";
 "use strict";
+/* eslint-disable unicorn/no-this-assignment -- assigning this to a variable (be, grid, my...) is intentional */
 //x// <amd-dependency path="../../../node_modules/like-ar/like-ar.d.ts" name="likeAr"/>
 //x// <reference path="../../node_modules/like-ar/like-ar.d.ts" />
 /// <reference path="../node_modules/types.d.ts/modules/myOwn/in-myOwn.d.ts" />

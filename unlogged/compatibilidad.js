@@ -66,7 +66,7 @@ var controles_de_compatibilidad={
     }}
 };
 
-function controlar_compatibilidad(ya, id, idBoton){ // eslint-disable-line max-statements
+function controlar_compatibilidad(ya, id, idBoton){ // eslint-disable-line max-statements, sonarjs/cognitive-complexity
     var boton=document.getElementById(idBoton || 'login');
     id = id || 'resultado_incompatibilidad';
     var div=document.getElementById(id);

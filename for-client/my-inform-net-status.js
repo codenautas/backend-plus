@@ -1,6 +1,7 @@
 "use strict";
+/* eslint-disable unicorn/no-this-assignment -- assigning this to a variable (be, grid, my...) is intentional */
 
-myOwn.informDetectedStatus = function informDetectedStatus(statusCode, logged) { // eslint-disable-line max-statements
+myOwn.informDetectedStatus = function informDetectedStatus(statusCode, logged) { // eslint-disable-line max-statements, sonarjs/cognitive-complexity
     var my=this;
     if(my.debuggingStatus){ my.debuggingStatus(statusCode); }
     if(my.previousStatusCode!=statusCode){

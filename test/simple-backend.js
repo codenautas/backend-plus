@@ -1,4 +1,5 @@
 "use strict";
+/* eslint-disable unicorn/no-this-assignment -- assigning this to a variable (be, grid, my...) is intentional */
 
 var Path = require('path');
 var backendPlus = require("../lib/backend-plus");

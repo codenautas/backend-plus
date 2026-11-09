@@ -31,7 +31,7 @@ async function testAFixture(be, fixture, agent, opt){
         ):(
             agent.post(opt.base+'/'+fixture.action).type('form').send(parameters)
         ))
-        .expect(function(res){ // eslint-disable-line max-statements
+        .expect(function(res){ // eslint-disable-line max-statements, sonarjs/cognitive-complexity
             var result;
             var chunks = res.text || res._body.toString('utf8');
             var error;

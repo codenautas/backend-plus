@@ -1,4 +1,5 @@
 "use strict";
+/* eslint-disable unicorn/no-this-assignment -- assigning this to a variable (be, grid, my...) is intentional */
 
 /// <reference path="../node_modules/types.d.ts/modules/typed-controls/index.d.ts" />
 //no/ <reference path="../node_modules/types.d.ts/modules/dialog-promise/index.d.ts" />
@@ -630,7 +631,7 @@ myOwn.captureKeys = function captureKeys() {
         throw new Error('captureKeysInstaled');
     }
     this.captureKeysInstaled=true;
-    document.addEventListener('keydown', function(evento){ // eslint-disable-line max-statements, complexity
+    document.addEventListener('keydown', function(evento){ // eslint-disable-line max-statements, complexity, sonarjs/cognitive-complexity
         // document.title=evento.which+','+evento.shiftKey+','+evento.ctrlKey+','+evento.altKey+','+evento.metaKey;
         if(evento.which==37 && !evento.shiftKey  && !evento.ctrlKey  && !evento.altKey  && !evento.metaKey){ // KeyLeft
             var info=tableInfo(this.activeElement);
@@ -770,7 +771,7 @@ myOwn.captureKeys = function captureKeys() {
         document.mayBeRepetibleButton = null;
         previousKey=evento.which;
     });
-    document.addEventListener('keypress', function(evento){ // eslint-disable-line max-statements
+    document.addEventListener('keypress', function(evento){ // eslint-disable-line max-statements, sonarjs/cognitive-complexity
         if(my.config.useragent.isiPad && evento.which==231){ // F4
             var info=tableInfo(this.activeElement);
             if(info.table){

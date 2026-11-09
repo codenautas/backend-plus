@@ -1,4 +1,5 @@
 "use strict";
+/* eslint-disable unicorn/no-this-assignment -- assigning this to a variable (be, grid, my...) is intentional */
 (function codenautasModuleDefinition(root, name, factory) {
     /* global define */
     /* istanbul ignore next */
@@ -224,7 +225,7 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
         // var progressIndicator;
         // var divBarProgressLabel = {};
         var onClose=function(){}
-        var defaultInformProgress = function defaultInformProgress(progressInfo){ // eslint-disable-line max-statements
+        var defaultInformProgress = function defaultInformProgress(progressInfo){ // eslint-disable-line max-statements, sonarjs/cognitive-complexity
             if(progressInfo.message || progressInfo.end || progressInfo.start || progressInfo.loaded){
                 // progressInfo.idGroup
                 if(!divProgress){
@@ -247,14 +248,14 @@ myAjax.ajaxPromise = function ajaxPromise(procedureDef,data,opts){
                         var stopCountDown=html.button(my.messages.stopCountDown).create();
                         divButton.innerHTML="";
                         divButton.appendChild(closeButton);
-                        closeButton.onclick=function(){
+                        closeButton.onclick=function(){ // eslint-disable-line sonarjs/no-nested-functions
                             divButton.dialogPromiseDone();
                         }
                         if(err){
                             divProgress.appendChild(html.div({class:'error-message'},err.message).create())
                         }
                         if(myAjax.ajaxPromise.autoClose && !err){
-                            setTimeout(function(){
+                            setTimeout(function(){ // eslint-disable-line sonarjs/no-nested-functions
                                 divButton.dialogPromiseDone();
                             },myAjax.ajaxPromise.autoClose);
                         }
@@ -570,7 +571,7 @@ cases.forEach(([expected, param]) => console.log(param, containsObjectsWithTheSa
  * @param {any} o
  * @param {(div:HTMLElement, o:any, a:string)=>{title:HTMLElement|null, data:HTMLElement, skip:boolean|null}=(div,o,a)} ubicaciones
  */
-function agregar_json(div, o, ubicaciones=agregar_json_default_ubicaciones){
+function agregar_json(div, o, ubicaciones=agregar_json_default_ubicaciones){ // eslint-disable-line sonarjs/cognitive-complexity
     if(o == null){
         return ;
     }

@@ -1,4 +1,5 @@
 "use strict";
+/* eslint-disable unicorn/no-this-assignment -- assigning this to a variable (be, grid, my...) is intentional */
 
 /*global myOwn, my, xlsxNow, xlsxNowBrowser, Pikaday  */
 /*global miniMenuPromise, dialogPromise, alertPromise, confirmPromise, promptPromise, simpleFormPromise */
@@ -621,19 +622,19 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                 fixedFields:grid.connector.fixedFields,
                 paramfun:grid.connector.parameterFunctions||{},
                 pick:grid.connector.pick
-            }).then(function(rows){
+            }).then(function(rows){ // eslint-disable-line sonarjs/cognitive-complexity
                 var primaryKey = grid.def.primaryKey;
                 var getPrimaryKeyValues=function getPrimaryKeyValues(primaryKey, row){
-                    return primaryKey.map(function(fieldName){
+                    return primaryKey.map(function(fieldName){ // eslint-disable-line sonarjs/no-nested-functions
                         return row[fieldName]
                     })
                 };
                 var tick = Math.random();
                 var thereIsANewRecord = grid.depots.filter(depot => depot.status == 'new').length;
-                rows.forEach(function(row){ // eslint-disable-line max-statements
+                rows.forEach(function(row){ // eslint-disable-line max-statements, sonarjs/cognitive-complexity
                     if (my.skipTimeStamp(row, timeStamp)) return;
                     var primaryKeyValuesForRow = getPrimaryKeyValues(primaryKey, row);
-                    var depot = grid.depots.find(function(depot){
+                    var depot = grid.depots.find(function(depot){ // eslint-disable-line sonarjs/no-nested-functions
                         var primaryKeyValuesForDepotRow = getPrimaryKeyValues(primaryKey, depot.row);
                         return sameValue(JSON.stringify(primaryKeyValuesForRow),JSON.stringify(primaryKeyValuesForDepotRow))
                     });
@@ -669,7 +670,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                         depot.tick = tick
                         if (!force) {
                             changeIoStatus(depot,'background-change', depot.row);
-                            setTimeout(function(){
+                            setTimeout(function(){ // eslint-disable-line sonarjs/no-nested-functions
                                 changeIoStatus(depot,'ok', depot.row);
                             },3000);
                         }
@@ -1232,7 +1233,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
             // no es necesario refrescar
         }
     }
-    detailControl.displayDetailGrid = function(opts,event){ // eslint-disable-line max-statements
+    detailControl.displayDetailGrid = function(opts,event){ // eslint-disable-line max-statements, sonarjs/cognitive-complexity
         var result;
         event=event||{};
         if(!('fixedFields' in opts)){
@@ -1468,7 +1469,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     prefilledFields:grid.connector.fixedFields,
                     skipUnknownFieldsAtImport:null
                 },
-                function(result){
+                function(result){ // eslint-disable-line sonarjs/cognitive-complexity
                     var messages=[];
                     if(result.uploaded){
                         if(result.uploaded.inserted==1){
@@ -1512,7 +1513,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
         menuOptions.push({img:my.path.img+'delete-all-rows.png', value:true, label:my.messages.deleteAllRecords, doneFun:function(){
             return confirmPromise(my.messages.confirmDeleteAll+(
                 grid.depotsToDisplay.length<grid.depots.length?my.messages.xOverTWillDelete:(
-                    grid.connector.fixedFields.length?my.messages.allGWillDelete:my.messages.allTWillDelete
+                    grid.connector.fixedFields.length?my.messages.allGWillDelete:my.messages.allTWillDelete // eslint-disable-line sonarjs/no-nested-conditional
                 )
             ).replace('{$x}',grid.depotsToDisplay.length).replace('{$t}',grid.depots.length)
             ).then(function(){
@@ -1657,7 +1658,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
                 }
                 return {dotExtension:'.tab', generate:function(){
                     return txtExport(fieldsDef2Export, '|', function(txt){
-                        return txt.replace(/[|\\\r\n]/g,function(char){
+                        return txt.replace(/[|\\\r\n]/g,function(char){ // eslint-disable-line sonarjs/no-nested-functions
                             return trans[char];
                         })
                     });
@@ -1691,12 +1692,12 @@ myOwn.dialogDownload = function dialogDownload(grid){
             var writeOnce=function(handle){
                 setStep('createWritable');
                 return handle.createWritable().then(function(writable){
-                    return Promise.resolve().then(function(){
+                    return Promise.resolve().then(function(){ // eslint-disable-line sonarjs/no-nested-functions
                         return file.write(writable);
-                    }).then(function(){
+                    }).then(function(){ // eslint-disable-line sonarjs/no-nested-functions
                         setStep('close');
                         return writable.close();
-                    }, function(err){
+                    }, function(err){ // eslint-disable-line sonarjs/no-nested-functions
                         return writable.abort().then(function(){
                             throw err;
                         }, function(abortErr){
@@ -1711,9 +1712,9 @@ myOwn.dialogDownload = function dialogDownload(grid){
                 return writeOnce(handle).catch(function(err){
                     if(step==='close' && err.name==='InvalidStateError' && attempt<closeRetries){
                         console.error('saveToDisk retry', attempt+1, err);
-                        return new Promise(function(resolve){
+                        return new Promise(function(resolve){ // eslint-disable-line sonarjs/no-nested-functions
                             setTimeout(resolve, 200 * Math.pow(2, attempt));
-                        }).then(function(){
+                        }).then(function(){ // eslint-disable-line sonarjs/no-nested-functions
                             return writeWithRetries(handle, attempt+1);
                         });
                     }
@@ -1970,8 +1971,8 @@ myOwn.dialogDownload = function dialogDownload(grid){
             var sheet2name=grid.def.name!=="metadata"?"metadata":"meta-data";
             var dataSheet = {
                 name: sheet1name,
-                freezeRows: my.config.config?.['unfreeze-excel-rows'] ? 0 : (grid.def.exportLabelsRow ? 2 : 1),
-                freezeColumns: my.config.config?.['unfreeze-excel-columns'] ? 0 : ((grid.def.primaryKey?.length ?? 0) + (grid.def.exportLabelsRow ? 1 : 0)),
+                freezeRows: my.config.config?.['unfreeze-excel-rows'] ? 0 : (grid.def.exportLabelsRow ? 2 : 1), // eslint-disable-line sonarjs/no-nested-conditional
+                freezeColumns: my.config.config?.['unfreeze-excel-columns'] ? 0 : ((grid.def.primaryKey?.length ?? 0) + (grid.def.exportLabelsRow ? 1 : 0)), // eslint-disable-line sonarjs/no-nested-conditional
                 autoWidthMax: 40,
                 autoWidthMin: 5,
                 autoWidthRows: 16384,
@@ -2214,7 +2215,7 @@ myOwn.TableGrid.prototype.refreshAggregates = function refreshAggregates(){
     }
 };
 
-myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){ // eslint-disable-line max-statements
+myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){ // eslint-disable-line max-statements, sonarjs/cognitive-complexity
     var grid = this;
     var my = grid.my;
     grid.view.hiddenColumns=grid.view.hiddenColumns||grid.def.hiddenColumns||[];
@@ -2473,7 +2474,7 @@ myOwn.specialDefaultValue={
     }
 }
 
-myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElements(aboveDepot, belowDepot){
+myOwn.TableGrid.prototype.createRowInsertElements = function createRowInsertElements(aboveDepot, belowDepot){ // eslint-disable-line sonarjs/cognitive-complexity
     var grid = this;
     if(!belowDepot){
         if(aboveDepot){
@@ -2558,7 +2559,7 @@ myOwn.TableGrid.prototype.updateRowCountHTML = function updateRowCountHTML(HTML)
 
 var changeIoStatus = function changeIoStatus(depot,newStatus, objectWithFieldsOrListOfFieldNames, title){
     var fieldNames=typeof objectWithFieldsOrListOfFieldNames === "string"?[objectWithFieldsOrListOfFieldNames]:(
-        Array.isArray(objectWithFieldsOrListOfFieldNames)?objectWithFieldsOrListOfFieldNames:Object.keys(objectWithFieldsOrListOfFieldNames)
+        Array.isArray(objectWithFieldsOrListOfFieldNames)?objectWithFieldsOrListOfFieldNames:Object.keys(objectWithFieldsOrListOfFieldNames) // eslint-disable-line sonarjs/no-nested-conditional
     );
     fieldNames.forEach(function(name){
         if(depot.rowControls[name]){
@@ -2709,7 +2710,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             tdActions.style.backgroundRepeat='no-repeat'
         }
     }
-    grid.depotRefresh = function depotRefresh(depot,result,opts){ // eslint-disable-line max-statements
+    grid.depotRefresh = function depotRefresh(depot,result,opts){ // eslint-disable-line max-statements, sonarjs/cognitive-complexity
         // ¡ATENCIÓN!: esta función no debe despleegar, llama a updateRowData, ahí se despliega
         opts=opts||{};
         upadteNumberOfRows(depot,grid);
@@ -3045,7 +3046,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
     grid.displayBody();
 };
 
-myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot, mode){
+myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot, mode){ // eslint-disable-line sonarjs/cognitive-complexity
     var grid = this;
     var fast = mode == 'change-ff'
     if (mode == 'unknown' && myOwn.config.config['grid-row-retain-moved-or-deleted']) {
@@ -3062,7 +3063,7 @@ myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot, mo
             var compareColNumberFun = function compareColNumberFun(a, b) {
                 var colNumberA = a.colNumber;
                 var colNumberB = b.colNumber;
-                return(colNumberA > colNumberB)?1:((colNumberA < colNumberB)?-1:0)
+                return(colNumberA > colNumberB)?1:((colNumberA < colNumberB)?-1:0) // eslint-disable-line sonarjs/no-nested-conditional
             }
             var i = 0;
             Array.prototype.forEach.call(grid.dom.table.rows,function(tr){

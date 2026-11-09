@@ -25,10 +25,14 @@ module.exports = [
         rules: {
             "no-unreachable-loop": 2,
             "sonarjs/code-eval": 2,
+            "sonarjs/cognitive-complexity": 2,
             "sonarjs/hashing": 2,
             "sonarjs/no-async-constructor": 2,
             "sonarjs/no-clear-text-protocols": 2,
+            "sonarjs/no-nested-conditional": 2,
+            "sonarjs/no-nested-functions": 2,
             "unicorn/no-thenable": 2,
+            "unicorn/no-this-assignment": 2,
             "unicorn/prefer-code-point": 2
         }
     },

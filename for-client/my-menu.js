@@ -1,4 +1,5 @@
 "use strict";
+/* eslint-disable unicorn/no-this-assignment -- assigning this to a variable (be, grid, my...) is intentional */
 
 // require('lazy-some').bindToPrototypeIn(Array);
 var changing = require('best-globals').changing;
@@ -105,8 +106,8 @@ myOwn.wScreens.procAux = {
             control.style.backgroundColor='white';
             TypedControls.adaptElement(control,changing({typeName:'text'}, parameterDef));
             const value = parameterDef.name in params ? params[parameterDef.name] : (
-                'defaultValue' in parameterDef ? parameterDef.defaultValue : (
-                    'specialDefaultValue' in parameterDef ? my.specialDefaultValue[parameterDef.specialDefaultValue](parameterDef.name, {row:{}}, {row:{}}) : (
+                'defaultValue' in parameterDef ? parameterDef.defaultValue : ( // eslint-disable-line sonarjs/no-nested-conditional
+                    'specialDefaultValue' in parameterDef ? my.specialDefaultValue[parameterDef.specialDefaultValue](parameterDef.name, {row:{}}, {row:{}}) : ( // eslint-disable-line sonarjs/no-nested-conditional
                         undefined
                     )
                 )
@@ -152,7 +153,7 @@ myOwn.wScreens.procAux = {
                 button.disabled=false;
                 divProgressOutside.style.opacity=0.33;
                 toggleProgress.disabled=false;
-                labelProgress.textContent=typeof resultOk == "string" ? resultOk : resultOk !== false ? my.messages.completed : 'error';
+                labelProgress.textContent=typeof resultOk == "string" ? resultOk : resultOk !== false ? my.messages.completed : 'error'; // eslint-disable-line sonarjs/no-nested-conditional
             }).catch(function(err){
                 my.log(err);
                 divProgress.textContent=err.message;
@@ -231,7 +232,7 @@ myOwn.preDisplayPage = function preDisplayPage(addrParams, wScreen, w){
     main_layout.setAttribute('my_w',w);
 }
 
-myOwn.showPage = function showPage(pageDef){ // eslint-disable-line max-statements
+myOwn.showPage = function showPage(pageDef){ // eslint-disable-line max-statements, sonarjs/cognitive-complexity
     my.prepareFloating3dots();
     var newHash;
     if(!location.hash){
