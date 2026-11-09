@@ -1,7 +1,7 @@
 "use strict";
 /* eslint-disable unicorn/no-this-assignment -- assigning this to a variable (be, grid, my...) is intentional */
 
-var Path = require('path');
+var Path = require('node:path');
 var backendPlus = require("../lib/backend-plus");
 var MiniTools = require('mini-tools');
 var changing = require('best-globals').changing;
@@ -24,7 +24,6 @@ class AppExample extends backendPlus.AppBackend{
         ]);
     }
     addLoggedServices(){
-        var be = this;
         super.addLoggedServices();
         this.app.get('/echo', function(req,res){
             res.end('echo');

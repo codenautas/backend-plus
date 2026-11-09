@@ -164,7 +164,7 @@ export class WebsqlDb{
     }
     async existsStructure(tableName:string):Promise<boolean>{
         var tableDef = await this.getStructure(tableName);
-        return tableDef?true:false;
+        return Boolean(tableDef);
     }
     private convertSQLResultSetRowListToArray(rowResultSetList:SQLResultSetRowList, copyResults:boolean):any[]{
         var arr:any[]=[];
@@ -181,7 +181,7 @@ export class WebsqlDb{
         var isNotSupported = notSupportedFields.find(function(field){
             return field.name==fieldName;
         })
-        return isNotSupported?true:false
+        return Boolean(isNotSupported)
     }
     private getNotSupportedFields(tableDef:TableDefinition):FieldDefinition[]{
         var jsonbFields = tableDef.fields.filter(function(field){

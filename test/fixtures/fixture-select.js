@@ -21,7 +21,7 @@ const bestGlobals = require("best-globals");  // eslint-disable-line strict
         row: {id_type: 'passport',id: 123456,first_name: 'Bob' ,last_name: 'Smith',birth_date: null ,salary: null },
     }
 },{
-    skip: !true,
+    skip: false,
     name: 'update dates',
     action: 'table_record_save',
     parameters: {

@@ -33,7 +33,9 @@ module.exports = [
             "sonarjs/no-nested-functions": 2,
             "unicorn/no-thenable": 2,
             "unicorn/no-this-assignment": 2,
-            "unicorn/prefer-code-point": 2
+            "unicorn/prefer-code-point": 2,
+            "unicorn/prefer-single-call": 2,
+            "sonarjs/no-redundant-boolean": 2
         }
     },
     {

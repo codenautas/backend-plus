@@ -8,13 +8,13 @@ var request = require('supertest');
 var changing = require('best-globals').changing;
 var expect = require('expect.js');
 var sinon = require('sinon');
-var fsSync = require('fs');
-var querystring = require('querystring');
+var fsSync = require('node:fs');
+var querystring = require('node:querystring');
 
 var assert = require('self-explain').assert;
 
 var myOwn = require('../for-client/my-things.js');
-const { resolve } = require('path');
+const { resolve } = require('node:path');
 
 async function testAFixture(be, fixture, agent, opt){
     await new Promise(function(resolve,reject){
@@ -46,7 +46,7 @@ async function testAFixture(be, fixture, agent, opt){
                         var lines = chunks.split(/\r?\n/);
                         while(!text && !error){
                             var line = lines[0];
-                            error = /^\{"error":/.test(line) && JSON.parse(line).error;
+                            error = line.startsWith('{"error":') && JSON.parse(line).error;
                             lines.shift();
                             if(line == '--') text = lines.join('');
                         }

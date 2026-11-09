@@ -134,7 +134,6 @@ export class LocalDb{
         })
     }
     async registerStructure(tableDef:TableDefinition):Promise<RegisterResult>{
-        var ldb = this;
         var wait4dbCurrent=this.wait4db;
         var registerTask=this.registerStructureInside(tableDef, wait4dbCurrent);
         this.wait4db = registerTask.then(result=>result.wait4db);
@@ -227,7 +226,7 @@ export class LocalDb{
     }
     async existsStructure(tableName:string):Promise<boolean>{
         var tableDef = await this.getStructure(tableName);
-        return tableDef?true:false;
+        return Boolean(tableDef);
     }
     async getOneIfExists<T>(tableName:string, key:Key):Promise<T|undefined>{
         var ldb=this;
@@ -258,7 +257,7 @@ export class LocalDb{
             internalKey=tableName+JSON.stringify(parentKey);
             internalKey=internalKey.substr(0,internalKey.length-1);
         }else{
-            internalKey=parentKey?parentKey:'';
+            internalKey=parentKey||'';
         }
         var cursor = db.transaction([tableName],'readonly').objectStore(tableName).openCursor(parentKey==null?null:IDBKeyRange.lowerBound(internalKey));
         return new Promise<T[]>(function(resolve, reject){
@@ -268,7 +267,7 @@ export class LocalDb{
                 if(cursor && ((parentKey == null) || (
                     detectedFeatures.needToUnwrapArrayKeys ?
                         internalKey == (cursor.key as string).slice(0,internalKey.length) :
-                        ! parentKey.find(function(expectedValue,i){
+                        ! parentKey.some(function(expectedValue,i){
                             var storedValue = (cursor.key as any[])[i]
                             return expectedValue != storedValue
                         })
@@ -286,7 +285,7 @@ export class LocalDb{
         });
     }
     async getAll<T>(tableName:string):Promise<T[]>{
-        return this.getChild<T>(tableName,tableName[0]=='$'?null:[]);
+        return this.getChild<T>(tableName,tableName.startsWith('$')?null:[]);
     }
     async getAllStructures<T>():Promise<T[]>{
         return this.getAll('$structures');

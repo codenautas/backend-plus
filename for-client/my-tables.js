@@ -197,7 +197,7 @@ myOwn.i18n.messages.es=changing(myOwn.i18n.messages.es, {
 /** @param {string} text */
 function regex4search(text){
     return new RegExp(
-        text.toString().trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+        text.toString().trim().replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)
         // .replace(/"/g,"\\b")
         .replace(/[ñÑ]/g,'(?:gn|nn?i?|[ñÑ])')
         .replace(/[cCçÇ]/g,'[cCçÇ]')
@@ -364,7 +364,7 @@ myOwn.TableConnector.prototype.getStructure = function getStructure(opts){
 
 myOwn.TableConnector.prototype.getData = function getData(){
     var connector = this;
-    if(((connector.opts||{}).tableDef||{}).forInsertOnlyMode){
+    if(connector.opts?.tableDef?.forInsertOnlyMode){
         return Promise.resolve([]);
     }
     return connector.my.ajax.table_data({
@@ -487,11 +487,11 @@ myOwn.TableConnectorLocal.prototype.getStructure = function getStructure(){
 
 myOwn.TableConnectorLocal.prototype.getData = function getData(){
     var connector = this;
-    if(((connector.opts||{}).tableDef||{}).forInsertOnlyMode){
+    if(connector.opts?.tableDef?.forInsertOnlyMode){
         return Promise.resolve([]);
     }
     if(connector.parameterFunctions){
-        for(var x in connector.parameterFunctions||{}){ // eslint-disable-line no-unreachable-loop -- it only checks whether there is any parameterFunction
+        for(var x in connector.parameterFunctions||{}){ // eslint-disable-line no-unreachable-loop, sonarjs/no-unused-vars, sonarjs/no-dead-store -- it only checks whether there is any parameterFunction
             throw new Error('no soportado parameterFunctions');
         }
     }
@@ -499,14 +499,13 @@ myOwn.TableConnectorLocal.prototype.getData = function getData(){
         var parentKey = [];
         var filterValues = connector.fixedFields.slice();
         var primaryKey = connector.def.primaryKey.slice();
-        var indexOfKey;
         while(primaryKey.length && connector.fixedField[primaryKey[0]]){
             var key=primaryKey.shift();
             parentKey.push(connector.fixedField[key]);
         }
         return my.ldb.getChild(connector.def.name,parentKey).then(function(rows){
             var result = rows.filter(function(row){
-                return !filterValues.find(function(pair){
+                return !filterValues.some(function(pair){
                     return row[pair.fieldName]!=pair.value
                 });
             });
@@ -581,7 +580,7 @@ function upadteNumberOfRows(depot,grid){
 
 var TIME_STAMP_PROP = Symbol('TIME_STAMP_PROP');
 myOwn.setTimeStamp = function setTimeStamp(row){
-    var timeStamp = new Date().getTime();
+    var timeStamp = Date.now();
     row[TIME_STAMP_PROP] = timeStamp;
     return timeStamp;
 }
@@ -602,7 +601,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
     grid.connector = new Connector({
         my:this,
         tableName: tableName,
-        getElementToDisplayCount:function(){ return (grid.dom.footInfo||{}).displayTo||html.div().create(); }
+        getElementToDisplayCount:function(){ return grid.dom.footInfo?.displayTo||html.div().create(); }
     }, opts);
     var preparing = grid.prepareAndDisplayGrid().then(function(){
         if(opts.detailing){
@@ -616,7 +615,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
             })
         }
         grid.refreshAllRows = async function(force){
-            var timeStamp = new Date().getTime();
+            var timeStamp = Date.now();
             await grid.connector.my.ajax.table_data({
                 table:grid.connector.tableName,
                 fixedFields:grid.connector.fixedFields,
@@ -645,7 +644,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                     var needToDisplayDepot = !!grid.filterDepots([depot])[0];
                     if (!needToDisplayDepot) return;
                     //chequeo que exista depot por las dudas
-                    if ((!depot || !depot.tr || !depot.tr.parentNode) && !thereIsANewRecord && !grid.vertical) {
+                    if (!depot?.tr?.parentNode && !thereIsANewRecord && !grid.vertical) {
                         var depotsToDisplay = grid.filterDepots(grid.depots);
                         if (needToAddInGrid) {
                             var depot = grid.createDepotFromRow(row);
@@ -660,7 +659,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                         while (i < depotsToDisplay.length){
                             var aDepot = depotsToDisplay[i];
                             if (depot == aDepot) break;
-                            if (aDepot && aDepot.tr && aDepot.tr.parentNode && aDepot.tr.rowIndex != null) {
+                            if (aDepot?.tr?.parentNode && aDepot.tr.rowIndex != null) {
                                 iRow = aDepot.tr.sectionRowIndex
                             }
                             i++;
@@ -685,7 +684,6 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                     }
                 })
                 if(!thereIsANewRecord){
-                    var i = 0;
                     var depotsToDisplay = grid.filterDepots(grid.depots);
                     var depotsToDelete = depotsToDisplay.filter(depot => depot.tick != tick);
                     var depot;
@@ -693,7 +691,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                         var depotsToRetain = grid.depots.filter(depot => depot.tick == tick);
                         for (depot of depotsToRetain) {
                             depot['$refreshed'] = false
-                            if (depot.tr && depot.tr.getAttribute('not-here')) depot.tr.removeAttribute('not-here')
+                            if (depot.tr?.getAttribute('not-here')) depot.tr.removeAttribute('not-here')
                         }
                     }
                     while (depot = depotsToDelete.pop()) { // eslint-disable-line no-cond-assign
@@ -853,7 +851,7 @@ myOwn.ColumnGrid.prototype.th = function th(){
 };
 
 myOwn.ColumnGrid.prototype.thDetail = function thDetail(){
-    return html.th({class:'th-detail'}, (this.fieldDef||{}).label);
+    return html.th({class:'th-detail'}, this.fieldDef?.label);
 };
 
 myOwn.ColumnGrid.prototype.thAgg = function thAgg(){
@@ -1004,7 +1002,6 @@ myOwn.DataColumnGrid.prototype.th = function th(){
 };
 
 myOwn.DataColumnGrid.prototype.thFilter = function thFilter(depot, iColumn){
-    var grid = this.grid;
     var fieldDef = this.fieldDef;
     var fieldName=fieldDef.name;
     depot.rowSymbols[fieldDef.name]=depot.rowSymbols[fieldDef.name]||(fieldDef.typeName == 'text' ? '~' : '=');
@@ -1121,7 +1118,9 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){ //
                 }
                 promiseChain.then(function(){
                     grid.updateRowData(depot,true);
-                }).catch(depot.my.alertError);
+                }).catch(function(err){
+                    my.log(err);
+                });
             }
         });
     }
@@ -1375,19 +1374,19 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
     menuOptions.push({img:my.path.img+'refresh.png', value:true, label:my.messages.refresh, doneFun:function(){
         return grid.refresh();
     }});
-    menuOptions.push({img:my.path.img+'show-inherited-keys.png', value:true, label:my.messages.showInheritedKeys, doneFun:function(){
+    menuOptions.push({img:my.path.img+'show-inherited-keys.png', value:true, label:my.messages.showInheritedKeys, doneFun:function(){ // eslint-disable-line unicorn/prefer-single-call
         grid.view.showInheritedKeys = !grid.view.showInheritedKeys;
         grid.dom.table.parentNode.setAttribute('show-inherited-keys', grid.view.showInheritedKeys?'yes':'no');
         return Promise.resolve(true);
     }});
-    menuOptions.push({img:my.path.img+'show-hide-columns.png', value:true, id:'menu-hide-or-show', label: my.messages.hideOrShow, doneFun:function(){
+    menuOptions.push({img:my.path.img+'show-hide-columns.png', value:true, id:'menu-hide-or-show', label: my.messages.hideOrShow, doneFun:function(){ // eslint-disable-line unicorn/prefer-single-call
         dialogPromise(function(dialogWindow, closeWindow){
             var button=html.button({class:'hide-or-show'},'ok').create();
             var createSelectElement=function createSelectElement(columns,hideOrShowId,disabledItems){
                 var selectElement=html.select(
                     {id:hideOrShowId, class:'hide-or-menu', multiple:true, size:Math.max(Math.min(grid.def.fields.lenght,10),4)},
                     columns.map(function(column){
-                        return html.option({value: column, disabled:disabledItems.indexOf(column)!==-1},column)
+                        return html.option({value: column, disabled:disabledItems.includes(column)},column)
                     })
                 ).create()
                 return selectElement;
@@ -1437,16 +1436,6 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                 });
                 grid.hideColumnsViaCss();
             });
-            var showAndHide=function showAndHide(selectColumnElement,showOrHide){
-                Array.prototype.forEach.call(selectColumnElement.children,function(child){
-                    if(showOrHide=='hide'){
-                        hideColumn(child.value)
-                        grid.view.hiddenColumns.push(child.value);
-                    }else{
-                        showColmn(child.value);
-                    }
-                })
-            };
             button.addEventListener('click',function(){
                 closeWindow();
             })
@@ -1522,10 +1511,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                     rowsToDelete:grid.depotsToDisplay.map(function(depot){
                         return likeAr(depot.row).filter(function(_value, name){
                             var fieldDef = grid.def.field[name];
-                            if(fieldDef.clientSide && !fieldDef.serverSide || fieldDef.inTable === false){
-                                return false;
-                            }
-                            return true;
+                            return !(fieldDef.clientSide && !fieldDef.serverSide || fieldDef.inTable === false);
                         }).plain();
                     }),
                     expectedRemainCount:grid.depots.length-grid.depotsToDisplay.length
@@ -1568,7 +1554,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
         var actionElement=html.button({class:'export-a'},canSaveToDisk ? my.messages.download : my.messages.confirmExport).create();
         var downloadElement=html.a({class:'export-a'},my.messages.download).create();
         var useTabPlus = my.config.config?.['tab-plus'] == 'only';
-        var tabPlusTableOptions = (my.config.config?.['tab-plus-table-options'] || {})[grid.def.name];
+        var tabPlusTableOptions = my.config.config?.['tab-plus-table-options']?.[grid.def.name];
         var tabPlusHeader=html.textarea({rows:3, style:'width:100%; box-sizing:border-box'}).create();
         if(typeof tabPlusTableOptions == 'string'){
             tabPlusHeader.value = tabPlusTableOptions;
@@ -1651,10 +1637,10 @@ myOwn.dialogDownload = function dialogDownload(grid){
                 }};
             }else{
                 var trans={
-                    '|':'\\x7C',
-                    '\\':'\\\\',
-                    '\r':'\\r',
-                    '\n':'\\n',
+                    '|':String.raw`\x7C`,
+                    '\\':String.raw`\\`,
+                    '\r':String.raw`\r`,
+                    '\n':String.raw`\n`,
                 }
                 return {dotExtension:'.tab', generate:function(){
                     return txtExport(fieldsDef2Export, '|', function(txt){
@@ -1807,7 +1793,6 @@ myOwn.dialogDownload = function dialogDownload(grid){
                 data.push(fieldsDef2Export.map(function(fieldDef){
                     if(fieldDef.inTable===false && !input.fromOtherTables.checked) return '';
                     var value=depot.row[fieldDef.name];
-                    var type=fieldDef.typeName;
                     return value!=null?typeStore.typerFrom(fieldDef).toPlainString(value):'';
                 }));
             });
@@ -1908,7 +1893,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
             if(fieldDef.isPk){
                 return isInterval?'intervalPk':'pk';
             }
-            if(!fieldDef.allow || !fieldDef.allow.update || depot.allow.update === false){
+            if(!fieldDef.allow?.update || depot.allow.update === false){
                 return isInterval?'intervalLookup':'lookup';
             }
             return isInterval?'interval':undefined;
@@ -2096,12 +2081,12 @@ myOwn.dialogUpload = function dialogUpload(ajaxPath, ajaxParams, ajaxPrepareResu
             progressBar,
         ]}).then(function(message){
             return Promise.all([
-                refresheable && refresheable.refresh(),
+                refresheable?.refresh(),
                 alertPromise(message)
             ]);
         },function(err){
             return Promise.all([
-                refresheable && refresheable.refresh(),
+                refresheable?.refresh(),
                 my.alertError(err)
             ]);
         });
@@ -2256,7 +2241,7 @@ myOwn.TableGrid.prototype.prepareGrid = function prepareGrid(){ // eslint-disabl
         // hidden until displayBody shows it (when depots are loaded and all rows are displayed)
         buttonInsert.style.visibility='hidden';
         buttonInsert.addEventListener('click', function(){
-            var tr=grid.createRowInsertElements();
+            grid.createRowInsertElements();
         });
     }
     if(grid.def.allow.filter && !grid.def.forInsertOnlyMode){
@@ -2632,9 +2617,9 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 var mandatoryOmitted=function(fieldDef){
                     return (specialMandatories[fieldDef.name] || fieldDef.nullable!==true && fieldDef.isPk || fieldDef.nullable===false)
                         && depot.row[fieldDef.name]==null
-                        && (grid.connector.fixedFields.find(function(pair){
+                        && grid.connector.fixedFields.find(function(pair){
                                 return !pair.range && !pair.until && pair.fieldName===fieldDef.name
-                            })||{}).value == null
+                            })?.value == null
                 }
                 //var cual=grid.def.fields.filter(mandatoryOmitted)
                 if(grid.def.fields.some(mandatoryOmitted)){
@@ -2716,7 +2701,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         upadteNumberOfRows(depot,grid);
         var retrievedRow = result.updatedRow;
         for(var fieldName in retrievedRow){
-            if(!/^\$/.test(fieldName)){
+            if(!fieldName.startsWith('$')){
                 if(grid.def.field[fieldName] && (!grid.def.field[fieldName].clientSide || grid.def.field[fieldName].serverSide && grid.def.field[fieldName].inTable!==false)){
                     if(depot.rowControls[fieldName]){
                         var value = depot.rowControls[fieldName].getTypedValue();
@@ -2777,7 +2762,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                         }
                     }
                 }
-            }else if(/^\$allow\./.test(fieldName)){
+            }else if(fieldName.startsWith('$allow.')){
                 depot.allow[fieldName.replace(/^\$allow\./,'')] = retrievedRow[fieldName];
             }
         }
@@ -2801,7 +2786,6 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
     }
     grid.createRowElements = function createRowElements(iRow, depot){
         var grid = this;
-        var forInsert = iRow>=0;
         var tr={};
         depot.colNumber = null;
         if(grid.vertical){
@@ -2825,7 +2809,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         if(!grid.vertical){
             tr.addEventListener('focusout', function(event){
                 tr.removeAttribute('current_line');
-                if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
+                if(event.target.parentNode != event.relatedTarget?.parentNode ){
                     depot.connector.recordLeave(depot).then(function(result){
                     });
                     if(Object.keys(depot.rowPendingForUpdate).length){
@@ -2835,7 +2819,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             });
             tr.addEventListener('focusin',function(event){
                 tr.setAttribute('current_line','1');
-                if(event.target.parentNode != (event.relatedTarget||{}).parentNode ){
+                if(event.target.parentNode != event.relatedTarget?.parentNode ){
                     return depot.connector.recordEnter(depot).then(function(result){
                     });
                 }
@@ -2920,7 +2904,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         var grid = this;
         var filterRows = grid.view.filter;
         var depotsToDisplay;
-        if(filterRows && filterRows.length){
+        if(filterRows?.length){
             depotsToDisplay = depotsToFilter.filter(function(depot,i){
                 var iFilter=0;
                 while(iFilter<filterRows.length){
@@ -2985,7 +2969,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             /*jshint loopfunc: true */
             for(var iRow=fromRowNumber; iRow<toRowNumber; iRow++){
                 (function(depot){
-                    var tr=grid.createRowElements(-1, depot);
+                    grid.createRowElements(-1, depot);
                     grid.updateRowData(depot);
                 })(depotsToDisplay[iRow]);
             }
@@ -3194,6 +3178,7 @@ myOwn.clientSides={
                 var valor = control.getTypedValue();
                 if((valor=='B' || valor=='🔑') && "no estaba lockeado"){
                     control.setTypedValue('⌚');
+                    control.removeAttribute('title');
                     var tokenPromise = Promise.resolve();
                     var token = localStorage.getItem('token');
                     if(!token){
@@ -3207,8 +3192,8 @@ myOwn.clientSides={
                             });
                         })
                     }
-                    tokenPromise = tokenPromise.then(function(){
-                        my.ajax.table_record_lock({
+                    tokenPromise.then(function(){
+                        return my.ajax.table_record_lock({
                             table:depot.def.name,
                             primaryKeyValues:depot.primaryKeyValues,
                             token:token,
@@ -3225,7 +3210,11 @@ myOwn.clientSides={
                                 control.setTypedValue('🔑');
                             })
                         })
-                    })
+                    }).catch(function(err){
+                        control.setTypedValue('🔺');
+                        control.title = 'error locking';
+                        my.log(err);
+                    });
                 }
             })
         }
@@ -3292,9 +3281,8 @@ myOwn.getReference = function getReference(referenceName, opts){
 }
 
 myOwn.autoSetupFunctions.push(function autoSetupMyTables(){
-    var my=this;
     TypedControls.Expanders.unshift(myOwn.ExpanderReferences);
-    TypedControls.Expanders.unshift(myOwn.ExpanderJsonReadOnly);
+    TypedControls.Expanders.unshift(myOwn.ExpanderJsonReadOnly); // eslint-disable-line unicorn/prefer-single-call
 });
 
 myOwn.ExpanderJsonReadOnly={
@@ -3383,9 +3371,9 @@ myOwn.ExpanderReferences={
                 rows=rows.concat(opts.extraRow);
             }
             if(typeInfo.referencesFields && typeInfo.referencesFields.length>1){
-                var prevFields=typeInfo.referencesFields.slice(0,typeInfo.referencesFields.length-1);
+                var prevFields=typeInfo.referencesFields.slice(0,-1);
                 rows = rows.filter(function(row){
-                    return prevFields.find(function(pair){ return !bestGlobals.sameValues(row[pair.target], typedControl.depot.row[pair.source]) }) === undefined
+                    return !prevFields.some(function(pair){ return !bestGlobals.sameValues(row[pair.target], typedControl.depot.row[pair.source]) })
                 })
             }
             var menu=rows.map(function(row){

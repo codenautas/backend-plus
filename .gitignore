@@ -43,4 +43,4 @@ for-client/*localdb.js
 test/karma-test-*.*
 /for-client/*websqldb.js
 
-.claude/settings.json
+.claude/

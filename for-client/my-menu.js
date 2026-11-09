@@ -64,7 +64,7 @@ myOwn.wScreens.table = function(addrParams){
         opts.detailingPath = [];
         var pageTitle = addrParams.label || addrParams.name || addrParams.table || my.config.config.title;
         document.title = pageTitle;
-        var grid = my.tableGrid(addrParams.table||addrParams.name,layout, opts);
+        my.tableGrid(addrParams.table||addrParams.name,layout, opts);
     },10);
 }
 
@@ -87,7 +87,7 @@ myOwn.wScreens.procAux = {
                     ...addrParams,
                     autoproced:true,
                     directUrl:true,
-                    ...(formDef && formDef.proceedLabel ? {label} : {}),
+                    ...(formDef?.proceedLabel ? {label} : {}),
                     // ...params
                 })
             }
@@ -256,7 +256,7 @@ myOwn.showPage = function showPage(pageDef){ // eslint-disable-line max-statemen
         if(!w){
             if(!addrParams.i.length && addrParams._firstParameterName && my.wScreens[addrParams._firstParameterName]){
                 w=addrParams._firstParameterName;
-            }else if(menu && menu.selectedItem){
+            }else if(menu?.selectedItem){
                 addrParams = changing(menu.selectedItem, addrParams);
                 w=menu.selectedItem.menuType;
             }
@@ -373,10 +373,10 @@ myOwn.createForkeableButton = function createForkeableButton(menu, opts){
 };
 
 myOwn.light = function light(name, onclick, opts){
-    var skin=((this.config||{}).config||{}).skin;
+    var skin=this.config?.config?.skin;
     var skinUrl=(skin?skin+'/':'');
     var attr={class:"light", id:'light-'+name, src:skinUrl+'img/'+name+'.png'};
-    if(opts && opts.attr){
+    if(opts?.attr){
         likeAr(opts.attr).forEach(function(value, key){ attr[key]=value; })
     }
     var img = html.img(attr).create();
@@ -390,7 +390,7 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
     var selectedItem = null;
     var elements=[];
     var depth = parents.length;
-    var skin=((this.config||{}).config||{}).skin;
+    var skin=this.config?.config?.skin;
     var skinUrl=(skin?skin+'/':'');
     if(depth===0){
         elements.push(html.img({id: "main-logo", src: skinUrl+"img/logo.png"}));
@@ -415,7 +415,7 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
     }))
     if(depth===0){
         elements.push(html.img({src: skinUrl+"img/three-dot-menu.png",id: "right-menu-icon"}));
-        elements.push(html.span({id: "active-user"}, my.config.username||"user"));
+        elements.push(html.span({id: "active-user"}, my.config.username||"user")); // eslint-disable-line unicorn/prefer-single-call
         var loginElement=html.a({id: "not-logged", href:'login'}, my.messages.signIn).create();
         loginElement.onclick=function(){
             this.href='login'+window.location.hash;
@@ -441,13 +441,13 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
                 );
             }),
         ]));
-        elements.push(status);
+        elements.push(status); // eslint-disable-line unicorn/prefer-single-call
     }
     var spanElements=html.span(elements).create();
     var menuLine=html.div({id: "main-top-bar"+(depth||''), class: depth?"sub-menu-bar":"top-menu-bar"}, spanElements).create();
     layout.appendChild(menuLine);
     var innerSelectedItem = selectedItem;
-    if(selectedItem && selectedItem.menuType === 'menu'){
+    if(selectedItem?.menuType === 'menu'){
         var subMenu = my.displayMenu(layout, selectedItem.menuContent, addrParams, parents.concat(selectedItem.name));
         var realign = function(){
             var div=html.div({style:'position:absolute; left:0; top:0; visibility:x-hidden'}).create();
@@ -582,7 +582,6 @@ window.addEventListener('load', function(){
 function updateOnlineStatus(){
     if(window.my){
         var networkLight=document.getElementById('light-network-signal');
-        var skin=((my.config||{}).config||{}).skin;
         if(networkLight){
             if(window.navigator.onLine){
                 networkLight.src=my.path.img+'network-signal-ok.png';
