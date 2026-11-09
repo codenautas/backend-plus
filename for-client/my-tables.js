@@ -475,7 +475,7 @@ myOwn.TableConnectorLocal.prototype.getStructure = function getStructure(){
     var connector = this;
     connector.whenStructureReady = my.getStructureFromLocalDb(connector.tableName).then(function(tableDef){
         if(!tableDef){
-            var err = new Error();
+            var err = new Error('no local structure for the table '+connector.tableName);
             err.code='NO-STRUCTURE';
             throw err;
         }
@@ -896,7 +896,7 @@ myOwn.ActionColumnGrid.prototype.thFilter = function thFilter(depot){
             // HACIENDO
             grid.view.filter = grid.view.filter.filter(d=>d!=depot);
             var info = my.tableInfo(this);
-            info.tr.parentNode.removeChild(info.tr);
+            info.tr.remove();
         });
     }
     return html.th([buttonFilter]);
@@ -1138,10 +1138,8 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){ //
                     }else if(cell.getAttribute("my-special")!=specialMandatory){
                         cell.setAttribute("my-special", specialMandatory);
                     }
-                }else{
-                    if(specialMandatory){
-                        cell.setAttribute("my-special", specialMandatory);
-                    }
+                }else if(specialMandatory){
+                    cell.setAttribute("my-special", specialMandatory);
                 }
             });
         }
@@ -1430,7 +1428,7 @@ myOwn.TableGrid.prototype.prepareMenu = function prepareMenu(button){
                 var listOptionsToShow=Array.prototype.slice.call(selectColumnsToShowElement.selectedOptions);
                 listOptionsToShow.forEach(function(option) {
                     grid.view.hiddenColumns.splice(grid.view.hiddenColumns.indexOf(option.value),1);
-                    selectColumnsToShowElement.removeChild(option);
+                    option.remove();
                     var elementToEnable=selectColumnsToHideElement.querySelector("[value="+option.value+"]");
                     elementToEnable.disabled=false;
                 });
@@ -2610,7 +2608,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         changeIoStatus(depot,'updating',depot.rowPendingForUpdate);
         depot.saving = depot.saving.then(function(){
             if(!Object.keys(depot.rowPendingForUpdate).length){
-                return Promise.resolve();
+                return;
             }
             var specialMandatories=grid.def.specialValidator?myOwn.validators[grid.def.specialValidator].getMandatoryMap(depot.row):{};
             if(depot.status==='new'){
@@ -2627,7 +2625,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     if(where){
                         where.title = myOwn.messages.mandatoryFieldOmited + grid.def.fields.filter(mandatoryOmitted).map(f=>f.name).join(', ');
                     }
-                    return Promise.resolve(); // no grabo todavía
+                    return; // no grabo todavía
                 }
             }else{
                 // en una modificación solo se controlan los obligatorios especiales (campos que son obligatorios según lo cargado en otros)
@@ -2638,7 +2636,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     if(depot.tr){
                         depot.tr.title = myOwn.messages.mandatoryFieldOmited + specialOmitted.map(f=>f.name).join(', ');
                     }
-                    return Promise.resolve(); // no grabo todavía
+                    return; // no grabo todavía
                 }
             }
             var timeStamp = my.setTimeStamp(depot.row);
@@ -2748,18 +2746,16 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                             delete depot.rowPendingForUpdate[fieldName];
                         }
                     }
-                }else{
-                    if(!sameValue(retrievedRow[fieldName], depot.row[fieldName])){
-                        depot.row[fieldName] = retrievedRow[fieldName];
-                        if(depot.rowControls[fieldName]){
-                            changeIoStatus(depot,'background-change', fieldName);
-                            //**VERIFICAR**// */ depot.rowControls[fieldName].setTypedValue(retrievedRow[fieldName]);
-                            /*jshint loopfunc: true */
-                            setTimeout(function(fieldName){
-                                changeIoStatus(depot,'ok', fieldName);
-                            },3000,fieldName);
-                            /*jshint loopfunc: false */
-                        }
+                }else if(!sameValue(retrievedRow[fieldName], depot.row[fieldName])){
+                    depot.row[fieldName] = retrievedRow[fieldName];
+                    if(depot.rowControls[fieldName]){
+                        changeIoStatus(depot,'background-change', fieldName);
+                        //**VERIFICAR**// */ depot.rowControls[fieldName].setTypedValue(retrievedRow[fieldName]);
+                        /*jshint loopfunc: true */
+                        setTimeout(function(fieldName){
+                            changeIoStatus(depot,'ok', fieldName);
+                        },3000,fieldName);
+                        /*jshint loopfunc: false */
                     }
                 }
             }else if(fieldName.startsWith('$allow.')){
@@ -2853,7 +2849,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
     grid.destroyRowFilter = function destroyRowFilter(){
         (grid.hasFilterRow||[]).forEach(function(tr){
             grid.dom.table.setAttribute('has-filter',0);
-            grid.dom.table.tHead.removeChild(tr);
+            tr.remove();
         });
         delete grid.hasFilterRow;
     };
@@ -2959,7 +2955,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                     Array.prototype.forEach.call(tbody.rows,function(tr){
                         var howManyCellsMayNotBeDeleted=1;
                         while(tr.cells.length>howManyCellsMayNotBeDeleted){
-                            tr.removeChild(tr.cells[howManyCellsMayNotBeDeleted]);
+                            tr.cells[howManyCellsMayNotBeDeleted].remove();
                         }
                     });
                 }else{
@@ -3060,13 +3056,11 @@ myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot, mo
             for(var j = depot.colNumber; j <= depots.length; j++){
                 depots[j-1].colNumber = j;
             }
-        }else{
-            if(depot.tr){
-                depot.my.fade(depot.tr, {fast});
-                for(var detailControl in depot.detailControls){
-                    if(depot.detailControls[detailControl].tr){
-                        depot.my.fade(depot.detailControls[detailControl].tr, {fast});
-                    }
+        }else if(depot.tr){
+            depot.my.fade(depot.tr, {fast});
+            for(var detailControl in depot.detailControls){
+                if(depot.detailControls[detailControl].tr){
+                    depot.my.fade(depot.detailControls[detailControl].tr, {fast});
                 }
             }
         }

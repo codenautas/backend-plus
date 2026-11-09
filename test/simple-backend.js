@@ -55,7 +55,7 @@ var localProcedures=[
     },
 ];
 
-module.exports = function(opts){
+module.exports = function startSimpleBackend(opts){
     var app = new AppExample(changing(opts||{},{server:{"silent-startup":true}}));
     return app.start({readConfig:{whenNotExist:'ignore'}, testing:true}).then(function(){
         return app;

@@ -29,8 +29,8 @@ export const detectedFeatures:DetectFeatures={
 }
 
 export class WebsqlDb{
-    private db:Database;
-    private wait4detectedFeatures:Promise<DetectFeatures>;
+    private readonly db:Database;
+    private readonly wait4detectedFeatures:Promise<DetectFeatures>;
     constructor(public name:string){
         var version = 1.0;
         var dbName = this.name;
@@ -77,7 +77,6 @@ export class WebsqlDb{
             json: 'text'
         };
         var lines = [];
-        var consLines:string[] = [];
         lines.push('CREATE TABLE IF NOT EXISTS '+SqlTools.quoteIdent(tableDef.name)+' (');
         var fields:any[]=[];
         tableDef.fields.forEach(function(fieldDef:FieldDefinition){
@@ -308,11 +307,9 @@ export class WebsqlDb{
         return await Promise.all(promisesArray).then(async function(){
             var fieldNames:string[]=[];
             var fieldValues:string[]=[];
-            var unquotedFieldValues:string[]=[];
             likeAr(element).forEach(function(value,key){
                 fieldNames.push(SqlTools.quoteIdent(key));
                 fieldValues.push(SqlTools.quoteLiteral(ldb.fieldIsNotSupported(key,jsonbFields)?JSON.stringify(value):value));
-                unquotedFieldValues.push(value);
             })
             await ldb.executeQuery(
                 `INSERT OR REPLACE INTO `+SqlTools.quoteIdent(tableName)+
@@ -348,7 +345,6 @@ export class WebsqlDb{
     }
     async close():Promise<void>{
         //TODO
-        return Promise.resolve()
     }
     async clear(tableName:string):Promise<void>{
         await this.executeQuery(

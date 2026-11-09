@@ -36,11 +36,9 @@ myOwn.informDetectedStatus = function informDetectedStatus(statusCode, logged) {
                     this.href=status.mustAsk.url+window.location.hash;
                 };
                 my.statusDiv.askLink.textContent=my.messages[status.mustAsk.idMessage];
-            }else{
-                if(my.statusDiv.askLink){
-                    my.statusDiv.askLink.parentNode.removeChild(my.statusDiv.askLink);
-                    my.statusDiv.askLink=null;
-                }
+            }else if(my.statusDiv.askLink){
+                my.statusDiv.askLink.remove();
+                my.statusDiv.askLink=null;
             }
             var attrToSet = 'blink';
             //attrToSet = 'pulse';

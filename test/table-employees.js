@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports = function(context){
+module.exports = function tableEmployees(context){
     return context.be.tableDefAdapt({
         name:'employees',
         title:'employees of this company',

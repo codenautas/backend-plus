@@ -410,7 +410,7 @@ export class LocalDbTransaction {
             var ldb = new LocalDb(name);
             async function closeLdb(err:Error):Promise<never>;
             async function closeLdb():Promise<void>;
-            async function closeLdb(previousError?:Error):Promise<void|never>{
+            async function closeLdb(previousError?:Error):Promise<void>{
                 try{
                     await ldb.close();
                     if(previousError){

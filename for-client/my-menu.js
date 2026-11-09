@@ -356,17 +356,15 @@ myOwn.createForkeableButton = function createForkeableButton(menu, opts){
         }
         if(errorText){
             alertPromise(errorText);
-        }else{
-            if(!event.ctrlKey && event.button!=1){
-                /*
-                if(button.parentNode.clientSidePrepared){
-                    history.replaceState(null, null, )
-                }
-                */
-                history.pushState(null, null, this.href);
-                my.showPage();
-                event.preventDefault();
+        }else if(!event.ctrlKey && event.button!=1){
+            /*
+            if(button.parentNode.clientSidePrepared){
+                history.replaceState(null, null, )
             }
+            */
+            history.pushState(null, null, this.href);
+            my.showPage();
+            event.preventDefault();
         }
     };
     return button;
@@ -455,7 +453,7 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
             subMenu.spanElements.parentNode.appendChild(div);
             var theWidth=subMenu.spanElements.offsetWidth;
             theWidth=div.childNodes[0].offsetWidth||theWidth;
-            subMenu.spanElements.parentNode.removeChild(div);
+            div.remove();
             var oneLimit=Math.max(1,layout.offsetWidth-theWidth-32);
             if(oneLimit<theWidth){
                 subMenu.menuLine.style.textAlign = 'right';
@@ -485,7 +483,7 @@ myOwn.displayMainMenu = function(addrParams){
         menu.realigns.reverse().forEach(function(realign){ if(realign){ realign(); }});
         var mtv = document.getElementById('main-top-bar');
         if(mtv){
-            if(location.href.match(/^.{0,8}localhost/)){
+            if(/^.{0,8}localhost/.test(location.href)){
                 mtv.style.backgroundImage='repeating-linear-gradient(-45deg, #FF8, #FF8 8px, #DDD 8px, #DDD 16px)'
                 mtv.setAttribute('dev-mode',true);
                 mtv.title = 'Warning! Using system in localhost!'

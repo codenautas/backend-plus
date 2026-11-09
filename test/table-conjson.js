@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports = function(context){
+module.exports = function tableConjson(context){
     return context.be.tableDefAdapt({
         name:'conjson',
         editable:true,
