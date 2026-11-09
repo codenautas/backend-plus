@@ -64,7 +64,7 @@ type DetectFeatures={
     needToUnwrapArrayKeys:boolean
 }
 
-export var detectedFeatures:DetectFeatures={
+export const detectedFeatures:DetectFeatures={
     needToUnwrapArrayKeys:null
 }
 
@@ -108,7 +108,7 @@ export class LocalDb{
                 resolve()
             }
             request.onerror=function(event){
-                reject()
+                reject(request.error ?? new Error('error deleting the local database '+name))
             }
         })
     }
@@ -146,9 +146,9 @@ export class LocalDb{
                 // @ts-ignore
                 var os: string = window.myOwn.config.useragent.os;
                 // @ts-ignore
-                var version: number = parseInt(window.myOwn.config.useragent.version.split('.')[0]);
+                var version: number = Number.parseInt(window.myOwn.config.useragent.version.split('.')[0]);
             }catch(err){
-                throw Error("unknowed OS or version");
+                throw new Error("unknowed OS or version");
             }
             if(os === 'OS X' && version < 11){
                 detectedFeatures.needToUnwrapArrayKeys=true
@@ -326,12 +326,12 @@ export class LocalDb{
         }
         var promisesArray: Promise<void>[] = [];
         if(tableDef.foreignKeys){
-            tableDef.foreignKeys.forEach(async function(fk){
+            tableDef.foreignKeys.forEach(function(fk){
                 promisesArray.push(createPromiseForFK(fk));
             });
         }
         if(tableDef.softForeignKeys){
-            tableDef.softForeignKeys.forEach(async function(fk){
+            tableDef.softForeignKeys.forEach(function(fk){
                 promisesArray.push(createPromiseForFK(fk));
             });
         }

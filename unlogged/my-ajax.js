@@ -55,13 +55,13 @@ myAjax.parseCookies = function parseCookies(){
 
 myAjax.parseStrCookies = function parseStrCookies(cookieString, prefix){
     var output = {};
-    cookieString.split(/\s*;\s*/).forEach(function(pair) {
-        pair = pair.split(/\s*=\s*/);
-        var varName = pair[0];
+    cookieString.split(';').forEach(function(pair) {
+        pair = pair.trim().split('=');
+        var varName = pair[0].trim();
         if(varName.substr(0,prefix.length)==prefix){
             varName=varName.slice(prefix.length);
         }
-        output[varName] = pair.splice(1).join('=');
+        output[varName] = pair.splice(1).join('=').trim();
     });
     return output;
 }
@@ -575,7 +575,7 @@ function agregar_json(div, o, ubicaciones=agregar_json_default_ubicaciones){
         return ;
     }
     if(typeof o == "object" && !(o instanceof Date) && !o.isRealDateTime){
-        if((o instanceof Array && o[0] && o[0] instanceof Object && !(o[0] instanceof Array) && !(o[0].isRealDateTime) || containsObjectsWithTheSameColumns(o)) ){
+        if((Array.isArray(o) && o[0] && o[0] instanceof Object && !Array.isArray(o[0]) && !(o[0].isRealDateTime) || containsObjectsWithTheSameColumns(o)) ){
             var table = document.createElement('table');
             div.appendChild(table);
             var titleRow = table.insertRow(-1);
@@ -586,7 +586,7 @@ function agregar_json(div, o, ubicaciones=agregar_json_default_ubicaciones){
                 if(o[a]!=null){
                     var row = table.insertRow(-1);
                     var cellName = row.insertCell(-1);
-                    agregar_class_textInDiv(cellName, 'row-num', Array.isArray(o) && !isNaN(a) ? Number(a)+1 : a);
+                    agregar_class_textInDiv(cellName, 'row-num', Array.isArray(o) && !Number.isNaN(Number(a)) ? Number(a)+1 : a);
                     agregar_json(row, o[a], function(div, _o, a){
                         // @ts-ignore sé que es Row
                         /** @type {HTMLTableRowElement} */
@@ -613,7 +613,7 @@ function agregar_json(div, o, ubicaciones=agregar_json_default_ubicaciones){
                 var cells=ubicaciones(div, o, a);
                 if(!cells.skip){
                     if(cells.title){
-                        if(o instanceof Array && !isNaN(a)){
+                        if(Array.isArray(o) && !Number.isNaN(Number(a))){
                             agregar_class_textInDiv(cells.title, 'row-num', Number(a) + 1);
                         }else{
                             agregar_class_textInDiv(cells.title, 'attr-name', a);
@@ -698,11 +698,11 @@ myAjax.replaceAddrParams = function replaceAddrParams(params){
 
 function encodeMinimalURIComponent(text){
     return (text+'')
-        .replace(/\=/g, '%3D')
-        .replace(/\?/g, '%3F')
-        .replace(/\#/g, '%23')
-        .replace(/&/g, '%26')
-        .replace(/%/g, '%25');
+        .replaceAll('%', '%25')
+        .replaceAll('=', '%3D')
+        .replaceAll('?', '%3F')
+        .replaceAll('#', '%23')
+        .replaceAll('&', '%26');
 }
 
 myAjax.paramsToUriPart = function paramsToUriPart(params, inMenu){

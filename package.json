@@ -108,7 +108,8 @@
     "typescript": "^5.9.3",
     "why-is-node-running": "^3.2.3",
     "typescript-eslint": "^8.72.1",
-    "eslint-plugin-sonarjs": "^4.2.2"
+    "eslint-plugin-sonarjs": "^4.2.2",
+    "eslint-plugin-unicorn": "^79.0.0"
   },
   "engines": {
     "node": ">= 22"

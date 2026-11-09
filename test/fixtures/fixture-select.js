@@ -35,7 +35,7 @@ const bestGlobals = require("best-globals");  // eslint-disable-line strict
         command: 'UPDATE',
         row: {id_type: 'passport',id: 123456,first_name: 'Bob' ,last_name: 'Smith',birth_date: bestGlobals.date.ymd(1990,1,8),salary: null },
     },
-    then:[
+    then:[ // eslint-disable-line unicorn/no-thenable -- then is the list of the next actions to test, not a function
         {
             action: 'table_data',
             parameters: {table: 'employees', fixedFields:[]},
@@ -50,7 +50,7 @@ const bestGlobals = require("best-globals");  // eslint-disable-line strict
     // name: 'double update',
     action: 'double_update_employees',
     expectedError: /fail to update/,
-    then:[
+    then:[ // eslint-disable-line unicorn/no-thenable -- then is the list of the next actions to test, not a function
         {
             action: 'table_data',
             parameters: {table: 'employees', fixedFields:[]},

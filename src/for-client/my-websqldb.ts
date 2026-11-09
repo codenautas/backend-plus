@@ -23,7 +23,7 @@ type DetectFeatures={
     needToCopyResults:boolean
 }
 
-export var detectedFeatures:DetectFeatures={
+export const detectedFeatures:DetectFeatures={
     needToCopyResults:null
 }
 
@@ -118,7 +118,7 @@ export class WebsqlDb{
     async executeQuery(sql:string, params:null|{}[]):Promise<SQLResultSetRowList>{
         var db = this.db;
         return new Promise(function(resolve, reject){
-            if (!db) return reject('no database.');
+            if (!db) return reject(new Error('no database.'));
             var result:SQLResultSetRowList;
             db.transaction(function(tx:SQLTransaction){
                 tx.executeSql(sql, params||[], function(_tx,res){
@@ -134,9 +134,9 @@ export class WebsqlDb{
     async executeQueries(sql:string, data:{}[]){
         var db = this.db;
         return new Promise(function(resolve, reject){
-            if (!db) return reject('no database.');
-            db.transaction(async function(tx:SQLTransaction){
-                data.forEach(async function(data){
+            if (!db) return reject(new Error('no database.'));
+            db.transaction(function(tx:SQLTransaction){
+                data.forEach(function(data){
                     tx.executeSql(sql, data)
                 })
             },function(tx,err){
@@ -229,7 +229,7 @@ export class WebsqlDb{
         if(convertedResult[0]){
             return convertedResult[0];
         }else{
-            throw Error('no existe el elemento');
+            throw new Error('no existe el elemento');
         }
     }
     async getChild<T>(tableName:string, parentKey:Key):Promise<T[]>{
@@ -295,12 +295,12 @@ export class WebsqlDb{
         var jsonbFields = this.getNotSupportedFields(tableDef);
         var promisesArray: Promise<void>[] = [];
         if(tableDef.foreignKeys){
-            tableDef.foreignKeys.forEach(async function(fk){
+            tableDef.foreignKeys.forEach(function(fk){
                 promisesArray.push(createPromiseForFK(fk));
             });
         }
         if(tableDef.softForeignKeys){
-            tableDef.softForeignKeys.forEach(async function(fk){
+            tableDef.softForeignKeys.forEach(function(fk){
                 promisesArray.push(createPromiseForFK(fk));
             });
         }

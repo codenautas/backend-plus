@@ -223,7 +223,7 @@ myOwn.comparator={
     '=':function(valueToCheck,condition){return sameValue(valueToCheck,condition);},
     '~': function(valueToCheck,condition){return condition==null || condition instanceof Date ? Math.abs(condition-valueToCheck) <= 1000*60*60*24 : regex4search(condition).test(valueToCheck);},
     '!~':function(valueToCheck,condition){return condition==null || condition instanceof Date ? Math.abs(condition-valueToCheck) >  1000*60*60*24 :!regex4search(condition).test(valueToCheck);},
-    '/R/i':function(valueToCheck,condition){return condition==null || RegExp(condition,'i').test(valueToCheck);},
+    '/R/i':function(valueToCheck,condition){return condition==null || new RegExp(condition,'i').test(valueToCheck);},
     '\u2205':function(valueToCheck,condition){return valueToCheck == null;},//\u2205 = conjunto vacío
     '!=\u2205':function(valueToCheck,condition){return valueToCheck != null;},//\u2205 = conjunto vacío
     '>':function(valueToCheck,condition){return (valueToCheck>condition); },
@@ -490,7 +490,7 @@ myOwn.TableConnectorLocal.prototype.getData = function getData(){
         return Promise.resolve([]);
     }
     if(connector.parameterFunctions){
-        for(var x in connector.parameterFunctions||{}){
+        for(var x in connector.parameterFunctions||{}){ // eslint-disable-line no-unreachable-loop -- it only checks whether there is any parameterFunction
             throw new Error('no soportado parameterFunctions');
         }
     }
@@ -1108,19 +1108,19 @@ myOwn.DataColumnGrid.prototype.td = function td(depot, iColumn, tr, saveRow){ //
                 }
                 var promiseChain = Promise.resolve();
                 if (fieldDef.references) {
-                    promiseChain = promiseChain.then(
-                        grid.setInheritedFields(depot, function(fkDef){
+                    promiseChain = promiseChain.then(function(){
+                        return grid.setInheritedFields(depot, function(fkDef){
                             return fkDef.references == fieldDef.references &&
                             fkDef.fields.find(function(field){
                                 return field.source == fieldDef.name
                             }) &&
                             fkDef.displayFields.length >= 0
-                        }
-                    ));
+                        })
+                    });
                 }
                 promiseChain.then(function(){
                     grid.updateRowData(depot,true);
-                });
+                }).catch(depot.my.alertError);
             }
         });
     }
@@ -1347,12 +1347,12 @@ function s2ab(s) {
         buf = new ArrayBuffer(s.length);
         var view = new Uint8Array(buf);
         for (i=0; i!=s.length; ++i){
-            view[i] = s.charCodeAt(i) & 0xFF;
+            view[i] = s.charCodeAt(i) & 0xFF; // eslint-disable-line unicorn/prefer-code-point -- s is a binary string: each char code is a byte
         }
     } else {
         buf = new Array(s.length);
         for (i=0; i!=s.length; ++i){
-            buf[i] = s.charCodeAt(i) & 0xFF;
+            buf[i] = s.charCodeAt(i) & 0xFF; // eslint-disable-line unicorn/prefer-code-point -- s is a binary string: each char code is a byte
         }
     }
     return buf;
@@ -1640,7 +1640,7 @@ myOwn.dialogDownload = function dialogDownload(grid){
             if(input.csv.checked){
                 return {dotExtension:'.csv', generate:function(){
                     return txtExport(fieldsDef2Export, ',', function(txt){
-                        return /[\n,"]/.test(txt)?'"'+txt.replace(/"/g,'""')+'"':txt
+                        return /[\n,"]/.test(txt)?'"'+txt.replaceAll('"','""')+'"':txt
                     });
                 }};
             }else if(useTabPlus){
@@ -2558,7 +2558,7 @@ myOwn.TableGrid.prototype.updateRowCountHTML = function updateRowCountHTML(HTML)
 
 var changeIoStatus = function changeIoStatus(depot,newStatus, objectWithFieldsOrListOfFieldNames, title){
     var fieldNames=typeof objectWithFieldsOrListOfFieldNames === "string"?[objectWithFieldsOrListOfFieldNames]:(
-        objectWithFieldsOrListOfFieldNames instanceof Array?objectWithFieldsOrListOfFieldNames:Object.keys(objectWithFieldsOrListOfFieldNames)
+        Array.isArray(objectWithFieldsOrListOfFieldNames)?objectWithFieldsOrListOfFieldNames:Object.keys(objectWithFieldsOrListOfFieldNames)
     );
     fieldNames.forEach(function(name){
         if(depot.rowControls[name]){
@@ -3036,7 +3036,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         grid.displayRows(0, linesToDisplay);
     };
     if(grid.def.filterColumns.length){
-        var filterRows=grid.def.filterColumns[0] instanceof Array?grid.def.filterColumns:[grid.def.filterColumns];
+        var filterRows=Array.isArray(grid.def.filterColumns[0])?grid.def.filterColumns:[grid.def.filterColumns];
         grid.view.filter=[];
         filterRows.forEach(function(filterColumns,iRow){
             grid.view.filter.push(grid.createRowFilter(iRow,filterColumns));
@@ -3376,7 +3376,7 @@ myOwn.ExpanderReferences={
         });
         return dataReady.then(function(rows){
             if(canceled){
-                return Promise.reject();
+                return Promise.reject(); // eslint-disable-line @typescript-eslint/prefer-promise-reject-errors
             }
             if(opts.extraRow){
                 rows=rows.concat(opts.extraRow);

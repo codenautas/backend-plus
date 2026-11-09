@@ -2,6 +2,7 @@
 
 const tseslint = require("typescript-eslint");
 const sonarjs = require("eslint-plugin-sonarjs");
+const unicorn = require("eslint-plugin-unicorn").default;
 
 module.exports = [
     {
@@ -19,12 +20,16 @@ module.exports = [
     },
     {
         // SonarQube rules (the ones silenced in the code)
-        files: ["lib/**/*.js", "test/**/*.js"],
-        plugins: { sonarjs },
+        files: ["lib/**/*.js", "test/**/*.js", "for-client/**/*.js", "unlogged/**/*.js"],
+        plugins: { sonarjs, unicorn, "@typescript-eslint": tseslint.plugin },
         rules: {
+            "no-unreachable-loop": 2,
             "sonarjs/code-eval": 2,
             "sonarjs/hashing": 2,
-            "sonarjs/no-clear-text-protocols": 2
+            "sonarjs/no-async-constructor": 2,
+            "sonarjs/no-clear-text-protocols": 2,
+            "unicorn/no-thenable": 2,
+            "unicorn/prefer-code-point": 2
         }
     },
     {

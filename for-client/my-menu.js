@@ -41,7 +41,7 @@ myOwn.wScreens.table = function(addrParams){
         var layout = document.getElementById('main_layout');
 		var opts={tableDef: addrParams.td ?? {}};
 		if(addrParams.ff){
-            if(addrParams.ff instanceof Array){
+            if(Array.isArray(addrParams.ff)){
                 opts.fixedFields=addrParams.ff;
             }else{
                 opts.fixedFields=likeAr(addrParams.ff).map(function(value, key){ return {fieldName:key, value:value}; }).array();
@@ -128,7 +128,7 @@ myOwn.wScreens.procAux = {
             });
             controls.push(control);
             return html.tr({"parameter-name":parameterDef.name},[
-                html.td(parameterDef.label||parameterDef.name.replace(/_/g,' ')),
+                html.td(parameterDef.label||parameterDef.name.replaceAll('_',' ')),
                 control,
                 html.td(parameterDef.description||''),
             ]);
@@ -333,7 +333,7 @@ myOwn.createForkeableButton = function createForkeableButton(menu, opts){
         opts = {label:opts};
     }
     var label=opts.label;
-    var button=html.a({"class": opts["class"]||menu["class"]||"menu-item", "menu-type":menu.menuType||menu.w, "menu-name":menu.name||'noname'}, label || menu.label || menu.name.replace(/_/g,' ')).create();
+    var button=html.a({"class": opts["class"]||menu["class"]||"menu-item", "menu-type":menu.menuType||menu.w, "menu-name":menu.name||'noname'}, label || menu.label || menu.name.replaceAll('_',' ')).create();
     button.setForkeableHref = function setForkeableHref(menu){
         button.href = my.getHRef(menu);
     }

@@ -77,7 +77,7 @@ async function testAFixture(be, fixture, agent, opt){
                 if(parameters.table && !"now, I'm using yaml"){
                     if(result){
                         var structure=be.tableStructures[parameters.table]({be});
-                        myOwn.adaptData(structure, (result instanceof Array?result:[result]));
+                        myOwn.adaptData(structure, (Array.isArray(result)?result:[result]));
                     }
                 }
                 var expected = fixture.expected;
