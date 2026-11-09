@@ -8,6 +8,7 @@ Backend for the anti Pareto rule.
 [![npm-version](https://img.shields.io/npm/v/backend-plus.svg)](https://npmjs.org/package/backend-plus)
 [![downloads](https://img.shields.io/npm/dm/backend-plus.svg)](https://npmjs.org/package/backend-plus)
 [![build](https://github.com/codenautas/backend-plus/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/codenautas/backend-plus/actions/workflows/build-and-test.yml)
+[![sonar](https://sonarcloud.io/api/project_badges/measure?project=codenautas_backend-plus&metric=alert_status)](https://sonarcloud.io/summary/overall?id=codenautas_backend-plus)
 [![qa-control](https://github.com/codenautas/backend-plus/actions/workflows/qa-control.yml/badge.svg)](https://github.com/codenautas/backend-plus/actions/workflows/qa-control.yml)
 
 
@@ -264,6 +265,21 @@ db                           | database options
 .allow_double_lodash_fields  | whether fields with double `_` underscore are allowed
 imports                      | options for importing to the platform
 .allow-plain-xls             | whether it allows importing xlsx that don't have the #backend-plus signal in cell A1
+
+#### xlsx format on import and export
+
+The importer reads the first sheet and decides how to interpret it according to the tags in cell A1 (they can be combined, in any order, separated by spaces):
+
+A1 | field names | data from | empty cell
+---|-------------|-----------|-----------
+(no tag, plain file) | row 1, from column A | row 2 | imported as null
+`#bp-labels` | row 2, from column B | row 3 | imported as null
+`#backend-plus` | row 2, from column B | row 3 | ignored (does not overwrite the existing value; to set null use `#null` if `imports.hashConverters` is on)
+
+With `#bp-labels` row 1 (from column B onwards) is ignored on import: it holds the field labels, only for people reading the file.
+A table can ask for this format on export with `exportLabelsRow: true` in its definition. Without that flag the file is exported as always (plain).
+Files without a tag, such as those from third party systems, are still imported as before, whether or not the table has the flag.
+If a file exported with `#bp-labels` is edited, the A1 tag and the position of the field row must match: keep both or remove both (delete row 1 and column A).
 
 ```yaml
 install:

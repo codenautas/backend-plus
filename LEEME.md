@@ -18,6 +18,7 @@ Backend for the anti Pareto rule.
 [![npm-version](https://img.shields.io/npm/v/backend-plus.svg)](https://npmjs.org/package/backend-plus)
 [![downloads](https://img.shields.io/npm/dm/backend-plus.svg)](https://npmjs.org/package/backend-plus)
 [![build](https://github.com/codenautas/backend-plus/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/codenautas/backend-plus/actions/workflows/build-and-test.yml)
+[![sonar](https://sonarcloud.io/api/project_badges/measure?project=codenautas_backend-plus&metric=alert_status)](https://sonarcloud.io/summary/overall?id=codenautas_backend-plus)
 [![qa-control](https://github.com/codenautas/backend-plus/actions/workflows/qa-control.yml/badge.svg)](https://github.com/codenautas/backend-plus/actions/workflows/qa-control.yml)
 
 <!--multilang buttons-->
