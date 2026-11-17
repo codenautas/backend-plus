@@ -704,6 +704,7 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                         }
                     }
                 }
+                if(grid.updateRowCountButtons) grid.updateRowCountButtons();
             })
         }
         if(grid.def.refrescable && !grid.def.forInsertOnlyMode){
@@ -2965,11 +2966,26 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             /*jshint loopfunc: true */
             for(var iRow=fromRowNumber; iRow<toRowNumber; iRow++){
                 (function(depot){
+                    // refreshAllRows pudo haber dibujado ya esta fila; no se debe repetir
+                    if(adding && !grid.vertical && depot.tr?.parentNode) return;
                     grid.createRowElements(-1, depot);
                     grid.updateRowData(depot);
                 })(depotsToDisplay[iRow]);
             }
             /*jshint loopfunc: false */
+            grid.shownRowsCount = iRow;
+            grid.updateRowCountButtons();
+        };
+        // recalcula contador y botones "+...N" con las filas realmente existentes y mostradas
+        // (también la llama refreshAllRows, que agrega y quita filas sin pasar por displayRows)
+        grid.updateRowCountButtons = function updateRowCountButtons(){
+            var grid = this;
+            depotsToDisplay = grid.filterDepots(grid.depots);
+            grid.sortDepotsToDisplay(depotsToDisplay);
+            grid.depotsToDisplay = depotsToDisplay;
+            var iRow = grid.vertical ?
+                Math.min(grid.shownRowsCount, depotsToDisplay.length) :
+                depotsToDisplay.filter(function(depot){ return depot.tr?.parentNode; }).length;
             grid.updateTotals(depotsToDisplay.length?1:0, iRow);
             grid.updateRowCountHTML('');
             if(iRow<depotsToDisplay.length){
@@ -2981,9 +2997,18 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                         return buttonRest;
                     }
                     var buttonRestClickFun = function(withFocus){
-                        grid.displayRows(iRow, toNextRowNumber, true);
+                        // la lista pudo cambiar desde que se creó el botón (refreshAllRows)
+                        depotsToDisplay = grid.filterDepots(grid.depots);
+                        grid.sortDepotsToDisplay(depotsToDisplay);
+                        var from = iRow;
+                        if(!grid.vertical){
+                            from = depotsToDisplay.findIndex(function(depot){ return !depot.tr?.parentNode; });
+                            if(from<0) from = depotsToDisplay.length;
+                        }
+                        grid.displayRows(from, Math.min(toNextRowNumber, depotsToDisplay.length), true);
                         if(withFocus){
-                            my.focusFirstColumnOf(grid.dom.table.tBodies[0].rows[iRow]);
+                            var firstNew = grid.dom.table.tBodies[0].rows[from];
+                            if(firstNew) my.focusFirstColumnOf(firstNew);
                         }
                     };
                     var buttonRestHead = createRestButtonInto(grid.dom.headInfo.rowCount);
@@ -3001,6 +3026,7 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
                 if(grid.dom.buttonInsert){
                     grid.dom.buttonInsert.style.visibility='hidden';
                 }
+                grid.dom.headInfo.rowCount.removeAttribute("all-rows-displayed");
             }else{
                 if(grid.dom.buttonInsert){
                     grid.dom.buttonInsert.style.visibility='visible';

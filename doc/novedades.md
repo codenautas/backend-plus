@@ -8,6 +8,9 @@ Se quita `req.session.loginReturnTo`, que se guardaba desde `?return-to` y nadie
 El nombre de la cookie de sesión agrega un identificador de la instalación (un hash de su carpeta), para que no se mezclen
 las sesiones de dos instalaciones de la misma aplicación en el mismo host. Al actualizar, los usuarios tienen que volver a iniciar sesión.
 
+Se corrige la paginación de las grillas con `refrescable` o `selfRefresh`: al agregarse filas con el refresco automático la botonera `+...N` y el contador
+`1-N` quedaban desactualizados y al apretar el botón se repetían filas. Ahora se recalculan después de cada refresco y el botón no vuelve a dibujar filas ya mostradas.
+
 **2.5.2-betha.28**
 
 passwords completamente compatibles con scram-sha-256 de postgres.

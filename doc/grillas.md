@@ -58,6 +58,12 @@ opc           |  uso
 `firstDisplayCount` | Máxima cantidad de líneas a mostrar cuando la cantidad e líneas es mayor a `firstDisplayOverLimit`
 `firstDisplayOverLimit` | Si la tabla tiene esta cantidad de líneas o menos se muestran todas aunque el valor sea mayor a `firstDisplayCount`. Se puede usar para provincias, en general se puede poner 20 líneas de máximo y 25 en *over limit* para que la tabla provincias aparezca entera y las largas se corten en 20.
 
+### paginación y refresco automático
+
+Cuando la grilla tiene más de `firstDisplayOverLimit` líneas se muestran solo `firstDisplayCount` y aparecen botones `+...N` (con los cortes de `myOwn.displayCountBreaks`, no configurables por grilla) para mostrar más.
+Si la tabla tiene `refrescable` (refresco cada 8 segundos) o `selfRefresh` (refresco al grabar o borrar), las filas que aparecen o desaparecen se reflejan en la grilla
+y el contador y los botones `+...N` se recalculan después de cada refresco, partiendo de las filas realmente mostradas.
+
 ## grillas basadas en otras (desde el servidor)
 
 Se puede definir una grilla basándose en otra de base y cambiándole pocas cosas. Los casos de uso son:
