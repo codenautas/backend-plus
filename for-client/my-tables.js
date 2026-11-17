@@ -1158,9 +1158,9 @@ myOwn.DetailColumnGrid.prototype.th = function th(){
     var grid = this.grid;
     var detailTableDef = this.detailTableDef;
     grid.detailNames = grid.detailNames || {};
-    var detailName = detailTableDef.table;
+    var detailName = detailTableDef.table || detailTableDef.wScreen;
     if(grid.detailNames[detailName]){
-        detailName = detailTableDef.table+' '+detailTableDef.abr;
+        detailName = detailName+' '+detailTableDef.abr;
         if(grid.detailNames[detailName]){
             detailName = likeAr(grid.detailNames[detailName]).array().length;
         }
@@ -1262,6 +1262,14 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
                         alertPromise('error lack of parameters in wScreen '+detailTableDef.wScreen);
                     }
                     wScreen.mainAction(params,divGrid);
+                    // un wScreen no tiene grilla propia: se refresca volviéndolo a dibujar
+                    detailControl.refreshAllRowsInGrid=function(force){
+                        if(detailTableDef.refreshFromParent || force){
+                            fixedFields = calculateFixedFields();
+                            divGrid.innerHTML='';
+                            wScreen.mainAction(likeAr.toPlainObject(fixedFields,'fieldName','value'),divGrid);
+                        }
+                    };
                 }else{
                     result = grid.my.tableGrid(detailTableDef.table, divGrid, {
                         fixedFields: fixedFields,

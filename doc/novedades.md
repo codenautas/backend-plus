@@ -11,6 +11,10 @@ las sesiones de dos instalaciones de la misma aplicación en el mismo host. Al a
 Se corrige la paginación de las grillas con `refrescable` o `selfRefresh`: al agregarse filas con el refresco automático la botonera `+...N` y el contador
 `1-N` quedaban desactualizados y al apretar el botón se repetían filas. Ahora se recalculan después de cada refresco y el botón no vuelve a dibujar filas ya mostradas.
 
+Se corrigen los `detailTables` con `wScreen`: se indexaban en `detailControls` con la clave `undefined` (chocaban si había más de uno) y al refrescar la fila
+se llamaba a un `refreshAllRowsInGrid` inexistente, lo que cortaba el refresco de la grilla. Ahora el wScreen se identifica por su nombre y se refresca volviéndose a dibujar
+(si el detalle tiene `refreshFromParent` o se pide `force`).
+
 **2.5.2-betha.28**
 
 passwords completamente compatibles con scram-sha-256 de postgres.
