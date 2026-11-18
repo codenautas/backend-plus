@@ -696,7 +696,8 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
                     }
                     while (depot = depotsToDelete.pop()) { // eslint-disable-line no-cond-assign
                         depot.manager.displayAsDeleted(depot, force ? 'change-ff' : 'unknown');
-                        if (myOwn.config.config['grid-row-retain-moved-or-deleted']) {
+                        // con force (cambio de fixedFields) la fila ya se quitó de la grilla: no hay nada que retener
+                        if (myOwn.config.config['grid-row-retain-moved-or-deleted'] && !force) {
                             if(!depot['$refreshed']){
                                 grid.retrieveRowAndRefresh(depot,{retrieveWithBroadWhere:true})
                                 depot['$refreshed'] = true
@@ -1223,7 +1224,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
             this.displayDetailGrid(opts);
         }
         this.divDetail=null;
-        this.displayDetailGrid(opts);
+        return this.displayDetailGrid(opts);
     }
     detailControl.refreshDetailGrid = function(opts){
         var detailControl=this;
@@ -1267,8 +1268,9 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
                         if(detailTableDef.refreshFromParent || force){
                             fixedFields = calculateFixedFields();
                             divGrid.innerHTML='';
-                            wScreen.mainAction(likeAr.toPlainObject(fixedFields,'fieldName','value'),divGrid);
+                            return Promise.resolve(wScreen.mainAction(likeAr.toPlainObject(fixedFields,'fieldName','value'),divGrid));
                         }
+                        return Promise.resolve();
                     };
                 }else{
                     result = grid.my.tableGrid(detailTableDef.table, divGrid, {
@@ -1293,11 +1295,21 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
                                     fixedFields = calculateFixedFields()
                                     g.connector.fixedFields = fixedFields
                                 }
-                                setTimeout(async ()=>{
-                                    await g.refreshAllRows(force);
-                                    g.dom.main.style.opacity=1;
-                                },1)
+                                // devuelve una promesa que se resuelve cuando termina de refrescar
+                                return new Promise(function(resolve, reject){
+                                    setTimeout(async ()=>{
+                                        try{
+                                            await g.refreshAllRows(force);
+                                            resolve();
+                                        }catch(err){
+                                            reject(err);
+                                        }finally{
+                                            g.dom.main.style.opacity=1;
+                                        }
+                                    },1)
+                                });
                             }
+                            return Promise.resolve();
                         }
                         return g;
                     });
@@ -2667,6 +2679,8 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
             pick:grid.def.pick,
             retrieveWithBroadWhere : opts?.retrieveWithBroadWhere ?? false
         }).then(function(result){
+            // la fila pudo no haberse dibujado nunca (grilla todavía cargando) o haberse quitado
+            if (!depot.tr) return;
             grid.depotRefresh(depot,{updatedRow:result[0], sendedForUpdate:{}}, opts);
         })
     }
@@ -3064,7 +3078,7 @@ myOwn.TableGrid.prototype.displayAsDeleted = function displayAsDeleted(depot, mo
     var grid = this;
     var fast = mode == 'change-ff'
     if (mode == 'unknown' && myOwn.config.config['grid-row-retain-moved-or-deleted']) {
-        depot.tr.setAttribute('not-here', 'yes');
+        depot.tr?.setAttribute('not-here', 'yes');
     } else {
         var position = depot.tr ? Math.min(grid.depots.length,Math.max(0,depot.tr.sectionRowIndex)) : 0;
         if(grid.depots[position] !== depot){

@@ -5,6 +5,11 @@
 var changing = require('best-globals').changing;
 myOwn.wScreens={}
 
+// cerrar un alertPromise con Escape o clickeando afuera rechaza la promesa; eso no es un error
+function ignoreDialogClosed(err){
+    if(err?.DialogPromise !== 'Escaped') throw err;
+}
+
 myOwn.i18n.messages.en=changing(myOwn.i18n.messages.en, {
     chpass:'change password',
     completed:'completed',
@@ -355,7 +360,7 @@ myOwn.createForkeableButton = function createForkeableButton(menu, opts){
             errorText=opts.preOnClick();
         }
         if(errorText){
-            alertPromise(errorText);
+            alertPromise(errorText).catch(ignoreDialogClosed);
         }else if(!event.ctrlKey && event.button!=1){
             /*
             if(button.parentNode.clientSidePrepared){
@@ -423,20 +428,20 @@ myOwn.displayMenu = function displayMenu(layout, menu, addrParams, parents){
         status.addEventListener('click',function(){
             var mensajeDiv=document.createElement('div');
             mensajeDiv.innerHTML=status.innerHTML;
-            alertPromise(mensajeDiv,{underElement:status, withCloseButton:true, mainAttrs:{style:'white-space:pre'}});
+            alertPromise(mensajeDiv,{underElement:status, withCloseButton:true, mainAttrs:{style:'white-space:pre'}}).catch(ignoreDialogClosed);
         });
         elements.push(html.span({class:'right-lights'},[
             my.light('server', function(){
                 alertPromise(
                     my.messages.speed1.replace('$1',this.result.speed),
                     {underElement:this}
-                );
+                ).catch(ignoreDialogClosed);
             }),
             my.light('network-signal', function(){
                 alertPromise(
                     my.messages.networkSignal1.replace('$1',this.result.status),
                     {underElement:this}
-                );
+                ).catch(ignoreDialogClosed);
             }),
         ]));
         elements.push(status); // eslint-disable-line unicorn/prefer-single-call
