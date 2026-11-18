@@ -616,12 +616,21 @@ myOwn.tableGrid = function tableGrid(tableName, mainElement, opts){
         }
         grid.refreshAllRows = async function(force){
             var timeStamp = Date.now();
+            // si se lanza otro refresco antes de que llegue esta respuesta (p.ej. cambio rápido de
+            // fixedFields), esta respuesta queda vieja y no se aplica: solo vale la última pedida
+            grid.refreshSeq = (grid.refreshSeq || 0) + 1;
+            var refreshSeq = grid.refreshSeq;
+            if (force) grid.refreshPendingForce = true;
             await grid.connector.my.ajax.table_data({
                 table:grid.connector.tableName,
                 fixedFields:grid.connector.fixedFields,
                 paramfun:grid.connector.parameterFunctions||{},
                 pick:grid.connector.pick
             }).then(function(rows){ // eslint-disable-line sonarjs/cognitive-complexity
+                if (refreshSeq !== grid.refreshSeq) return;
+                // un refresco forzado descartado le pasa el force al que sí se aplica
+                force = force || grid.refreshPendingForce;
+                grid.refreshPendingForce = false;
                 var primaryKey = grid.def.primaryKey;
                 var getPrimaryKeyValues=function getPrimaryKeyValues(primaryKey, row){
                     return primaryKey.map(function(fieldName){ // eslint-disable-line sonarjs/no-nested-functions
@@ -1273,6 +1282,12 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
                         return Promise.resolve();
                     };
                 }else{
+                    // si se vuelve a desplegar (o se cierra) antes de que esta grilla termine de cargar,
+                    // esta grilla queda vieja y no debe adueñarse del detailControl
+                    var displayToken = {};
+                    detailControl.displayToken = displayToken;
+                    detailControl.refreshAllRowsInGrid = null;
+                    var pendingRefreshes = 0;
                     result = grid.my.tableGrid(detailTableDef.table, divGrid, {
                         fixedFields: fixedFields,
                         detailing:opts.detailing,
@@ -1280,6 +1295,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
                         detailingPath:(grid.detailingPath||[]).concat(depot.lastsPrimaryKeyValues),
                         parentDepot: depot
                     }).waitForReady(function(g){
+                        if(detailControl.displayToken !== displayToken) return g;
                         detailControl.divDetail=g.dom.table;
                         if(detailTableDef.refreshParent || grid.def.complexDef && detailTableDef.refreshParent!==false){
                             var refresh = function refresh(){
@@ -1295,6 +1311,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
                                     fixedFields = calculateFixedFields()
                                     g.connector.fixedFields = fixedFields
                                 }
+                                pendingRefreshes++;
                                 // devuelve una promesa que se resuelve cuando termina de refrescar
                                 return new Promise(function(resolve, reject){
                                     setTimeout(async ()=>{
@@ -1304,7 +1321,9 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
                                         }catch(err){
                                             reject(err);
                                         }finally{
-                                            g.dom.main.style.opacity=1;
+                                            // con refrescos superpuestos, se vuelve a opacidad normal cuando termina el último
+                                            pendingRefreshes--;
+                                            if(!pendingRefreshes) g.dom.main.style.opacity=1;
                                         }
                                     },1)
                                 });
@@ -1333,6 +1352,7 @@ myOwn.DetailColumnGrid.prototype.td = function td(depot, iColumn, tr){
             }
             detailControl.show = false;
             detailControl.tr = null;
+            detailControl.displayToken = null;
             // opts.detailing[depot.lastsPrimaryKeyValues]=opts.detailing[depot.lastsPrimaryKeyValues]||{};
             // delete opts.detailing[depot.lastsPrimaryKeyValues][detailTableNameAndAbr];
         }
