@@ -2793,8 +2793,13 @@ myOwn.TableGrid.prototype.displayGrid = function displayGrid(){
         }
         grid.refreshAggregates();
         for(var detailControl in depot.detailControls){
-            if(depot.detailControls[detailControl].tr){
-                depot.detailControls[detailControl].refreshAllRowsInGrid()
+            var control = depot.detailControls[detailControl];
+            // refreshAllRowsInGrid se define cuando la grilla del detalle termina de cargar;
+            // si todavía está cargando no hace falta refrescarla (va a traer los datos actuales)
+            if(control.tr && typeof control.refreshAllRowsInGrid === 'function'){
+                Promise.resolve(control.refreshAllRowsInGrid()).catch(function(err){
+                    my.log(err);
+                });
             }
         }
     }
